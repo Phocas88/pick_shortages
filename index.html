@@ -1264,7 +1264,7 @@ body.has-banner #app{margin-top:44px}
       <input type="text" id="shortageSearch" placeholder="Search by product, order, picker, division…" oninput="renderShortageList()" class="tracker-search-inp" style="flex:1;min-width:200px">
       <select id="shortageFilterDiv" onchange="renderShortageList()" class="tracker-sort-sel"><option value="">All Divisions</option><option>GT</option><option>NH</option><option>BC</option><option>FS</option><option>EE</option><option>VP</option><option>TP</option><option>CI</option><option>KA</option></select>
       <select id="shortageFilterLoc" onchange="renderShortageList()" class="tracker-sort-sel"><option value="">All</option><option value="Y">Located</option><option value="N">Not Located</option><option value="pending">Pending</option></select>
-      <select id="shortageFilterArchive" onchange="onShortageArchiveFilterChange()" class="tracker-sort-sel"><option value="active">Active</option><option value="archived">📦 Archived</option><option value="all">All</option></select>
+      <select id="shortageFilterArchive" onchange="renderShortageList()" class="tracker-sort-sel"><option value="active">Active</option><option value="archived">📦 Archived</option><option value="all">All</option></select>
       <select id="shortageSort" onchange="renderShortageList()" class="tracker-sort-sel">
         <option value="date-desc">Newest First</option>
         <option value="date-asc">Oldest First</option>
@@ -1280,7 +1280,7 @@ body.has-banner #app{margin-top:44px}
         <button class="refresh-btn" onclick="generateAppriseExport()" id="btnExport" style="background:rgba(16,185,129,.15);border-color:rgba(16,185,129,.4);color:var(--green)">⬇ Apprise Export</button>
       </div>
       <div id="shortageClearControls" style="display:none;gap:6px;align-items:center">
-        <button class="refresh-btn" onclick="clearExportedShortages()" style="background:rgba(248,113,113,.12);border-color:rgba(248,113,113,.3);color:var(--red)" title="Remove all rows already marked as exported to Apprise">📦 Archive Exported</button>
+        <button class="refresh-btn" onclick="clearExportedShortages()" style="background:rgba(248,113,113,.12);border-color:rgba(248,113,113,.3);color:var(--red)" title="Remove all rows already marked as exported to Apprise">🗑 Clear Exported</button>
         <button class="refresh-btn" onclick="archiveSelectedShortages()" style="background:rgba(107,116,148,.12);border-color:var(--border);color:var(--muted)">📦 Archive Selected</button>
         <button class="refresh-btn" onclick="clearSelectedShortages()" id="btnClearSelected" style="display:none;background:rgba(248,113,113,.12);border-color:rgba(248,113,113,.3);color:var(--red)">🗑 Delete Selected (<span id="clearSelCount">0</span>)</button>
       </div>
@@ -1387,12 +1387,32 @@ body.has-banner #app{margin-top:44px}
       <div class="form-row one">
         <div class="field">
           <label>Firebase Project ID</label>
-          <input id="settingsFirebaseProject" placeholder="your-shortage-project-id">
+          <input id="settingsFirebaseProject" placeholder="shortage-control-portal">
           <div class="hint">This should be the new Firebase project for the standalone shortage app.</div>
         </div>
         <div class="field">
           <label>Firebase Web API Key</label>
           <input id="settingsFirebaseApiKey" placeholder="AIza...">
+        </div>
+      </div>
+      <div class="form-row one">
+        <div class="field">
+          <label>Firebase Auth Domain</label>
+          <input id="settingsFirebaseAuthDomain" placeholder="shortage-control-portal.firebaseapp.com">
+        </div>
+        <div class="field">
+          <label>Firebase Storage Bucket</label>
+          <input id="settingsFirebaseStorageBucket" placeholder="shortage-control-portal.firebasestorage.app">
+        </div>
+      </div>
+      <div class="form-row one">
+        <div class="field">
+          <label>Firebase Messaging Sender ID</label>
+          <input id="settingsFirebaseMessagingSenderId" placeholder="898395749653">
+        </div>
+        <div class="field">
+          <label>Firebase App ID</label>
+          <input id="settingsFirebaseAppId" placeholder="1:898395749653:web:5fe13a7e08aea369a37d1c">
         </div>
       </div>
       <div class="form-row one">
@@ -1833,8 +1853,12 @@ body.has-banner #app{margin-top:44px}
    ═══════════════════════════════════════════════════════ */
 const CFG = {
   // ── Firebase (data) ──────────────────────────────────────────────
-  FIREBASE_PROJECT:  'inventory-control-portal',
-  FIREBASE_API_KEY:  'AIzaSyA1n5P6MFUojFsEBqlXaSLumNiChgAH1Lw',
+  FIREBASE_PROJECT:  'shortage-control-portal',
+  FIREBASE_API_KEY:  'AIzaSyB1CEylhHj4JoWH2VejdLoOt1nteztaqH8',
+  FIREBASE_AUTH_DOMAIN: 'shortage-control-portal.firebaseapp.com',
+  FIREBASE_STORAGE_BUCKET: 'shortage-control-portal.firebasestorage.app',
+  FIREBASE_MESSAGING_SENDER_ID: '898395749653',
+  FIREBASE_APP_ID: '1:898395749653:web:5fe13a7e08aea369a37d1c',
   // GAS is email-only now — no data reads/writes go here
   GAS_URL:     'https://script.google.com/macros/s/AKfycbwEyxzUgEuTbcWMTyyU8Gl8IhK2zGP490krQKqnf0rtv261kH3AWgcgpfRnDNFy4jaNVQ/exec',
   DEMO_MODE:   false,
@@ -1854,6 +1878,10 @@ const DEFAULT_SHORTAGE_COLLECTIONS = { ACTIVE:'shortages_active', ARCHIVE:'short
     const saved = JSON.parse(localStorage.getItem('shortageFirebaseSettings')||'null');
     if(saved && saved.projectId) CFG.FIREBASE_PROJECT = saved.projectId;
     if(saved && saved.apiKey) CFG.FIREBASE_API_KEY = saved.apiKey;
+    if(saved && saved.authDomain) CFG.FIREBASE_AUTH_DOMAIN = saved.authDomain;
+    if(saved && saved.storageBucket) CFG.FIREBASE_STORAGE_BUCKET = saved.storageBucket;
+    if(saved && saved.messagingSenderId) CFG.FIREBASE_MESSAGING_SENDER_ID = saved.messagingSenderId;
+    if(saved && saved.appId) CFG.FIREBASE_APP_ID = saved.appId;
     CFG.SHORTAGE_ACTIVE_COLLECTION = (saved && saved.activeCollection) || DEFAULT_SHORTAGE_COLLECTIONS.ACTIVE;
     CFG.SHORTAGE_ARCHIVE_COLLECTION = (saved && saved.archiveCollection) || DEFAULT_SHORTAGE_COLLECTIONS.ARCHIVE;
   }catch(e){
@@ -2128,10 +2156,10 @@ function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   const target = document.getElementById(id+'Screen');
   if(target) target.classList.add('active');
-  ['navTracker','navForm','navDash','navStats','navOps','navShortage','navRestock','navSettings'].forEach(n=>{
+  ['navTracker','navForm','navDash','navStats','navOps','navShortage','navRestock'].forEach(n=>{
     const el=document.getElementById(n); if(el) el.classList.remove('active');
   });
-  const map={tracker:'navTracker',form:'navForm',dash:'navDash',stats:'navStats',ops:'navOps',shortage:'navShortage',restock:'navRestock',settings:'navSettings'};
+  const map={tracker:'navTracker',form:'navForm',dash:'navDash',stats:'navStats',ops:'navOps',shortage:'navShortage',restock:'navRestock'};
   if(map[id]&&document.getElementById(map[id])) document.getElementById(map[id]).classList.add('active');
   if(id==='form') setupForm();
   if(id==='stats'){
@@ -2155,6 +2183,10 @@ function renderSettingsScreen(){
   const saved = (()=>{ try{return JSON.parse(localStorage.getItem('shortageFirebaseSettings')||'{}')}catch(e){return{}} })();
   const p=document.getElementById('settingsFirebaseProject'); if(p) p.value=saved.projectId || CFG.FIREBASE_PROJECT || '';
   const k=document.getElementById('settingsFirebaseApiKey'); if(k) k.value=saved.apiKey || CFG.FIREBASE_API_KEY || '';
+  const auth=document.getElementById('settingsFirebaseAuthDomain'); if(auth) auth.value=saved.authDomain || CFG.FIREBASE_AUTH_DOMAIN || '';
+  const bucket=document.getElementById('settingsFirebaseStorageBucket'); if(bucket) bucket.value=saved.storageBucket || CFG.FIREBASE_STORAGE_BUCKET || '';
+  const sender=document.getElementById('settingsFirebaseMessagingSenderId'); if(sender) sender.value=saved.messagingSenderId || CFG.FIREBASE_MESSAGING_SENDER_ID || '';
+  const app=document.getElementById('settingsFirebaseAppId'); if(app) app.value=saved.appId || CFG.FIREBASE_APP_ID || '';
   const a=document.getElementById('settingsActiveCollection'); if(a) a.value=saved.activeCollection || CFG.SHORTAGE_ACTIVE_COLLECTION || 'shortages_active';
   const r=document.getElementById('settingsArchiveCollection'); if(r) r.value=saved.archiveCollection || CFG.SHORTAGE_ARCHIVE_COLLECTION || 'shortages_archive';
 }
@@ -2163,10 +2195,14 @@ function saveSettingsScreen(){
   const settings={
     projectId:(document.getElementById('settingsFirebaseProject')?.value||'').trim(),
     apiKey:(document.getElementById('settingsFirebaseApiKey')?.value||'').trim(),
+    authDomain:(document.getElementById('settingsFirebaseAuthDomain')?.value||'').trim(),
+    storageBucket:(document.getElementById('settingsFirebaseStorageBucket')?.value||'').trim(),
+    messagingSenderId:(document.getElementById('settingsFirebaseMessagingSenderId')?.value||'').trim(),
+    appId:(document.getElementById('settingsFirebaseAppId')?.value||'').trim(),
     activeCollection:(document.getElementById('settingsActiveCollection')?.value||'shortages_active').trim(),
     archiveCollection:(document.getElementById('settingsArchiveCollection')?.value||'shortages_archive').trim(),
   };
-  if(!settings.projectId || !settings.apiKey){ toast('Enter the Firebase Project ID and API key','error'); return; }
+  if(!settings.projectId || !settings.apiKey || !settings.authDomain || !settings.storageBucket || !settings.messagingSenderId || !settings.appId){ toast('Enter the full Firebase web config','error'); return; }
   localStorage.setItem('shortageFirebaseSettings', JSON.stringify(settings));
   toast('Settings saved. Reloading…','success');
   setTimeout(()=>location.reload(),700);
@@ -4299,7 +4335,8 @@ async function archiveSelectedShortages(){
   let done=0;
   for(const id of ids){
     try{
-      await moveShortageToArchive(id);
+      if(!CFG.DEMO_MODE){ await fsPatch('shortages/'+id,{shortageArchived:true}); }
+      const rec=shortageData.find(r=>r.id===id); if(rec) rec.shortageArchived=true;
       done++;
     }catch(e){ console.error('Archive failed for '+id,e); }
   }
@@ -4331,12 +4368,12 @@ async function clearSelectedShortages(){
 async function clearExportedShortages(){
   const toDelete=shortageData.filter(r=>r.exported);
   if(!toDelete.length){ toast('No exported records to clear','error'); return; }
-  if(!confirm(`Archive ${toDelete.length} exported shortage record(s)? They will move out of the active tracker.`)) return;
-  showLoad('Archiving exported records…');
+  if(!confirm(`Clear ${toDelete.length} exported shortage record(s)? This cannot be undone.`)) return;
+  showLoad('Clearing exported records…');
   let done=0;
   for(const r of toDelete){
     try{
-      await moveShortageToArchive(r.id);
+      if(!CFG.DEMO_MODE){ await fsDelete(CFG.SHORTAGE_ACTIVE_COLLECTION+'/'+r.id); }
       done++;
     }catch(e){ console.error('Delete failed for '+r.id,e); }
   }
@@ -4345,7 +4382,7 @@ async function clearExportedShortages(){
     localStorage.setItem('shortages_demo',JSON.stringify(shortageData));
   }
   hideLoad();
-  toast(done+' exported record(s) archived ✓','success');
+  toast(done+' exported record(s) cleared ✓','success');
   renderShortageList();
 }
 
@@ -4470,70 +4507,6 @@ async function fetchShortages(forceRefresh){
     }
     renderShortageList();
   }catch(e){ toast('Could not load shortages: '+e.message,'error'); }
-}
-
-async function fetchArchivedShortages(forceRefresh){
-  try{
-    const cached = readCacheGet('shortages_archive_latest');
-    if(cached && forceRefresh!==true){
-      const activeIds = new Set(shortageData.filter(r=>!r.shortageArchived).map(r=>r.id));
-      const archived = cached.filter(r=>!activeIds.has(r.id));
-      shortageData = [...shortageData.filter(r=>!r.shortageArchived), ...archived];
-      renderShortageList();
-      return;
-    }
-    if(CFG.DEMO_MODE) return;
-    const docs = await fsQuery(CFG.SHORTAGE_ARCHIVE_COLLECTION, null, 'timestamp', 350);
-    const archived = docs.map(d=>({
-      id:d._id||d.id||'', timestamp:d.timestamp||'', name:d.name||'', division:d.division||'', picker:autoCapPicker(d.picker||''),
-      orderNumber:d.orderNumber||'', binShorted:d.binShorted||'', productCode:d.productCode||'',
-      qtyShorted:typeof d.qtyShorted==='number'?d.qtyShorted:parseInt(d.qtyShorted||0), uom:d.uom||'',
-      located:d.located||'pending', foundBin:d.foundBin||'', foundInShortedBin:d.foundInShortedBin||false,
-      binReplenished:d.binReplenished||false, shortageArchived:true,
-      qtyLocated:typeof d.qtyLocated==='number'?d.qtyLocated:parseInt(d.qtyLocated||0),
-      icQtyAtSecondLoc:typeof d.icQtyAtSecondLoc==='number'?d.icQtyAtSecondLoc:parseInt(d.icQtyAtSecondLoc||0),
-      secondaryLocations:Array.isArray(d.secondaryLocations)?d.secondaryLocations:[], locNotes:d.locNotes||'', exported:d.exported||false,
-      shift:d.shift||getShift(d.timestamp||''), icErroneousCounts:Array.isArray(d.icErroneousCounts)?d.icErroneousCounts:[], archivedAt:d.archivedAt||''
-    }));
-    readCacheSet('shortages_archive_latest', archived);
-    const activeIds = new Set(shortageData.filter(r=>!r.shortageArchived).map(r=>r.id));
-    shortageData = [...shortageData.filter(r=>!r.shortageArchived), ...archived.filter(r=>!activeIds.has(r.id))];
-    renderShortageList();
-  }catch(e){ toast('Could not load archived shortages: '+e.message,'error'); }
-}
-
-async function onShortageArchiveFilterChange(){
-  const mode=document.getElementById('shortageFilterArchive')?.value||'active';
-  if(mode==='archived'||mode==='all') await fetchArchivedShortages(false);
-  else renderShortageList();
-}
-
-async function moveShortageToArchive(id){
-  const rec=shortageData.find(r=>r.id===id);
-  if(!rec) throw new Error('Shortage record not found');
-  const archived={...rec, shortageArchived:true, archivedAt:new Date().toISOString(), archivedBy:role||'manager'};
-  if(!CFG.DEMO_MODE){
-    await fsPatch(CFG.SHORTAGE_ARCHIVE_COLLECTION+'/'+id, archived);
-    await fsDelete(CFG.SHORTAGE_ACTIVE_COLLECTION+'/'+id);
-  }else{
-    const saved=JSON.parse(localStorage.getItem('shortages_demo')||'[]').filter(r=>r.id!==id);
-    localStorage.setItem('shortages_demo', JSON.stringify(saved));
-  }
-  shortageData = shortageData.filter(r=>r.id!==id);
-  readCacheClear('shortages'); readCacheClear('shortages_archive');
-}
-
-async function moveShortageToActive(id){
-  const rec=shortageData.find(r=>r.id===id);
-  if(!rec) throw new Error('Archived shortage record not found');
-  const active={...rec, shortageArchived:false, unarchivedAt:new Date().toISOString(), unarchivedBy:role||'manager'};
-  delete active.archivedAt; delete active.archivedBy;
-  if(!CFG.DEMO_MODE){
-    await fsPatch(CFG.SHORTAGE_ACTIVE_COLLECTION+'/'+id, active);
-    await fsDelete(CFG.SHORTAGE_ARCHIVE_COLLECTION+'/'+id);
-  }
-  Object.assign(rec, active);
-  readCacheClear('shortages'); readCacheClear('shortages_archive');
 }
 
 let sfLineCount = 0;
@@ -4903,7 +4876,15 @@ async function confirmPickerRename(){
 
 async function archiveShortageRow(id){
   try{
-    await moveShortageToArchive(id);
+    const upd={shortageArchived:true};
+    if(!CFG.DEMO_MODE){ await fsPatch(CFG.SHORTAGE_ACTIVE_COLLECTION+'/'+id, upd); }
+    const rec=shortageData.find(r=>r.id===id);
+    if(rec) rec.shortageArchived=true;
+    else {
+      const s=JSON.parse(localStorage.getItem('shortages_demo')||'[]');
+      const i=s.findIndex(r=>r.id===id);
+      if(i>=0){ s[i].shortageArchived=true; localStorage.setItem('shortages_demo',JSON.stringify(s)); }
+    }
     renderShortageList();
     toast('Archived ✓','success');
   }catch(e){ toast('Archive failed: '+e.message,'error'); }
@@ -4911,10 +4892,13 @@ async function archiveShortageRow(id){
 
 async function unarchiveShortageRow(id){
   try{
-    await moveShortageToActive(id);
+    const upd={shortageArchived:false};
+    if(!CFG.DEMO_MODE){ await fsPatch(CFG.SHORTAGE_ACTIVE_COLLECTION+'/'+id, upd); }
+    const rec=shortageData.find(r=>r.id===id);
+    if(rec) rec.shortageArchived=false;
     renderShortageList();
     toast('Unarchived ✓','success');
-  }catch(e){ toast('Unarchive failed: '+e.message,'error'); }
+  }catch(e){ toast('Unarchive failed','error'); }
 }
 
 async function toggleReplenished(id, checked){
