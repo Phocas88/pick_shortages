@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shortage Control Portal</title>
+<title>IC Inquiry — C&F Enterprises</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -722,7 +722,7 @@ body.has-banner #app{margin-top:44px}
 <header class="topbar" style="position:sticky;top:0;z-index:100">
   <div class="brand">
     
-    <span class="brand-text">Shortage Control Portal</span>
+    <span class="brand-text">IC Inquiry</span>
     
     <span class="role-chip" id="roleChip" style="display:none"></span>
   </div>
@@ -734,7 +734,8 @@ body.has-banner #app{margin-top:44px}
     <button class="nav-btn" onclick="if(role==='ops'||role==='icteam'||role==='manager')showScreen('ops')" id="navOps" style="display:none">⚙️ Ops</button>
     <button class="nav-btn" onclick="loadShortageScreen();showScreen('shortage')" id="navShortage" style="display:none">📋 Shortages</button>
     <button class="nav-btn" onclick="loadRestockScreen();showScreen('restock')" id="navRestock" style="display:none">📦 Restock</button>
-    <button class="nav-btn" onclick="showSettingsScreen()" id="navSettings" style="display:none">⚙️ Settings</button>
+    <button class="nav-btn" onclick="openTicketPortal()" id="navTicketPortal" style="display:none">🎫 IC Portal</button>
+    <button class="nav-btn" onclick="showMigrationScreen()" id="navMigration" style="display:none">↔️ Migration</button>
     <button id="allocBell" class="alloc-bell" onclick="showScreen('ops')" style="display:none" title="Allocation confirmed by Ops — click to view">🔔 <span id="allocBellCount">0</span></button>
     <button class="nav-btn" id="themeToggle" onclick="toggleTheme()" title="Switch light/dark mode" style="padding:4px 8px;font-size:14px;line-height:1">🌙</button>
     <button class="nav-btn lock" onclick="logout()">← Lock</button>
@@ -755,20 +756,45 @@ body.has-banner #app{margin-top:44px}
   <div class="login-wrap">
     <div class="login-header">
       <div class="li"></div>
-      <h1>815 Shortage Control Portal</h1>
+      <h1>815 Inventory Control Portal</h1>
     </div>
-    <div class="login-section-title">Shortage Portal</div>
-    <div class="ic-btns" style="grid-template-columns:1fr 1fr;gap:10px">
+    <div class="login-section-title">Divisions</div>
+    <div class="div-grid" id="divGridExternal">
+      <button class="div-btn" onclick="goPin('BC')"><span class="db-code">BC</span><span class="db-name">Beachcombers</span></button>
+      <button class="div-btn" onclick="goPin('EE')"><span class="db-code">EE</span><span class="db-name">Ever Ellis</span></button>
+      <button class="div-btn" onclick="goPin('FS')"><span class="db-code">FS</span><span class="db-name">Forside</span></button>
+      <button class="div-btn" onclick="goPin('GT')"><span class="db-code">GT</span><span class="db-name">TAG Home Goods</span></button>
+      <button class="div-btn" onclick="goPin('NH')"><span class="db-code">NH</span><span class="db-name">NAPA Home</span></button>
+      <button class="div-btn" onclick="goPin('TP')"><span class="db-code">TP</span><span class="db-name">Transpac</span></button>
+      <button class="div-btn" onclick="goPin('VP')"><span class="db-code">VP</span><span class="db-name">VIP</span></button>
+    </div>
+    <div class="login-group-label" style="margin-top:12px">815 Internal</div>
+    <div class="div-grid" style="grid-template-columns:1fr 1fr">
+      <button class="div-btn" onclick="goPin('CI')"><span class="db-code">CI</span><span class="db-name">Chapman Internal</span></button>
+      <button class="div-btn" onclick="goPin('KA')"><span class="db-code">KA</span><span class="db-name">Key Account</span></button>
+    </div>
+    <div class="login-section-title" style="margin-top:14px">Inventory Control</div>
+    <div class="ic-btns" style="grid-template-columns:1fr 1fr">
       <button class="ic-login-btn" onclick="goPin('icteam')">
-        <div><div class="ib-title">IC Team</div><div class="ib-sub">Review shorts, count bins, print reports</div></div>
+        <div><div class="ib-title">IC Team</div><div class="ib-sub">Investigate &amp; update tickets</div></div>
       </button>
       <button class="ic-login-btn manager" onclick="goPin('manager')">
-        <div><div class="ib-title">IC Manager</div><div class="ib-sub">Reports, archive, settings, picker management</div></div>
+        <div><div class="ib-title">IC Manager</div><div class="ib-sub">Full control &amp; oversight</div></div>
+      </button>
+    </div>
+    <div class="login-section-title" style="margin-top:14px">Section Management</div>
+    <div class="ic-btns" style="grid-template-columns:1fr 1fr">
+      <button class="ic-login-btn dockmanager" onclick="goPin('dockmanager')">
+        <div><div class="ib-title">Receiving Manager</div><div class="ib-sub">Shipping &amp; receiving tickets</div></div>
+      </button>
+      <button class="ic-login-btn ops" onclick="goPin('ops')">
+        <div><div class="ib-title">Operations Manager</div><div class="ib-sub">View &amp; release allocated items</div></div>
       </button>
       <button class="ic-login-btn" style="grid-column:1/-1" onclick="goPin('clerk')">
-        <div><div class="ib-title">Outbound Clerk</div><div class="ib-sub">Shortage entry and location updates</div></div>
+        <div><div class="ib-title">Outbound Clerk</div><div class="ib-sub">Shortage entry &amp; location tracking</div></div>
       </button>
-    </div>  </div>
+    </div>
+  </div>
 </div>
 
 <!-- ═══════════ PIN ═══════════ -->
@@ -1190,8 +1216,8 @@ body.has-banner #app{margin-top:44px}
         <div style="font-size:10px;font-family:var(--mono);font-weight:600;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:2px">Outbound</div>
         <div style="font-size:17px;font-weight:700;color:var(--text)">Shortage Entry</div>
       </div>
-      <button class="refresh-btn" onclick="switchShortageView('stats')" id="btnShowStats" style="margin-left:auto">📊 Stats</button>
-      <button class="refresh-btn" onclick="switchShortageView('list')" id="btnShowList">📋 All Shortages</button>
+      <button class="refresh-btn" onclick="switchShortageView('list')" id="btnShowList" style="margin-left:auto;background:rgba(79,131,245,.12);border-color:rgba(79,131,245,.35);color:var(--accent)">📋 Active Shortages</button>
+      <button class="refresh-btn" onclick="switchShortageView('stats')" id="btnShowStats">📊 Summary Report</button>
       <button class="refresh-btn" onclick="refreshShortageData()" id="btnRefreshShortages">↻ Refresh Data</button>
     </div>
 
@@ -1260,11 +1286,14 @@ body.has-banner #app{margin-top:44px}
   <!-- List view -->
   <div id="shortageListWrap" style="flex:1;overflow:auto;padding:16px 20px 28px;display:block">
     <!-- toolbar -->
+    <div id="icShortageArchiveNotice" style="display:none;background:rgba(79,131,245,.10);border:1.5px solid rgba(79,131,245,.25);border-radius:10px;padding:10px 12px;margin-bottom:12px;color:var(--text);font-size:12px;line-height:1.5">
+      <strong style="color:var(--accent)">IC Manager shortage archive:</strong> Select rows below, then use <strong>Archive Selected</strong>, <strong>Archive Exported</strong>, or <strong>Archive Filtered Active</strong>. Archived rows move to <span class="mono">shortages_archive</span> so they stop loading with active shortages.
+    </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
       <input type="text" id="shortageSearch" placeholder="Search by product, order, picker, division…" oninput="renderShortageList()" class="tracker-search-inp" style="flex:1;min-width:200px">
       <select id="shortageFilterDiv" onchange="renderShortageList()" class="tracker-sort-sel"><option value="">All Divisions</option><option>GT</option><option>NH</option><option>BC</option><option>FS</option><option>EE</option><option>VP</option><option>TP</option><option>CI</option><option>KA</option></select>
       <select id="shortageFilterLoc" onchange="renderShortageList()" class="tracker-sort-sel"><option value="">All</option><option value="Y">Located</option><option value="N">Not Located</option><option value="pending">Pending</option></select>
-      <select id="shortageFilterArchive" onchange="renderShortageList()" class="tracker-sort-sel"><option value="active">Active</option><option value="archived">📦 Archived</option><option value="all">All</option></select>
+      <select id="shortageFilterArchive" onchange="onShortageArchiveFilterChange()" class="tracker-sort-sel"><option value="active">Active</option><option value="archived">📦 Archived</option><option value="all">All</option></select>
       <select id="shortageSort" onchange="renderShortageList()" class="tracker-sort-sel">
         <option value="date-desc">Newest First</option>
         <option value="date-asc">Oldest First</option>
@@ -1280,8 +1309,9 @@ body.has-banner #app{margin-top:44px}
         <button class="refresh-btn" onclick="generateAppriseExport()" id="btnExport" style="background:rgba(16,185,129,.15);border-color:rgba(16,185,129,.4);color:var(--green)">⬇ Apprise Export</button>
       </div>
       <div id="shortageClearControls" style="display:none;gap:6px;align-items:center">
-        <button class="refresh-btn" onclick="clearExportedShortages()" style="background:rgba(248,113,113,.12);border-color:rgba(248,113,113,.3);color:var(--red)" title="Remove all rows already marked as exported to Apprise">🗑 Clear Exported</button>
+        <button class="refresh-btn" onclick="clearExportedShortages()" style="background:rgba(107,116,148,.12);border-color:var(--border);color:var(--muted)" title="Move all rows already marked as exported to the archive collection">📦 Archive Exported</button>
         <button class="refresh-btn" onclick="archiveSelectedShortages()" style="background:rgba(107,116,148,.12);border-color:var(--border);color:var(--muted)">📦 Archive Selected</button>
+        <button class="refresh-btn" onclick="archiveFilteredShortages()" style="background:rgba(79,131,245,.12);border-color:rgba(79,131,245,.35);color:var(--accent)" title="Archive every row currently matching the active filters">📦 Archive Filtered Active</button>
         <button class="refresh-btn" onclick="clearSelectedShortages()" id="btnClearSelected" style="display:none;background:rgba(248,113,113,.12);border-color:rgba(248,113,113,.3);color:var(--red)">🗑 Delete Selected (<span id="clearSelCount">0</span>)</button>
       </div>
     </div>
@@ -1303,7 +1333,9 @@ body.has-banner #app{margin-top:44px}
       <input type="date" id="statsDateTo" onchange="renderShortageStats()" class="tracker-search-inp" style="max-width:160px">
       <select id="statsFilterDiv" onchange="renderShortageStats()" class="tracker-sort-sel"><option value="">All Divisions</option><option>GT</option><option>NH</option><option>BC</option><option>FS</option><option>EE</option><option>VP</option><option>TP</option><option>CI</option><option>KA</option></select>
       <select id="statsFilterShift" onchange="renderShortageStats()" class="tracker-sort-sel"><option value="">All Shifts</option><option value="1">1st Shift (6A–3:30P)</option><option value="2">2nd Shift (3:30P–12A)</option></select>
-      <button class="refresh-btn" onclick="printShortageReport()" style="margin-left:auto">🖨 Print Report</button>
+      <select id="statsArchiveScope" onchange="onStatsArchiveScopeChange()" class="tracker-sort-sel"><option value="active">Active Only</option><option value="archived">Archived History</option><option value="all">Active + Archived</option></select>
+      <button class="refresh-btn" onclick="switchShortageView('list')" style="margin-left:auto;background:rgba(79,131,245,.12);border-color:rgba(79,131,245,.35);color:var(--accent)">📋 View / Archive Individual Shortages</button>
+      <button class="refresh-btn" onclick="printShortageReport()">🖨 Print Report</button>
       <button class="refresh-btn" onclick="printICCheckSheet()" style="background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.4);color:#f59e0b">📋 IC Check Sheet</button>
       <button class="refresh-btn" onclick="openPickerManager()" id="btnPickerMgr" style="display:none;background:rgba(167,139,250,.12);border-color:rgba(167,139,250,.4);color:var(--purple)">👤 Manage Pickers</button>
     </div>
@@ -1372,59 +1404,75 @@ body.has-banner #app{margin-top:44px}
   </div>
 </div>
 
-</div><!-- #app -->
 
-<!-- ═══════════ SETTINGS SCREEN ═══════════ -->
-<div class="screen" id="settingsScreen">
+<!-- ═══════════ MIGRATION SCREEN ═══════════ -->
+<div class="screen" id="migrationScreen">
   <div class="form-wrap">
     <div class="form-header">
-      <div class="form-eyebrow">Manager Settings</div>
-      <h1>Shortage App Firebase Settings</h1>
-      <p>Only IC Manager can change these settings. Save the separate shortage Firebase project here, then reload the page.</p>
+      <div class="form-eyebrow">IC Manager Only</div>
+      <h1>Shortage Firebase Migration</h1>
+      <p>Move shortage records from the old IC Portal Firebase into the new standalone shortage Firebase. This does not delete the old records.</p>
     </div>
+
     <div class="card">
-      <div class="card-title">Firebase Project</div>
-      <div class="form-row one">
-        <div class="field">
-          <label>Firebase Project ID</label>
-          <input id="settingsFirebaseProject" placeholder="shortage-control-portal">
-          <div class="hint">This should be the new Firebase project for the standalone shortage app.</div>
-        </div>
-        <div class="field">
-          <label>Firebase Web API Key</label>
-          <input id="settingsFirebaseApiKey" placeholder="AIza...">
-        </div>
+      <div class="card-title">Old Source Firebase</div>
+      <div class="form-row">
+        <div class="field"><label>Old API Key</label><input id="migOldApiKey"></div>
+        <div class="field"><label>Old Project ID</label><input id="migOldProjectId"></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Old Auth Domain</label><input id="migOldAuthDomain"></div>
+        <div class="field"><label>Old Storage Bucket</label><input id="migOldStorageBucket"></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Old Messaging Sender ID</label><input id="migOldMessagingSenderId"></div>
+        <div class="field"><label>Old App ID</label><input id="migOldAppId"></div>
       </div>
       <div class="form-row one">
-        <div class="field">
-          <label>Firebase Auth Domain</label>
-          <input id="settingsFirebaseAuthDomain" placeholder="shortage-control-portal.firebaseapp.com">
-        </div>
-        <div class="field">
-          <label>Firebase Storage Bucket</label>
-          <input id="settingsFirebaseStorageBucket" placeholder="shortage-control-portal.firebasestorage.app">
-        </div>
+        <div class="field"><label>Old Shortage Collection</label><input id="migOldCollection" value="shortages"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">New Destination Firebase</div>
+      <div class="form-row">
+        <div class="field"><label>New API Key</label><input id="migNewApiKey"></div>
+        <div class="field"><label>New Project ID</label><input id="migNewProjectId"></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>New Auth Domain</label><input id="migNewAuthDomain"></div>
+        <div class="field"><label>New Storage Bucket</label><input id="migNewStorageBucket"></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>New Messaging Sender ID</label><input id="migNewMessagingSenderId"></div>
+        <div class="field"><label>New App ID</label><input id="migNewAppId"></div>
       </div>
       <div class="form-row one">
-        <div class="field">
-          <label>Firebase Messaging Sender ID</label>
-          <input id="settingsFirebaseMessagingSenderId" placeholder="898395749653">
-        </div>
-        <div class="field">
-          <label>Firebase App ID</label>
-          <input id="settingsFirebaseAppId" placeholder="1:898395749653:web:5fe13a7e08aea369a37d1c">
-        </div>
+        <div class="field"><label>New Active Collection</label><input id="migNewCollection" value="shortages_active"></div>
       </div>
-      <div class="form-row one">
-        <div class="field"><label>Active Collection</label><input id="settingsActiveCollection" value="shortages_active"></div>
-        <div class="field"><label>Archive Collection</label><input id="settingsArchiveCollection" value="shortages_archive"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Migration Options</div>
+      <div class="form-row">
+        <div class="field"><label>From Date</label><input type="date" id="migFromDate"><div class="hint">Optional. Leave blank to migrate all old records.</div></div>
+        <div class="field"><label>To Date</label><input type="date" id="migToDate"><div class="hint">Optional. Uses the shortage timestamp field.</div></div>
       </div>
-      <button class="submit-btn" onclick="saveSettingsScreen()">Save Settings</button>
-      <button class="outline-btn" onclick="resetSettingsScreen()">Reset to Defaults</button>
+      <div class="form-row">
+        <div class="field"><label>Page Size</label><input type="number" id="migPageSize" min="25" max="500" value="250"></div>
+        <div class="field"><label>Mode</label><select id="migMode"><option value="copy">Copy records only</option><option value="dry">Dry run, count only</option></select></div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+        <button class="submit-btn" style="width:auto;min-width:220px;margin-top:0" onclick="runShortageMigration()">Run Migration</button>
+        <button class="outline-btn" style="margin-top:0" onclick="saveMigrationDefaults()">Save Migration Settings</button>
+        <button class="outline-btn" style="margin-top:0" onclick="loadMigrationDefaults(true)">Reload Defaults</button>
+      </div>
+      <div id="migrationStatus" style="margin-top:14px;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px;font-family:var(--mono);font-size:12px;color:var(--muted);white-space:pre-wrap;min-height:48px">Ready.</div>
     </div>
   </div>
 </div>
 
+</div><!-- #app -->
 <div id="printReportWrap" style="display:none"></div>
 <!-- ═══════════ PICKER MANAGER MODAL ═══════════ -->
 <div class="merge-overlay" id="pickerMgrOverlay" style="display:none">
@@ -1847,18 +1895,157 @@ body.has-banner #app{margin-top:44px}
 <div class="toast" id="toast"></div>
 <div class="loading-overlay" id="loadOv"><div class="spinner"></div><p id="loadMsg">Loading…</p></div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js">
+
+/* ═══════════════════════════════════════════════════════
+   SHORTAGE FIREBASE MIGRATION
+   ═══════════════════════════════════════════════════════ */
+const MIGRATION_DEFAULTS = {
+  oldApiKey: 'AIzaSyA1m5P6MFUojFsEBqLXaSLumNiChgAH1Lw',
+  oldAuthDomain: 'inventory-control-portal.firebaseapp.com',
+  oldProjectId: 'inventory-control-portal',
+  oldStorageBucket: 'inventory-control-portal.firebasestorage.app',
+  oldMessagingSenderId: '925547075268',
+  oldAppId: '1:925547075268:web:e6ebce91417aa6885a1b91',
+  oldCollection: 'shortages',
+  newApiKey: 'AIzaSyB1CEylhHj4JoWH2VejdLoOt1nteztaqH8',
+  newAuthDomain: 'shortage-control-portal.firebaseapp.com',
+  newProjectId: 'shortage-control-portal',
+  newStorageBucket: 'shortage-control-portal.firebasestorage.app',
+  newMessagingSenderId: '898395749653',
+  newAppId: '1:898395749653:web:5fe13a7e08aea369a37d1c',
+  newCollection: 'shortages_active',
+  pageSize: 250,
+};
+function migrationEls(){
+  return {
+    oldApiKey: document.getElementById('migOldApiKey'), oldAuthDomain: document.getElementById('migOldAuthDomain'), oldProjectId: document.getElementById('migOldProjectId'), oldStorageBucket: document.getElementById('migOldStorageBucket'), oldMessagingSenderId: document.getElementById('migOldMessagingSenderId'), oldAppId: document.getElementById('migOldAppId'), oldCollection: document.getElementById('migOldCollection'),
+    newApiKey: document.getElementById('migNewApiKey'), newAuthDomain: document.getElementById('migNewAuthDomain'), newProjectId: document.getElementById('migNewProjectId'), newStorageBucket: document.getElementById('migNewStorageBucket'), newMessagingSenderId: document.getElementById('migNewMessagingSenderId'), newAppId: document.getElementById('migNewAppId'), newCollection: document.getElementById('migNewCollection'),
+    fromDate: document.getElementById('migFromDate'), toDate: document.getElementById('migToDate'), pageSize: document.getElementById('migPageSize'), mode: document.getElementById('migMode'), status: document.getElementById('migrationStatus'),
+  };
+}
+function getMigrationConfig(){
+  const e=migrationEls();
+  return {
+    oldApiKey:e.oldApiKey.value.trim(), oldAuthDomain:e.oldAuthDomain.value.trim(), oldProjectId:e.oldProjectId.value.trim(), oldStorageBucket:e.oldStorageBucket.value.trim(), oldMessagingSenderId:e.oldMessagingSenderId.value.trim(), oldAppId:e.oldAppId.value.trim(), oldCollection:e.oldCollection.value.trim()||'shortages',
+    newApiKey:e.newApiKey.value.trim(), newAuthDomain:e.newAuthDomain.value.trim(), newProjectId:e.newProjectId.value.trim(), newStorageBucket:e.newStorageBucket.value.trim(), newMessagingSenderId:e.newMessagingSenderId.value.trim(), newAppId:e.newAppId.value.trim(), newCollection:e.newCollection.value.trim()||'shortages_active',
+    fromDate:e.fromDate.value, toDate:e.toDate.value, pageSize:Math.max(25, Math.min(500, parseInt(e.pageSize.value||'250',10))), mode:e.mode.value,
+  };
+}
+function setMigrationStatus(msg){
+  const e=migrationEls();
+  if(e.status) e.status.textContent=msg;
+}
+function renderMigrationScreen(){
+  if(role!=='manager'){ showScreen('dash'); return; }
+  loadMigrationDefaults(false);
+}
+function loadMigrationDefaults(showToast){
+  const saved=(()=>{try{return JSON.parse(localStorage.getItem('shortageMigrationSettings')||'{}')}catch(e){return{}}})();
+  const cfg=Object.assign({}, MIGRATION_DEFAULTS, saved||{});
+  const e=migrationEls();
+  Object.keys(cfg).forEach(k=>{ if(e[k]) e[k].value=cfg[k]; });
+  if(e.status) e.status.textContent='Ready. Migration copies old shortage records into the new shortage Firebase and keeps the same document IDs.';
+  if(showToast) toast('Migration defaults loaded','success');
+}
+function saveMigrationDefaults(){
+  if(role!=='manager'){ toast('IC Manager only','error'); return; }
+  localStorage.setItem('shortageMigrationSettings', JSON.stringify(getMigrationConfig()));
+  toast('Migration settings saved on this browser','success');
+}
+function migrationBase(projectId, apiKey){
+  return {
+    docBase:`https://firestore.googleapis.com/v1/projects/${encodeURIComponent(projectId)}/databases/(default)/documents`,
+    key:`?key=${encodeURIComponent(apiKey)}`,
+  };
+}
+function migrationDocId(docName){
+  return String(docName||'').split('/').pop();
+}
+function migrationInDateRange(row, fromDate, toDate){
+  if(!fromDate && !toDate) return true;
+  const raw=row.timestamp || row.date || row.createdAt || row.created || '';
+  if(!raw) return false;
+  const d=new Date(raw);
+  if(isNaN(d.getTime())) return false;
+  if(fromDate){ const f=new Date(fromDate+'T00:00:00'); if(d<f) return false; }
+  if(toDate){ const t=new Date(toDate+'T23:59:59'); if(d>t) return false; }
+  return true;
+}
+async function migrationListPage(projectId, apiKey, collectionName, pageSize, pageToken){
+  const b=migrationBase(projectId, apiKey);
+  let url=`${b.docBase}/${encodeURIComponent(collectionName)}${b.key}&pageSize=${pageSize}`;
+  if(pageToken) url+='&pageToken='+encodeURIComponent(pageToken);
+  const r=await fetch(url);
+  if(!r.ok){ const t=await r.text(); throw new Error('Source read failed '+r.status+': '+t.substring(0,180)); }
+  const data=await r.json();
+  return {
+    docs:(data.documents||[]).map(d=>{ const row=fromFSDoc(d); row._sourceDocName=d.name; row.id=row._id||migrationDocId(d.name); return row; }),
+    nextPageToken:data.nextPageToken||'',
+  };
+}
+async function migrationWriteDoc(projectId, apiKey, collectionName, docId, row){
+  const b=migrationBase(projectId, apiKey);
+  const clean=Object.assign({}, row);
+  delete clean._sourceDocName;
+  delete clean._id;
+  clean.id=docId;
+  clean.sourceDocId=docId;
+  clean.migratedAt=new Date().toISOString();
+  clean.migratedFrom='inventory-control-portal/shortages';
+  const url=`${b.docBase}/${encodeURIComponent(collectionName)}/${encodeURIComponent(docId)}${b.key}`;
+  const r=await fetch(url,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields:toFSFields(clean)})});
+  if(!r.ok){ const t=await r.text(); throw new Error('Destination write failed '+r.status+': '+t.substring(0,180)); }
+  return true;
+}
+async function runShortageMigration(){
+  if(role!=='manager'){ toast('Migration is IC Manager only','error'); return; }
+  const cfg=getMigrationConfig();
+  if(!cfg.oldProjectId||!cfg.oldApiKey||!cfg.newProjectId||!cfg.newApiKey){ toast('Old and new Firebase project IDs and API keys are required','error'); return; }
+  if(!confirm('Run shortage migration now? This copies records into the new Firebase. It will not delete the old records.')) return;
+  saveMigrationDefaults();
+  showLoad('Migrating shortage records…');
+  let pageToken='', scanned=0, matched=0, written=0, skipped=0, failed=0, page=0;
+  const errors=[];
+  try{
+    do{
+      page++;
+      setMigrationStatus(`Reading source page ${page}...\nScanned: ${scanned}\nMatched: ${matched}\nWritten: ${written}\nSkipped: ${skipped}\nFailed: ${failed}`);
+      const res=await migrationListPage(cfg.oldProjectId, cfg.oldApiKey, cfg.oldCollection, cfg.pageSize, pageToken);
+      pageToken=res.nextPageToken;
+      for(const row of res.docs){
+        scanned++;
+        const docId=row.id||('migrated_'+Date.now()+'_'+scanned);
+        if(!migrationInDateRange(row,cfg.fromDate,cfg.toDate)){ skipped++; continue; }
+        matched++;
+        if(cfg.mode==='dry') continue;
+        try{ await migrationWriteDoc(cfg.newProjectId,cfg.newApiKey,cfg.newCollection,docId,row); written++; }
+        catch(e){ failed++; errors.push(docId+': '+e.message); console.error(e); }
+        if((written+failed)%20===0){
+          setMigrationStatus(`Migrating...\nScanned: ${scanned}\nMatched: ${matched}\nWritten: ${written}\nSkipped: ${skipped}\nFailed: ${failed}`);
+          await new Promise(r=>setTimeout(r,40));
+        }
+      }
+    }while(pageToken);
+    hideLoad();
+    const summary=`Migration complete.\nScanned: ${scanned}\nMatched date filter: ${matched}\nWritten to new Firebase: ${written}\nSkipped by date filter: ${skipped}\nFailed: ${failed}${errors.length?'\n\nFirst errors:\n'+errors.slice(0,6).join('\n'):''}`;
+    setMigrationStatus(summary);
+    toast(cfg.mode==='dry'?'Dry run complete':'Migration complete','success');
+  }catch(e){
+    hideLoad();
+    setMigrationStatus(`Migration stopped.\nScanned: ${scanned}\nMatched: ${matched}\nWritten: ${written}\nSkipped: ${skipped}\nFailed: ${failed}\n\nError: ${e.message}`);
+    toast('Migration failed: '+e.message,'error');
+  }
+}
+
+</script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 /* ═══════════════════════════════════════════════════════
    CONFIG
    ═══════════════════════════════════════════════════════ */
 const CFG = {
   // ── Firebase (data) ──────────────────────────────────────────────
-  FIREBASE_PROJECT:  'shortage-control-portal',
-  FIREBASE_API_KEY:  'AIzaSyB1CEylhHj4JoWH2VejdLoOt1nteztaqH8',
-  FIREBASE_AUTH_DOMAIN: 'shortage-control-portal.firebaseapp.com',
-  FIREBASE_STORAGE_BUCKET: 'shortage-control-portal.firebasestorage.app',
-  FIREBASE_MESSAGING_SENDER_ID: '898395749653',
-  FIREBASE_APP_ID: '1:898395749653:web:5fe13a7e08aea369a37d1c',
+  FIREBASE_PROJECT:  'inventory-control-portal',
+  FIREBASE_API_KEY:  'AIzaSyA1n5P6MFUojFsEBqlXaSLumNiChgAH1Lw',
   // GAS is email-only now — no data reads/writes go here
   GAS_URL:     'https://script.google.com/macros/s/AKfycbwEyxzUgEuTbcWMTyyU8Gl8IhK2zGP490krQKqnf0rtv261kH3AWgcgpfRnDNFy4jaNVQ/exec',
   DEMO_MODE:   false,
@@ -1870,25 +2057,6 @@ const CFG = {
   DIV_PINS: { GT:'4411',NH:'4422',FS:'4433',EE:'4444',BC:'4455',VP:'4466',TP:'4477',CI:'4488',KA:'5000' },
   MAX_FILES: 5, MAX_MB: 10,
 };
-
-
-const DEFAULT_SHORTAGE_COLLECTIONS = { ACTIVE:'shortages_active', ARCHIVE:'shortages_archive' };
-(function applySavedShortageSettings(){
-  try{
-    const saved = JSON.parse(localStorage.getItem('shortageFirebaseSettings')||'null');
-    if(saved && saved.projectId) CFG.FIREBASE_PROJECT = saved.projectId;
-    if(saved && saved.apiKey) CFG.FIREBASE_API_KEY = saved.apiKey;
-    if(saved && saved.authDomain) CFG.FIREBASE_AUTH_DOMAIN = saved.authDomain;
-    if(saved && saved.storageBucket) CFG.FIREBASE_STORAGE_BUCKET = saved.storageBucket;
-    if(saved && saved.messagingSenderId) CFG.FIREBASE_MESSAGING_SENDER_ID = saved.messagingSenderId;
-    if(saved && saved.appId) CFG.FIREBASE_APP_ID = saved.appId;
-    CFG.SHORTAGE_ACTIVE_COLLECTION = (saved && saved.activeCollection) || DEFAULT_SHORTAGE_COLLECTIONS.ACTIVE;
-    CFG.SHORTAGE_ARCHIVE_COLLECTION = (saved && saved.archiveCollection) || DEFAULT_SHORTAGE_COLLECTIONS.ARCHIVE;
-  }catch(e){
-    CFG.SHORTAGE_ACTIVE_COLLECTION = DEFAULT_SHORTAGE_COLLECTIONS.ACTIVE;
-    CFG.SHORTAGE_ARCHIVE_COLLECTION = DEFAULT_SHORTAGE_COLLECTIONS.ARCHIVE;
-  }
-})();
 
 const DIV_NAMES = { GT:'TAG Home Goods',NH:'NAPA Home',FS:'Forside',EE:'Ever Ellis',BC:'Beachcombers',VP:'VIP',TP:'Transpac',CI:'Chapman Internal',KA:'Key Account' };
 
@@ -2026,13 +2194,9 @@ function doLogin(target){
     role='icteam'; currentDiv='';
     allTix=[];
     setChip('IC Team','icteam');
-    setNav('none','none','none','none','none','','');
-    const ns=document.getElementById('navShortage'); if(ns) ns.style.display='';
-    const nr=document.getElementById('navRestock'); if(nr) nr.style.display='';
-    const st=document.getElementById('navSettings'); if(st) st.style.display='none';
-    document.getElementById('globalStats').classList.remove('show');
+    setNav('none','none','','','','','');
     loadBanner(); saveSession(target);
-    loadShortageScreen(); showScreen('shortage');
+    loadTix().then(()=>showScreen('dash'));
   } else if(target==='dockmanager'){
     role='dockmanager'; currentDiv='';
     allTix=[];
@@ -2053,7 +2217,6 @@ function doLogin(target){
     allTix=[];
     setChip('📋 Outbound Clerk','clerk');
     setNav('none','none','none','none','none','','none');
-    const st=document.getElementById('navSettings'); if(st) st.style.display='none';
     document.getElementById('globalStats').classList.remove('show');
     loadBanner(); saveSession(target);
     loadShortageScreen();
@@ -2062,16 +2225,13 @@ function doLogin(target){
     role='manager'; currentDiv='';
     allTix=[];
     setChip('IC Manager','manager');
-    setNav('none','none','none','none','none','','');
-    const ns=document.getElementById('navShortage'); if(ns) ns.style.display='';
-    const nr=document.getElementById('navRestock'); if(nr) nr.style.display='';
-    const st=document.getElementById('navSettings'); if(st) st.style.display='';
-    document.getElementById('bannerCreator').classList.remove('show');
-    document.getElementById('globalStats').classList.remove('show');
+    setNav('none','none','','','','','');
+    document.getElementById('bannerCreator').classList.add('show');
     loadBanner(); saveSession(target);
-    loadShortageScreen(); showScreen('shortage');
+    loadTix().then(()=>showScreen('dash'));
   }
-  if(role==='division'||role==='dockmanager'||role==='ops') loadGlobalStats();
+  updatePortalShortcutNav();
+  loadGlobalStats();
 }
 
 // ── Session persistence ──────────────────────────────
@@ -2115,6 +2275,8 @@ function logout(){
   document.getElementById('bannerCreator').classList.remove('show');
   document.getElementById('globalStats').classList.remove('show');
   document.getElementById('navStats').style.display='none';
+  const ntp=document.getElementById('navTicketPortal'); if(ntp) ntp.style.display='none';
+  const nm=document.getElementById('navMigration'); if(nm) nm.style.display='none';
   showScreen('login'); ud(); pe('');
 }
 
@@ -2149,6 +2311,22 @@ function submitForgotPin(){
   if(!CFG.DEMO_MODE){ gasPost({action:'sendForgotPin',email}); }
 }
 
+
+function updatePortalShortcutNav(){
+  const ticketBtn=document.getElementById('navTicketPortal');
+  const migrationBtn=document.getElementById('navMigration');
+  const canPortal=(role==='icteam'||role==='manager');
+  if(ticketBtn) ticketBtn.style.display=canPortal?'':'none';
+  if(migrationBtn) migrationBtn.style.display=(role==='manager')?'':'none';
+}
+function openTicketPortal(){
+  window.open('https://phocas88.github.io/Chapman_Inventory_Control_Portal/','_blank','noopener');
+}
+function showMigrationScreen(){
+  if(role!=='manager'){ toast('Migration is IC Manager only','error'); return; }
+  showScreen('migration');
+}
+
 /* ═══════════════════════════════════════════════════════
    SCREEN ROUTING
    ═══════════════════════════════════════════════════════ */
@@ -2156,10 +2334,10 @@ function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   const target = document.getElementById(id+'Screen');
   if(target) target.classList.add('active');
-  ['navTracker','navForm','navDash','navStats','navOps','navShortage','navRestock'].forEach(n=>{
+  ['navTracker','navForm','navDash','navStats','navOps','navShortage','navRestock','navMigration'].forEach(n=>{
     const el=document.getElementById(n); if(el) el.classList.remove('active');
   });
-  const map={tracker:'navTracker',form:'navForm',dash:'navDash',stats:'navStats',ops:'navOps',shortage:'navShortage',restock:'navRestock'};
+  const map={tracker:'navTracker',form:'navForm',dash:'navDash',stats:'navStats',ops:'navOps',shortage:'navShortage',restock:'navRestock',migration:'navMigration'};
   if(map[id]&&document.getElementById(map[id])) document.getElementById(map[id]).classList.add('active');
   if(id==='form') setupForm();
   if(id==='stats'){
@@ -2170,49 +2348,8 @@ function showScreen(id){
   if(id==='ops') loadOpsAlerts();
   if(id==='shortage') loadShortageScreen();
   if(id==='restock') loadRestockScreen();
+  if(id==='migration') renderMigrationScreen();
   if(id==='tracker' && role==='division' && allTix.length>0) renderTrackerCards(allTix);
-}
-
-
-function showSettingsScreen(){
-  if(role!=='manager'){ toast('Only IC Manager can open settings','error'); return; }
-  renderSettingsScreen();
-  showScreen('settings');
-}
-function renderSettingsScreen(){
-  const saved = (()=>{ try{return JSON.parse(localStorage.getItem('shortageFirebaseSettings')||'{}')}catch(e){return{}} })();
-  const p=document.getElementById('settingsFirebaseProject'); if(p) p.value=saved.projectId || CFG.FIREBASE_PROJECT || '';
-  const k=document.getElementById('settingsFirebaseApiKey'); if(k) k.value=saved.apiKey || CFG.FIREBASE_API_KEY || '';
-  const auth=document.getElementById('settingsFirebaseAuthDomain'); if(auth) auth.value=saved.authDomain || CFG.FIREBASE_AUTH_DOMAIN || '';
-  const bucket=document.getElementById('settingsFirebaseStorageBucket'); if(bucket) bucket.value=saved.storageBucket || CFG.FIREBASE_STORAGE_BUCKET || '';
-  const sender=document.getElementById('settingsFirebaseMessagingSenderId'); if(sender) sender.value=saved.messagingSenderId || CFG.FIREBASE_MESSAGING_SENDER_ID || '';
-  const app=document.getElementById('settingsFirebaseAppId'); if(app) app.value=saved.appId || CFG.FIREBASE_APP_ID || '';
-  const a=document.getElementById('settingsActiveCollection'); if(a) a.value=saved.activeCollection || CFG.SHORTAGE_ACTIVE_COLLECTION || 'shortages_active';
-  const r=document.getElementById('settingsArchiveCollection'); if(r) r.value=saved.archiveCollection || CFG.SHORTAGE_ARCHIVE_COLLECTION || 'shortages_archive';
-}
-function saveSettingsScreen(){
-  if(role!=='manager'){ toast('Only IC Manager can save settings','error'); return; }
-  const settings={
-    projectId:(document.getElementById('settingsFirebaseProject')?.value||'').trim(),
-    apiKey:(document.getElementById('settingsFirebaseApiKey')?.value||'').trim(),
-    authDomain:(document.getElementById('settingsFirebaseAuthDomain')?.value||'').trim(),
-    storageBucket:(document.getElementById('settingsFirebaseStorageBucket')?.value||'').trim(),
-    messagingSenderId:(document.getElementById('settingsFirebaseMessagingSenderId')?.value||'').trim(),
-    appId:(document.getElementById('settingsFirebaseAppId')?.value||'').trim(),
-    activeCollection:(document.getElementById('settingsActiveCollection')?.value||'shortages_active').trim(),
-    archiveCollection:(document.getElementById('settingsArchiveCollection')?.value||'shortages_archive').trim(),
-  };
-  if(!settings.projectId || !settings.apiKey || !settings.authDomain || !settings.storageBucket || !settings.messagingSenderId || !settings.appId){ toast('Enter the full Firebase web config','error'); return; }
-  localStorage.setItem('shortageFirebaseSettings', JSON.stringify(settings));
-  toast('Settings saved. Reloading…','success');
-  setTimeout(()=>location.reload(),700);
-}
-function resetSettingsScreen(){
-  if(role!=='manager') return;
-  if(!confirm('Reset shortage Firebase settings on this browser?')) return;
-  localStorage.removeItem('shortageFirebaseSettings');
-  toast('Settings reset. Reloading…','success');
-  setTimeout(()=>location.reload(),700);
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -4216,8 +4353,12 @@ async function reactivateTicket(id){
    SHORTAGE TRACKING
    Storage: Firestore collection 'shortages'
    ═══════════════════════════════════════════════════════ */
-let shortageData = [];   // loaded from Firestore
+let shortageData = [];          // active shortage records loaded from Firestore collection: shortages
+let shortageArchiveData = [];   // historical shortage records loaded on demand from collection: shortages_archive
+let shortageArchiveLoaded = false;
 let shortageView = 'list'; // 'list' | 'stats'
+const SHORTAGE_ACTIVE_COLLECTION = 'shortages';
+const SHORTAGE_ARCHIVE_COLLECTION = 'shortages_archive';
 
 function loadShortageScreen(){
   // Prevent duplicate intervals
@@ -4234,10 +4375,12 @@ function loadShortageScreen(){
   if(formBody) formBody.style.display = (role==='clerk') ? '' : 'none';
   const titleEl = formPanel ? formPanel.querySelector('.shortage-form-header div div:nth-child(2)') : null;
   if(titleEl) titleEl.textContent = (role==='clerk') ? 'Shortage Entry' : 'Shortage Review';
+  const noticeEl = document.getElementById('icShortageArchiveNotice');
+  if(noticeEl) noticeEl.style.display = (role==='manager'||role==='icteam') ? 'block' : 'none';
+  const exportBtn = document.getElementById('btnExport');
+  if(exportBtn) exportBtn.style.display = (role==='clerk') ? '' : 'none';
   const pickerMgrBtn = document.getElementById('btnPickerMgr');
   if(pickerMgrBtn) pickerMgrBtn.style.display = role==='manager' ? '' : 'none';
-  const statsBtn=document.getElementById('btnShowStats'); if(statsBtn) statsBtn.style.display=(role==='manager'||role==='icteam')?'':'none';
-  const listBtn=document.getElementById('btnShowList'); if(listBtn) listBtn.style.display='';
   showShortageClearControls();
   // Auto-add first product line for clerk only when the form is empty
   if(role==='clerk' && document.getElementById('sfProductLines') && !document.getElementById('sfProductLines').children.length) addProductLine();
@@ -4250,7 +4393,12 @@ function loadShortageScreen(){
   if(frEl && !frEl.value) frEl.value = from30.toISOString().slice(0,10);
   // Load data then show appropriate default view
   fetchShortages(false).then(()=>{
-    switchShortageView('list');
+    if(role==='manager' || role==='icteam'){
+      // IC Manager and IC Team must land on the individual shortage rows so archive controls are visible immediately.
+      switchShortageView('list');
+    } else {
+      switchShortageView('list');
+    }
   });
 }
 
@@ -4260,7 +4408,6 @@ function updateShortageDateTime(){
 }
 
 function switchShortageView(v){
-  if(v==='stats' && !(role==='manager'||role==='icteam')){ toast('Reports are only available to IC Team and IC Manager','error'); v='list'; }
   shortageView = v;
   document.getElementById('shortageListWrap').style.display  = v==='list'  ? 'block':'none';
   document.getElementById('shortageStatsWrap').style.display = v==='stats' ? 'block':'none';
@@ -4272,6 +4419,11 @@ async function refreshShortageData(){
   readCacheClear('shortages');
   showLoad('Refreshing shortage data…');
   await fetchShortages(true);
+  const archF = document.getElementById('shortageFilterArchive')?.value||'active';
+  const statsScope = document.getElementById('statsArchiveScope')?.value||'active';
+  if(archF==='archived'||archF==='all'||statsScope==='archived'||statsScope==='all'){
+    await fetchArchivedShortages(true);
+  }
   hideLoad();
   if(shortageView==='stats') renderShortageStats();
   else renderShortageList();
@@ -4290,12 +4442,100 @@ function getShift(dateStr){
    SHORTAGE CLEAR / DELETE
    ═══════════════════════════════════════════════════════ */
 function showShortageClearControls(){
-  // Show clear controls for IC team and manager; hide for clerk
+  // Show archive controls for IC team and manager; hide for clerk
   const ctrl = document.getElementById('shortageClearControls');
   const selRow = document.getElementById('shortageSelRow');
   const canClearRole = (role==='icteam'||role==='manager');
   if(ctrl)   ctrl.style.display   = canClearRole ? 'flex' : 'none';
   if(selRow) selRow.style.display = canClearRole ? 'flex' : 'none';
+}
+
+function normalizeShortageDoc(d, archivedSource){
+  return {
+    id:          d._id || d.id || '',
+    timestamp:   d.timestamp || '',
+    name:        d.name || '',
+    division:    d.division || '',
+    picker:      autoCapPicker(d.picker || ''),
+    orderNumber: d.orderNumber || '',
+    binShorted:  d.binShorted || '',
+    productCode: d.productCode || '',
+    qtyShorted:  typeof d.qtyShorted === 'number' ? d.qtyShorted : parseInt(d.qtyShorted||0),
+    uom:         d.uom || 'EA',
+    located:     d.located || 'pending',
+    foundBin:    d.foundBin || '',
+    foundInShortedBin: !!d.foundInShortedBin,
+    binReplenished: !!d.binReplenished,
+    shortageArchived: archivedSource ? true : !!d.shortageArchived,
+    archivedAt: d.archivedAt || '',
+    archivedBy: d.archivedBy || '',
+    archiveReason: d.archiveReason || '',
+    qtyLocated:  typeof d.qtyLocated === 'number' ? d.qtyLocated : parseInt(d.qtyLocated||0),
+    icQtyAtSecondLoc: typeof d.icQtyAtSecondLoc === 'number' ? d.icQtyAtSecondLoc : parseInt(d.icQtyAtSecondLoc||0),
+    secondaryLocations: Array.isArray(d.secondaryLocations) ? d.secondaryLocations : [],
+    icErroneousCounts: Array.isArray(d.icErroneousCounts) ? d.icErroneousCounts : [],
+    locNotes:    d.locNotes || '',
+    exported:    !!d.exported,
+    shift:       d.shift || getShift(d.timestamp||''),
+    shiftOverride: !!d.shiftOverride,
+  };
+}
+
+function shortageHasSecondLocationEvidence(r){
+  const secondary = Array.isArray(r.secondaryLocations) ? r.secondaryLocations : [];
+  const hasSecondaryArray = secondary.some(loc => (loc.bin||'').trim() && (Number(loc.qty)||Number(loc.icQty)||0) > 0);
+  const hasLegacySecondBin = String(r.foundBin||'').trim() && (Number(r.qtyLocated)||Number(r.icQtyAtSecondLoc)||0) > 0;
+  return r.located === 'Y' || hasSecondaryArray || hasLegacySecondBin;
+}
+
+function isErroneousBackorder(r){
+  // Picker shorted the original bin, IC later found inventory in that same bin,
+  // and there is no recorded second-location fill. That means the order line likely stayed short/backordered.
+  return !!r.foundInShortedBin && !shortageHasSecondLocationEvidence(r);
+}
+
+function getShortageDataset(scope){
+  if(scope === 'archived') return [...shortageArchiveData];
+  if(scope === 'all') return [...shortageData, ...shortageArchiveData];
+  return [...shortageData];
+}
+
+function getFilteredVisibleShortages(){
+  const q      = (document.getElementById('shortageSearch')?.value||'').toLowerCase();
+  const divF   = document.getElementById('shortageFilterDiv')?.value||'';
+  const locF   = document.getElementById('shortageFilterLoc')?.value||'';
+  const sort   = document.getElementById('shortageSort')?.value||'date-desc';
+  const archF  = document.getElementById('shortageFilterArchive')?.value||'active';
+  let data = getShortageDataset(archF);
+  if(q)    data=data.filter(r=>[r.productCode,r.orderNumber,r.picker,r.division,r.name,r.binShorted].join(' ').toLowerCase().includes(q));
+  if(divF) data=data.filter(r=>r.division===divF);
+  if(locF) data=data.filter(r=>r.located===locF||(locF==='pending'&&r.located==='pending'));
+  if(sort==='date-desc') data.sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
+  else if(sort==='date-asc')   data.sort((a,b)=>new Date(a.timestamp)-new Date(b.timestamp));
+  else if(sort==='product')    data.sort((a,b)=>(a.productCode||'').localeCompare(b.productCode||''));
+  else if(sort==='division')   data.sort((a,b)=>(a.division||'').localeCompare(b.division||''));
+  else if(sort==='order')      data.sort((a,b)=>(a.orderNumber||'').localeCompare(b.orderNumber||''));
+  return data;
+}
+
+async function onShortageArchiveFilterChange(){
+  const archF = document.getElementById('shortageFilterArchive')?.value||'active';
+  if((archF==='archived'||archF==='all') && !shortageArchiveLoaded){
+    showLoad('Loading archive history…');
+    await fetchArchivedShortages(false);
+    hideLoad();
+  }
+  renderShortageList();
+}
+
+async function onStatsArchiveScopeChange(){
+  const scope = document.getElementById('statsArchiveScope')?.value||'active';
+  if((scope==='archived'||scope==='all') && !shortageArchiveLoaded){
+    showLoad('Loading archive history…');
+    await fetchArchivedShortages(false);
+    hideLoad();
+  }
+  renderShortageStats();
 }
 
 function toggleSelectAllShortages(chk){
@@ -4318,7 +4558,7 @@ function onShortageRowCheck(){
 
 async function deleteShortageRow(id){
   try{
-    if(!CFG.DEMO_MODE){ await fsDelete(CFG.SHORTAGE_ACTIVE_COLLECTION+'/'+id); }
+    if(!CFG.DEMO_MODE){ await fsDelete('shortages/'+id); }
     else {
       const saved=JSON.parse(localStorage.getItem('shortages_demo')||'[]');
       localStorage.setItem('shortages_demo',JSON.stringify(saved.filter(r=>r.id!==id)));
@@ -4331,20 +4571,40 @@ async function deleteShortageRow(id){
 async function archiveSelectedShortages(){
   const ids=[...document.querySelectorAll('.shortage-row-chk:checked')].map(c=>c.dataset.id);
   if(!ids.length){ toast('Select rows to archive','error'); return; }
+  if(!confirm(`Archive ${ids.length} selected shortage record(s)? They will move out of the active Firestore collection and will only load during historical pulls.`)) return;
   showLoad(`Archiving ${ids.length} record(s)…`);
   let done=0;
   for(const id of ids){
-    try{
-      if(!CFG.DEMO_MODE){ await fsPatch('shortages/'+id,{shortageArchived:true}); }
-      const rec=shortageData.find(r=>r.id===id); if(rec) rec.shortageArchived=true;
-      done++;
-    }catch(e){ console.error('Archive failed for '+id,e); }
+    try{ if(await archiveShortageRecord(id,'Selected archive')) done++; }
+    catch(e){ console.error('Archive failed for '+id,e); }
   }
   hideLoad();
   document.querySelectorAll('.shortage-row-chk').forEach(c=>c.checked=false);
   onShortageRowCheck();
   renderShortageList();
+  if(shortageView==='stats') renderShortageStats();
   toast(done+' record(s) archived ✓','success');
+}
+
+async function archiveFilteredShortages(){
+  const archF = document.getElementById('shortageFilterArchive')?.value||'active';
+  if(archF!=='active'){
+    toast('Archive Filtered Active only works while the list is set to Active','error');
+    return;
+  }
+  const rows=getFilteredVisibleShortages().filter(r=>!r.shortageArchived);
+  if(!rows.length){ toast('No active filtered records to archive','error'); return; }
+  if(!confirm(`Archive ${rows.length} active shortage record(s) matching the current filters?\n\nThis moves them to shortage history so they stop loading on the active dashboard.`)) return;
+  showLoad(`Archiving ${rows.length} filtered record(s)…`);
+  let done=0;
+  for(const r of rows){
+    try{ if(await archiveShortageRecord(r.id,'Filtered active archive')) done++; }
+    catch(e){ console.error('Archive failed for '+r.id,e); }
+  }
+  hideLoad();
+  renderShortageList();
+  if(shortageView==='stats') renderShortageStats();
+  toast(done+' filtered record(s) archived ✓','success');
 }
 
 async function clearSelectedShortages(){
@@ -4355,7 +4615,7 @@ async function clearSelectedShortages(){
   let done=0;
   for(const id of ids){
     try{
-      if(!CFG.DEMO_MODE){ await fsDelete(CFG.SHORTAGE_ACTIVE_COLLECTION+'/'+id); }
+      if(!CFG.DEMO_MODE){ await fsDelete('shortages/'+id); }
       shortageData=shortageData.filter(r=>r.id!==id);
       done++;
     }catch(e){ console.error('Delete failed for '+id,e); }
@@ -4366,24 +4626,19 @@ async function clearSelectedShortages(){
 }
 
 async function clearExportedShortages(){
-  const toDelete=shortageData.filter(r=>r.exported);
-  if(!toDelete.length){ toast('No exported records to clear','error'); return; }
-  if(!confirm(`Clear ${toDelete.length} exported shortage record(s)? This cannot be undone.`)) return;
-  showLoad('Clearing exported records…');
+  const toArchive=shortageData.filter(r=>r.exported);
+  if(!toArchive.length){ toast('No exported active records to archive','error'); return; }
+  if(!confirm(`Archive ${toArchive.length} exported shortage record(s)?\n\nThey will move to shortage history and stop loading on the active dashboard.`)) return;
+  showLoad('Archiving exported records…');
   let done=0;
-  for(const r of toDelete){
-    try{
-      if(!CFG.DEMO_MODE){ await fsDelete(CFG.SHORTAGE_ACTIVE_COLLECTION+'/'+r.id); }
-      done++;
-    }catch(e){ console.error('Delete failed for '+r.id,e); }
-  }
-  shortageData=shortageData.filter(r=>!r.exported);
-  if(CFG.DEMO_MODE){
-    localStorage.setItem('shortages_demo',JSON.stringify(shortageData));
+  for(const r of toArchive){
+    try{ if(await archiveShortageRecord(r.id,'Exported to Apprise archive')) done++; }
+    catch(e){ console.error('Archive failed for '+r.id,e); }
   }
   hideLoad();
-  toast(done+' exported record(s) cleared ✓','success');
   renderShortageList();
+  if(shortageView==='stats') renderShortageStats();
+  toast(done+' exported record(s) archived ✓','success');
 }
 
 function openShortageEdit(id){
@@ -4449,7 +4704,7 @@ async function saveShortageEdit(){
   if(ts) upd.timestamp = ts;
   showLoad('Saving…');
   try{
-    if(!CFG.DEMO_MODE){ await fsPatch(CFG.SHORTAGE_ACTIVE_COLLECTION+'/'+id, upd); }
+    if(!CFG.DEMO_MODE){ await fsPatch('shortages/'+id, upd); }
     else {
       const saved=JSON.parse(localStorage.getItem('shortages_demo')||'[]');
       const i=saved.findIndex(r=>r.id===id);
@@ -4469,44 +4724,69 @@ async function fetchShortages(forceRefresh){
   try{
     if(CFG.DEMO_MODE){
       const saved = localStorage.getItem('shortages_demo');
-      shortageData = saved ? JSON.parse(saved) : [];
+      shortageData = saved ? JSON.parse(saved).map(r=>normalizeShortageDoc(r,false)) : [];
     } else {
-      const cached = readCacheGet('shortages_latest');
+      const cached = readCacheGet('shortages_active_latest');
       if(cached && forceRefresh!==true){
-        shortageData = cached;
+        shortageData = cached.map(r=>normalizeShortageDoc(r,false));
         renderShortageList();
         return;
       }
-      const docs = await fsQuery(CFG.SHORTAGE_ACTIVE_COLLECTION, null, 'timestamp', 350);
-      const rawDocs = docs.map(d=>({
-        id:          d._id || d.id || '',
-        timestamp:   d.timestamp || '',
-        name:        d.name || '',
-        division:    d.division || '',
-        picker:      d.picker || '',
-        orderNumber: d.orderNumber || '',
-        binShorted:  d.binShorted || '',
-        productCode: d.productCode || '',
-        qtyShorted:  typeof d.qtyShorted === 'number' ? d.qtyShorted : parseInt(d.qtyShorted||0),
-        uom:         d.uom || '',
-        located:     d.located || 'pending',  // 'Y','N','pending'
-        foundBin:    d.foundBin || '',
-        foundInShortedBin: d.foundInShortedBin || false,
-        binReplenished: d.binReplenished || false,
-        shortageArchived: d.shortageArchived || false,
-        qtyLocated:  typeof d.qtyLocated === 'number' ? d.qtyLocated : parseInt(d.qtyLocated||0),
-        icQtyAtSecondLoc: typeof d.icQtyAtSecondLoc === 'number' ? d.icQtyAtSecondLoc : parseInt(d.icQtyAtSecondLoc||0),
-        secondaryLocations: Array.isArray(d.secondaryLocations) ? d.secondaryLocations : [],
-        locNotes:    d.locNotes || '',
-        exported:    d.exported || false,
-        shift:       d.shift || getShift(d.timestamp||''),
-      }));
-      // Auto-normalize picker capitalization in memory (non-destructive — just display)
-      shortageData = rawDocs.map(r=>({...r, picker: autoCapPicker(r.picker||'')}));
-      readCacheSet('shortages_latest', shortageData);
+      // Active dashboard pulls ONLY the active collection. Archived records are moved out
+      // of this collection so normal dashboard use does not keep reading hundreds of old rows.
+      const docs = await fsQuery(SHORTAGE_ACTIVE_COLLECTION, null, 'timestamp', 600);
+      shortageData = docs.map(d=>normalizeShortageDoc(d,false));
+      readCacheSet('shortages_active_latest', shortageData);
     }
     renderShortageList();
   }catch(e){ toast('Could not load shortages: '+e.message,'error'); }
+}
+
+async function fetchArchivedShortages(forceRefresh){
+  try{
+    if(CFG.DEMO_MODE){
+      const saved = localStorage.getItem('shortages_archive_demo');
+      shortageArchiveData = saved ? JSON.parse(saved).map(r=>normalizeShortageDoc(r,true)) : [];
+    } else {
+      const cached = readCacheGet('shortages_archive_latest');
+      if(cached && forceRefresh!==true){
+        shortageArchiveData = cached.map(r=>normalizeShortageDoc(r,true));
+        shortageArchiveLoaded = true;
+        return;
+      }
+      const docs = await fsQuery(SHORTAGE_ARCHIVE_COLLECTION, null, 'timestamp', 1000);
+      shortageArchiveData = docs.map(d=>normalizeShortageDoc(d,true));
+      readCacheSet('shortages_archive_latest', shortageArchiveData);
+    }
+    shortageArchiveLoaded = true;
+  }catch(e){ toast('Could not load archived shortages: '+e.message,'error'); }
+}
+
+async function archiveShortageRecord(id, reason){
+  const rec = shortageData.find(r=>r.id===id);
+  if(!rec) return false;
+  const archivedRec = {
+    ...rec,
+    shortageArchived:true,
+    archivedAt:new Date().toISOString(),
+    archivedBy:role||'unknown',
+    archiveReason:reason||'Manual archive',
+  };
+  if(!CFG.DEMO_MODE){
+    await fsPatch(SHORTAGE_ARCHIVE_COLLECTION+'/'+id, archivedRec);
+    await fsDelete(SHORTAGE_ACTIVE_COLLECTION+'/'+id);
+  } else {
+    const active=JSON.parse(localStorage.getItem('shortages_demo')||'[]').filter(r=>r.id!==id);
+    const archive=JSON.parse(localStorage.getItem('shortages_archive_demo')||'[]').filter(r=>r.id!==id);
+    archive.unshift(archivedRec);
+    localStorage.setItem('shortages_demo',JSON.stringify(active));
+    localStorage.setItem('shortages_archive_demo',JSON.stringify(archive));
+  }
+  shortageData = shortageData.filter(r=>r.id!==id);
+  shortageArchiveData = [normalizeShortageDoc(archivedRec,true), ...shortageArchiveData.filter(r=>r.id!==id)];
+  shortageArchiveLoaded = true;
+  readCacheClear('shortages');
+  return true;
 }
 
 let sfLineCount = 0;
@@ -4613,13 +4893,14 @@ async function submitShortage(){
       located:     'N',
       foundBin:    '', qtyLocated:0, locNotes:'',
       exported:    false,
+      shortageArchived: false,
       shift,
       // Store shift override flag so stats show correctly
       shiftOverride: !!shiftOver,
     };
     try{
       if(!CFG.DEMO_MODE){
-        await fsPatch(CFG.SHORTAGE_ACTIVE_COLLECTION+'/'+rec.id, rec);
+        await fsPatch('shortages/'+rec.id, rec);
       } else {
         const s=JSON.parse(localStorage.getItem('shortages_demo')||'[]');
         s.unshift(rec);
@@ -4657,7 +4938,7 @@ async function markLocated(id){
   const bin = ''; const qty = 0; const icqty = 0; const notes = '';
   try{
     const upd = {located:'Y', foundBin:bin, qtyLocated:qty, icQtyAtSecondLoc:icqty||0, locNotes:notes||''};
-    if(!CFG.DEMO_MODE){ await fsPatch(CFG.SHORTAGE_ACTIVE_COLLECTION+'/'+id, upd); }
+    if(!CFG.DEMO_MODE){ await fsPatch('shortages/'+id, upd); }
     const rec = shortageData.find(r=>r.id===id);
     if(rec) Object.assign(rec, upd);
     else {
@@ -4766,7 +5047,7 @@ async function mergeSelectedPickers(){
   let done=0, failed=0;
   for(const r of toUpdate){
     try{
-      if(!CFG.DEMO_MODE){ await fsPatch(CFG.SHORTAGE_ACTIVE_COLLECTION+'/'+r.id,{picker:canonical}); }
+      if(!CFG.DEMO_MODE){ await fsPatch('shortages/'+r.id,{picker:canonical}); }
       r.picker=canonical;
       done++;
     }catch(e){ failed++; }
@@ -4854,7 +5135,7 @@ async function confirmPickerRename(){
   let done=0, failed=0;
   for(const r of toUpdate){
     try{
-      if(!CFG.DEMO_MODE){ await fsPatch(CFG.SHORTAGE_ACTIVE_COLLECTION+'/'+r.id,{picker:to}); }
+      if(!CFG.DEMO_MODE){ await fsPatch('shortages/'+r.id,{picker:to}); }
       r.picker=to; // update in memory
       done++;
     }catch(e){ console.error('Rename failed for '+r.id,e); failed++; }
@@ -4875,25 +5156,21 @@ async function confirmPickerRename(){
 }
 
 async function archiveShortageRow(id){
+  if(!confirm('Archive this shortage record? It will move to historical shortage archive and stop loading on the active dashboard.')) return;
   try{
-    const upd={shortageArchived:true};
-    if(!CFG.DEMO_MODE){ await fsPatch(CFG.SHORTAGE_ACTIVE_COLLECTION+'/'+id, upd); }
-    const rec=shortageData.find(r=>r.id===id);
-    if(rec) rec.shortageArchived=true;
-    else {
-      const s=JSON.parse(localStorage.getItem('shortages_demo')||'[]');
-      const i=s.findIndex(r=>r.id===id);
-      if(i>=0){ s[i].shortageArchived=true; localStorage.setItem('shortages_demo',JSON.stringify(s)); }
+    if(await archiveShortageRecord(id,'Single row archive')){
+      renderShortageList();
+      if(shortageView==='stats') renderShortageStats();
+      toast('Record archived ✓','success');
     }
-    renderShortageList();
-    toast('Archived ✓','success');
   }catch(e){ toast('Archive failed: '+e.message,'error'); }
 }
+
 
 async function unarchiveShortageRow(id){
   try{
     const upd={shortageArchived:false};
-    if(!CFG.DEMO_MODE){ await fsPatch(CFG.SHORTAGE_ACTIVE_COLLECTION+'/'+id, upd); }
+    if(!CFG.DEMO_MODE){ await fsPatch('shortages/'+id, upd); }
     const rec=shortageData.find(r=>r.id===id);
     if(rec) rec.shortageArchived=false;
     renderShortageList();
@@ -4904,7 +5181,7 @@ async function unarchiveShortageRow(id){
 async function toggleReplenished(id, checked){
   try{
     const upd={binReplenished: checked};
-    if(!CFG.DEMO_MODE){ await fsPatch(CFG.SHORTAGE_ACTIVE_COLLECTION+'/'+id, upd); }
+    if(!CFG.DEMO_MODE){ await fsPatch('shortages/'+id, upd); }
     const rec=shortageData.find(r=>r.id===id);
     if(rec) rec.binReplenished=checked;
     else {
@@ -4917,7 +5194,6 @@ async function toggleReplenished(id, checked){
 
 /* ── IC Check Sheet print ────────────────────────────────── */
 function printICCheckSheet(){
-  if(!(role==='manager'||role==='icteam')){ toast('IC Check Sheet is only available to IC Team and IC Manager','error'); return; }
   const fromStr=document.getElementById('statsDateFrom')?.value;
   const toStr  =document.getElementById('statsDateTo')?.value;
   const divF   =document.getElementById('statsFilterDiv')?.value||'';
@@ -5018,7 +5294,7 @@ function printICCheckSheet(){
 async function toggleExported(id, checked){
   try{
     const upd = {exported: checked};
-    if(!CFG.DEMO_MODE){ await fsPatch(CFG.SHORTAGE_ACTIVE_COLLECTION+'/'+id, upd); }
+    if(!CFG.DEMO_MODE){ await fsPatch('shortages/'+id, upd); }
     const rec = shortageData.find(r=>r.id===id);
     if(rec) rec.exported=checked;
     else {
@@ -5031,25 +5307,13 @@ async function toggleExported(id, checked){
 
 // ── Render list ──────────────────────────────────────────
 function renderShortageList(){
-  const q      = (document.getElementById('shortageSearch')?.value||'').toLowerCase();
-  const divF   = document.getElementById('shortageFilterDiv')?.value||'';
-  const locF   = document.getElementById('shortageFilterLoc')?.value||'';
-  const sort   = document.getElementById('shortageSort')?.value||'date-desc';
-
-  let data = [...shortageData];
   const archF = document.getElementById('shortageFilterArchive')?.value||'active';
-  if(archF==='active')   data=data.filter(r=>!r.shortageArchived);
-  else if(archF==='archived') data=data.filter(r=>r.shortageArchived);
-  // 'all' shows everything
-  if(q)    data=data.filter(r=>[r.productCode,r.orderNumber,r.picker,r.division,r.name,r.binShorted].join(' ').toLowerCase().includes(q));
-  if(divF) data=data.filter(r=>r.division===divF);
-  if(locF) data=data.filter(r=>r.located===locF||(locF==='pending'&&r.located==='pending'));
-
-  if(sort==='date-desc') data.sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp));
-  else if(sort==='date-asc')   data.sort((a,b)=>new Date(a.timestamp)-new Date(b.timestamp));
-  else if(sort==='product')    data.sort((a,b)=>a.productCode.localeCompare(b.productCode));
-  else if(sort==='division')   data.sort((a,b)=>a.division.localeCompare(b.division));
-  else if(sort==='order')      data.sort((a,b)=>(a.orderNumber||'').localeCompare(b.orderNumber||''));
+  let data = getFilteredVisibleShortages();
+  if((archF==='archived'||archF==='all') && !shortageArchiveLoaded){
+    const el = document.getElementById('shortageListArea');
+    if(el) el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)">Archived history is not loaded yet. Use the archive dropdown again or Refresh Data.</div>';
+    return;
+  }
 
   const el = document.getElementById('shortageListArea');
   if(!data.length){ el.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">No shortages found</div>'; return; }
@@ -5062,6 +5326,7 @@ function renderShortageList(){
       else if(r.located==='N') badges+=`<span class="sr-badge not-located">✗ Not Located</span>`;
       else badges+=`<span class="sr-badge pending">⏳ Pending</span>`;
       if(r.foundInShortedBin) badges+=` <span class="sr-badge" style="background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3)">⚠ Also in Shorted Bin</span>`;
+      if(isErroneousBackorder(r)) badges+=` <span class="sr-badge" style="background:rgba(220,38,38,.15);color:#dc2626;border:1px solid rgba(220,38,38,.35)">Backorder Risk</span>`;
       return badges;
     })();
     const expBadge = r.exported ? `<span class="sr-badge exported">✓ Exported</span>` : '';
@@ -5121,7 +5386,7 @@ function renderShortageList(){
     const deleteBtn = canClear
       ? `<button onclick="if(confirm('Delete this record?')) deleteShortageRow('${r.id}')" style="padding:3px 8px;background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3);border-radius:5px;font-size:11px;color:var(--red);cursor:pointer;flex-shrink:0" title="Delete record">🗑</button>`
       : '';
-    const editBtn = (role==='manager'||role==='icteam'||role==='clerk')
+    const editBtn = (role==='manager'||role==='icteam')
       ? `<button onclick="openShortageEdit('${r.id}')" style="padding:3px 8px;background:var(--accent-l);border:1px solid rgba(79,131,245,.3);border-radius:5px;font-size:11px;color:var(--accent);cursor:pointer;flex-shrink:0" title="Edit record">✏️ Edit</button>`
       : '';
     return `<div class="shortage-row ${locClass} ${r.exported?'exported':''}">
@@ -5169,7 +5434,7 @@ async function markFoundInShortedBin(id){
   const icFields=Array.isArray(rec.icErroneousCounts)?[...rec.icErroneousCounts,countRec]:[countRec];
   try{
     const upd={foundInShortedBin:true, icErroneousCounts:icFields};
-    if(!CFG.DEMO_MODE){ await fsPatch(CFG.SHORTAGE_ACTIVE_COLLECTION+'/'+id, upd); }
+    if(!CFG.DEMO_MODE){ await fsPatch('shortages/'+id, upd); }
     Object.assign(rec,upd);
     icCountsData.unshift(countRec);
     sessionSet('icCounts',icCountsData);
@@ -5247,7 +5512,7 @@ async function saveSecondaryLocs(id){
       locNotes:first.notes,
       secondaryLocations:locs,  // all locations stored here
     };
-    if(!CFG.DEMO_MODE){ await fsPatch(CFG.SHORTAGE_ACTIVE_COLLECTION+'/'+id, upd); }
+    if(!CFG.DEMO_MODE){ await fsPatch('shortages/'+id, upd); }
     const rec=shortageData.find(r=>r.id===id);
     if(rec) Object.assign(rec,upd);
     document.getElementById('il-'+id).style.display='none';
@@ -5259,7 +5524,7 @@ async function saveSecondaryLocs(id){
 async function markNotLocated(id){
   try{
     const upd = {located:'N'};
-    if(!CFG.DEMO_MODE){ await fsPatch(CFG.SHORTAGE_ACTIVE_COLLECTION+'/'+id, upd); }
+    if(!CFG.DEMO_MODE){ await fsPatch('shortages/'+id, upd); }
     const rec = shortageData.find(r=>r.id===id);
     if(rec) rec.located='N';
     toast('Marked as not found','success');
@@ -5333,7 +5598,6 @@ function generateAppriseExport(){
 }
 
 function loadRestockScreen(){
-  if(!(role==='manager'||role==='icteam')){ toast('Restock report is only available to IC Team and IC Manager','error'); showScreen('shortage'); return; }
   renderICCountsLog();
   const savedBin=sessionGet('binReport');
   if(savedBin&&savedBin.length){ binReportData=savedBin; const el=document.getElementById('binReportStatus'); if(el) el.textContent='Bin report loaded: '+binReportData.length+' rows. Ready to generate.'; }
@@ -5398,7 +5662,7 @@ async function saveICCount(){
     if(sr&&!CFG.DEMO_MODE){
       const icFields=Array.isArray(sr.icErroneousCounts)?[...sr.icErroneousCounts]:[];
       icFields.push({productCode:product,bin,qty,uom,notes,timestamp:rec.timestamp});
-      await fsPatch(CFG.SHORTAGE_ACTIVE_COLLECTION+'/'+shortageId,{icErroneousCounts:icFields});
+      await fsPatch('shortages/'+shortageId,{icErroneousCounts:icFields});
       sr.icErroneousCounts=icFields;
     }
   }
@@ -5474,7 +5738,6 @@ function renderRestockReportTable({plan,noReserves,generatedAt}){
 }
 
 function printRestockReport(){
-  if(!(role==='manager'||role==='icteam')){ toast('Restock report is only available to IC Team and IC Manager','error'); return; }
   if(!restockReportCache){ toast('Generate the report first','error'); return; }
   const {plan,noReserves,generatedAt}=restockReportCache;
   const today=new Date(generatedAt).toLocaleString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
@@ -5509,11 +5772,11 @@ function printRestockReport(){
 let statsDrillDiv=null, statsDrillShift=null, statsDrillType='bins';
 
 function printShortageReport(){
-  if(!(role==='manager'||role==='icteam')){ toast('Reports are only available to IC Team and IC Manager','error'); return; }
   const fromStr = document.getElementById('statsDateFrom')?.value;
   const toStr   = document.getElementById('statsDateTo')?.value;
   const divF    = document.getElementById('statsFilterDiv')?.value||'';
   const shiftF  = document.getElementById('statsFilterShift')?.value||'';
+  const scope   = document.getElementById('statsArchiveScope')?.value||'active';
 
   const from = fromStr ? new Date(fromStr+'T00:00:00') : new Date(0);
   const to   = toStr   ? new Date(toStr  +'T23:59:59') : new Date();
@@ -5522,7 +5785,7 @@ function printShortageReport(){
   const shiftLabel = shiftF==='1'?'1st Shift (6am–3:30pm)':shiftF==='2'?'2nd Shift (3:30pm–12am)':'All Shifts';
   const divLabel   = divF ? divF+' — '+(DIV_NAMES[divF]||divF) : 'All Divisions';
 
-  let data = shortageData.filter(r=>{
+  let data = getShortageDataset(scope).filter(r=>{
     const d=new Date(r.timestamp);
     return d>=from && d<=to
       && (!divF   || r.division===divF)
@@ -5536,7 +5799,7 @@ function printShortageReport(){
   const notLoc     = data.filter(r=>r.located==='N'&&!r.foundInShortedBin).length;  // truly not found anywhere
   // Erroneous fully-shorted: marked erroneous (found in shorted bin) but NOT located in 2nd bin
   // These mean the picker shorted item that was there, didn't find it anywhere else → customer shorted
-  const errFullyShorted = data.filter(r=>r.foundInShortedBin&&r.located!=='Y').length;
+  const errFullyShorted = data.filter(isErroneousBackorder).length;
   const pending    = data.filter(r=>r.located==='pending').length;
   const shift1c    = data.filter(r=>(r.shift||getShift(r.timestamp))===1).length;
   const shift2c    = data.filter(r=>(r.shift||getShift(r.timestamp))===2).length;
@@ -5615,6 +5878,7 @@ function printShortageReport(){
         ['Total Shortages',total,'#1a2038'],
         ['2nd Location Found',located2nd+'  ('+locPct+'%)','#047857'],
         ['⚠ Erroneous Shorts',erroneous+'  ('+errPct+'%)','#92400e'],
+        ['Erroneous Backorders',errFullyShorted,'#b91c1c'],
         ['Not Located',notLoc,'#b91c1c'],
         ['Pending Resolution',pending,'#92400e'],
         ['1st Shift',shift1c,'#1d4ed8'],
@@ -5753,6 +6017,33 @@ function printShortageReport(){
     </table>
     </div>` : ''}
 
+
+    ${ data.filter(isErroneousBackorder).length ? `
+    <div style="page-break-before:always;page-break-inside:avoid">
+    <div style="font-size:8pt;font-weight:700;color:#7f1d1d;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #fecaca;padding-bottom:4pt;margin:14pt 0 8pt">Erroneous Shortages That Likely Became Backorders</div>
+    <div style="font-size:8.5pt;color:#6b7280;margin-bottom:8pt">These records were found by IC in the original shorted bin, but no secondary location fill was recorded. The item was available in the correct bin, but the customer line likely stayed short/backordered.</div>
+    <table class="pr-tbl" style="width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:16pt">
+      <thead><tr>${['Product Code','Division','Shorted Bin','Qty Shorted','IC Qty Found','UOM','Pick Demand','Picker','Date'].map(h=>`<th style="background:#7f1d1d;color:#fff;padding:5pt 8pt;text-align:left;font-size:8pt;font-weight:600;letter-spacing:.04em">${h}</th>`).join('')}</tr></thead>
+      <tbody>
+        ${data.filter(isErroneousBackorder).sort((a,b)=>(a.binShorted||'').localeCompare(b.binShorted||'')).map((r,i)=>{
+          const c=Array.isArray(r.icErroneousCounts)&&r.icErroneousCounts.length?r.icErroneousCounts[r.icErroneousCounts.length-1]:{};
+          const bg=i%2===0?'#fff5f5':'#fee2e2';
+          return `<tr style="background:${bg}">
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-family:'Courier New',monospace;font-weight:700;color:#1a2038">${esc(r.productCode)}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-family:'Courier New',monospace">${esc(r.division)}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-family:'Courier New',monospace;font-weight:700;color:#7f1d1d">${esc(r.binShorted||'—')}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-family:'Courier New',monospace">${r.qtyShorted||0}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-family:'Courier New',monospace;font-weight:700;color:#7f1d1d">${c.qty||r.qtyShorted||'—'}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-family:'Courier New',monospace">${esc(c.uom||r.uom||'EA')}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-family:'Courier New',monospace">${esc(r.orderNumber||'—')}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-size:8.5pt">${esc(r.picker||'—')}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-size:8pt;color:#6b7280">${new Date(r.timestamp).toLocaleDateString('en-US',{month:'2-digit',day:'2-digit',year:'2-digit'})}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+    </div>` : ''}
+
     <!-- Daily Summary -->
     <div style="page-break-before:always;page-break-inside:avoid">
     <div style="font-size:8pt;font-weight:700;color:#374151;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #e5e7eb;padding-bottom:4pt;margin:14pt 0 8pt">Daily Summary</div>
@@ -5801,11 +6092,12 @@ function renderShortageStats(){
   const toStr   = document.getElementById('statsDateTo')?.value;
   const divF    = document.getElementById('statsFilterDiv')?.value||'';
   const shiftF  = document.getElementById('statsFilterShift')?.value||'';
+  const scope   = document.getElementById('statsArchiveScope')?.value||'active';
 
   const from = fromStr ? new Date(fromStr+'T00:00:00') : new Date(0);
   const to   = toStr   ? new Date(toStr  +'T23:59:59') : new Date();
 
-  let data = shortageData.filter(r=>{
+  let data = getShortageDataset(scope).filter(r=>{
     const d = new Date(r.timestamp);
     return d>=from && d<=to
       && (!divF   || r.division===divF)
@@ -5826,6 +6118,7 @@ function renderShortageStats(){
   const total       = data.length;
   const located2nd  = data.filter(r=>r.located==='Y'&&!r.foundInShortedBin).length;
   const erroneous   = data.filter(r=>r.foundInShortedBin).length;
+  const errFullyShorted = data.filter(isErroneousBackorder).length;
   const notLoc      = data.filter(r=>r.located==='N'&&!r.foundInShortedBin).length;
   const pending     = data.filter(r=>r.located==='pending').length;
   const exported    = data.filter(r=>r.exported).length;
@@ -5921,7 +6214,7 @@ function renderShortageStats(){
 
   el.innerHTML = `
     ${drillHtml}
-    <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px">Shortage Statistics${divF?' — '+divF:''}${shiftF?' — Shift '+shiftF:''}</div>
+    <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:12px">Shortage Statistics${divF?' — '+divF:''}${shiftF?' — Shift '+shiftF:''}${scope==='archived'?' — Archived':scope==='all'?' — Active + Archived':''}</div>
 
     <!-- Summary cards -->
     <div class="shortage-stat-grid">
@@ -6586,7 +6879,7 @@ async function fsPatch(path, fields){
   }
   const out = await r.json();
   if(path.startsWith('tickets/')) readCacheClear('tickets');
-  if(path.startsWith('shortages/')||path.startsWith((CFG.SHORTAGE_ACTIVE_COLLECTION||'shortages_active')+'/')||path.startsWith((CFG.SHORTAGE_ARCHIVE_COLLECTION||'shortages_archive')+'/')) readCacheClear('shortages');
+  if(path.startsWith('shortages/')) readCacheClear('shortages');
   return out;
 }
 
@@ -6627,7 +6920,7 @@ async function fsDelete(path){
   const r = await fetch(FS_BASE+'/'+path+FS_KEY, {method:'DELETE'});
   if(!r.ok && r.status!==404){ const t=await r.text(); throw new Error('FS DELETE '+r.status+': '+t.substring(0,100)); }
   if(path.startsWith('tickets/')) readCacheClear('tickets');
-  if(path.startsWith('shortages/')||path.startsWith((CFG.SHORTAGE_ACTIVE_COLLECTION||'shortages_active')+'/')||path.startsWith((CFG.SHORTAGE_ARCHIVE_COLLECTION||'shortages_archive')+'/')) readCacheClear('shortages');
+  if(path.startsWith('shortages/')) readCacheClear('shortages');
 }
 
 // Firestore field type converters
