@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shortage Control Portal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;700&family=DM+Sans:wght@300;400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#181c27;--surface:#1e2334;--panel:#242840;--panel2:#2c3250;--border:#343d5c;--border2:#485070;--text:#dde2f0;--muted:#8892ac;--subtle:#5a6480;--accent:#4f83f5;--accent-l:rgba(79,131,245,.12);--green:#10b981;--green-l:rgba(16,185,129,.12);--yellow:#f59e0b;--yellow-l:rgba(245,158,11,.12);--red:#f87171;--red-l:rgba(248,113,113,.12);--orange:#fb923c;--orange-l:rgba(251,146,60,.12);--purple:#a78bfa;--purple-l:rgba(167,139,250,.12);--shadow:0 1px 4px rgba(0,0,0,.4),0 4px 20px rgba(0,0,0,.25);--radius:8px;--mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif}
 body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;--border:#d4d9e8;--border2:#bcc4d8;--text:#1a2038;--muted:#5a6480;--subtle:#8892ac;--accent:#2563eb;--green:#059669;--yellow:#d97706;--red:#dc2626;--orange:#ea580c;--purple:#7c3aed;--shadow:0 1px 4px rgba(0,0,0,.1),0 4px 16px rgba(0,0,0,.08)}
@@ -54,6 +54,123 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 .ic-prog-bar{height:4px;background:var(--border);border-radius:2px;margin:0 22px 0}
 .ic-prog-fill{height:4px;background:var(--green);border-radius:2px;transition:width .3s}
 @media(max-width:900px){.ic-sheet-row{grid-template-columns:24px 70px 110px 60px 1fr 130px 80px}}
+
+
+/* ── RTL / Dari (Persian) font overrides ── */
+[dir="rtl"] {
+  font-family: 'Noto Naskh Arabic', 'Noto Sans', 'Segoe UI', Tahoma, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.8;
+  letter-spacing: 0;
+}
+[dir="rtl"] body,
+[dir="rtl"] button,
+[dir="rtl"] input,
+[dir="rtl"] select,
+[dir="rtl"] textarea {
+  font-family: 'Noto Naskh Arabic', 'Noto Sans', 'Segoe UI', Tahoma, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.8;
+  letter-spacing: 0;
+}
+/* Mono fields stay Latin in RTL — product codes, bins, numbers */
+[dir="rtl"] .sr-codes,
+[dir="rtl"] .ic-qty-input,
+[dir="rtl"] input[id="opOrder"],
+[dir="rtl"] .op-product,
+[dir="rtl"] .line-product,
+[dir="rtl"] .line-qty,
+[dir="rtl"] .line-bin,
+[dir="rtl"] input[type="datetime-local"],
+[dir="rtl"] input[type="date"],
+[dir="rtl"] input[type="number"] {
+  font-family: 'DM Mono', monospace;
+  letter-spacing: .04em;
+  direction: ltr;
+  text-align: left;
+}
+[dir="rtl"] label { font-size: 13px; font-weight: 600; }
+[dir="rtl"] h1 { font-size: 24px; font-weight: 700; }
+[dir="rtl"] .card-title {
+  font-family: 'Noto Naskh Arabic', 'Noto Sans', sans-serif;
+  font-size: 13px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+[dir="rtl"] .nav-btn { font-size: 13px; font-weight: 600; letter-spacing: 0; }
+[dir="rtl"] .btn { font-size: 13px; letter-spacing: 0; }
+[dir="rtl"] .badge {
+  font-family: 'Noto Naskh Arabic', 'Noto Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+[dir="rtl"] .eyebrow {
+  font-family: 'Noto Naskh Arabic', 'Noto Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+[dir="rtl"] .sr-meta { font-size: 12px; line-height: 1.7; }
+[dir="rtl"] .stat-lbl {
+  font-family: 'Noto Naskh Arabic', 'Noto Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0;
+  text-transform: none;
+  line-height: 1.6;
+}
+[dir="rtl"] .stat-num {
+  font-family: 'DM Mono', monospace;
+  direction: ltr;
+}
+[dir="rtl"] .login-group-label {
+  font-family: 'Noto Naskh Arabic', 'Noto Sans', sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+  font-size: 12px;
+}
+[dir="rtl"] .ib-title { font-size: 15px; }
+[dir="rtl"] .ib-sub { font-size: 12px; }
+[dir="rtl"] .pin-key {
+  font-family: 'DM Mono', monospace;
+}
+[dir="rtl"] .field-wrap, [dir="rtl"] .bin-input-wrap { direction: ltr; }
+[dir="rtl"] .bin-format-hint, [dir="rtl"] .bin-format-err {
+  font-family: 'DM Mono', monospace;
+  direction: ltr;
+  text-align: left;
+  font-size: 10px;
+}
+[dir="rtl"] .suggest-item { font-size: 14px; }
+[dir="rtl"] .si-badge { font-family: 'DM Mono', monospace; }
+[dir="rtl"] .ic-sheet-row { font-size: 13px; }
+[dir="rtl"] .ic-sheet-head {
+  font-family: 'Noto Naskh Arabic', 'Noto Sans', sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+  font-size: 11px;
+}
+[dir="rtl"] .ic-result-select,
+[dir="rtl"] .ic-notes-input { font-size: 13px; font-family: 'Noto Naskh Arabic', 'Noto Sans', sans-serif; }
+[dir="rtl"] .table th {
+  font-family: 'Noto Naskh Arabic', 'Noto Sans', sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+  font-size: 11px;
+}
+[dir="rtl"] .table td { font-size: 13px; }
+[dir="rtl"] .notice, [dir="rtl"] .empty { font-size: 14px; }
+[dir="rtl"] select option {
+  font-family: 'Noto Naskh Arabic', 'Noto Sans', sans-serif;
+}
+/* Nav layout fix for RTL — keep left-to-right flow for buttons */
+[dir="rtl"] .topbar { flex-direction: row-reverse; }
+[dir="rtl"] .nav { flex-direction: row-reverse; margin-left: 0; margin-right: auto; }
+[dir="rtl"] .page-head { flex-direction: row-reverse; }
+[dir="rtl"] .actions, [dir="rtl"] .filters { flex-direction: row-reverse; }
+[dir="rtl"] .card-title::after { order: -1; }
+[dir="rtl"] .sr-head { flex-direction: row-reverse; }
+[dir="rtl"] .sr-actions { flex-direction: row-reverse; }
 
 @media print{body>*:not(.print-area){display:none!important}.print-area{display:block!important;color:#111;background:#fff;font-family:Arial,sans-serif}@page{size:letter portrait;margin:.55in}.card,.no-break,table,tr{break-inside:avoid;page-break-inside:avoid}.table th{background:#111827!important;color:#fff!important}}
 </style>
@@ -2107,7 +2224,9 @@ function setLang(lang){
   if(!LANGS[lang])return;
   currentLang=lang;
   localStorage.setItem('scp_lang',lang);
-  document.documentElement.dir=LANGS[lang].dir||'ltr';
+  const dir=LANGS[lang].dir||'ltr';
+  document.documentElement.dir=dir;
+  document.documentElement.lang=lang==='fa'?'fa-AF':lang==='fil'?'fil':lang==='es'?'es':'en';
   // Update all i18n-keyed elements
   document.querySelectorAll('[data-i18n]').forEach(el=>{
     const key=el.dataset.i18n;
