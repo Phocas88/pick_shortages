@@ -47,33 +47,63 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 <section id="pickerScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Personnel</div><h1>Manage Pickers &amp; Packers</h1><p>IC Manager only. Names stored as FirstInitialLastName (e.g. JDoe).</p></div></div><div class="card"><div class="card-title">Pickers</div><div class="form-row two"><div class="field"><label>Picker Name (FirstInitialLastName)</label><input id="pickerName" placeholder="JDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPickerManual()">Add Picker</button></div></div><div id="pickerList"></div></div><div class="card"><div class="card-title">Packers</div><div class="form-row two"><div class="field"><label>Packer Name (FirstInitialLastName)</label><input id="packerName" placeholder="MDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackerManual()">Add Packer</button></div></div><div id="packerList"></div></div><div class="card"><div class="card-title">Pack Stations</div><div class="form-row two"><div class="field"><label>Pack Station Name</label><input id="packStationName" placeholder="PS-01"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackStationManual()">Add Station</button></div></div><div id="packStationList"></div></div></div></section>
 <section id="migrationScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Migration</div><h1>Old Firebase Migration</h1><p>Copies old shortage records into the new shortage database. Does not delete the old database.</p></div></div><div class="card"><div class="notice">Source: <b>inventory-control-portal</b> collection <b>shortages</b>. Destination: current active collection.</div><div class="form-row three"><div class="field"><label>Old Collection</label><input id="oldCollection" value="shortages"></div><div class="field"><label>Limit</label><input id="migLimit" type="number" value="5000"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="runMigration()">Run Migration</button></div></div><div id="migrationResult"></div></div></div></section>
 <section id="settingsScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Settings</div><h1>Firebase Settings</h1><p>IC Manager only.</p></div></div><div class="card"><div class="form-row two"><div class="field"><label>API Key</label><input id="cfgApiKey"></div><div class="field"><label>Auth Domain</label><input id="cfgAuthDomain"></div><div class="field"><label>Project ID</label><input id="cfgProjectId"></div><div class="field"><label>Storage Bucket</label><input id="cfgStorageBucket"></div><div class="field"><label>Messaging Sender ID</label><input id="cfgSenderId"></div><div class="field"><label>App ID</label><input id="cfgAppId"></div><div class="field"><label>Active Collection</label><input id="cfgActiveCollection"></div><div class="field"><label>Archive Collection</label><input id="cfgArchiveCollection"></div></div><label class="toggle"><input id="themeToggle" type="checkbox" onchange="saveTheme(this.checked)"> Light mode</label><div class="actions" style="margin-top:14px"><button class="btn primary" onclick="saveSettings()">Save Settings</button></div></div></div></section>
-<section id="overpullScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow" style="color:var(--orange);background:var(--orange-l);border-color:rgba(251,146,60,.25)">Operations</div><h1>Over Pull Log</h1><p>No login required &mdash; log items pulled in excess of the pick demand.</p></div><div class="actions"><button class="btn orange" onclick="printOverPullReport()">&#128438; Print KPI Report</button></div></div>
-<div class="card"><div class="card-title">New Over Pull Entry</div>
-  <div class="form-row three">
-    <div class="field"><label>Date &amp; Time</label><input id="opDate" type="datetime-local"></div>
-    <div class="field"><label>Order Number <em>*</em></label><input id="opOrder" placeholder="e.g. NH00012345" autocomplete="off" oninput="opAutoDivision()"></div>
-    <div class="field"><label>Division</label><input id="opDiv" placeholder="Auto-filled" readonly style="opacity:.7;cursor:default"></div>
-  </div>
-  <div class="form-row three">
-    <div class="field"><label>Packer Name <em>*</em></label><div class="field-wrap"><input id="opPacker" placeholder="e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('opPacker','packer')" onblur="validatePersonField('opPacker','packer')" onkeydown="handleSuggestKey(event,'opPackerSuggest')"><div class="suggest-box" id="opPackerSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name (e.g. JDoe)</div></div>
-    <div class="field"><label>Picker Name</label><div class="field-wrap"><input id="opPicker" placeholder="e.g. MDoe" autocomplete="off" oninput="livePersonSuggest('opPicker','picker')" onblur="validatePersonField('opPicker','picker')" onkeydown="handleSuggestKey(event,'opPickerSuggest')"><div class="suggest-box" id="opPickerSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name</div></div>
-    <div class="field"><label>Pack Station</label><div class="field-wrap"><input id="opPackStation" placeholder="e.g. PS-01" autocomplete="off" oninput="liveStationSuggest('opPackStation')" onblur="savePackStation()" onkeydown="handleSuggestKey(event,'opPackStationSuggest')"><div class="suggest-box" id="opPackStationSuggest" style="display:none"></div></div></div>
-  </div>
-  <div class="card-title" style="margin-top:4px">Items Over-Pulled</div>
-  <div id="opLines"></div>
-  <div class="actions" style="margin-bottom:14px"><button class="btn" onclick="opAddLine()">+ Add Item</button></div>
-  <div id="opMoreWrap" style="display:none;background:var(--panel);border:1.5px solid var(--accent);border-radius:10px;padding:16px 18px;margin-bottom:14px">
-    <div style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--accent)">&#10067; Are there more items to add to this entry?</div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn" onclick="opYesMore()">&#10133; Yes &mdash; Add Another Item</button>
-      <button class="btn primary" onclick="opFinishEntry()">&#10003; No &mdash; Submit This Entry</button>
+<section id="overpullScreen" class="screen"><div class="wrap">
+
+  <!-- Header -->
+  <div class="page-head">
+    <div>
+      <div class="eyebrow" style="color:var(--orange);background:var(--orange-l);border-color:rgba(251,146,60,.25)">Operations</div>
+      <h1>Over Pull Log</h1>
+      <p>No login required &mdash; log items pulled in excess of the pick demand.</p>
     </div>
   </div>
-  <div class="actions"><button class="btn" onclick="opClearForm()">Clear Form</button><button class="btn primary" style="flex:1" onclick="opPromptMore()">Submit Over Pull</button></div>
-</div>
-<div class="filters"><input id="opFilterText" class="search" placeholder="Search by packer, picker, order, product, division..." oninput="opRenderList()"><input id="opFilterStart" type="date" onchange="opRenderList()"><input id="opFilterEnd" type="date" onchange="opRenderList()"><button class="btn" onclick="opLoadRecords(true)">Refresh</button></div>
-<div id="opKpiBar" class="stat-grid" style="margin-bottom:14px"></div>
-<div id="opList" class="shortage-list"></div>
+
+  <!-- Tab Bar -->
+  <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:18px">
+    <button id="opTab-entry" onclick="opSwitchTab('entry')" style="padding:10px 22px;font-size:13px;font-weight:700;border:none;border-bottom:3px solid var(--orange);margin-bottom:-2px;background:none;color:var(--orange);cursor:pointer">&#128221; Log Entry</button>
+    <button id="opTab-records" onclick="opSwitchTab('records')" style="padding:10px 22px;font-size:13px;font-weight:700;border:none;border-bottom:3px solid transparent;margin-bottom:-2px;background:none;color:var(--muted);cursor:pointer">&#128202; Records &amp; Stats</button>
+  </div>
+
+  <!-- TAB: LOG ENTRY -->
+  <div id="opPane-entry">
+    <div class="card"><div class="card-title">New Over Pull Entry</div>
+      <div class="form-row three">
+        <div class="field"><label>Date &amp; Time</label><input id="opDate" type="datetime-local"></div>
+        <div class="field"><label>Order Number <em>*</em></label><input id="opOrder" placeholder="e.g. NH00012345" autocomplete="off" oninput="opAutoDivision()"></div>
+        <div class="field"><label>Division</label><input id="opDiv" placeholder="Auto-filled" readonly style="opacity:.7;cursor:default"></div>
+      </div>
+      <div class="form-row three">
+        <div class="field"><label>Packer Name <em>*</em></label><div class="field-wrap"><input id="opPacker" placeholder="e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('opPacker','packer')" onblur="validatePersonField('opPacker','packer')" onkeydown="handleSuggestKey(event,'opPackerSuggest')"><div class="suggest-box" id="opPackerSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name (e.g. JDoe)</div></div>
+        <div class="field"><label>Picker Name</label><div class="field-wrap"><input id="opPicker" placeholder="e.g. MDoe" autocomplete="off" oninput="livePersonSuggest('opPicker','picker')" onblur="validatePersonField('opPicker','picker')" onkeydown="handleSuggestKey(event,'opPickerSuggest')"><div class="suggest-box" id="opPickerSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name</div></div>
+        <div class="field"><label>Pack Station</label><div class="field-wrap"><input id="opPackStation" placeholder="e.g. PS-01" autocomplete="off" oninput="liveStationSuggest('opPackStation')" onblur="savePackStation()" onkeydown="handleSuggestKey(event,'opPackStationSuggest')"><div class="suggest-box" id="opPackStationSuggest" style="display:none"></div></div></div>
+      </div>
+      <div class="card-title" style="margin-top:4px">Items Over-Pulled</div>
+      <div id="opLines"></div>
+      <div class="actions" style="margin-bottom:14px"><button class="btn" onclick="opAddLine()">+ Add Item</button></div>
+      <div id="opMoreWrap" style="display:none;background:var(--panel);border:1.5px solid var(--accent);border-radius:10px;padding:16px 18px;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--accent)">&#10067; Are there more items to add to this entry?</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn" onclick="opYesMore()">&#10133; Yes &mdash; Add Another Item</button>
+          <button class="btn primary" onclick="opFinishEntry()">&#10003; No &mdash; Submit This Entry</button>
+        </div>
+      </div>
+      <div class="actions"><button class="btn" onclick="opClearForm()">Clear Form</button><button class="btn primary" style="flex:1" onclick="opPromptMore()">Submit Over Pull</button></div>
+    </div>
+  </div>
+
+  <!-- TAB: RECORDS & STATS -->
+  <div id="opPane-records" style="display:none">
+    <div class="filters">
+      <input id="opFilterText" class="search" placeholder="Search by packer, picker, order, product, division..." oninput="opRenderList()">
+      <input id="opFilterStart" type="date" onchange="opRenderList()">
+      <input id="opFilterEnd" type="date" onchange="opRenderList()">
+      <button class="btn" onclick="opLoadRecords(true)">Refresh</button>
+      <button class="btn orange" onclick="printOverPullReport()">&#128438; Print KPI Report</button>
+    </div>
+    <div id="opKpiBar" class="stat-grid" style="margin-bottom:14px"></div>
+    <div id="opList" class="shortage-list"></div>
+  </div>
+
 </div></section>
 <div id="editOverlay" class="overlay"><div class="modal"><div class="modal-head"><h3>Edit Shortage</h3><button onclick="closeEdit()">&#215;</button></div><div id="editBody" class="modal-body"></div></div></div>
 <div id="loading" class="loading"><div class="loading-card" id="loadingText">Loading...</div></div>
@@ -96,7 +126,7 @@ function getSettings(){try{return {...DEFAULT_SETTINGS,...JSON.parse(localStorag
 function initFirebase(){const s=getSettings();try{if(!firebase.apps.length)firebase.initializeApp(s.firebaseConfig);db=firebase.firestore();firebase.firestore().settings({ignoreUndefinedProperties:true});}catch(e){console.error(e);alert('Firebase connection failed. Check Settings. '+e.message)}}
 function showLoading(t){$('loadingText').textContent=t||'Loading...';$('loading').classList.add('show')}function hideLoading(){$('loading').classList.remove('show')}
 function applyTheme(){const light=localStorage.getItem('scp_theme')==='light';document.body.classList.toggle('light-mode',light);if($('themeToggle'))$('themeToggle').checked=light}function saveTheme(light){localStorage.setItem('scp_theme',light?'light':'dark');applyTheme()}
-function showScreen(name){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const el=$(name+'Screen');if(el)el.classList.add('active');$('topbar').classList.toggle('show',name!=='login'&&name!=='pin');document.querySelectorAll('.nav-btn[data-screen]').forEach(b=>b.classList.toggle('active',b.dataset.screen===name));if(name==='shortage')loadShortages(false);if(name==='report')renderReports();if(name==='picker')renderPickers();if(name==='restock')buildReplenishmentReport();if(name==='settings')loadSettingsForm();if(name==='overpull'){opInitForm();opLoadRecords(false);}}
+function showScreen(name){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const el=$(name+'Screen');if(el)el.classList.add('active');$('topbar').classList.toggle('show',name!=='login'&&name!=='pin');document.querySelectorAll('.nav-btn[data-screen]').forEach(b=>b.classList.toggle('active',b.dataset.screen===name));if(name==='shortage')loadShortages(false);if(name==='report')renderReports();if(name==='picker')renderPickers();if(name==='restock')buildReplenishmentReport();if(name==='settings')loadSettingsForm();if(name==='overpull'){opInitForm();opSwitchTab('entry');}}
 function goPin(target){pinTarget=target;pinBuf='';$('pinBadge').textContent=ROLE_LABELS[target];updateDots();$('pinError').textContent='';showScreen('pin')}
 function pinKey(k){if(pinBuf.length>=4)return;pinBuf+=k;updateDots();document.querySelectorAll('.pin-key').forEach(btn=>{if(btn.dataset.key===k){btn.classList.add('active-press');setTimeout(()=>btn.classList.remove('active-press'),140)}});if(pinBuf.length===4)setTimeout(checkPin,120)}
 function pinBack(){pinBuf=pinBuf.slice(0,-1);updateDots()}function pinClear(){pinBuf='';updateDots();$('pinError').textContent=''}function updateDots(){document.querySelectorAll('#pinDots .pin-dot').forEach((d,i)=>d.classList.toggle('filled',i<pinBuf.length))}
@@ -846,12 +876,25 @@ function enterOverPull(){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   $('overpullScreen').classList.add('active');
   opInitForm();
-  opLoadRecords(false);
+  opSwitchTab('entry');
 }
 
 function opAutoDivision(){
   const v=($('opOrder').value||'').trim().slice(0,2).toUpperCase();
   $('opDiv').value=v;
+}
+
+function opSwitchTab(tab){
+  ['entry','records'].forEach(t=>{
+    const pane=$('opPane-'+t);
+    const btn=$('opTab-'+t);
+    if(pane) pane.style.display=t===tab?'':'none';
+    if(btn){
+      btn.style.color=t===tab?'var(--orange)':'var(--muted)';
+      btn.style.borderBottomColor=t===tab?'var(--orange)':'transparent';
+    }
+  });
+  if(tab==='records'){opLoadRecords(false);opRenderList();}
 }
 
 function opInitForm(){
@@ -956,6 +999,7 @@ async function opSaveEntry(){
     }
     opClearForm();
     await opLoadRecords(true);
+    opSwitchTab('records');
   }catch(e){alert('Save failed: '+e.message);}finally{hideLoading();}
 }
 
@@ -1052,47 +1096,88 @@ function printOverPullReport(){
   const totalLines=rows.length;
   const totalQty=rows.reduce((s,r)=>s+num(r.qty),0);
 
-  // By packer (primary person responsible)
+  // ── By Packer ──────────────────────────────────────────
+  const byPacker={};
+  rows.forEach(r=>{
+    const p=r.packer||'—';
+    if(!byPacker[p])byPacker[p]={lines:0,qty:0,orders:new Set(),divs:new Set(),stations:new Set()};
+    byPacker[p].lines++;byPacker[p].qty+=num(r.qty);
+    if(r.orderNumber)byPacker[p].orders.add(r.orderNumber);
+    if(r.division)byPacker[p].divs.add(r.division);
+    if(r.packStation)byPacker[p].stations.add(r.packStation);
+  });
+  const packerRows=Object.entries(byPacker).sort((a,b)=>b[1].qty-a[1].qty);
+
+  // ── By Picker ──────────────────────────────────────────
   const byPicker={};
   rows.forEach(r=>{
-    const p=r.packer||r.picker||'Unknown';
-    if(!byPicker[p])byPicker[p]={lines:0,qty:0,orders:new Set(),divs:new Set(),pickers:new Set()};
-    byPicker[p].lines++;
-    byPicker[p].qty+=num(r.qty);
+    const p=r.picker||'—';
+    if(!byPicker[p])byPicker[p]={lines:0,qty:0,orders:new Set(),divs:new Set(),packers:new Set()};
+    byPicker[p].lines++;byPicker[p].qty+=num(r.qty);
     if(r.orderNumber)byPicker[p].orders.add(r.orderNumber);
     if(r.division)byPicker[p].divs.add(r.division);
-    if(r.picker)byPicker[p].pickers.add(r.picker);
+    if(r.packer)byPicker[p].packers.add(r.packer);
   });
-  const pickerRows=Object.entries(byPicker).sort((a,b)=>b[1].qty-a[1].qty);
+  const pickerRows=Object.entries(byPicker).filter(([k])=>k!=='—').sort((a,b)=>b[1].qty-a[1].qty);
 
-  // By division
+  // ── By Pack Station ────────────────────────────────────
+  const byStation={};
+  rows.forEach(r=>{
+    const s=r.packStation||'—';
+    if(!byStation[s])byStation[s]={lines:0,qty:0,orders:new Set(),packers:new Set(),pickers:new Set()};
+    byStation[s].lines++;byStation[s].qty+=num(r.qty);
+    if(r.orderNumber)byStation[s].orders.add(r.orderNumber);
+    if(r.packer)byStation[s].packers.add(r.packer);
+    if(r.picker)byStation[s].pickers.add(r.picker);
+  });
+  const stationRows=Object.entries(byStation).filter(([k])=>k!=='—').sort((a,b)=>b[1].qty-a[1].qty);
+
+  // ── By Division (summary + order list) ────────────────
   const byDiv={};
   rows.forEach(r=>{
     const d=r.division||'??';
-    if(!byDiv[d])byDiv[d]={lines:0,qty:0,orders:new Set(),pickers:new Set()};
+    if(!byDiv[d])byDiv[d]={lines:0,qty:0,orders:new Set(),packers:new Set(),pickers:new Set(),stations:new Set(),orderDetails:{}};
     byDiv[d].lines++;byDiv[d].qty+=num(r.qty);
-    if(r.orderNumber)byDiv[d].orders.add(r.orderNumber);
+    if(r.orderNumber){
+      byDiv[d].orders.add(r.orderNumber);
+      if(!byDiv[d].orderDetails[r.orderNumber])byDiv[d].orderDetails[r.orderNumber]={lines:0,qty:0,products:new Set(),packers:new Set()};
+      byDiv[d].orderDetails[r.orderNumber].lines++;
+      byDiv[d].orderDetails[r.orderNumber].qty+=num(r.qty);
+      if(r.productCode)byDiv[d].orderDetails[r.orderNumber].products.add(r.productCode);
+      if(r.packer)byDiv[d].orderDetails[r.orderNumber].packers.add(r.packer);
+    }
+    if(r.packer)byDiv[d].packers.add(r.packer);
     if(r.picker)byDiv[d].pickers.add(r.picker);
+    if(r.packStation)byDiv[d].stations.add(r.packStation);
   });
 
-  // By day
+  // ── By Day ─────────────────────────────────────────────
   const byDay={};
   rows.forEach(r=>{
     const d=(r.date||r.createdAt||'').slice(0,10)||'Unknown';
-    if(!byDay[d])byDay[d]={lines:0,qty:0,pickers:new Set()};
+    if(!byDay[d])byDay[d]={lines:0,qty:0,packers:new Set(),pickers:new Set()};
     byDay[d].lines++;byDay[d].qty+=num(r.qty);
+    if(r.packer)byDay[d].packers.add(r.packer);
     if(r.picker)byDay[d].pickers.add(r.picker);
   });
 
-  // Detail rows sorted by date desc
   const sorted=[...rows].sort((a,b)=>(b.date||b.createdAt||'').localeCompare(a.date||a.createdAt||''));
-
-  const th=h=>`<th style="background:#1a2038;color:#fff;padding:5pt 8pt;text-align:left;font-size:8pt;font-weight:600;letter-spacing:.04em">${h}</th>`;
-  const thO=h=>`<th style="background:#92400e;color:#fff;padding:5pt 8pt;text-align:left;font-size:8pt;font-weight:600;letter-spacing:.04em">${h}</th>`;
-
   const fmtDT=v=>v?new Date(v).toLocaleString('en-US',{month:'2-digit',day:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
 
+  const th=h=>`<th style="background:#1a2038;color:#fff;padding:5pt 8pt;text-align:left;font-size:8pt;font-weight:600;letter-spacing:.04em">${h}</th>`;
+  const thG=h=>`<th style="background:#047857;color:#fff;padding:5pt 8pt;text-align:left;font-size:8pt;font-weight:600;letter-spacing:.04em">${h}</th>`;
+  const thP=h=>`<th style="background:#1d4ed8;color:#fff;padding:5pt 8pt;text-align:left;font-size:8pt;font-weight:600;letter-spacing:.04em">${h}</th>`;
+  const thS=h=>`<th style="background:#6d28d9;color:#fff;padding:5pt 8pt;text-align:left;font-size:8pt;font-weight:600;letter-spacing:.04em">${h}</th>`;
+  const thO=h=>`<th style="background:#92400e;color:#fff;padding:5pt 8pt;text-align:left;font-size:8pt;font-weight:600;letter-spacing:.04em">${h}</th>`;
+
+  const totalPackers=new Set(rows.map(r=>r.packer).filter(Boolean)).size;
+  const totalPickers=new Set(rows.map(r=>r.picker).filter(Boolean)).size;
+  const totalStations=new Set(rows.map(r=>r.packStation).filter(Boolean)).size;
+  const totalOrders=new Set(rows.map(r=>r.orderNumber).filter(Boolean)).size;
+
   const html=`<div style="font-family:'Segoe UI',Arial,sans-serif;color:#111;font-size:10pt;line-height:1.4">
+
+    <!-- Report Header -->
     <div style="display:flex;align-items:flex-start;justify-content:space-between;border-bottom:2.5pt solid #1a2038;padding-bottom:12pt;margin-bottom:18pt">
       <div>
         <div style="font-size:8pt;font-weight:700;color:#6b7280;letter-spacing:.12em;text-transform:uppercase;margin-bottom:4pt">C &amp; F Enterprises &middot; 815 Chapman Warehouse</div>
@@ -1102,21 +1187,22 @@ function printOverPullReport(){
       <div style="text-align:right;font-size:8.5pt;color:#6b7280;line-height:1.8;padding-top:4pt">
         <div><span style="font-weight:600;color:#374151">Generated:</span> ${today}</div>
         <div><span style="font-weight:600;color:#374151">Prepared by:</span> 815 Operations</div>
-        <div><span style="font-weight:600;color:#374151">Total Records:</span> ${totalLines}</div>
+        <div><span style="font-weight:600;color:#374151">Total Lines:</span> ${totalLines}</div>
       </div>
     </div>
 
+    <!-- Executive Summary -->
     <div style="font-size:8pt;font-weight:700;color:#374151;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #e5e7eb;padding-bottom:4pt;margin-bottom:10pt">Executive Summary</div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8pt;margin-bottom:18pt">
       ${[
         ['Total Over Pull Lines',totalLines,'#1a2038'],
         ['Total Units Over-Pulled',totalQty,'#92400e'],
-        ['Pickers Involved',Object.keys(byPicker).length,'#1d4ed8'],
-        ['Orders Affected',new Set(rows.map(r=>r.orderNumber)).size,'#047857'],
+        ['Orders Affected',totalOrders,'#047857'],
         ['Divisions Affected',Object.keys(byDiv).length,'#1d4ed8'],
+        ['Packers Involved',totalPackers,'#047857'],
+        ['Pickers Involved',totalPickers,'#1d4ed8'],
+        ['Pack Stations',totalStations,'#6d28d9'],
         ['Days in Range',Object.keys(byDay).length,'#374151'],
-        ['Avg Units / Line',totalLines?Math.round(totalQty/totalLines*10)/10:0,'#92400e'],
-        ['Avg Lines / Picker',Object.keys(byPicker).length?Math.round(totalLines/Object.keys(byPicker).length*10)/10:0,'#374151'],
       ].map(([lbl,val,color])=>`
         <div style="border:1pt solid #d1d5db;border-radius:4pt;padding:10pt;background:#f9fafb;text-align:center;break-inside:avoid">
           <div style="font-size:20pt;font-weight:700;color:${color};line-height:1.1">${val}</div>
@@ -1124,55 +1210,119 @@ function printOverPullReport(){
         </div>`).join('')}
     </div>
 
-    <div style="font-size:8pt;font-weight:700;color:#374151;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #e5e7eb;padding-bottom:4pt;margin:14pt 0 8pt">Picker Performance — Over Pull KPI</div>
+    <!-- By Packer -->
+    <div style="page-break-inside:avoid">
+    <div style="font-size:8pt;font-weight:700;color:#047857;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #d1fae5;padding-bottom:4pt;margin:14pt 0 8pt">By Packer</div>
     <table style="width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:16pt">
-      <thead><tr>${['Packer','Total Lines','Total Units Over-Pulled','Orders Affected','Divisions','Pickers'].map(th).join('')}</tr></thead>
+      <thead><tr>${['Packer','Lines','Units Over-Pulled','Orders','Divisions','Pack Stations'].map(thG).join('')}</tr></thead>
       <tbody>
-        ${pickerRows.map(([picker,row],i)=>{
-          const bg=i%2===0?'#fff':'#f3f4f6';
-          const qtyColor=row.qty>50?'#b91c1c':row.qty>20?'#92400e':'#111';
+        ${packerRows.map(([packer,row],i)=>{
+          const bg=i%2===0?'#fff':'#f0fdf4';
+          const qC=row.qty>50?'#b91c1c':row.qty>20?'#92400e':'#111';
           return `<tr style="background:${bg}">
-            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-weight:700">${esc(picker)}</td>
-            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${row.lines}</td>
-            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;font-weight:700;color:${qtyColor}">${row.qty}</td>
-            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${row.orders.size}</td>
-            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-size:8.5pt">${[...row.divs].join(', ')}</td>
-            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-size:8.5pt;color:#6b7280">${row.pickers?[...row.pickers].join(', '):'—'}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #d1fae5;font-weight:700">${esc(packer)}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #d1fae5;font-family:'Courier New',monospace">${row.lines}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #d1fae5;font-family:'Courier New',monospace;font-weight:700;color:${qC}">${row.qty}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #d1fae5;font-family:'Courier New',monospace">${row.orders.size}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #d1fae5;font-size:8.5pt">${[...row.divs].sort().join(', ')||'—'}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #d1fae5;font-size:8.5pt">${[...row.stations].sort().join(', ')||'—'}</td>
           </tr>`;
         }).join('')}
-        <tr style="background:#1a2038;color:#fff">
+        <tr style="background:#047857;color:#fff">
           <td style="padding:5pt 8pt;font-weight:700">TOTAL</td>
           <td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700">${totalLines}</td>
-          <td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700;color:#fcd34d">${totalQty}</td>
-          <td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700">${new Set(rows.map(r=>r.orderNumber)).size}</td>
-          <td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700">${Object.keys(byDiv).length}</td>
-          <td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700">${new Set(rows.map(r=>r.picker||'').filter(Boolean)).size}</td>
+          <td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700;color:#6ee7b7">${totalQty}</td>
+          <td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700">${totalOrders}</td>
+          <td style="padding:5pt 8pt;font-weight:700">${Object.keys(byDiv).length} divisions</td>
+          <td style="padding:5pt 8pt;font-weight:700">${totalStations} stations</td>
         </tr>
-      </tbody>
-    </table>
-
-    <div style="page-break-inside:avoid">
-    <div style="font-size:8pt;font-weight:700;color:#374151;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #e5e7eb;padding-bottom:4pt;margin:14pt 0 8pt">Division Breakdown</div>
-    <table style="width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:16pt">
-      <thead><tr>${['Division','Lines','Total Units','Orders','Pickers'].map(th).join('')}</tr></thead>
-      <tbody>
-        ${Object.entries(byDiv).sort((a,b)=>b[1].qty-a[1].qty).map(([div,row],i)=>{
-          const bg=i%2===0?'#fff':'#f3f4f6';
-          return `<tr style="background:${bg}">
-            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-weight:700;font-family:'Courier New',monospace">${esc(div)}</td>
-            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${row.lines}</td>
-            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;font-weight:700;color:#92400e">${row.qty}</td>
-            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${row.orders.size}</td>
-            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-size:8.5pt">${[...row.pickers].join(', ')}</td>
-          </tr>`;
-        }).join('')}
       </tbody>
     </table></div>
 
+    <!-- By Picker -->
+    ${pickerRows.length?`<div style="page-break-inside:avoid">
+    <div style="font-size:8pt;font-weight:700;color:#1d4ed8;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #dbeafe;padding-bottom:4pt;margin:14pt 0 8pt">By Picker</div>
+    <table style="width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:16pt">
+      <thead><tr>${['Picker','Lines','Units Over-Pulled','Orders','Divisions','Associated Packers'].map(thP).join('')}</tr></thead>
+      <tbody>
+        ${pickerRows.map(([picker,row],i)=>{
+          const bg=i%2===0?'#fff':'#eff6ff';
+          const qC=row.qty>50?'#b91c1c':row.qty>20?'#92400e':'#111';
+          return `<tr style="background:${bg}">
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #dbeafe;font-weight:700">${esc(picker)}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #dbeafe;font-family:'Courier New',monospace">${row.lines}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #dbeafe;font-family:'Courier New',monospace;font-weight:700;color:${qC}">${row.qty}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #dbeafe;font-family:'Courier New',monospace">${row.orders.size}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #dbeafe;font-size:8.5pt">${[...row.divs].sort().join(', ')||'—'}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #dbeafe;font-size:8.5pt;color:#6b7280">${[...row.packers].sort().join(', ')||'—'}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table></div>`:''}
+
+    <!-- By Pack Station -->
+    ${stationRows.length?`<div style="page-break-inside:avoid">
+    <div style="font-size:8pt;font-weight:700;color:#6d28d9;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #ede9fe;padding-bottom:4pt;margin:14pt 0 8pt">By Pack Station</div>
+    <table style="width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:16pt">
+      <thead><tr>${['Pack Station','Lines','Units Over-Pulled','Orders','Packers','Pickers'].map(thS).join('')}</tr></thead>
+      <tbody>
+        ${stationRows.map(([station,row],i)=>{
+          const bg=i%2===0?'#fff':'#faf5ff';
+          const qC=row.qty>50?'#b91c1c':row.qty>20?'#92400e':'#111';
+          return `<tr style="background:${bg}">
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #ede9fe;font-weight:700;font-family:'Courier New',monospace">${esc(station)}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #ede9fe;font-family:'Courier New',monospace">${row.lines}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #ede9fe;font-family:'Courier New',monospace;font-weight:700;color:${qC}">${row.qty}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #ede9fe;font-family:'Courier New',monospace">${row.orders.size}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #ede9fe;font-size:8.5pt">${[...row.packers].sort().join(', ')||'—'}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #ede9fe;font-size:8.5pt;color:#6b7280">${[...row.pickers].sort().join(', ')||'—'}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table></div>`:''}
+
+    <!-- Orders Affected by Division -->
+    <div style="page-break-before:always">
+    <div style="font-size:8pt;font-weight:700;color:#374151;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #e5e7eb;padding-bottom:4pt;margin:14pt 0 8pt">Orders Affected by Division</div>
+    ${Object.keys(byDiv).sort().map(div=>{
+      const drow=byDiv[div];
+      const orderList=Object.entries(drow.orderDetails).sort((a,b)=>b[1].qty-a[1].qty);
+      return `<div style="break-inside:avoid;margin-bottom:14pt">
+        <div style="display:flex;align-items:center;gap:10pt;background:#1a2038;color:#fff;padding:6pt 10pt;border-radius:4pt 4pt 0 0">
+          <span style="font-family:'Courier New',monospace;font-size:13pt;font-weight:700">${esc(div)}</span>
+          <span style="font-size:8.5pt;color:#9ca3af">${drow.orders.size} order${drow.orders.size!==1?'s':''} &nbsp;&middot;&nbsp; ${drow.lines} lines &nbsp;&middot;&nbsp; ${drow.qty} units over-pulled</span>
+          <span style="margin-left:auto;font-size:8pt;color:#9ca3af">Packers: ${[...drow.packers].sort().join(', ')||'—'}</span>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:8.5pt">
+          <thead><tr>
+            <th style="background:#374151;color:#fff;padding:4pt 8pt;text-align:left;font-size:7.5pt;font-weight:600">Order #</th>
+            <th style="background:#374151;color:#fff;padding:4pt 8pt;text-align:left;font-size:7.5pt;font-weight:600">Lines</th>
+            <th style="background:#374151;color:#fff;padding:4pt 8pt;text-align:left;font-size:7.5pt;font-weight:600">Units Over-Pulled</th>
+            <th style="background:#374151;color:#fff;padding:4pt 8pt;text-align:left;font-size:7.5pt;font-weight:600">Products</th>
+            <th style="background:#374151;color:#fff;padding:4pt 8pt;text-align:left;font-size:7.5pt;font-weight:600">Packer(s)</th>
+          </tr></thead>
+          <tbody>
+            ${orderList.map(([order,od],i)=>{
+              const bg=i%2===0?'#fff':'#f3f4f6';
+              return `<tr style="background:${bg}">
+                <td style="padding:3pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;font-weight:700;color:#1d4ed8">${esc(order)}</td>
+                <td style="padding:3pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${od.lines}</td>
+                <td style="padding:3pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;font-weight:700;color:#92400e">${od.qty}</td>
+                <td style="padding:3pt 8pt;border-bottom:.5pt solid #e5e7eb;font-size:8pt;color:#374151">${[...od.products].sort().join(', ')||'—'}</td>
+                <td style="padding:3pt 8pt;border-bottom:.5pt solid #e5e7eb;font-size:8pt">${[...od.packers].sort().join(', ')||'—'}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>`;
+    }).join('')}
+    </div>
+
+    <!-- Daily Summary -->
     <div style="page-break-before:always;page-break-inside:avoid">
     <div style="font-size:8pt;font-weight:700;color:#374151;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #e5e7eb;padding-bottom:4pt;margin:14pt 0 8pt">Daily Summary</div>
     <table style="width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:16pt">
-      <thead><tr>${['Date','Lines','Total Units','Pickers'].map(th).join('')}</tr></thead>
+      <thead><tr>${['Date','Lines','Units Over-Pulled','Packers','Pickers'].map(th).join('')}</tr></thead>
       <tbody>
         ${Object.keys(byDay).sort().map((d,i)=>{
           const bg=i%2===0?'#fff':'#f3f4f6';
@@ -1180,27 +1330,31 @@ function printOverPullReport(){
             <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${d}</td>
             <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${byDay[d].lines}</td>
             <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;font-weight:700;color:#92400e">${byDay[d].qty}</td>
-            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-size:8.5pt">${[...byDay[d].pickers].join(', ')}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-size:8.5pt">${[...byDay[d].packers].sort().join(', ')||'—'}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-size:8.5pt;color:#6b7280">${[...byDay[d].pickers].sort().join(', ')||'—'}</td>
           </tr>`;
         }).join('')}
       </tbody>
     </table></div>
 
+    <!-- Full Detail Log -->
     <div style="page-break-before:always;page-break-inside:avoid">
     <div style="font-size:8pt;font-weight:700;color:#374151;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #e5e7eb;padding-bottom:4pt;margin:14pt 0 8pt">Full Detail Log</div>
     <table style="width:100%;border-collapse:collapse;font-size:8.5pt;margin-bottom:16pt">
-      <thead><tr>${['Date/Time','Order #','Division','Picker','Product Code','Qty','UOM'].map(thO).join('')}</tr></thead>
+      <thead><tr>${['Date/Time','Order #','Div','Packer','Picker','Station','Product Code','Qty','UOM'].map(thO).join('')}</tr></thead>
       <tbody>
         ${sorted.map((r,i)=>{
           const bg=i%2===0?'#fff':'#fff7ed';
           return `<tr style="background:${bg}">
-            <td style="padding:4pt 6pt;border-bottom:.5pt solid #fed7aa;font-size:7.5pt;color:#6b7280">${fmtDT(r.date||r.createdAt)}</td>
-            <td style="padding:4pt 6pt;border-bottom:.5pt solid #fed7aa;font-family:'Courier New',monospace;font-weight:700">${esc(r.orderNumber||'—')}</td>
-            <td style="padding:4pt 6pt;border-bottom:.5pt solid #fed7aa;font-family:'Courier New',monospace">${esc(r.division||'—')}</td>
-            <td style="padding:4pt 6pt;border-bottom:.5pt solid #fed7aa;font-weight:600">${esc(r.picker||'—')}</td>
-            <td style="padding:4pt 6pt;border-bottom:.5pt solid #fed7aa;font-family:'Courier New',monospace;font-weight:700">${esc(r.productCode||'—')}</td>
-            <td style="padding:4pt 6pt;border-bottom:.5pt solid #fed7aa;font-family:'Courier New',monospace;font-weight:700;color:#92400e">${r.qty||0}</td>
-            <td style="padding:4pt 6pt;border-bottom:.5pt solid #fed7aa;font-family:'Courier New',monospace">${esc(r.uom||'EA')}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #fed7aa;font-size:7.5pt;color:#6b7280">${fmtDT(r.date||r.createdAt)}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #fed7aa;font-family:'Courier New',monospace;font-weight:700;color:#1d4ed8">${esc(r.orderNumber||'—')}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #fed7aa;font-family:'Courier New',monospace">${esc(r.division||'—')}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #fed7aa;font-weight:600">${esc(r.packer||'—')}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #fed7aa;color:#6b7280">${esc(r.picker||'—')}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #fed7aa;font-family:'Courier New',monospace;font-size:8pt">${esc(r.packStation||'—')}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #fed7aa;font-family:'Courier New',monospace;font-weight:700">${esc(r.productCode||'—')}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #fed7aa;font-family:'Courier New',monospace;font-weight:700;color:#92400e">${r.qty||0}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #fed7aa;font-family:'Courier New',monospace">${esc(r.uom||'EA')}</td>
           </tr>`;
         }).join('')}
       </tbody>
