@@ -59,10 +59,10 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 </style>
 </head>
 <body>
-<div id="topbar" class="topbar"><div class="brand">Shortage Control Portal</div><span id="roleChip" class="role-chip"></span><div id="nav" class="nav"></div></div>
-<section id="loginScreen" class="screen active"><div class="login-wrap"><div class="login-header"><h1>Shortage Control Portal</h1><p>Separate shortage reporting app</p></div><div class="login-group-label">Select role</div><div class="ic-btns"><button class="ic-login-btn" onclick="goPin('clerk')"><span class="ib-icon">&#128203;</span><span class="ib-title">Outbound Clerk</span><span class="ib-sub">Shortage Entry</span></button><button class="ic-login-btn" onclick="goPin('icteam')"><span class="ib-icon">&#128270;</span><span class="ib-title">IC Team</span><span class="ib-sub">Verify and Report</span></button><button class="ic-login-btn" onclick="goPin('manager')"><span class="ib-icon">&#9881;&#65039;</span><span class="ib-title">IC Manager</span><span class="ib-sub">Settings and Migration</span></button></div><div class="login-group-label" style="margin-top:16px">No Login Required</div><div style="display:grid;grid-template-columns:1fr;gap:10px"><button class="ic-login-btn" onclick="enterOverPull()" style="border-color:rgba(251,146,60,.4);background:var(--orange-l)"><span class="ib-icon">&#128202;</span><span class="ib-title" style="color:var(--orange)">Over Pull Log</span><span class="ib-sub">Operations — no PIN needed</span></button></div></div></section>
+<div id="topbar" class="topbar"><div class="brand">Shortage Control Portal</div><span id="roleChip" class="role-chip"></span><div id="nav" class="nav"></div><div class="actions" style="margin-left:8px"><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('en')" id="langEn">EN</button><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('es')" id="langEs">ES</button><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('fa')" id="langFa">داری</button><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('fil')" id="langFil">FIL</button></div></div>
+<section id="loginScreen" class="screen active"><div class="login-wrap"><div class="login-header"><h1 id="i18n-title">Shortage Control Portal</h1><p id="i18n-subtitle">Separate shortage reporting app</p><div style="display:flex;gap:8px;justify-content:center;margin-top:10px"><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('en')">EN</button><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('es')">ES</button><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('fa')">داری</button><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('fil')">FIL</button></div></div><div class="login-group-label">Select role</div><div class="ic-btns"><button class="ic-login-btn" onclick="goPin('clerk')"><span class="ib-icon">&#128203;</span><span class="ib-title">Outbound Clerk</span><span class="ib-sub">Shortage Entry</span></button><button class="ic-login-btn" onclick="goPin('icteam')"><span class="ib-icon">&#128270;</span><span class="ib-title">IC Team</span><span class="ib-sub">Verify and Report</span></button><button class="ic-login-btn" onclick="goPin('manager')"><span class="ib-icon">&#9881;&#65039;</span><span class="ib-title">IC Manager</span><span class="ib-sub">Settings and Migration</span></button></div><div class="login-group-label" style="margin-top:16px">No Login Required</div><div style="display:grid;grid-template-columns:1fr;gap:10px"><button class="ic-login-btn" onclick="enterOverPull()" style="border-color:rgba(251,146,60,.4);background:var(--orange-l)"><span class="ib-icon">&#128202;</span><span class="ib-title" style="color:var(--orange)">Over Pull Log</span><span class="ib-sub">Operations — no PIN needed</span></button></div></div></section>
 <section id="pinScreen" class="screen"><div class="pin-card"><div id="pinBadge" class="pin-div-badge">Role</div><p style="color:var(--muted);font-size:12px">Enter PIN</p><div id="pinDots" class="pin-dots"><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span></div><div class="pin-keypad"><button class="pin-key" data-key="1" onclick="pinKey('1')">1</button><button class="pin-key" data-key="2" onclick="pinKey('2')">2</button><button class="pin-key" data-key="3" onclick="pinKey('3')">3</button><button class="pin-key" data-key="4" onclick="pinKey('4')">4</button><button class="pin-key" data-key="5" onclick="pinKey('5')">5</button><button class="pin-key" data-key="6" onclick="pinKey('6')">6</button><button class="pin-key" data-key="7" onclick="pinKey('7')">7</button><button class="pin-key" data-key="8" onclick="pinKey('8')">8</button><button class="pin-key" data-key="9" onclick="pinKey('9')">9</button><button class="pin-key clr" onclick="pinClear()">CLR</button><button class="pin-key" data-key="0" onclick="pinKey('0')">0</button><button class="pin-key clr" onclick="pinBack()">&#9003;</button></div><div id="pinError" class="pin-error"></div><button class="pin-back-btn" onclick="backToLogin()">Back</button></div></section>
-<section id="shortageScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Outbound</div><h1>Shortage Entry</h1><p>Log shortage lines and review active records.</p></div><div id="shortageTopActions" class="actions"></div></div><div class="card" id="entryCard"><div class="form-row four"><div class="field"><label>Date &amp; Time</label><input id="sDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="sDiv"><option value="">Select</option><option>NH</option><option>GT</option><option>FS</option><option>EE</option><option>BC</option><option>CF</option></select></div><div class="field"><label>Picker <em>*</em></label><select id="sPickerSelect" onchange="onPickerSelectChange('sPickerSelect','sPickerNew','sPicker')"><option value="">-- Select Picker --</option></select><div id="sPickerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="sPickerNew" placeholder="FirstInitialLastName e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('sPickerNew','picker')" onblur="validatePersonField('sPickerNew','picker')" onkeydown="handleSuggestKey(event,'sPickerNewSuggest')"><div class="suggest-box" id="sPickerNewSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name</div></div><input id="sPicker" type="hidden"></div><div class="field"><label>Packer</label><select id="sPackerSelect" onchange="onPickerSelectChange('sPackerSelect','sPackerNew','sPacker')"><option value="">-- Select Packer --</option></select><div id="sPackerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="sPackerNew" placeholder="FirstInitialLastName e.g. MDoe" autocomplete="off" oninput="livePersonSuggest('sPackerNew','packer')" onblur="validatePersonField('sPackerNew','packer')" onkeydown="handleSuggestKey(event,'sPackerNewSuggest')"><div class="suggest-box" id="sPackerNewSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name</div></div><input id="sPacker" type="hidden"></div><div class="field"><label>Pack Station</label><div class="field-wrap"><input id="sPackStation" placeholder="e.g. PS-01" autocomplete="off" oninput="liveStationSuggest()" onblur="savePackStation()" onkeydown="handleSuggestKey(event,'sPackStationSuggest')"><div class="suggest-box" id="sPackStationSuggest" style="display:none"></div></div></div><div class="field"><label>Pick Demand # <em>*</em></label><input id="sDemand" placeholder="e.g. NH00012345" oninput="autoDivisionFromDemand()"></div><div class="field"><label>Shift Override</label><select id="sShift"><option value="auto">Auto (use current time)</option><option value="1st">1st</option><option value="2nd">2nd</option><option value="3rd">3rd</option></select></div></div><div class="card-title">Product Lines</div><div id="productLines"></div><div class="actions"><button class="btn" onclick="addProductLine()">+ Add Line</button><button class="btn" onclick="clearEntry()">Clear Form</button><button class="btn primary" style="flex:1" onclick="saveShortage()">+ Log All Shortages</button></div><div class="field" style="margin-top:12px"><label>Notes</label><textarea id="sNotes"></textarea></div></div><div class="filters"><input id="filterText" class="search" placeholder="Search by product, order, picker, division..." oninput="renderShortages()"><select id="viewMode" onchange="loadShortages(true)"><option value="active">Active</option><option value="archive">Archived History</option><option value="both">Active + Archived</option></select><input id="filterStart" type="date" onchange="renderShortages()"><input id="filterEnd" type="date" onchange="renderShortages()"><button class="btn" onclick="loadShortages(true)">Refresh Data</button></div><div id="archiveActions" class="actions" style="margin-bottom:10px"></div><div id="shortageList" class="shortage-list"></div></div></section>
+<section id="shortageScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Outbound</div><h1>Shortage Entry</h1><p>Log shortage lines and review active records.</p></div><div id="shortageTopActions" class="actions"></div></div><div class="card" id="entryCard"><div class="form-row four"><div class="field"><label>Date &amp; Time</label><input id="sDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="sDiv"><option value="">Select</option><option value="NH">NH</option><option value="GT">GT</option><option value="FS">FS</option><option value="EE">EE</option><option value="BC">BC</option><option value="CF">CF</option><option value="VP">VP – VIP</option><option value="TP">TP – Transpac</option></select></div><div class="field"><label>Picker <em>*</em></label><select id="sPickerSelect" onchange="onPickerSelectChange('sPickerSelect','sPickerNew','sPicker')"><option value="">-- Select Picker --</option></select><div id="sPickerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="sPickerNew" placeholder="FirstInitialLastName e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('sPickerNew','picker')" onblur="validatePersonField('sPickerNew','picker')" onkeydown="handleSuggestKey(event,'sPickerNewSuggest')"><div class="suggest-box" id="sPickerNewSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name</div></div><input id="sPicker" type="hidden"></div><div class="field"><label>Packer</label><select id="sPackerSelect" onchange="onPickerSelectChange('sPackerSelect','sPackerNew','sPackerVal')"><option value="">-- Select Packer --</option></select><div id="sPackerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="sPackerNew" placeholder="FirstInitialLastName e.g. MDoe" autocomplete="off" oninput="livePersonSuggest('sPackerNew','packer')" onblur="validatePersonField('sPackerNew','packer')" onkeydown="handleSuggestKey(event,'sPackerNewSuggest')"><div class="suggest-box" id="sPackerNewSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name</div></div><input id="sPackerVal" type="hidden"></div><div class="field"><label>Pack Station</label><div class="field-wrap"><input id="sPackStation" placeholder="e.g. PS-01" autocomplete="off" oninput="liveStationSuggest()" onblur="savePackStation()" onkeydown="handleSuggestKey(event,'sPackStationSuggest')"><div class="suggest-box" id="sPackStationSuggest" style="display:none"></div></div></div><div class="field"><label>Pick Demand # <em>*</em></label><input id="sDemand" placeholder="e.g. NH00012345" oninput="autoDivisionFromDemand()"></div><div class="field"><label>Shift Override</label><select id="sShift"><option value="auto">Auto (use current time)</option><option value="1st">1st</option><option value="2nd">2nd</option><option value="3rd">3rd</option></select></div></div><div class="card-title">Product Lines</div><div id="productLines"></div><div class="actions"><button class="btn" onclick="addProductLine()">+ Add Line</button><button class="btn" onclick="clearEntry()">Clear Form</button><button class="btn primary" style="flex:1" onclick="saveShortage()">+ Log All Shortages</button></div><div class="field" style="margin-top:12px"><label>Notes</label><textarea id="sNotes"></textarea></div></div><div class="filters"><input id="filterText" class="search" placeholder="Search by product, order, picker, division..." oninput="renderShortages()"><select id="viewMode" onchange="loadShortages(true)"><option value="active">Active</option><option value="archive">Archived History</option><option value="both">Active + Archived</option></select><input id="filterStart" type="date" onchange="renderShortages()"><input id="filterEnd" type="date" onchange="renderShortages()"><button class="btn" onclick="loadShortages(true)">Refresh Data</button></div><div id="archiveActions" class="actions" style="margin-bottom:10px"></div><div id="shortageList" class="shortage-list"></div></div></section>
 <section id="reportScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Reports</div><h1>Shortage Reports</h1><p>IC Team and IC Manager only.</p></div><div class="actions"><button class="btn primary" onclick="printSummaryReport()">Print Summary</button><button class="btn" onclick="printCheckReport()">Print IC Check Sheet</button></div></div><div class="card"><div class="form-row four"><div class="field"><label>Report Mode</label><select id="reportMode"><option value="active">Active Only</option><option value="archive">Archived History</option><option value="both">Active + Archived</option></select></div><div class="field"><label>Start Date</label><input id="reportStart" type="date"></div><div class="field"><label>End Date</label><input id="reportEnd" type="date"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="runReportPull()">Run Report</button></div></div></div><div id="reportBody"></div></div></section>
 <section id="restockScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Replenishment</div><h1>Replenishment Report</h1><p>IC Manager only.</p></div><button class="btn primary" onclick="printReplenReport()">Print</button></div><div class="card"><div class="card-title">Inventory Bin Report Import</div><p class="notice">Paste report columns: Bin Name, Product Code, Qty on Hand, Qty Allocated, Unit of Measure.</p><textarea id="binImport" style="width:100%;min-height:160px" placeholder="82-26-01&#9;DI1210&#9;12&#9;0&#9;EA"></textarea><div class="actions" style="margin-top:10px"><button class="btn primary" onclick="saveInventoryBinReport()">Import Bin Report</button></div></div><div id="restockBody"></div></div></section>
 <section id="pickerScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Personnel</div><h1>Manage Pickers &amp; Packers</h1><p>IC Manager only. Names stored as FirstInitialLastName (e.g. JDoe).</p></div></div><div class="card"><div class="card-title">Pickers</div><div class="form-row two"><div class="field"><label>Picker Name (FirstInitialLastName)</label><input id="pickerName" placeholder="JDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPickerManual()">Add Picker</button></div></div><div id="pickerList"></div></div><div class="card"><div class="card-title">Packers</div><div class="form-row two"><div class="field"><label>Packer Name (FirstInitialLastName)</label><input id="packerName" placeholder="MDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackerManual()">Add Packer</button></div></div><div id="packerList"></div></div><div class="card"><div class="card-title">Pack Stations</div><div class="form-row two"><div class="field"><label>Pack Station Name</label><input id="packStationName" placeholder="PS-01"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackStationManual()">Add Station</button></div></div><div id="packStationList"></div></div></div></section>
@@ -350,7 +350,7 @@ function validatePersonField(fieldId, type){
 }
 function nowLocalInput(){const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,16)}
 function demandDivision(v){return String(v||'').trim().slice(0,2).toUpperCase()}
-function autoDivisionFromDemand(){const div=demandDivision($('sDemand').value);if(div&&[...$('sDiv').options].some(o=>o.value===div||o.textContent===div))$('sDiv').value=div}
+function autoDivisionFromDemand(){const div=demandDivision($('sDemand').value);if(div&&[...$('sDiv').options].some(o=>o.value===div||o.textContent.startsWith(div)))$('sDiv').value=div}
 function addProductLine(data={}){const wrap=$('productLines');const row=document.createElement('div');row.className='product-line-card';row.innerHTML=`<div class="product-line-grid"><div class="field"><label>Product Code <em>*</em></label><input class="line-product" placeholder="E.G. DI1210" value="${esc(data.productCode||'')}"></div><div class="field"><label>Qty (Each) <em>*</em></label><input class="line-qty" type="number" min="0" step="1" value="${esc(data.qtyShorted??0)}"></div><div class="field"><label>Bin Shorted <em>*</em></label><div class="bin-input-wrap"><input class="line-bin" placeholder="82-26-01 / P12345 / BULK" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" value="${esc(data.shortedBin||'')}" oninput="liveBinValidate(this)" onblur="strictBinValidate(this)"><span class="bin-valid-icon"></span></div><div class="bin-format-hint">##-##-## &nbsp;·&nbsp; ##-##-# &nbsp;·&nbsp; P##### &nbsp;·&nbsp; BULK &nbsp;·&nbsp; ROOM &nbsp;·&nbsp; KEY ACCOUNT</div><div class="bin-format-err"></div></div><button class="btn remove-line-btn" onclick="removeProductLine(this)">&times;</button></div>`;wrap.appendChild(row);if(data.shortedBin){const binEl=row.querySelector('.line-bin');liveBinValidate(binEl);};}
 function removeProductLine(btn){const rows=$('productLines').querySelectorAll('.product-line-card');if(rows.length<=1){alert('At least one product line is required.');return}btn.closest('.product-line-card').remove()}
 function getProductLines(){return [...$('productLines').querySelectorAll('.product-line-card')].map(row=>({productCode:row.querySelector('.line-product').value.trim().toUpperCase(),qtyShorted:num(row.querySelector('.line-qty').value),shortedBin:row.querySelector('.line-bin').value.trim().toUpperCase()})).filter(x=>x.productCode||x.shortedBin||x.qtyShorted)}
@@ -410,10 +410,10 @@ function isBackorderRisk(r){return !!r.foundInShortedBin&&!r.secondLocationFille
 function statusBadges(r){let b=[];if(r._archived)b.push('<span class="badge purple">Archived</span>');if(r.icConfirmed==='confirmed_short')b.push('<span class="badge green">&#10003; IC Confirmed Short</span>');if(r.icConfirmed==='erroneous')b.push('<span class="badge yellow">&#9888; Erroneous Bin</span>');else if(r.foundInShortedBin)b.push('<span class="badge yellow">Erroneous Bin</span>');if(isBackorderRisk(r))b.push('<span class="badge red">Backorder Risk</span>');if(r.secondLocationFilled)b.push('<span class="badge blue">Second Location Filled</span>');if(r.replenishedAfterPick)b.push('<span class="badge green">Replenished After Pick</span>');return b.join(' ')}
 function secondarySummary(r){const locs=Array.isArray(r.secondaryLocations)?r.secondaryLocations:[];return locs.map(x=>`${x.bin||'NO BIN'}: ${x.qty||0} ${x.uom||r.uom||'EA'}${x.icQtyOnHand?` (OH ${x.icQtyOnHand})`:''}${x.notes?` - ${x.notes}`:''}`).join(' | ')}
 function rowHtml(r){const chk=canRunReports()&&!r._archived?`<input class="sr-check" type="checkbox" data-id="${esc(r.id)}">`:'';const edit=`<button class="btn" onclick="openEdit('${esc(r.id)}',${r._archived})">Edit</button>`;const mark=!r._archived?`<button class="btn green" onclick="markErroneous('${esc(r.id)}')">Found in Shorted Bin / Count</button><button class="btn" onclick="toggleSecond('${esc(r.id)}')">Second Location Filled</button><button class="btn" onclick="toggleReplenished('${esc(r.id)}')">Bin Replenished After Pick?</button>`:'';const unarch=r._archived&&canRunReports()?`<button class="btn orange" onclick="unarchiveOne('${esc(r.id)}')">Unarchive</button>`:'';const sec=secondarySummary(r);return `<div class="shortage-row ${r._archived?'archived':''} ${r.foundInShortedBin?'erroneous':''}"><div class="sr-head">${chk}<div style="flex:1"><div class="sr-codes">${esc(r.productCode||'NO PRODUCT')} <span style="color:var(--muted)">&bull;</span> ${esc(r.shortedBin||'NO BIN')}</div><div class="sr-meta">${esc(r.date||'No date')} &bull; ${esc(r.division||'')} &bull; Qty ${esc(r.qtyShorted||'')} ${esc(r.uom||'')} &bull; Demand ${esc(r.pickDemand||'')} &bull; Picker ${esc(r.picker||'')}${r.packer?' &bull; Packer '+esc(r.packer):''}${r.packStation?' &bull; Station '+esc(r.packStation):''}</div><div class="sr-meta">IC Found: ${esc(r.icQtyFound||'')} ${esc(r.icUom||r.uom||'')} ${r.icNotes?'&bull; '+esc(r.icNotes):''}</div>${sec?`<div class="sr-meta"><b>Second location filled:</b> ${esc(sec)}</div>`:''}<div style="margin-top:6px">${statusBadges(r)}</div><div class="sr-actions">${edit}${mark}${unarch}</div></div></div></div>`}
-async function saveShortage(){autoDivisionFromDemand();validatePickerInput();const base={date:$('sDate').value||nowLocalInput(),division:$('sDiv').value,pickDemand:$('sDemand').value.trim().toUpperCase(),picker:normalizeName($('sPicker').value.trim()),packer:normalizeName($('sPacker').value.trim()),packStation:($('sPackStation').value.trim().toUpperCase()),shift:shiftValue(),uom:'EA',notes:$('sNotes').value.trim(),createdAt:new Date().toISOString(),createdBy:role,foundInShortedBin:false,secondLocationFilled:false,replenishedAfterPick:false,status:'open'};const lines=getProductLines();if(!base.pickDemand){alert('Pick Demand # is required.');return}if(!base.division){alert('Division is required. Enter or scan the Pick Demand # first.');return}if(!base.picker){alert('Picker is required.');return}if(base.picker&&!fuzzyMatchPerson(base.picker,'picker')){if(!confirm(`"${base.picker}" is not saved. Save as new picker?`)){$('sPicker').focus();return}savePerson(base.picker,'picker');}if(base.packer&&!fuzzyMatchPerson(base.packer,'packer')){if(!confirm(`"${base.packer}" is not saved. Save as new packer?`)){$('sPacker').focus();return}savePerson(base.packer,'packer');}if(!lines.length||lines.some(l=>!l.productCode||!l.shortedBin)){alert('Each product line needs Product Code and Bin Shorted.');return}
+async function saveShortage(){autoDivisionFromDemand();validatePickerInput();const base={date:$('sDate').value||nowLocalInput(),division:$('sDiv').value,pickDemand:$('sDemand').value.trim().toUpperCase(),picker:normalizeName($('sPicker').value.trim()),packer:normalizeName(($('sPackerVal').value||$('sPackerNew').value||'').trim()),packStation:($('sPackStation').value.trim().toUpperCase()),shift:shiftValue(),uom:'EA',notes:$('sNotes').value.trim(),createdAt:new Date().toISOString(),createdBy:role,foundInShortedBin:false,secondLocationFilled:false,replenishedAfterPick:false,status:'open'};const lines=getProductLines();if(!base.pickDemand){alert('Pick Demand # is required.');return}if(!base.division){alert('Division is required. Enter or scan the Pick Demand # first.');return}if(!base.picker){alert('Picker is required.');return}if(base.picker&&!fuzzyMatchPerson(base.picker,'picker')){if(!confirm(`"${base.picker}" is not saved. Save as new picker?`)){$('sPicker').focus();return}savePerson(base.picker,'picker');}if(base.packer&&!fuzzyMatchPerson(base.packer,'packer')){if(!confirm(`"${base.packer}" is not saved. Save as new packer?`)){$('sPacker').focus();return}savePerson(base.packer,'packer');}if(!lines.length||lines.some(l=>!l.productCode||!l.shortedBin)){alert('Each product line needs Product Code and Bin Shorted.');return}
   const invalidBins=lines.filter(l=>l.shortedBin&&!validateBinFormat(l.shortedBin).ok);
   if(invalidBins.length){alert('Invalid bin format on one or more lines.\n\nValid formats:\n  ##-##-##  (e.g. 82-26-01)\n  ##-##-#   (e.g. 82-26-1)\n  P#####    (e.g. P12345)\n  BULK\n  ROOM\n  KEY ACCOUNT');return}showLoading('Saving shortages...');try{const batch=db.batch();const col=db.collection(getSettings().activeCollection);lines.forEach(line=>{batch.set(col.doc(),{...base,...line,uom:'EA'});});await batch.commit();clearCaches();clearEntry();await loadShortages(true)}catch(e){alert(e.message)}finally{hideLoading()}}
-function clearEntry(){['sDemand','sPicker','sPacker','sPackStation','sNotes'].forEach(id=>{if($(id))$(id).value='';});['sPickerSelect','sPackerSelect'].forEach(id=>{const el=$(id);if(el)el.value='';});['sPickerNewWrap','sPackerNewWrap'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});$('sDiv').value='';$('sShift').value='auto';$('sDate').value=nowLocalInput();$('productLines').innerHTML='';addProductLine();['sPickerNewSuggest','sPackerNewSuggest','sPackStationSuggest'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});}
+function clearEntry(){['sDemand','sPicker','sPackerVal','sPackStation','sNotes'].forEach(id=>{if($(id))$(id).value='';});['sPickerSelect','sPackerSelect'].forEach(id=>{const el=$(id);if(el)el.value='';});['sPickerNewWrap','sPackerNewWrap'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});$('sDiv').value='';$('sShift').value='auto';$('sDate').value=nowLocalInput();$('productLines').innerHTML='';addProductLine();['sPickerNewSuggest','sPackerNewSuggest','sPackStationSuggest'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});}
 function clearCaches(){Object.keys(localStorage).filter(k=>k.startsWith('scp_cache_')).forEach(k=>localStorage.removeItem(k))}
 async function updateRecord(id,data,archived=false){showLoading('Saving...');try{const s=getSettings();await db.collection(archived?s.archiveCollection:s.activeCollection).doc(id).set({...data,updatedAt:new Date().toISOString(),updatedBy:role},{merge:true});clearCaches();await loadShortages(true)}catch(e){alert(e.message)}finally{hideLoading()}}
 async function markErroneous(id){const r=shortages.find(x=>x.id===id&&!x._archived);if(!r)return;const qty=prompt('Qty found in the shorted bin:',r.icQtyFound||r.qtyShorted||'');if(qty===null)return;const uom=prompt('UOM:',r.icUom||r.uom||'EA');if(uom===null)return;await updateRecord(id,{foundInShortedBin:true,icQtyFound:num(qty),icUom:(uom||'EA').toUpperCase(),status:'located'},false)}
@@ -1540,7 +1540,7 @@ function savePerson(raw,type){
       }
       sel.value=normalized;
     });
-    const sh=$('sPacker');if(sh)sh.value=normalized;
+    const sh=$('sPackerVal');if(sh)sh.value=normalized;
     const oph=$('opPacker');if(oph)oph.value=normalized;
     const wsp=$('sPackerNewWrap');if(wsp)wsp.style.display='none';
     const wop=$('opPackerNewWrap');if(wop)wop.style.display='none';
@@ -1861,7 +1861,271 @@ async function icConfirmSubmitAll(){
   }
 }
 
-function startup(){applyTheme();initFirebase();$('sDate').value=nowLocalInput();loadAllPersonnel();populatePickerSelects();if($('productLines'))addProductLine()}
+
+/* ═══════════════════════════════════════════════════════
+   INTERNATIONALIZATION (i18n) MODULE
+   Languages: English (en), Spanish (es), Dari (fa), Filipino (fil)
+   ═══════════════════════════════════════════════════════ */
+let currentLang='en';
+
+const LANGS={
+  en:{
+    dir:'ltr',
+    // Login
+    'login.title':'Shortage Control Portal',
+    'login.subtitle':'Separate shortage reporting app',
+    'login.select_role':'Select role',
+    'login.clerk_title':'Outbound Clerk','login.clerk_sub':'Shortage Entry',
+    'login.ic_title':'IC Team','login.ic_sub':'Verify and Report',
+    'login.manager_title':'IC Manager','login.manager_sub':'Settings and Migration',
+    'login.shortage_portal':'Shortage & Over Pull Portal','login.shortage_portal_sub':'Opens the standalone shortage app (new tab)',
+    'login.enter_pin':'Enter PIN','login.back':'Back',
+    // Shortage form
+    'form.date_time':'Date & Time','form.division':'Division','form.picker':'Picker',
+    'form.packer':'Packer','form.pack_station':'Pack Station','form.pick_demand':'Pick Demand #',
+    'form.shift_override':'Shift Override','form.shift_auto':'Auto (use current time)',
+    'form.shift_1st':'1st','form.shift_2nd':'2nd','form.shift_3rd':'3rd',
+    'form.product_lines':'Product Lines','form.product_code':'Product Code',
+    'form.qty_each':'Qty (Each)','form.bin_shorted':'Bin Shorted',
+    'form.add_line':'+ Add Line','form.clear_form':'Clear Form','form.log_shortages':'+ Log All Shortages',
+    'form.notes':'Notes',
+    // Filters/list
+    'list.search':'Search by product, order, picker, division...',
+    'list.active':'Active','list.archive':'Archived History','list.both':'Active + Archived',
+    'list.refresh':'Refresh Data','list.no_shortages':'No shortages found for this filter.',
+    // Buttons
+    'btn.edit':'Edit','btn.found_bin':'Found in Shorted Bin / Count',
+    'btn.second_loc':'Second Location Filled','btn.replenished':'Bin Replenished After Pick?',
+    'btn.unarchive':'Unarchive',
+    // Over Pull
+    'op.title':'Over Pull Log','op.subtitle':'No login required — log items pulled in excess of the pick demand.',
+    'op.tab_entry':'Log Entry','op.tab_records':'Records & Stats',
+    'op.new_entry':'New Over Pull Entry','op.order_num':'Order Number',
+    'op.packer_name':'Packer Name','op.picker_name':'Picker Name','op.pack_station':'Pack Station',
+    'op.items_title':'Items Over-Pulled','op.add_item':'+ Add Item','op.clear':'Clear Form',
+    'op.submit':'Submit Over Pull','op.more_items':'Are there more items to add to this entry?',
+    'op.yes_more':'+ Yes — Add Another Item','op.no_submit':'✓ No — Submit This Entry',
+    'op.print':'Print KPI Report',
+    // Page headers
+    'page.shortages_title':'Shortage Entry','page.shortages_desc':'Log shortage lines and review active records.',
+    'page.reports_title':'Shortage Reports','page.reports_desc':'IC Team and IC Manager only.',
+  },
+  es:{
+    dir:'ltr',
+    'login.title':'Portal de Control de Escasez',
+    'login.subtitle':'Aplicación separada de informes de escasez',
+    'login.select_role':'Seleccionar rol',
+    'login.clerk_title':'Empleado de Salida','login.clerk_sub':'Entrada de Escasez',
+    'login.ic_title':'Equipo IC','login.ic_sub':'Verificar e Informar',
+    'login.manager_title':'Gerente IC','login.manager_sub':'Configuración y Migración',
+    'login.shortage_portal':'Portal de Escasez y Exceso','login.shortage_portal_sub':'Abre la aplicación de escasez (nueva pestaña)',
+    'login.enter_pin':'Ingresar PIN','login.back':'Regresar',
+    'form.date_time':'Fecha y Hora','form.division':'División','form.picker':'Recolector',
+    'form.packer':'Empacador','form.pack_station':'Estación de Empaque','form.pick_demand':'Núm. de Demanda',
+    'form.shift_override':'Turno (manual)','form.shift_auto':'Auto (hora actual)',
+    'form.shift_1st':'1er Turno','form.shift_2nd':'2do Turno','form.shift_3rd':'3er Turno',
+    'form.product_lines':'Líneas de Producto','form.product_code':'Código de Producto',
+    'form.qty_each':'Cantidad (c/u)','form.bin_shorted':'Bin con Escasez',
+    'form.add_line':'+ Agregar Línea','form.clear_form':'Limpiar','form.log_shortages':'+ Registrar Escasez',
+    'form.notes':'Notas',
+    'list.search':'Buscar por producto, orden, recolector, división...',
+    'list.active':'Activo','list.archive':'Historial Archivado','list.both':'Activo + Archivado',
+    'list.refresh':'Actualizar','list.no_shortages':'No se encontraron escaseces.',
+    'btn.edit':'Editar','btn.found_bin':'Encontrado en Bin / Conteo',
+    'btn.second_loc':'Llenado en Segunda Ubicación','btn.replenished':'¿Bin Reabastecido?',
+    'btn.unarchive':'Desarchivar',
+    'op.title':'Registro de Exceso','op.subtitle':'Sin inicio de sesión — registre artículos retirados en exceso.',
+    'op.tab_entry':'Entrada','op.tab_records':'Registros y Estadísticas',
+    'op.new_entry':'Nueva Entrada de Exceso','op.order_num':'Número de Orden',
+    'op.packer_name':'Nombre del Empacador','op.picker_name':'Nombre del Recolector','op.pack_station':'Estación de Empaque',
+    'op.items_title':'Artículos en Exceso','op.add_item':'+ Agregar Artículo','op.clear':'Limpiar',
+    'op.submit':'Enviar Exceso','op.more_items':'¿Hay más artículos para agregar?',
+    'op.yes_more':'+ Sí — Agregar Otro','op.no_submit':'✓ No — Enviar Esta Entrada',
+    'op.print':'Imprimir Reporte KPI',
+    'page.shortages_title':'Entrada de Escasez','page.shortages_desc':'Registrar líneas de escasez y revisar registros activos.',
+    'page.reports_title':'Reportes de Escasez','page.reports_desc':'Solo para Equipo IC y Gerente IC.',
+  },
+  fa:{
+    dir:'rtl',
+    'login.title':'پورتل کنترل کمبود',
+    'login.subtitle':'برنامه جداگانه گزارش کمبود',
+    'login.select_role':'نقش را انتخاب کنید',
+    'login.clerk_title':'کارمند خروجی','login.clerk_sub':'ورود کمبود',
+    'login.ic_title':'تیم IC','login.ic_sub':'تأیید و گزارش',
+    'login.manager_title':'مدیر IC','login.manager_sub':'تنظیمات و انتقال',
+    'login.shortage_portal':'پورتل کمبود و مازاد','login.shortage_portal_sub':'برنامه کمبود را باز می‌کند (تب جدید)',
+    'login.enter_pin':'پین را وارد کنید','login.back':'برگشت',
+    'form.date_time':'تاریخ و ساعت','form.division':'بخش','form.picker':'جمع‌آورنده',
+    'form.packer':'بسته‌بند','form.pack_station':'ایستگاه بسته‌بندی','form.pick_demand':'شماره تقاضا',
+    'form.shift_override':'نوبت (دستی)','form.shift_auto':'خودکار (زمان فعلی)',
+    'form.shift_1st':'نوبت اول','form.shift_2nd':'نوبت دوم','form.shift_3rd':'نوبت سوم',
+    'form.product_lines':'خطوط محصول','form.product_code':'کد محصول',
+    'form.qty_each':'تعداد (هر کدام)','form.bin_shorted':'بین کمبود',
+    'form.add_line':'+ افزودن خط','form.clear_form':'پاک کردن','form.log_shortages':'+ ثبت کمبود',
+    'form.notes':'یادداشت‌ها',
+    'list.search':'جستجو بر اساس محصول، سفارش، جمع‌آورنده، بخش...',
+    'list.active':'فعال','list.archive':'تاریخچه آرشیو','list.both':'فعال + آرشیو',
+    'list.refresh':'بروزرسانی','list.no_shortages':'کمبودی یافت نشد.',
+    'btn.edit':'ویرایش','btn.found_bin':'در بین کمبود یافت شد',
+    'btn.second_loc':'از مکان دوم پر شد','btn.replenished':'بین بعد از جمع‌آوری پر شد؟',
+    'btn.unarchive':'از آرشیو خارج شود',
+    'op.title':'ثبت مازاد','op.subtitle':'بدون ورود — اقلام مازاد را ثبت کنید.',
+    'op.tab_entry':'ورود داده','op.tab_records':'سوابق و آمار',
+    'op.new_entry':'ورود مازاد جدید','op.order_num':'شماره سفارش',
+    'op.packer_name':'نام بسته‌بند','op.picker_name':'نام جمع‌آورنده','op.pack_station':'ایستگاه بسته‌بندی',
+    'op.items_title':'اقلام مازاد','op.add_item':'+ افزودن قلم','op.clear':'پاک کردن',
+    'op.submit':'ثبت مازاد','op.more_items':'آیا قلم دیگری برای اضافه کردن وجود دارد؟',
+    'op.yes_more':'+ بله — افزودن قلم دیگر','op.no_submit':'✓ نه — ارسال این ورودی',
+    'op.print':'چاپ گزارش KPI',
+    'page.shortages_title':'ورود کمبود','page.shortages_desc':'ثبت خطوط کمبود و بررسی سوابق فعال.',
+    'page.reports_title':'گزارش‌های کمبود','page.reports_desc':'فقط برای تیم IC و مدیر IC.',
+  },
+  fil:{
+    dir:'ltr',
+    'login.title':'Portal ng Kontrol sa Kakulangan',
+    'login.subtitle':'Hiwalay na app para sa pag-uulat ng kakulangan',
+    'login.select_role':'Pumili ng papel',
+    'login.clerk_title':'Outbound Clerk','login.clerk_sub':'Pagpasok ng Kakulangan',
+    'login.ic_title':'Koponan ng IC','login.ic_sub':'I-verify at Mag-ulat',
+    'login.manager_title':'IC Manager','login.manager_sub':'Mga Setting at Paglipat',
+    'login.shortage_portal':'Portal ng Kakulangan at Sobra','login.shortage_portal_sub':'Binuksan ang standalone app (bagong tab)',
+    'login.enter_pin':'Ilagay ang PIN','login.back':'Bumalik',
+    'form.date_time':'Petsa at Oras','form.division':'Dibisyon','form.picker':'Tagapulot',
+    'form.packer':'Tagabalot','form.pack_station':'Estasyon ng Pagbabalot','form.pick_demand':'Pick Demand #',
+    'form.shift_override':'Shift (Manual)','form.shift_auto':'Auto (kasalukuyang oras)',
+    'form.shift_1st':'1st Shift','form.shift_2nd':'2nd Shift','form.shift_3rd':'3rd Shift',
+    'form.product_lines':'Mga Linya ng Produkto','form.product_code':'Codigo ng Produkto',
+    'form.qty_each':'Dami (bawat isa)','form.bin_shorted':'Bin na may Kakulangan',
+    'form.add_line':'+ Magdagdag ng Linya','form.clear_form':'I-clear','form.log_shortages':'+ I-log ang Kakulangan',
+    'form.notes':'Mga Tala',
+    'list.search':'Maghanap sa pamamagitan ng produkto, order, tagapulot, dibisyon...',
+    'list.active':'Aktibo','list.archive':'Kasaysayan ng Archive','list.both':'Aktibo + Archive',
+    'list.refresh':'I-refresh','list.no_shortages':'Walang kakulangan na natagpuan.',
+    'btn.edit':'I-edit','btn.found_bin':'Natagpuan sa Shorted Bin / Bilang',
+    'btn.second_loc':'Napuno mula sa Pangalawang Lokasyon','btn.replenished':'Na-replenish ang Bin pagkatapos Pulutin?',
+    'btn.unarchive':'I-unarchive',
+    'op.title':'Log ng Sobra','op.subtitle':'Hindi kailangan ng login — i-log ang mga item na nakuha nang higit sa demand.',
+    'op.tab_entry':'Pagpasok','op.tab_records':'Mga Rekord at Stats',
+    'op.new_entry':'Bagong Entry ng Sobra','op.order_num':'Numero ng Order',
+    'op.packer_name':'Pangalan ng Tagabalot','op.picker_name':'Pangalan ng Tagapulot','op.pack_station':'Estasyon ng Pagbabalot',
+    'op.items_title':'Mga Item na Sobra','op.add_item':'+ Magdagdag ng Item','op.clear':'I-clear',
+    'op.submit':'Isumite ang Sobra','op.more_items':'Mayroon pa bang mga item na idadagdag?',
+    'op.yes_more':'+ Oo — Magdagdag ng Isa pa','op.no_submit':'✓ Hindi — Isumite Itong Entry',
+    'op.print':'I-print ang KPI Report',
+    'page.shortages_title':'Pagpasok ng Kakulangan','page.shortages_desc':'I-log ang mga linya ng kakulangan at suriin ang mga aktibong rekord.',
+    'page.reports_title':'Mga Ulat ng Kakulangan','page.reports_desc':'Para sa Koponan ng IC at IC Manager lamang.',
+  }
+};
+
+function t(key){
+  return (LANGS[currentLang]&&LANGS[currentLang][key])||LANGS['en'][key]||key;
+}
+
+function setLang(lang){
+  if(!LANGS[lang])return;
+  currentLang=lang;
+  localStorage.setItem('scp_lang',lang);
+  document.documentElement.dir=LANGS[lang].dir||'ltr';
+  // Update all i18n-keyed elements
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key=el.dataset.i18n;
+    const attr=el.dataset.i18nAttr;
+    const val=t(key);
+    if(attr)el.setAttribute(attr,val);
+    else el.textContent=val;
+  });
+  // Update page title
+  const ti=$('i18n-title');if(ti)ti.textContent=t('login.title');
+  const su=$('i18n-subtitle');if(su)su.textContent=t('login.subtitle');
+  // Highlight active lang button
+  ['en','es','fa','fil'].forEach(l=>{
+    const btn=$('lang'+l.charAt(0).toUpperCase()+l.slice(1));
+    if(btn)btn.style.borderColor=l===lang?'var(--accent)':'var(--border)';
+    if(btn)btn.style.color=l===lang?'var(--accent)':'var(--muted)';
+  });
+  // Dynamically update key labels and placeholders in the current active screen
+  applyLangToForms();
+}
+
+function applyLangToForms(){
+  // Shortage form labels
+  const labelMap={
+    'sDate':t('form.date_time'),'sDiv':t('form.division'),
+    'sPickerSelect':t('form.picker'),'sPackerSelect':t('form.packer'),
+    'sPackStation':t('form.pack_station'),'sDemand':t('form.pick_demand'),
+    'sShift':t('form.shift_override'),'sNotes':t('form.notes'),
+  };
+  Object.entries(labelMap).forEach(([id,lbl])=>{
+    const el=$(id);if(!el)return;
+    // Find the label element immediately before/above this field
+    const field=el.closest('.field');
+    if(field){const lel=field.querySelector('label');if(lel)lel.firstChild.textContent=lbl+' ';}
+  });
+  // Placeholders
+  const placeholderMap={
+    'filterText':t('list.search'),
+    'sDemand':'e.g. NH00012345',
+  };
+  Object.entries(placeholderMap).forEach(([id,ph])=>{const el=$(id);if(el)el.placeholder=ph;});
+  // Buttons by text content pattern
+  const btnTextMap=[
+    ['addProductLine','+ Add Line',t('form.add_line')],
+    ['clearEntry','Clear Form',t('form.clear_form')],
+    ['saveShortage','+ Log All Shortages',t('form.log_shortages')],
+  ];
+  // Shift options
+  const sShift=$('sShift');
+  if(sShift){
+    const opts=sShift.options;
+    if(opts[0])opts[0].textContent=t('form.shift_auto');
+    if(opts[1])opts[1].textContent=t('form.shift_1st');
+    if(opts[2])opts[2].textContent=t('form.shift_2nd');
+    if(opts[3])opts[3].textContent=t('form.shift_3rd');
+  }
+  // viewMode options
+  const vm=$('viewMode');
+  if(vm){
+    if(vm.options[0])vm.options[0].textContent=t('list.active');
+    if(vm.options[1])vm.options[1].textContent=t('list.archive');
+    if(vm.options[2])vm.options[2].textContent=t('list.both');
+  }
+  // Shortage page heading
+  const spTitle=document.querySelector('#shortageScreen h1');
+  if(spTitle)spTitle.textContent=t('page.shortages_title');
+  const spDesc=document.querySelector('#shortageScreen .page-head p');
+  if(spDesc)spDesc.textContent=t('page.shortages_desc');
+  // Over Pull page heading
+  const opTitle=document.querySelector('#overpullScreen h1');
+  if(opTitle)opTitle.textContent=t('op.title');
+  const opDesc=document.querySelector('#overpullScreen .page-head p');
+  if(opDesc)opDesc.textContent=t('op.subtitle');
+  // Over Pull tab buttons
+  const et=$('opTab-entry');if(et)et.textContent='📝 '+t('op.tab_entry');
+  const rt=$('opTab-records');if(rt)rt.innerHTML='📊 '+t('op.tab_records');
+  // Op form labels
+  const opLabelMap={
+    'opOrder':t('op.order_num'),'opPacker':t('op.packer_name'),
+    'opPicker':t('op.picker_name'),'opPackStation':t('op.pack_station'),
+  };
+  Object.entries(opLabelMap).forEach(([id,lbl])=>{
+    const el=$(id);if(!el)return;
+    const field=el.closest('.field');
+    if(field){const lel=field.querySelector('label');if(lel)lel.firstChild.textContent=lbl+' ';}
+  });
+  // Re-render the more-items prompt text
+  const mw=$('opMoreWrap');
+  if(mw){
+    const q=mw.querySelector('div');if(q)q.textContent='❓ '+t('op.more_items');
+  }
+  // Select picker/packer placeholder options
+  ['sPickerSelect','sPackerSelect','opPackerSelect','opPickerSelect'].forEach(id=>{
+    const sel=$(id);if(!sel||!sel.options.length)return;
+    if(sel.options[0]&&sel.options[0].value==='')sel.options[0].textContent=
+      id.includes('Packer')?'-- '+t('form.packer')+' --':'-- '+t('form.picker')+' --';
+  });
+}
+
+function startup(){applyTheme();initFirebase();$('sDate').value=nowLocalInput();loadAllPersonnel();populatePickerSelects();if($('productLines'))addProductLine();const sl=localStorage.getItem('scp_lang')||'en';setLang(sl);}
 startup();
 </script>
 </body>
