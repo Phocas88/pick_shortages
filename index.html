@@ -157,15 +157,15 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 </style>
 </head>
 <body>
-<div id="topbar" class="topbar"><div class="brand">Shortage Control Portal</div><span id="roleChip" class="role-chip"></span><div id="nav" class="nav"></div><div class="actions" style="margin-left:8px"><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('en')" id="langEn">EN</button><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('es')" id="langEs">ES</button><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('fa')" id="langFa">داری</button><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('fil')" id="langFil">FIL</button></div></div>
-<section id="loginScreen" class="screen active"><div class="login-wrap"><div class="login-header"><h1 id="i18n-title">Shortage Control Portal</h1><p id="i18n-subtitle">Separate shortage reporting app</p><div style="display:flex;gap:8px;justify-content:center;margin-top:10px"><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('en')">EN</button><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('es')">ES</button><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('fa')">داری</button><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('fil')">FIL</button></div></div><div class="login-group-label">Select role</div><div class="ic-btns"><button class="ic-login-btn" onclick="goPin('clerk')"><span class="ib-icon">&#128203;</span><span class="ib-title">Outbound Clerk</span><span class="ib-sub">Shortage Entry</span></button><button class="ic-login-btn" onclick="goPin('icteam')"><span class="ib-icon">&#128270;</span><span class="ib-title">IC Team</span><span class="ib-sub">Verify and Report</span></button><button class="ic-login-btn" onclick="goPin('manager')"><span class="ib-icon">&#9881;&#65039;</span><span class="ib-title">IC Manager</span><span class="ib-sub">Settings and Migration</span></button></div><div class="login-group-label" style="margin-top:16px">No Login Required</div><div style="display:grid;grid-template-columns:1fr;gap:10px"><button class="ic-login-btn" onclick="enterOverPull()" style="border-color:rgba(251,146,60,.4);background:var(--orange-l)"><span class="ib-icon">&#128202;</span><span class="ib-title" style="color:var(--orange)">Over Pull Log</span><span class="ib-sub">Operations — no PIN needed</span></button></div></div></section>
+<div id="topbar" class="topbar"><div class="brand">Shortage Control Portal</div><span id="roleChip" class="role-chip"></span><div id="nav" class="nav"></div><div class="actions" style="margin-left:8px"><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('en')" id="langEn">EN</button><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('es')" id="langEs">ES</button><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('fa')" id="langFa">داری</button><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('ar')" id="langAr">عربي</button><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('fil')" id="langFil">FIL</button></div></div>
+<section id="loginScreen" class="screen active"><div class="login-wrap"><div class="login-header"><h1 id="i18n-title">Shortage Control Portal</h1><p id="i18n-subtitle">Separate shortage reporting app</p><div style="display:flex;gap:8px;justify-content:center;margin-top:10px"><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('en')">EN</button><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('es')">ES</button><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('fa')">داری</button><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('ar')">عربي</button><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('fil')">FIL</button></div></div><div class="login-group-label">Select role</div><div class="ic-btns"><button class="ic-login-btn" onclick="goPin('clerk')"><span class="ib-icon">&#128203;</span><span class="ib-title">Outbound Clerk</span><span class="ib-sub">Shortage Entry</span></button><button class="ic-login-btn" onclick="goPin('icteam')"><span class="ib-icon">&#128270;</span><span class="ib-title">IC Team</span><span class="ib-sub">Verify and Report</span></button><button class="ic-login-btn" onclick="goPin('manager')"><span class="ib-icon">&#9881;&#65039;</span><span class="ib-title">IC Manager</span><span class="ib-sub">Settings and Migration</span></button></div><div class="login-group-label" style="margin-top:16px">No Login Required</div><div style="display:grid;grid-template-columns:1fr;gap:10px"><button class="ic-login-btn" onclick="enterOverPull()" style="border-color:rgba(251,146,60,.4);background:var(--orange-l)"><span class="ib-icon">&#128202;</span><span class="ib-title" style="color:var(--orange)">Over Pull Log</span><span class="ib-sub">Operations — no PIN needed</span></button></div></div></section>
 <section id="pinScreen" class="screen"><div class="pin-card"><div id="pinBadge" class="pin-div-badge">Role</div><p style="color:var(--muted);font-size:12px">Enter PIN</p><div id="pinDots" class="pin-dots"><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span></div><div class="pin-keypad"><button class="pin-key" data-key="1" onclick="pinKey('1')">1</button><button class="pin-key" data-key="2" onclick="pinKey('2')">2</button><button class="pin-key" data-key="3" onclick="pinKey('3')">3</button><button class="pin-key" data-key="4" onclick="pinKey('4')">4</button><button class="pin-key" data-key="5" onclick="pinKey('5')">5</button><button class="pin-key" data-key="6" onclick="pinKey('6')">6</button><button class="pin-key" data-key="7" onclick="pinKey('7')">7</button><button class="pin-key" data-key="8" onclick="pinKey('8')">8</button><button class="pin-key" data-key="9" onclick="pinKey('9')">9</button><button class="pin-key clr" onclick="pinClear()">CLR</button><button class="pin-key" data-key="0" onclick="pinKey('0')">0</button><button class="pin-key clr" onclick="pinBack()">&#9003;</button></div><div id="pinError" class="pin-error"></div><button class="pin-back-btn" onclick="backToLogin()">Back</button></div></section>
 <section id="shortageScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Outbound</div><h1>Shortage Entry</h1><p>Log shortage lines and review active records.</p></div><div id="shortageTopActions" class="actions"></div></div><div class="card" id="entryCard"><div class="form-row four"><div class="field"><label>Date &amp; Time</label><input id="sDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="sDiv"><option value="">Select</option><option value="NH">NH</option><option value="GT">GT</option><option value="FS">FS</option><option value="EE">EE</option><option value="BC">BC</option><option value="CF">CF</option><option value="VP">VP – VIP</option><option value="TP">TP – Transpac</option></select></div><div class="field"><label>Picker <em>*</em></label><select id="sPickerSelect" onchange="onPickerSelectChange('sPickerSelect','sPickerNew','sPicker')"><option value="">-- Select Picker --</option></select><div id="sPickerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="sPickerNew" placeholder="FirstInitialLastName e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('sPickerNew','picker');syncNewPersonToHidden('sPickerNew','sPicker')" onblur="validatePersonField('sPickerNew','picker');syncNewPersonToHidden('sPickerNew','sPicker')" onkeydown="handleSuggestKey(event,'sPickerNewSuggest')"><div class="suggest-box" id="sPickerNewSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name</div></div><input id="sPicker" type="hidden"></div><div class="field"><label>Pack Station</label><div class="field-wrap"><input id="sPackStation" placeholder="e.g. PS-01" autocomplete="off" oninput="liveStationSuggest()" onblur="savePackStation()" onkeydown="handleSuggestKey(event,'sPackStationSuggest')"><div class="suggest-box" id="sPackStationSuggest" style="display:none"></div></div></div><div class="field"><label>Pick Demand # <em>*</em></label><input id="sDemand" placeholder="e.g. NH00012345" oninput="autoDivisionFromDemand()"></div><div class="field"><label>Shift Override</label><select id="sShift"><option value="auto">Auto (use current time)</option><option value="1st">1st</option><option value="2nd">2nd</option><option value="3rd">3rd</option></select></div></div><div class="card-title">Product Lines</div><div id="productLines"></div><div class="actions"><button class="btn" onclick="addProductLine()">+ Add Line</button><button class="btn" onclick="clearEntry()">Clear Form</button><button class="btn primary" style="flex:1" onclick="saveShortage()">+ Log All Shortages</button></div><div class="field" style="margin-top:12px"><label>Notes</label><textarea id="sNotes"></textarea></div></div><div class="filters"><input id="filterText" class="search" placeholder="Search by product, order, picker, division..." oninput="renderShortages()"><select id="viewMode" onchange="loadShortages(true)"><option value="active">Active</option><option value="archive">Archived History</option><option value="both">Active + Archived</option></select><input id="filterStart" type="date" onchange="renderShortages()"><input id="filterEnd" type="date" onchange="renderShortages()"><button class="btn" onclick="loadShortages(true)">Refresh Data</button></div><div id="archiveActions" class="actions" style="margin-bottom:10px"></div><div id="shortageList" class="shortage-list"></div></div></section>
 <section id="reportScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Reports</div><h1>Shortage Reports</h1><p>IC Team and IC Manager only.</p></div><div class="actions"><button class="btn primary" onclick="printSummaryReport()">Print Summary</button><button class="btn" onclick="printCheckReport()">Print IC Check Sheet</button></div></div><div class="card"><div class="form-row four"><div class="field"><label>Report Mode</label><select id="reportMode"><option value="active">Active Only</option><option value="archive">Archived History</option><option value="both">Active + Archived</option></select></div><div class="field"><label>Start Date</label><input id="reportStart" type="date"></div><div class="field"><label>End Date</label><input id="reportEnd" type="date"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="runReportPull()">Run Report</button></div></div></div><div id="reportBody"></div></div></section>
 <section id="restockScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Replenishment</div><h1>Replenishment Report</h1><p>IC Manager only.</p></div><button class="btn primary" onclick="printReplenReport()">Print</button></div><div class="card"><div class="card-title">Inventory Bin Report Import</div><p class="notice">Paste report columns: Bin Name, Product Code, Qty on Hand, Qty Allocated, Unit of Measure.</p><textarea id="binImport" style="width:100%;min-height:160px" placeholder="82-26-01&#9;DI1210&#9;12&#9;0&#9;EA"></textarea><div class="actions" style="margin-top:10px"><button class="btn primary" onclick="saveInventoryBinReport()">Import Bin Report</button></div></div><div id="restockBody"></div></div></section>
 <section id="pickerScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Personnel</div><h1>Manage Pickers &amp; Packers</h1><p>IC Manager only. Names stored as FirstInitialLastName (e.g. JDoe).</p></div></div><div class="card"><div class="card-title">Pickers</div><div class="form-row two"><div class="field"><label>Picker Name (FirstInitialLastName)</label><input id="pickerName" placeholder="JDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPickerManual()">Add Picker</button></div></div><div id="pickerList"></div></div><div class="card"><div class="card-title">Packers</div><div class="form-row two"><div class="field"><label>Packer Name (FirstInitialLastName)</label><input id="packerName" placeholder="MDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackerManual()">Add Packer</button></div></div><div id="packerList"></div></div><div class="card"><div class="card-title">Pack Stations</div><div class="form-row two"><div class="field"><label>Pack Station Name</label><input id="packStationName" placeholder="PS-01"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackStationManual()">Add Station</button></div></div><div id="packStationList"></div></div></div></section>
 <section id="migrationScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Migration</div><h1>Old Firebase Migration</h1><p>Copies old shortage records into the new shortage database. Does not delete the old database.</p></div></div><div class="card"><div class="notice">Source: <b>inventory-control-portal</b> collection <b>shortages</b>. Destination: current active collection.</div><div class="form-row three"><div class="field"><label>Old Collection</label><input id="oldCollection" value="shortages"></div><div class="field"><label>Limit</label><input id="migLimit" type="number" value="5000"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="runMigration()">Run Migration</button></div></div><div id="migrationResult"></div></div></div></section>
-<section id="settingsScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Settings</div><h1>Firebase Settings</h1><p>IC Manager only.</p></div></div><div class="card"><div class="form-row two"><div class="field"><label>API Key</label><input id="cfgApiKey"></div><div class="field"><label>Auth Domain</label><input id="cfgAuthDomain"></div><div class="field"><label>Project ID</label><input id="cfgProjectId"></div><div class="field"><label>Storage Bucket</label><input id="cfgStorageBucket"></div><div class="field"><label>Messaging Sender ID</label><input id="cfgSenderId"></div><div class="field"><label>App ID</label><input id="cfgAppId"></div><div class="field"><label>Active Collection</label><input id="cfgActiveCollection"></div><div class="field"><label>Archive Collection</label><input id="cfgArchiveCollection"></div></div><label class="toggle"><input id="themeToggle" type="checkbox" onchange="saveTheme(this.checked)"> Light mode</label><div class="actions" style="margin-top:14px"><button class="btn primary" onclick="saveSettings()">Save Settings</button></div></div></div></section>
+<section id="settingsScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Settings</div><h1>Firebase Settings</h1><p>IC Manager only.</p></div></div><div class="card"><div class="form-row two"><div class="field"><label>API Key</label><input id="cfgApiKey"></div><div class="field"><label>Auth Domain</label><input id="cfgAuthDomain"></div><div class="field"><label>Project ID</label><input id="cfgProjectId"></div><div class="field"><label>Storage Bucket</label><input id="cfgStorageBucket"></div><div class="field"><label>Messaging Sender ID</label><input id="cfgSenderId"></div><div class="field"><label>App ID</label><input id="cfgAppId"></div><div class="field"><label>Active Collection</label><input id="cfgActiveCollection"></div><div class="field"><label>Archive Collection</label><input id="cfgArchiveCollection"></div></div><label class="toggle"><input id="themeToggle" type="checkbox" onchange="saveTheme(this.checked)"> Light mode</label><div class="actions" style="margin-top:14px"><button class="btn primary" onclick="saveSettings()">Save Settings</button><button class="btn red" onclick="forceReloadAllClients()" style="margin-left:auto">&#128257; Force Reload All Open Instances</button></div></div></div></section>
 <section id="overpullScreen" class="screen"><div class="wrap">
 
   <!-- Header -->
@@ -207,6 +207,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
         </div>
       </div>
       <div class="actions"><button class="btn" onclick="opClearForm()">Clear Form</button><button class="btn primary" style="flex:1" onclick="opPromptMore()">Submit Over Pull</button></div>
+      <div class="actions" style="margin-top:8px"><button class="btn orange" style="width:100%" onclick="openPickedTwiceModal()" id="pickedTwiceBtn">&#9888; Report Duplicate Pick — Entire Order Picked Twice</button></div>
     </div>
   </div>
 
@@ -224,6 +225,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
   </div>
 
 </div></section>
+<div id="pickedTwiceOverlay" class="overlay"><div class="modal"><div class="modal-head"><h3>&#9888; Report: Order Picked Twice / Duplicate Pick</h3><button onclick="closePickedTwiceModal()">&#215;</button></div><div class="modal-body"><div class="notice" style="background:var(--orange-l);border-color:rgba(251,146,60,.35);margin-bottom:16px"><b>What this does:</b> Flags an entire order as having been picked twice (over-pulled). No product lines needed — the whole order must be returned and investigated. This creates a Duplicate Pick record for IC and management review.</div><div class="form-row two"><div class="field"><label>Date &amp; Time <em>*</em></label><input id="ptDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="ptDiv"><option value="">Select</option><option value="NH">NH</option><option value="GT">GT</option><option value="FS">FS</option><option value="EE">EE</option><option value="BC">BC</option><option value="CF">CF</option><option value="VP">VP – VIP</option><option value="TP">TP – Transpac</option></select></div><div class="field"><label>Pick Demand # <em>*</em></label><input id="ptDemand" placeholder="e.g. NH00012345" oninput="ptAutoDivision()"></div><div class="field"><label>Picker Involved <em>*</em></label><select id="ptPickerSelect" onchange="onPickerSelectChange('ptPickerSelect','ptPickerNew','ptPicker')"><option value="">-- Select Picker --</option></select><div id="ptPickerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="ptPickerNew" placeholder="e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('ptPickerNew','picker');syncNewPersonToHidden('ptPickerNew','ptPicker')" onblur="validatePersonField('ptPickerNew','picker');syncNewPersonToHidden('ptPickerNew','ptPicker')" onkeydown="handleSuggestKey(event,'ptPickerNewSuggest')"><div class="suggest-box" id="ptPickerNewSuggest" style="display:none"></div></div></div><input id="ptPicker" type="hidden"></div></div><div class="field"><label>Shift</label><select id="ptShift"><option value="auto">Auto (use current time)</option><option value="1st">1st</option><option value="2nd">2nd</option><option value="3rd">3rd</option></select></div><div class="field"><label>Notes / Details <em>*</em></label><textarea id="ptNotes" placeholder="Describe what happened — where was the duplicate pick found, who reported it, what action was taken..."></textarea></div><div class="actions" style="margin-top:8px"><button class="btn primary" onclick="savePickedTwice()">&#9888; Submit Duplicate Pick Report</button><button class="btn" onclick="closePickedTwiceModal()">Cancel</button></div></div></div></div>
 <div id="editOverlay" class="overlay"><div class="modal"><div class="modal-head"><h3>Edit Shortage</h3><button onclick="closeEdit()">&#215;</button></div><div id="editBody" class="modal-body"></div></div></div>
 <div id="icConfirmOverlay" class="ic-confirm-overlay">
   <div class="ic-confirm-modal">
@@ -518,11 +520,25 @@ async function runReportPull(){const mode=$('reportMode').value;$('viewMode').va
 function normalizeDate(v){if(!v)return '';try{if(v.toDate)return v.toDate().toISOString().slice(0,10);const str=String(v);if(/^\d{4}-\d{2}-\d{2}/.test(str))return str.slice(0,10);const t=Date.parse(str);return isNaN(t)?str.slice(0,10):new Date(t).toISOString().slice(0,10)}catch(e){return ''}}
 function matchesDate(r,start,end){const d=normalizeDate(r.date||r.createdAt||r.timestamp);if(start&&d<start)return false;if(end&&d>end)return false;return true}
 function filteredRows(forReport=false){const text=(forReport?'':$('filterText')?.value||'').toLowerCase().trim();const start=forReport?$('reportStart').value:$('filterStart')?.value;const end=forReport?$('reportEnd').value:$('filterEnd')?.value;return shortages.filter(r=>{if(!matchesDate(r,start,end))return false;if(!text)return true;return [r.productCode,r.shortedBin,r.picker,r.pickDemand,r.division,r.notes].join(' ').toLowerCase().includes(text)})}
-function renderShortages(){visibleShortages=filteredRows(false);$('shortageList').innerHTML=visibleShortages.length?visibleShortages.map(rowHtml).join(''):`<div class="empty">${t('list.no_shortages')}</div>`;renderCheckPreview()}
+function renderShortages(){visibleShortages=filteredRows(false);$('shortageList').innerHTML=visibleShortages.length?visibleShortages.map(rowHtml).join(''):`<div class="empty">${t('list.no_shortages')}</div>`;renderCheckPreview();}
 function isBackorderRisk(r){return !!r.foundInShortedBin&&!r.secondLocationFilled}
 function statusBadges(r){let b=[];if(r._archived)b.push(`<span class="badge purple">${t('badge.archived')}</span>`);if(r.icConfirmed==='confirmed_short')b.push(`<span class="badge green">&#10003; ${t('badge.confirmed')}</span>`);if(r.icConfirmed==='erroneous')b.push(`<span class="badge yellow">&#9888; ${t('badge.erroneous')}</span>`);else if(r.foundInShortedBin)b.push(`<span class="badge yellow">${t('badge.erroneous')}</span>`);if(isBackorderRisk(r))b.push(`<span class="badge red">${t('badge.backorder')}</span>`);if(r.secondLocationFilled)b.push(`<span class="badge blue">${t('badge.second_loc')}</span>`);if(r.replenishedAfterPick)b.push(`<span class="badge green">${t('badge.replenished')}</span>`);return b.join(' ')}
 function secondarySummary(r){const locs=Array.isArray(r.secondaryLocations)?r.secondaryLocations:[];return locs.map(x=>`${x.bin||'NO BIN'}: ${x.qty||0} ${x.uom||r.uom||'EA'}${x.icQtyOnHand?` (OH ${x.icQtyOnHand})`:''}${x.notes?` - ${x.notes}`:''}`).join(' | ')}
-function rowHtml(r){const chk=canRunReports()&&!r._archived?`<input class="sr-check" type="checkbox" data-id="${esc(r.id)}">`:'';const edit=`<button class="btn" onclick="openEdit('${esc(r.id)}',${r._archived})">${t('btn.edit')}</button>`;const mark=!r._archived?`<button class="btn green" onclick="markErroneous('${esc(r.id)}')">${t('btn.found_bin')}</button><button class="btn" onclick="toggleSecond('${esc(r.id)}')">${t('btn.second_loc')}</button><button class="btn" onclick="toggleReplenished('${esc(r.id)}')">${t('btn.replenished')}</button>`:'';const unarch=r._archived&&canRunReports()?`<button class="btn orange" onclick="unarchiveOne('${esc(r.id)}')">${t('btn.unarchive')}</button>`:'';const sec=secondarySummary(r);return `<div class="shortage-row ${r._archived?'archived':''} ${r.foundInShortedBin?'erroneous':''}"><div class="sr-head">${chk}<div style="flex:1"><div class="sr-codes">${esc(r.productCode||'NO PRODUCT')} <span style="color:var(--muted)">&bull;</span> ${esc(r.shortedBin||'NO BIN')}</div><div class="sr-meta">${esc(r.date||'No date')} &bull; ${esc(r.division||'')} &bull; ${t('row.qty')} ${esc(r.qtyShorted||'')} ${esc(r.uom||'')} &bull; ${t('row.demand')} ${esc(r.pickDemand||'')} &bull; ${t('row.picker')} ${esc(r.picker||'')}${r.packStation?' &bull; Station '+esc(r.packStation):''}</div><div class="sr-meta">${t('row.ic_found')}: ${esc(r.icQtyFound||'')} ${esc(r.icUom||r.uom||'')} ${r.icNotes?'&bull; '+esc(r.icNotes):''}</div>${sec?`<div class="sr-meta"><b>${t('row.second_filled')}</b> ${esc(sec)}</div>`:''}<div style="margin-top:6px">${statusBadges(r)}</div><div class="sr-actions">${edit}${mark}${unarch}</div></div></div></div>`}
+function rowHtml(r){
+  // Special rendering for duplicate pick reports
+  if(r.type==='duplicate_pick'){
+    const edit=canRunReports()?`<button class="btn" onclick="openEdit('${esc(r.id)}',${r._archived})">Edit</button>`:'';
+    return `<div class="shortage-row" style="border-color:rgba(251,146,60,.5);background:rgba(251,146,60,.06)">
+      <div class="sr-head"><div style="flex:1">
+        <div class="sr-codes" style="color:var(--orange)">&#9888; DUPLICATE PICK &bull; ${esc(r.pickDemand||'NO ORDER')}</div>
+        <div class="sr-meta">${esc(r.date||'No date')} &bull; ${esc(r.division||'')} &bull; Picker: <strong>${esc(r.picker||'')}</strong> &bull; ${esc(r.shift||'')} Shift</div>
+        <div class="sr-meta" style="margin-top:4px;color:var(--text)">${esc(r.notes||'')}</div>
+        <div style="margin-top:6px"><span class="badge orange" style="color:var(--orange);background:var(--orange-l);border-color:rgba(251,146,60,.35)">&#9888; Duplicate Pick — Investigation Required</span></div>
+        <div class="sr-actions">${edit}</div>
+      </div></div>
+    </div>`;
+  }
+  const chk=canRunReports()&&!r._archived?`<input class="sr-check" type="checkbox" data-id="${esc(r.id)}">`:'';const edit=`<button class="btn" onclick="openEdit('${esc(r.id)}',${r._archived})">${t('btn.edit')}</button>`;const mark=!r._archived?`<button class="btn green" onclick="markErroneous('${esc(r.id)}')">${t('btn.found_bin')}</button><button class="btn" onclick="toggleSecond('${esc(r.id)}')">${t('btn.second_loc')}</button><button class="btn" onclick="toggleReplenished('${esc(r.id)}')">${t('btn.replenished')}</button>`:'';const unarch=r._archived&&canRunReports()?`<button class="btn orange" onclick="unarchiveOne('${esc(r.id)}')">${t('btn.unarchive')}</button>`:'';const sec=secondarySummary(r);return `<div class="shortage-row ${r._archived?'archived':''} ${r.foundInShortedBin?'erroneous':''}"><div class="sr-head">${chk}<div style="flex:1"><div class="sr-codes">${esc(r.productCode||'NO PRODUCT')} <span style="color:var(--muted)">&bull;</span> ${esc(r.shortedBin||'NO BIN')}</div><div class="sr-meta">${esc(r.date||'No date')} &bull; ${esc(r.division||'')} &bull; ${t('row.qty')} ${esc(r.qtyShorted||'')} ${esc(r.uom||'')} &bull; ${t('row.demand')} ${esc(r.pickDemand||'')} &bull; ${t('row.picker')} ${esc(r.picker||'')}${r.packStation?' &bull; Station '+esc(r.packStation):''}</div><div class="sr-meta">${t('row.ic_found')}: ${esc(r.icQtyFound||'')} ${esc(r.icUom||r.uom||'')} ${r.icNotes?'&bull; '+esc(r.icNotes):''}</div>${sec?`<div class="sr-meta"><b>${t('row.second_filled')}</b> ${esc(sec)}</div>`:''}<div style="margin-top:6px">${statusBadges(r)}</div><div class="sr-actions">${edit}${mark}${unarch}</div></div></div></div>`}
 async function saveShortage(){autoDivisionFromDemand();validatePickerInput();const base={date:$('sDate').value||nowLocalInput(),division:$('sDiv').value,pickDemand:$('sDemand').value.trim().toUpperCase(),picker:normalizeName(($('sPicker').value||$('sPickerNew').value||'').trim()),packStation:($('sPackStation').value.trim().toUpperCase()),shift:shiftValue(),uom:'EA',notes:$('sNotes').value.trim(),createdAt:new Date().toISOString(),createdBy:role,foundInShortedBin:false,secondLocationFilled:false,replenishedAfterPick:false,status:'open'};const lines=getProductLines();if(!base.pickDemand){alert('Pick Demand # is required.');return}if(!base.division){alert('Division is required. Enter or scan the Pick Demand # first.');return}if(!base.picker){alert('Picker is required.');return}if(base.picker&&!fuzzyMatchPerson(base.picker,'picker')){if(!confirm(`"${base.picker}" is not saved. Save as new picker?`)){$('sPicker').focus();return}savePerson(base.picker,'picker');}if(!lines.length||lines.some(l=>!l.productCode||!l.shortedBin)){alert('Each product line needs Product Code and Bin Shorted.');return}
   const invalidBins=lines.filter(l=>l.shortedBin&&!validateBinFormat(l.shortedBin).ok);
   if(invalidBins.length){alert('Invalid bin format on one or more lines.\n\nValid formats:\n  ##-##-##  (e.g. 82-26-01)\n  ##-##-#   (e.g. 82-26-1)\n  P#####    (e.g. P12345)\n  BULK\n  ROOM\n  KEY ACCOUNT');return}showLoading('Saving shortages...');try{const batch=db.batch();const col=db.collection(getSettings().activeCollection);lines.forEach(line=>{batch.set(col.doc(),{...base,...line,uom:'EA'});});await batch.commit();clearCaches();clearEntry();await loadShortages(true)}catch(e){alert(e.message)}finally{hideLoading()}}
@@ -2041,6 +2057,7 @@ const LANGS={
     'nav.ic_portal':'IC Portal','nav.light_dark':'Light/Dark','nav.logout':'Logout',
     'nav.over_pull':'Over Pull',
     'viewmode.active':'Active','viewmode.archive':'Archived History','viewmode.both':'Active + Archived',
+    'form.duplicate_order':'Report: Order Picked Twice',
   },
   es:{dir:'ltr',
     'login.title':'Portal de Control de Escasez','login.subtitle':'Aplicación separada de informes de escasez',
@@ -2092,6 +2109,7 @@ const LANGS={
     'nav.ic_portal':'Portal IC','nav.light_dark':'Claro/Oscuro','nav.logout':'Cerrar Sesión',
     'nav.over_pull':'Exceso de Retiro',
     'viewmode.active':'Activo','viewmode.archive':'Historial Archivado','viewmode.both':'Activo + Archivado',
+    'form.duplicate_order':'Reporte: Orden Doble',
   },
   fa:{dir:'rtl',
     'login.title':'پورتل کنترل کمبود','login.subtitle':'برنامه جداگانه گزارش کمبود',
@@ -2143,6 +2161,7 @@ const LANGS={
     'nav.ic_portal':'پورتل IC','nav.light_dark':'روشن/تیره','nav.logout':'خروج',
     'nav.over_pull':'ثبت مازاد',
     'viewmode.active':'فعال','viewmode.archive':'تاریخچه آرشیو','viewmode.both':'فعال + آرشیو',
+    'form.duplicate_order':'گزارش: سفارش دو بار برداشته شد',
   },
   fil:{dir:'ltr',
     'login.title':'Portal ng Kontrol sa Kakulangan','login.subtitle':'Hiwalay na app para sa pag-uulat ng kakulangan',
@@ -2194,7 +2213,62 @@ const LANGS={
     'nav.ic_portal':'IC Portal','nav.light_dark':'Maliwanag/Madilim','nav.logout':'Mag-logout',
     'nav.over_pull':'Log ng Sobra',
     'viewmode.active':'Aktibo','viewmode.archive':'Kasaysayan ng Archive','viewmode.both':'Aktibo + Archive',
+    'form.duplicate_order':'Report: Dalawang Beses na na-pick',
+  },
+  ar:{dir:'rtl',
+    'login.title':'بوابة التحكم في النقص','login.subtitle':'تطبيق منفصل للإبلاغ عن النقص',
+    'login.select_role':'اختر الدور',
+    'login.clerk_title':'موظف الشحن','login.clerk_sub':'إدخال النقص',
+    'login.ic_title':'فريق IC','login.ic_sub':'التحقق والتقرير',
+    'login.manager_title':'مدير IC','login.manager_sub':'الإعدادات والترحيل',
+    'login.no_login':'بدون تسجيل دخول',
+    'login.shortage_portal':'بوابة النقص والزيادة','login.shortage_portal_sub':'يفتح تطبيق النقص (تبويب جديد)',
+    'login.enter_pin':'أدخل رمز PIN','login.back':'رجوع',
+    'form.date_time':'التاريخ والوقت','form.division':'القسم','form.picker':'جامع البضائع',
+    'form.pack_station':'محطة التعبئة','form.pick_demand':'رقم طلب الانتقاء',
+    'form.shift_override':'الوردية (يدوي)','form.shift_auto':'تلقائي (الوقت الحالي)',
+    'form.shift_1st':'الوردية الأولى','form.shift_2nd':'الوردية الثانية','form.shift_3rd':'الوردية الثالثة',
+    'form.product_lines':'خطوط المنتجات','form.product_code':'كود المنتج',
+    'form.qty_each':'الكمية (لكل وحدة)','form.bin_shorted':'خانة النقص',
+    'form.uom':'وحدة القياس','form.notes':'ملاحظات',
+    'form.add_line':'+ إضافة سطر','form.clear_form':'مسح النموذج','form.log_shortages':'+ تسجيل جميع النقصات',
+    'form.required':'مطلوب',
+    'form.duplicate_order':'تكرار الطلب',
+    'list.search':'بحث حسب المنتج، الطلب، الجامع، القسم...',
+    'list.active':'نشط','list.archive':'الأرشيف','list.both':'نشط + أرشيف',
+    'list.refresh':'تحديث','list.no_shortages':'لا توجد نقصات لهذا الفلتر.',
+    'list.select_visible':'تحديد المرئي','list.clear_selection':'إلغاء التحديد',
+    'list.archive_selected':'أرشفة المحدد','list.archive_filtered':'أرشفة النشط المفلتر',
+    'list.ic_verify':'ورقة تحقق IC',
+    'btn.edit':'تعديل','btn.found_bin':'وجد في خانة النقص / العد',
+    'btn.second_loc':'تم تعبئته من موقع ثانٍ','btn.replenished':'هل تم إعادة تعبئة الخانة؟',
+    'btn.unarchive':'إلغاء الأرشفة','btn.open_ic_portal':'فتح بوابة IC',
+    'badge.archived':'مؤرشف','badge.erroneous':'خانة خاطئة','badge.backorder':'خطر تأخير الطلب',
+    'badge.second_loc':'تم التعبئة من موقع ثانٍ','badge.replenished':'تمت إعادة التعبئة بعد الانتقاء',
+    'badge.confirmed':'تم تأكيد النقص من IC',
+    'row.ic_found':'وجد IC','row.second_filled':'موقع ثانٍ مملوء:',
+    'row.qty':'الكمية','row.demand':'الطلب','row.picker':'جامع البضائع',
+    'pin.incorrect':'رمز PIN غير صحيح',
+    'op.title':'سجل الزيادة','op.subtitle':'بدون تسجيل دخول — سجّل العناصر التي تم سحبها بزيادة.',
+    'op.tab_entry':'📝 إدخال البيانات','op.tab_records':'📊 السجلات والإحصاءات',
+    'op.new_entry':'إدخال زيادة جديد','op.order_num':'رقم الطلب',
+    'op.packer_name':'اسم المعبّئ','op.picker_name':'اسم الجامع','op.pack_station':'محطة التعبئة',
+    'op.items_title':'العناصر الزائدة','op.add_item':'+ إضافة عنصر','op.clear':'مسح النموذج',
+    'op.submit':'تسجيل الزيادة','op.more_q':'هل هناك عناصر أخرى لإضافتها؟',
+    'op.yes_more':'+ نعم — إضافة عنصر آخر','op.no_submit':'✓ لا — تسجيل هذا الإدخال',
+    'op.print':'🖨 طباعة تقرير KPI',
+    'op.search':'بحث حسب المعبّئ، الجامع، الطلب، المنتج، القسم...',
+    'op.product_code':'كود المنتج','op.qty':'الكمية','op.uom':'وحدة القياس',
+    'page.shortages_title':'إدخال النقص','page.shortages_desc':'تسجيل خطوط النقص ومراجعة السجلات النشطة.',
+    'page.reports_title':'تقارير النقص','page.reports_desc':'لفريق IC ومدير IC فقط.',
+    'nav.shortages':'النقصات','nav.reports':'التقارير','nav.replenishment':'إعادة التخزين',
+    'nav.manage_pickers':'إدارة جامعي البضائع','nav.migration':'الترحيل','nav.settings':'الإعدادات',
+    'nav.ic_portal':'بوابة IC','nav.light_dark':'فاتح/داكن','nav.logout':'تسجيل الخروج',
+    'nav.over_pull':'سجل الزيادة',
+    'viewmode.active':'نشط','viewmode.archive':'الأرشيف','viewmode.both':'نشط + أرشيف',
+    'dup.select':'اختر طلباً للتكرار...','dup.btn':'↩ تكرار طلب سابق',
   }
+
 };
 
 function t(key){
@@ -2207,7 +2281,7 @@ function setLang(lang){
   localStorage.setItem('scp_lang',lang);
   const dir=LANGS[lang].dir||'ltr';
   document.documentElement.dir=dir;
-  document.documentElement.lang=lang==='fa'?'fa-AF':lang==='fil'?'fil':lang==='es'?'es':'en';
+  document.documentElement.lang=lang==='fa'?'fa-AF':lang==='ar'?'ar':lang==='fil'?'fil':lang==='es'?'es':'en';
   // Update all i18n-keyed elements
   document.querySelectorAll('[data-i18n]').forEach(el=>{
     const key=el.dataset.i18n;
@@ -2220,7 +2294,7 @@ function setLang(lang){
   const ti=$('i18n-title');if(ti)ti.textContent=t('login.title');
   const su=$('i18n-subtitle');if(su)su.textContent=t('login.subtitle');
   // Highlight active lang button
-  ['en','es','fa','fil'].forEach(l=>{
+  ['en','es','fa','ar','fil'].forEach(l=>{
     const btn=$('lang'+l.charAt(0).toUpperCase()+l.slice(1));
     if(btn)btn.style.borderColor=l===lang?'var(--accent)':'var(--border)';
     if(btn)btn.style.color=l===lang?'var(--accent)':'var(--muted)';
@@ -2418,7 +2492,7 @@ function applyLangToForms(){
   if(opRefresh)opRefresh.textContent=t('list.refresh');
 
   // ── Highlight active lang button ──
-  ['en','es','fa','fil'].forEach(l=>{
+  ['en','es','fa','ar','fil'].forEach(l=>{
     const id='lang'+l.charAt(0).toUpperCase()+l.slice(1);
     const btn=$(id);
     if(!btn)return;
@@ -2431,7 +2505,121 @@ function applyLangToForms(){
   if(typeof renderShortages==='function'&&shortages.length)renderShortages();
 }
 
-function startup(){applyTheme();initFirebase();$('sDate').value=nowLocalInput();loadAllPersonnel();populatePickerSelects();if($('productLines'))addProductLine();const sl=localStorage.getItem('scp_lang')||'en';setLang(sl);}
+
+/* ── PICKED TWICE / DUPLICATE PICK REPORT ─────────── */
+function openPickedTwiceModal(){
+  const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());
+  $('ptDate').value=d.toISOString().slice(0,16);
+  $('ptDemand').value='';$('ptDiv').value='';$('ptNotes').value='';$('ptShift').value='auto';
+  $('ptPicker').value='';
+  const sel=$('ptPickerSelect');if(sel)sel.value='';
+  const wrap=$('ptPickerNewWrap');if(wrap)wrap.style.display='none';
+  // Pre-fill from Over Pull form fields if filled
+  const d2=$('opOrder').value;if(d2){$('ptDemand').value=d2.replace('.','');ptAutoDivision();}
+  const pv=$('opPacker').value||$('opPackerNew').value||$('opPicker').value||$('opPickerNew').value;
+  // Populate picker dropdown
+  const pickerOpts=['<option value="">-- Select Picker --</option>',
+    ...pickerNames.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`),
+    '<option value="__new__">+ Add New Picker...</option>'
+  ].join('');
+  const ptSel=$('ptPickerSelect');if(ptSel)ptSel.innerHTML=pickerOpts;
+  // Pre-fill picker if we got a value from Over Pull form
+  if(pv&&ptSel){
+    const opt=[...ptSel.options].find(o=>o.value===normalizeName(pv));
+    if(opt){ptSel.value=opt.value;onPickerSelectChange('ptPickerSelect','ptPickerNew','ptPicker');}
+  }
+  $('pickedTwiceOverlay').classList.add('open');
+}
+
+function closePickedTwiceModal(){
+  $('pickedTwiceOverlay').classList.remove('open');
+}
+
+function ptAutoDivision(){
+  const v=($('ptDemand').value||'').trim().slice(0,2).toUpperCase();
+  $('ptDiv').value=v;
+}
+
+async function savePickedTwice(){
+  const demand=($('ptDemand').value||'').trim().toUpperCase();
+  const picker=($('ptPicker').value||$('ptPickerNew').value||'').trim();
+  const notes=($('ptNotes').value||'').trim();
+  const div=($('ptDiv').value||'').trim().toUpperCase();
+  if(!demand){alert('Pick Demand # is required.');return;}
+  if(!div){alert('Division is required.');return;}
+  if(!picker){alert('Picker is required.');return;}
+  if(!notes){alert('Notes are required — describe what happened.');return;}
+  const shiftV=(()=>{const ov=$('ptShift').value;if(ov&&ov!=='auto')return ov;const h=new Date().getHours();if(h>=6&&h<14)return'1st';if(h>=14&&h<22)return'2nd';return'3rd';})();
+  showLoading('Saving duplicate pick report...');
+  try{
+    const s=getSettings();
+    const record={
+      type:'duplicate_pick',
+      date:$('ptDate').value||nowLocalInput(),
+      pickDemand:demand,
+      division:div,
+      picker:normalizeName(picker),
+      shift:shiftV,
+      notes,
+      status:'open',
+      createdAt:new Date().toISOString(),
+      createdBy:role,
+      requiresInvestigation:true,
+    };
+    if(db){
+      await db.collection(s.activeCollection).add(record);
+    } else {
+      alert('Firebase not connected. Record not saved.');hideLoading();return;
+    }
+    clearCaches();
+    closePickedTwiceModal();
+    await loadShortages(true);
+    hideLoading();
+    alert(`Duplicate pick report filed for order ${demand}.\nIC team and management have been flagged for investigation.`);
+  }catch(e){hideLoading();alert('Save failed: '+e.message);}
+}
+
+/* ── GLOBAL RESET / FORCE RELOAD ALL CLIENTS ───────── */
+let _resetListener=null;
+
+function startResetListener(){
+  if(!db)return;
+  if(_resetListener){_resetListener();_resetListener=null;}
+  try{
+    _resetListener=db.collection('_system').doc('reset')
+      .onSnapshot(snap=>{
+        if(!snap.exists)return;
+        const ts=snap.data()?.resetAt;
+        if(!ts)return;
+        const key='scp_last_reset';
+        const last=localStorage.getItem(key);
+        if(last!==ts){
+          localStorage.setItem(key,ts);
+          // Don't reload on the very first load — only on subsequent signals
+          if(last){
+            setTimeout(()=>location.reload(),800);
+          }
+        }
+      });
+  }catch(e){console.warn('Reset listener failed:',e);}
+}
+
+async function forceReloadAllClients(){
+  if(!canSettings()){alert('IC Manager access required.');return;}
+  if(!confirm('Force reload ALL open instances of this app on every computer?\n\nThis will refresh everyone\'s browser within ~2 seconds.'))return;
+  try{
+    showLoading('Sending reload signal...');
+    await db.collection('_system').doc('reset').set({
+      resetAt:new Date().toISOString(),
+      triggeredBy:role,
+      reason:'Manual force reload by IC Manager'
+    });
+    hideLoading();
+    alert('Reload signal sent. All open instances will refresh within a few seconds.');
+  }catch(e){hideLoading();alert('Failed: '+e.message);}
+}
+
+function startup(){applyTheme();initFirebase();$('sDate').value=nowLocalInput();loadAllPersonnel();populatePickerSelects();if($('productLines'))addProductLine();const sl=localStorage.getItem('scp_lang')||'en';setLang(sl);startResetListener();}
 startup();
 </script>
 </body>
