@@ -22,7 +22,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 </head>
 <body>
 <div id="topbar" class="topbar"><div class="brand">Shortage Control Portal</div><span id="roleChip" class="role-chip"></span><div id="nav" class="nav"></div></div>
-<section id="loginScreen" class="screen active"><div class="login-wrap"><div class="login-header"><h1>Shortage Control Portal</h1><p>Separate shortage reporting app</p></div><div class="login-group-label">Select role</div><div class="ic-btns"><button class="ic-login-btn" onclick="goPin('clerk')"><span class="ib-icon">&#128203;</span><span class="ib-title">Outbound Clerk</span><span class="ib-sub">Shortage Entry</span></button><button class="ic-login-btn" onclick="goPin('icteam')"><span class="ib-icon">&#128270;</span><span class="ib-title">IC Team</span><span class="ib-sub">Verify and Report</span></button><button class="ic-login-btn" onclick="goPin('manager')"><span class="ib-icon">&#9881;&#65039;</span><span class="ib-title">IC Manager</span><span class="ib-sub">Settings and Migration</span></button></div></div></section>
+<section id="loginScreen" class="screen active"><div class="login-wrap"><div class="login-header"><h1>Shortage Control Portal</h1><p>Separate shortage reporting app</p></div><div class="login-group-label">Select role</div><div class="ic-btns"><button class="ic-login-btn" onclick="goPin('clerk')"><span class="ib-icon">&#128203;</span><span class="ib-title">Outbound Clerk</span><span class="ib-sub">Shortage Entry</span></button><button class="ic-login-btn" onclick="goPin('icteam')"><span class="ib-icon">&#128270;</span><span class="ib-title">IC Team</span><span class="ib-sub">Verify and Report</span></button><button class="ic-login-btn" onclick="goPin('manager')"><span class="ib-icon">&#9881;&#65039;</span><span class="ib-title">IC Manager</span><span class="ib-sub">Settings and Migration</span></button></div><div class="login-group-label" style="margin-top:16px">No Login Required</div><div style="display:grid;grid-template-columns:1fr;gap:10px"><button class="ic-login-btn" onclick="enterOverPull()" style="border-color:rgba(251,146,60,.4);background:var(--orange-l)"><span class="ib-icon">&#128202;</span><span class="ib-title" style="color:var(--orange)">Over Pull Log</span><span class="ib-sub">Operations — no PIN needed</span></button></div></div></section>
 <section id="pinScreen" class="screen"><div class="pin-card"><div id="pinBadge" class="pin-div-badge">Role</div><p style="color:var(--muted);font-size:12px">Enter PIN</p><div id="pinDots" class="pin-dots"><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span></div><div class="pin-keypad"><button class="pin-key" data-key="1" onclick="pinKey('1')">1</button><button class="pin-key" data-key="2" onclick="pinKey('2')">2</button><button class="pin-key" data-key="3" onclick="pinKey('3')">3</button><button class="pin-key" data-key="4" onclick="pinKey('4')">4</button><button class="pin-key" data-key="5" onclick="pinKey('5')">5</button><button class="pin-key" data-key="6" onclick="pinKey('6')">6</button><button class="pin-key" data-key="7" onclick="pinKey('7')">7</button><button class="pin-key" data-key="8" onclick="pinKey('8')">8</button><button class="pin-key" data-key="9" onclick="pinKey('9')">9</button><button class="pin-key clr" onclick="pinClear()">CLR</button><button class="pin-key" data-key="0" onclick="pinKey('0')">0</button><button class="pin-key clr" onclick="pinBack()">&#9003;</button></div><div id="pinError" class="pin-error"></div><button class="pin-back-btn" onclick="backToLogin()">Back</button></div></section>
 <section id="shortageScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Outbound</div><h1>Shortage Entry</h1><p>Log shortage lines and review active records.</p></div><div id="shortageTopActions" class="actions"></div></div><div class="card" id="entryCard"><div class="form-row four"><div class="field"><label>Date &amp; Time</label><input id="sDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="sDiv"><option value="">Select</option><option>NH</option><option>GT</option><option>FS</option><option>EE</option><option>BC</option><option>CF</option></select></div><div class="field"><label>Picker <em>*</em></label><input id="sPicker" list="pickerOptions" placeholder="Scan picker badge..." onblur="validatePickerInput()"><datalist id="pickerOptions"></datalist></div><div class="field"><label>Pick Demand # <em>*</em></label><input id="sDemand" placeholder="e.g. NH00012345" oninput="autoDivisionFromDemand()"></div><div class="field"><label>Shift Override</label><select id="sShift"><option value="auto">Auto (use current time)</option><option value="1st">1st</option><option value="2nd">2nd</option><option value="3rd">3rd</option></select></div></div><div class="card-title">Product Lines</div><div id="productLines"></div><div class="actions"><button class="btn" onclick="addProductLine()">+ Add Line</button><button class="btn" onclick="clearEntry()">Clear Form</button><button class="btn primary" style="flex:1" onclick="saveShortage()">+ Log All Shortages</button></div><div class="field" style="margin-top:12px"><label>Notes</label><textarea id="sNotes"></textarea></div></div><div class="filters"><input id="filterText" class="search" placeholder="Search by product, order, picker, division..." oninput="renderShortages()"><select id="viewMode" onchange="loadShortages(true)"><option value="active">Active</option><option value="archive">Archived History</option><option value="both">Active + Archived</option></select><input id="filterStart" type="date" onchange="renderShortages()"><input id="filterEnd" type="date" onchange="renderShortages()"><button class="btn" onclick="loadShortages(true)">Refresh Data</button></div><div id="archiveActions" class="actions" style="margin-bottom:10px"></div><div id="shortageList" class="shortage-list"></div></div></section>
 <section id="reportScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Reports</div><h1>Shortage Reports</h1><p>IC Team and IC Manager only.</p></div><div class="actions"><button class="btn primary" onclick="printSummaryReport()">Print Summary</button><button class="btn" onclick="printCheckReport()">Print IC Check Sheet</button></div></div><div class="card"><div class="form-row four"><div class="field"><label>Report Mode</label><select id="reportMode"><option value="active">Active Only</option><option value="archive">Archived History</option><option value="both">Active + Archived</option></select></div><div class="field"><label>Start Date</label><input id="reportStart" type="date"></div><div class="field"><label>End Date</label><input id="reportEnd" type="date"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="runReportPull()">Run Report</button></div></div></div><div id="reportBody"></div></div></section>
@@ -30,6 +30,44 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 <section id="pickerScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Pickers</div><h1>Manage Pickers</h1><p>IC Manager only.</p></div></div><div class="card"><div class="form-row two"><div class="field"><label>Picker Name</label><input id="pickerName" placeholder="Dmartin"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPicker()">Add Picker</button></div></div><div id="pickerList"></div></div></div></section>
 <section id="migrationScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Migration</div><h1>Old Firebase Migration</h1><p>Copies old shortage records into the new shortage database. Does not delete the old database.</p></div></div><div class="card"><div class="notice">Source: <b>inventory-control-portal</b> collection <b>shortages</b>. Destination: current active collection.</div><div class="form-row three"><div class="field"><label>Old Collection</label><input id="oldCollection" value="shortages"></div><div class="field"><label>Limit</label><input id="migLimit" type="number" value="5000"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="runMigration()">Run Migration</button></div></div><div id="migrationResult"></div></div></div></section>
 <section id="settingsScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Settings</div><h1>Firebase Settings</h1><p>IC Manager only.</p></div></div><div class="card"><div class="form-row two"><div class="field"><label>API Key</label><input id="cfgApiKey"></div><div class="field"><label>Auth Domain</label><input id="cfgAuthDomain"></div><div class="field"><label>Project ID</label><input id="cfgProjectId"></div><div class="field"><label>Storage Bucket</label><input id="cfgStorageBucket"></div><div class="field"><label>Messaging Sender ID</label><input id="cfgSenderId"></div><div class="field"><label>App ID</label><input id="cfgAppId"></div><div class="field"><label>Active Collection</label><input id="cfgActiveCollection"></div><div class="field"><label>Archive Collection</label><input id="cfgArchiveCollection"></div></div><label class="toggle"><input id="themeToggle" type="checkbox" onchange="saveTheme(this.checked)"> Light mode</label><div class="actions" style="margin-top:14px"><button class="btn primary" onclick="saveSettings()">Save Settings</button></div></div></div></section>
+<section id="overpullScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow" style="color:var(--orange);background:var(--orange-l);border-color:rgba(251,146,60,.25)">Operations</div><h1>Over Pull Log</h1><p>No login required — log items pulled in excess of the pick demand.</p></div><div class="actions"><button class="btn orange" onclick="printOverPullReport()">&#128438; Print KPI Report</button></div></div>
+<div class="card">
+  <div class="card-title">New Over Pull Entry</div>
+  <div class="form-row three">
+    <div class="field"><label>Date &amp; Time</label><input id="opDate" type="datetime-local"></div>
+    <div class="field"><label>Order Number <em>*</em></label><input id="opOrder" placeholder="e.g. NH00012345" oninput="opAutoDivision()"></div>
+    <div class="field"><label>Division</label><input id="opDiv" placeholder="Auto-filled" readonly style="opacity:.7;cursor:default"></div>
+  </div>
+  <div class="form-row two">
+    <div class="field"><label>Picker First Name <em>*</em></label><input id="opFirst" placeholder="First"></div>
+    <div class="field"><label>Picker Last Name <em>*</em></label><input id="opLast" placeholder="Last"></div>
+  </div>
+  <div class="card-title" style="margin-top:4px">Items Over-Pulled</div>
+  <div id="opLines"></div>
+  <div class="actions" style="margin-bottom:14px">
+    <button class="btn" onclick="opAddLine()">+ Add Item</button>
+  </div>
+  <div id="opMoreWrap" style="display:none;background:var(--panel);border:1.5px solid var(--accent);border-radius:10px;padding:16px 18px;margin-bottom:14px">
+    <div style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--accent)">&#10067; Are there more items to add to this entry?</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn" onclick="opYesMore()">&#10133; Yes — Add Another Item</button>
+      <button class="btn primary" onclick="opFinishEntry()">&#10003; No — Submit This Entry</button>
+    </div>
+  </div>
+  <div class="actions">
+    <button class="btn" onclick="opClearForm()">Clear Form</button>
+    <button class="btn primary" style="flex:1" onclick="opPromptMore()">Submit Over Pull</button>
+  </div>
+</div>
+<div class="filters">
+  <input id="opFilterText" class="search" placeholder="Search by picker, order, product, division..." oninput="opRenderList()">
+  <input id="opFilterStart" type="date" onchange="opRenderList()">
+  <input id="opFilterEnd" type="date" onchange="opRenderList()">
+  <button class="btn" onclick="opLoadRecords(true)">Refresh</button>
+</div>
+<div id="opKpiBar" class="stat-grid" style="margin-bottom:14px"></div>
+<div id="opList" class="shortage-list"></div>
+</div></section>
 <div id="editOverlay" class="overlay"><div class="modal"><div class="modal-head"><h3>Edit Shortage</h3><button onclick="closeEdit()">&#215;</button></div><div id="editBody" class="modal-body"></div></div></div>
 <div id="loading" class="loading"><div class="loading-card" id="loadingText">Loading...</div></div>
 <div id="printArea" class="print-area"></div>
@@ -42,7 +80,7 @@ const ROLE_LABELS={clerk:'Outbound Clerk',icteam:'IC Team',manager:'IC Manager'}
 const IC_PORTAL_URL='https://phocas88.github.io/Chapman_Inventory_Control_Portal/';
 const DEFAULT_NEW_CONFIG={apiKey:'AIzaSyB1CEylhHj4JoWH2VejdLoOt1nteztaqH8',authDomain:'shortage-control-portal.firebaseapp.com',projectId:'shortage-control-portal',storageBucket:'shortage-control-portal.firebasestorage.app',messagingSenderId:'791183009826',appId:'1:791183009826:web:76f397201bd0228e61ee38'};
 const OLD_CONFIG={apiKey:'AIzaSyA1m5P6MFUojFsEBqLXaSLumNiChgAH1Lw',authDomain:'inventory-control-portal.firebaseapp.com',projectId:'inventory-control-portal',storageBucket:'inventory-control-portal.firebasestorage.app',messagingSenderId:'925547075268',appId:'1:925547075268:web:e6ebce91417aa6885a1b91'};
-const DEFAULT_SETTINGS={firebaseConfig:DEFAULT_NEW_CONFIG,activeCollection:'shortages_active',archiveCollection:'shortages_archive'};
+const DEFAULT_SETTINGS={firebaseConfig:DEFAULT_NEW_CONFIG,activeCollection:'shortages_active',archiveCollection:'shortages_archive',overpullCollection:'overpull_active'};
 let role='',pinTarget='',pinBuf='',db=null,oldDb=null,shortages=[],visibleShortages=[],pickerNames=[],inventoryBins=[],editingId=null,editingArchive=false,lastLoadMode='active';
 function esc(v){return String(v??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]))}
 function num(v){const n=Number(v);return isNaN(n)?0:n}function val(v){return v===undefined||v===null?'':v}
@@ -51,7 +89,7 @@ function getSettings(){try{return {...DEFAULT_SETTINGS,...JSON.parse(localStorag
 function initFirebase(){const s=getSettings();try{if(!firebase.apps.length)firebase.initializeApp(s.firebaseConfig);db=firebase.firestore();firebase.firestore().settings({ignoreUndefinedProperties:true});}catch(e){console.error(e);alert('Firebase connection failed. Check Settings. '+e.message)}}
 function showLoading(t){$('loadingText').textContent=t||'Loading...';$('loading').classList.add('show')}function hideLoading(){$('loading').classList.remove('show')}
 function applyTheme(){const light=localStorage.getItem('scp_theme')==='light';document.body.classList.toggle('light-mode',light);if($('themeToggle'))$('themeToggle').checked=light}function saveTheme(light){localStorage.setItem('scp_theme',light?'light':'dark');applyTheme()}
-function showScreen(name){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const el=$(name+'Screen');if(el)el.classList.add('active');$('topbar').classList.toggle('show',name!=='login'&&name!=='pin');document.querySelectorAll('.nav-btn[data-screen]').forEach(b=>b.classList.toggle('active',b.dataset.screen===name));if(name==='shortage')loadShortages(false);if(name==='report')renderReports();if(name==='picker')renderPickers();if(name==='restock')buildReplenishmentReport();if(name==='settings')loadSettingsForm()}
+function showScreen(name){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const el=$(name+'Screen');if(el)el.classList.add('active');$('topbar').classList.toggle('show',name!=='login'&&name!=='pin');document.querySelectorAll('.nav-btn[data-screen]').forEach(b=>b.classList.toggle('active',b.dataset.screen===name));if(name==='shortage')loadShortages(false);if(name==='report')renderReports();if(name==='picker')renderPickers();if(name==='restock')buildReplenishmentReport();if(name==='settings')loadSettingsForm();if(name==='overpull'){opInitForm();opLoadRecords(false);}}
 function goPin(target){pinTarget=target;pinBuf='';$('pinBadge').textContent=ROLE_LABELS[target];updateDots();$('pinError').textContent='';showScreen('pin')}
 function pinKey(k){if(pinBuf.length>=4)return;pinBuf+=k;updateDots();document.querySelectorAll('.pin-key').forEach(btn=>{if(btn.dataset.key===k){btn.classList.add('active-press');setTimeout(()=>btn.classList.remove('active-press'),140)}});if(pinBuf.length===4)setTimeout(checkPin,120)}
 function pinBack(){pinBuf=pinBuf.slice(0,-1);updateDots()}function pinClear(){pinBuf='';updateDots();$('pinError').textContent=''}function updateDots(){document.querySelectorAll('#pinDots .pin-dot').forEach((d,i)=>d.classList.toggle('filled',i<pinBuf.length))}
@@ -59,7 +97,7 @@ function checkPin(){if(pinBuf!==PINS[pinTarget]){document.querySelectorAll('#pin
 function backToLogin(){role='';pinTarget='';pinBuf='';showScreen('login')}
 document.addEventListener('keydown',e=>{if(!$('pinScreen').classList.contains('active'))return;if(e.key>='0'&&e.key<='9')pinKey(e.key);else if(e.key==='Backspace')pinBack();else if(e.key==='Escape')pinClear();else if(e.key==='Enter'&&pinBuf.length===4)checkPin()});
 function canRunReports(){return role==='icteam'||role==='manager'}function canSettings(){return role==='manager'}function canManage(){return role==='manager'}
-function buildNav(){let nav=[['shortage','Shortages']];if(canRunReports())nav.push(['report','Reports']);if(role==='manager')nav.push(['restock','Replenishment'],['picker','Manage Pickers'],['migration','Migration'],['settings','Settings']);if(role==='icteam'||role==='manager')nav.push(['link','IC Portal']);nav.push(['theme','Light/Dark'],['logout','Logout']);$('nav').innerHTML=nav.map(n=>n[0]==='link'?`<a class="nav-btn" href="${IC_PORTAL_URL}" target="_blank">${n[1]}</a>`:n[0]==='logout'?`<button class="nav-btn lock" onclick="logout()">${n[1]}</button>`:n[0]==='theme'?`<button class="nav-btn" onclick="saveTheme(!document.body.classList.contains('light-mode'))">${n[1]}</button>`:`<button class="nav-btn" data-screen="${n[0]}" onclick="showScreen('${n[0]}')">${n[1]}</button>`).join('')}
+function buildNav(){let nav=[['shortage','Shortages']];if(canRunReports())nav.push(['report','Reports']);if(role==='manager')nav.push(['restock','Replenishment'],['picker','Manage Pickers'],['migration','Migration'],['settings','Settings']);nav.push(['overpull','Over Pull']);if(role==='icteam'||role==='manager')nav.push(['link','IC Portal']);nav.push(['theme','Light/Dark'],['logout','Logout']);$('nav').innerHTML=nav.map(n=>n[0]==='link'?`<a class="nav-btn" href="${IC_PORTAL_URL}" target="_blank">${n[1]}</a>`:n[0]==='logout'?`<button class="nav-btn lock" onclick="logout()">${n[1]}</button>`:n[0]==='theme'?`<button class="nav-btn" onclick="saveTheme(!document.body.classList.contains('light-mode'))">${n[1]}</button>`:n[0]==='overpull'?`<button class="nav-btn" data-screen="overpull" onclick="showScreen('overpull')" style="color:var(--orange)">${n[1]}</button>`:`<button class="nav-btn" data-screen="${n[0]}" onclick="showScreen('${n[0]}')">${n[1]}</button>`).join('')}
 function login(r){role=r;$('roleChip').textContent=ROLE_LABELS[r];$('roleChip').className='role-chip '+(r==='manager'?'manager':r==='icteam'?'icteam':'clerk');buildNav();$('entryCard').classList.toggle('hide',r!=='clerk');$('shortageTopActions').innerHTML=canRunReports()?`<a class="btn" href="${IC_PORTAL_URL}" target="_blank">Open IC Portal Tickets</a>`:'';$('archiveActions').innerHTML=canRunReports()?`<button class="btn" onclick="selectVisible(true)">Select Visible</button><button class="btn" onclick="selectVisible(false)">Clear Selection</button><button class="btn orange" onclick="archiveSelected()">Archive Selected</button><button class="btn red" onclick="archiveFiltered()">Archive Filtered Active</button>`:'';showScreen('shortage')}
 function logout(){role='';shortages=[];visibleShortages=[];showScreen('login')}
 async function loadPickerNames(){pickerNames=JSON.parse(localStorage.getItem('scp_pickers')||'[]');$('pickerOptions').innerHTML=pickerNames.map(p=>`<option value="${esc(p)}"></option>`).join('')}
@@ -527,6 +565,384 @@ async function runMigration(){
     alert('Migration failed: '+e.message);
   }finally{hideLoading()}
 }
+
+/* ═══════════════════════════════════════════════════════
+   OVER PULL MODULE
+   ═══════════════════════════════════════════════════════ */
+let opRecords=[];
+
+function enterOverPull(){
+  // No pin needed — go straight to overpull screen via showScreen logic but without role gating
+  // Show topbar manually since we're not "logged in" via a role
+  if(!role){ // not logged into any role — treat as ops visitor
+    $('topbar').classList.add('show');
+    $('roleChip').textContent='Operations';
+    $('roleChip').className='role-chip';
+    $('nav').innerHTML=`<button class="nav-btn" onclick="enterOverPull()">Over Pull</button><button class="nav-btn lock" onclick="location.reload()">Exit</button>`;
+  }
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $('overpullScreen').classList.add('active');
+  opInitForm();
+  opLoadRecords(false);
+}
+
+function opAutoDivision(){
+  const v=($('opOrder').value||'').trim().slice(0,2).toUpperCase();
+  $('opDiv').value=v;
+}
+
+function opInitForm(){
+  const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());
+  $('opDate').value=d.toISOString().slice(0,16);
+  $('opOrder').value='';
+  $('opDiv').value='';
+  $('opFirst').value='';
+  $('opLast').value='';
+  $('opLines').innerHTML='';
+  $('opMoreWrap').style.display='none';
+  opAddLine();
+}
+
+function opAddLine(data={}){
+  const wrap=$('opLines');
+  const row=document.createElement('div');
+  row.className='product-line-card';
+  row.innerHTML=`<div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;align-items:end">
+    <div class="field" style="margin-bottom:0"><label>Product Code <em>*</em></label><input class="op-product" placeholder="e.g. 123456" value="${esc(data.productCode||'')}"></div>
+    <div class="field" style="margin-bottom:0"><label>Qty <em>*</em></label><input class="op-qty" type="number" min="0" step="1" value="${esc(data.qty??1)}"></div>
+    <div class="field" style="margin-bottom:0"><label>UOM</label><select class="op-uom"><option value="EA"${(!data.uom||data.uom==='EA')?' selected':''}>EA</option><option value="CS"${data.uom==='CS'?' selected':''}>CS</option><option value="PK"${data.uom==='PK'?' selected':''}>PK</option><option value="PR"${data.uom==='PR'?' selected':''}>PR</option><option value="BX"${data.uom==='BX'?' selected':''}>BX</option><option value="DZ"${data.uom==='DZ'?' selected':''}>DZ</option></select></div>
+    <button class="btn remove-line-btn" style="margin-bottom:0" onclick="opRemoveLine(this)">&times;</button>
+  </div>`;
+  wrap.appendChild(row);
+  row.querySelector('.op-product').focus();
+}
+
+function opRemoveLine(btn){
+  const rows=$('opLines').querySelectorAll('.product-line-card');
+  if(rows.length<=1){alert('At least one item is required.');return;}
+  btn.closest('.product-line-card').remove();
+}
+
+function opGetLines(){
+  return [...$('opLines').querySelectorAll('.product-line-card')].map(row=>({
+    productCode:row.querySelector('.op-product').value.trim().toUpperCase(),
+    qty:num(row.querySelector('.op-qty').value),
+    uom:row.querySelector('.op-uom').value
+  })).filter(x=>x.productCode&&x.qty>0);
+}
+
+function opValidateHeader(){
+  if(!$('opOrder').value.trim()){alert('Order Number is required.');return false;}
+  if(!$('opFirst').value.trim()||!$('opLast').value.trim()){alert('Picker first and last name are required.');return false;}
+  return true;
+}
+
+function opPromptMore(){
+  if(!opValidateHeader())return;
+  const lines=opGetLines();
+  if(!lines.length){alert('Add at least one item with a product code and qty.');return;}
+  $('opMoreWrap').style.display='block';
+  $('opMoreWrap').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function opYesMore(){
+  $('opMoreWrap').style.display='none';
+  opAddLine();
+  $('opLines').lastElementChild.querySelector('.op-product').focus();
+}
+
+function opFinishEntry(){
+  $('opMoreWrap').style.display='none';
+  opSaveEntry();
+}
+
+async function opSaveEntry(){
+  if(!opValidateHeader())return;
+  const lines=opGetLines();
+  if(!lines.length){alert('Add at least one item with a product code and qty.');return;}
+  const s=getSettings();
+  const col=s.overpullCollection||'overpull_active';
+  const base={
+    date:$('opDate').value||nowLocalInput(),
+    orderNumber:$('opOrder').value.trim().toUpperCase(),
+    division:$('opDiv').value.trim().toUpperCase(),
+    pickerFirst:$('opFirst').value.trim(),
+    pickerLast:$('opLast').value.trim(),
+    picker:($('opFirst').value.trim()+' '+$('opLast').value.trim()).trim(),
+    createdAt:new Date().toISOString(),
+    source:'overpull'
+  };
+  showLoading('Saving over pull...');
+  try{
+    if(db){
+      const batch=db.batch();
+      const colRef=db.collection(col);
+      lines.forEach(line=>{batch.set(colRef.doc(),{...base,...line});});
+      await batch.commit();
+    } else {
+      // localStorage fallback when Firebase not configured
+      const saved=JSON.parse(localStorage.getItem('scp_overpull')||'[]');
+      lines.forEach(line=>{saved.unshift({...base,...line,id:'OP-'+Date.now()+'-'+Math.random().toString(36).slice(2,6)});});
+      localStorage.setItem('scp_overpull',JSON.stringify(saved));
+    }
+    opClearForm();
+    await opLoadRecords(true);
+  }catch(e){alert('Save failed: '+e.message);}finally{hideLoading();}
+}
+
+function opClearForm(){opInitForm();}
+
+async function opLoadRecords(force){
+  const s=getSettings();
+  const col=s.overpullCollection||'overpull_active';
+  const cacheK='scp_opcache';
+  if(!force){
+    try{const c=JSON.parse(localStorage.getItem(cacheK)||'null');if(c&&Date.now()-c.t<3*60*1000){opRecords=c.rows;opRenderList();opRenderKpi();return;}}catch(e){}
+  }
+  try{
+    if(db){
+      const snap=await db.collection(col).limit(2000).get();
+      opRecords=snap.docs.map(d=>({...d.data(),id:d.id})).sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
+      localStorage.setItem(cacheK,JSON.stringify({t:Date.now(),rows:opRecords}));
+    } else {
+      opRecords=JSON.parse(localStorage.getItem('scp_overpull')||'[]');
+    }
+  }catch(e){
+    opRecords=JSON.parse(localStorage.getItem('scp_overpull')||'[]');
+  }
+  opRenderList();
+  opRenderKpi();
+}
+
+function opFilteredRows(){
+  const text=($('opFilterText')?.value||'').toLowerCase().trim();
+  const start=$('opFilterStart')?.value||'';
+  const end=$('opFilterEnd')?.value||'';
+  return opRecords.filter(r=>{
+    const d=(r.date||r.createdAt||'').slice(0,10);
+    if(start&&d<start)return false;
+    if(end&&d>end)return false;
+    if(!text)return true;
+    return [r.picker,r.orderNumber,r.productCode,r.division].join(' ').toLowerCase().includes(text);
+  });
+}
+
+function opRenderKpi(){
+  const rows=opFilteredRows();
+  const totalLines=rows.length;
+  const totalQty=rows.reduce((s,r)=>s+num(r.qty),0);
+  const pickers=new Set(rows.map(r=>r.picker)).size;
+  const orders=new Set(rows.map(r=>r.orderNumber)).size;
+  const divs=new Set(rows.map(r=>r.division)).size;
+  $('opKpiBar').innerHTML=`
+    <div class="stat-card"><div class="stat-num">${totalLines}</div><div class="stat-lbl">Over Pull Lines</div></div>
+    <div class="stat-card" style="border-color:rgba(251,146,60,.3)"><div class="stat-num" style="color:var(--orange)">${totalQty}</div><div class="stat-lbl">Total Units Over-Pulled</div></div>
+    <div class="stat-card"><div class="stat-num">${pickers}</div><div class="stat-lbl">Pickers Involved</div></div>
+    <div class="stat-card"><div class="stat-num">${orders}</div><div class="stat-lbl">Orders Affected</div></div>
+    <div class="stat-card"><div class="stat-num">${divs}</div><div class="stat-lbl">Divisions</div></div>
+  `;
+}
+
+function opRenderList(){
+  opRenderKpi();
+  const rows=opFilteredRows();
+  if(!rows.length){$('opList').innerHTML='<div class="empty">No over pull records found.</div>';return;}
+  // Group by order+picker+date (same submission)
+  const groups={};
+  rows.forEach(r=>{
+    const key=(r.orderNumber||'')+'|'+(r.picker||'')+'|'+(r.date||r.createdAt||'').slice(0,16);
+    if(!groups[key])groups[key]={...r,_lines:[]};
+    groups[key]._lines.push(r);
+  });
+  $('opList').innerHTML=Object.values(groups).map(g=>{
+    const d=g.date||g.createdAt||'';
+    const dateDisp=d?new Date(d).toLocaleString('en-US',{month:'2-digit',day:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
+    const lineHtml=g._lines.map(l=>`<span style="font-family:var(--mono);font-size:12px;background:var(--panel2);border:1px solid var(--border);border-radius:5px;padding:2px 8px;margin:2px;display:inline-block">${esc(l.productCode)} &times; ${l.qty} ${esc(l.uom)}</span>`).join('');
+    return `<div class="shortage-row" style="border-color:rgba(251,146,60,.3)">
+      <div class="sr-head">
+        <div style="flex:1">
+          <div class="sr-codes" style="color:var(--orange)">${esc(g.orderNumber||'NO ORDER')} <span style="color:var(--muted)">&bull;</span> <span style="font-size:11px">${esc(g.division||'')}</span></div>
+          <div class="sr-meta">${esc(dateDisp)} &bull; Picker: <strong>${esc(g.picker)}</strong></div>
+          <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:2px">${lineHtml}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function printOverPullReport(){
+  const rows=opFilteredRows();
+  if(!rows.length){alert('No over pull records in selected range.');return;}
+  const today=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  const fromStr=$('opFilterStart')?.value;
+  const toStr=$('opFilterEnd')?.value;
+  const dateRange=fromStr||toStr?(fromStr||'All')+' to '+(toStr||'today'):'All Dates';
+
+  const totalLines=rows.length;
+  const totalQty=rows.reduce((s,r)=>s+num(r.qty),0);
+
+  // By picker
+  const byPicker={};
+  rows.forEach(r=>{
+    const p=r.picker||'Unknown';
+    if(!byPicker[p])byPicker[p]={lines:0,qty:0,orders:new Set(),divs:new Set()};
+    byPicker[p].lines++;
+    byPicker[p].qty+=num(r.qty);
+    if(r.orderNumber)byPicker[p].orders.add(r.orderNumber);
+    if(r.division)byPicker[p].divs.add(r.division);
+  });
+  const pickerRows=Object.entries(byPicker).sort((a,b)=>b[1].qty-a[1].qty);
+
+  // By division
+  const byDiv={};
+  rows.forEach(r=>{
+    const d=r.division||'??';
+    if(!byDiv[d])byDiv[d]={lines:0,qty:0,orders:new Set(),pickers:new Set()};
+    byDiv[d].lines++;byDiv[d].qty+=num(r.qty);
+    if(r.orderNumber)byDiv[d].orders.add(r.orderNumber);
+    if(r.picker)byDiv[d].pickers.add(r.picker);
+  });
+
+  // By day
+  const byDay={};
+  rows.forEach(r=>{
+    const d=(r.date||r.createdAt||'').slice(0,10)||'Unknown';
+    if(!byDay[d])byDay[d]={lines:0,qty:0,pickers:new Set()};
+    byDay[d].lines++;byDay[d].qty+=num(r.qty);
+    if(r.picker)byDay[d].pickers.add(r.picker);
+  });
+
+  // Detail rows sorted by date desc
+  const sorted=[...rows].sort((a,b)=>(b.date||b.createdAt||'').localeCompare(a.date||a.createdAt||''));
+
+  const th=h=>`<th style="background:#1a2038;color:#fff;padding:5pt 8pt;text-align:left;font-size:8pt;font-weight:600;letter-spacing:.04em">${h}</th>`;
+  const thO=h=>`<th style="background:#92400e;color:#fff;padding:5pt 8pt;text-align:left;font-size:8pt;font-weight:600;letter-spacing:.04em">${h}</th>`;
+
+  const fmtDT=v=>v?new Date(v).toLocaleString('en-US',{month:'2-digit',day:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
+
+  const html=`<div style="font-family:'Segoe UI',Arial,sans-serif;color:#111;font-size:10pt;line-height:1.4">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;border-bottom:2.5pt solid #1a2038;padding-bottom:12pt;margin-bottom:18pt">
+      <div>
+        <div style="font-size:8pt;font-weight:700;color:#6b7280;letter-spacing:.12em;text-transform:uppercase;margin-bottom:4pt">C &amp; F Enterprises &middot; 815 Chapman Warehouse</div>
+        <div style="font-size:20pt;font-weight:700;color:#1a2038;line-height:1.1">Over Pull Report</div>
+        <div style="font-size:10pt;color:#6b7280;margin-top:4pt">${esc(dateRange)}</div>
+      </div>
+      <div style="text-align:right;font-size:8.5pt;color:#6b7280;line-height:1.8;padding-top:4pt">
+        <div><span style="font-weight:600;color:#374151">Generated:</span> ${today}</div>
+        <div><span style="font-weight:600;color:#374151">Prepared by:</span> 815 Operations</div>
+        <div><span style="font-weight:600;color:#374151">Total Records:</span> ${totalLines}</div>
+      </div>
+    </div>
+
+    <div style="font-size:8pt;font-weight:700;color:#374151;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #e5e7eb;padding-bottom:4pt;margin-bottom:10pt">Executive Summary</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8pt;margin-bottom:18pt">
+      ${[
+        ['Total Over Pull Lines',totalLines,'#1a2038'],
+        ['Total Units Over-Pulled',totalQty,'#92400e'],
+        ['Pickers Involved',Object.keys(byPicker).length,'#1d4ed8'],
+        ['Orders Affected',new Set(rows.map(r=>r.orderNumber)).size,'#047857'],
+        ['Divisions Affected',Object.keys(byDiv).length,'#1d4ed8'],
+        ['Days in Range',Object.keys(byDay).length,'#374151'],
+        ['Avg Units / Line',totalLines?Math.round(totalQty/totalLines*10)/10:0,'#92400e'],
+        ['Avg Lines / Picker',Object.keys(byPicker).length?Math.round(totalLines/Object.keys(byPicker).length*10)/10:0,'#374151'],
+      ].map(([lbl,val,color])=>`
+        <div style="border:1pt solid #d1d5db;border-radius:4pt;padding:10pt;background:#f9fafb;text-align:center;break-inside:avoid">
+          <div style="font-size:20pt;font-weight:700;color:${color};line-height:1.1">${val}</div>
+          <div style="font-size:7pt;color:#6b7280;margin-top:3pt;text-transform:uppercase;letter-spacing:.06em">${lbl}</div>
+        </div>`).join('')}
+    </div>
+
+    <div style="font-size:8pt;font-weight:700;color:#374151;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #e5e7eb;padding-bottom:4pt;margin:14pt 0 8pt">Picker Performance — Over Pull KPI</div>
+    <table style="width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:16pt">
+      <thead><tr>${['Picker','Total Lines','Total Units Over-Pulled','Orders Affected','Divisions'].map(th).join('')}</tr></thead>
+      <tbody>
+        ${pickerRows.map(([picker,row],i)=>{
+          const bg=i%2===0?'#fff':'#f3f4f6';
+          const qtyColor=row.qty>50?'#b91c1c':row.qty>20?'#92400e':'#111';
+          return `<tr style="background:${bg}">
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-weight:700">${esc(picker)}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${row.lines}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;font-weight:700;color:${qtyColor}">${row.qty}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${row.orders.size}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-size:8.5pt">${[...row.divs].join(', ')}</td>
+          </tr>`;
+        }).join('')}
+        <tr style="background:#1a2038;color:#fff">
+          <td style="padding:5pt 8pt;font-weight:700">TOTAL</td>
+          <td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700">${totalLines}</td>
+          <td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700;color:#fcd34d">${totalQty}</td>
+          <td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700">${new Set(rows.map(r=>r.orderNumber)).size}</td>
+          <td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700">${Object.keys(byDiv).length}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="page-break-inside:avoid">
+    <div style="font-size:8pt;font-weight:700;color:#374151;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #e5e7eb;padding-bottom:4pt;margin:14pt 0 8pt">Division Breakdown</div>
+    <table style="width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:16pt">
+      <thead><tr>${['Division','Lines','Total Units','Orders','Pickers'].map(th).join('')}</tr></thead>
+      <tbody>
+        ${Object.entries(byDiv).sort((a,b)=>b[1].qty-a[1].qty).map(([div,row],i)=>{
+          const bg=i%2===0?'#fff':'#f3f4f6';
+          return `<tr style="background:${bg}">
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-weight:700;font-family:'Courier New',monospace">${esc(div)}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${row.lines}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;font-weight:700;color:#92400e">${row.qty}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${row.orders.size}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-size:8.5pt">${[...row.pickers].join(', ')}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table></div>
+
+    <div style="page-break-before:always;page-break-inside:avoid">
+    <div style="font-size:8pt;font-weight:700;color:#374151;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #e5e7eb;padding-bottom:4pt;margin:14pt 0 8pt">Daily Summary</div>
+    <table style="width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:16pt">
+      <thead><tr>${['Date','Lines','Total Units','Pickers'].map(th).join('')}</tr></thead>
+      <tbody>
+        ${Object.keys(byDay).sort().map((d,i)=>{
+          const bg=i%2===0?'#fff':'#f3f4f6';
+          return `<tr style="background:${bg}">
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${d}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${byDay[d].lines}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;font-weight:700;color:#92400e">${byDay[d].qty}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-size:8.5pt">${[...byDay[d].pickers].join(', ')}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table></div>
+
+    <div style="page-break-before:always;page-break-inside:avoid">
+    <div style="font-size:8pt;font-weight:700;color:#374151;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #e5e7eb;padding-bottom:4pt;margin:14pt 0 8pt">Full Detail Log</div>
+    <table style="width:100%;border-collapse:collapse;font-size:8.5pt;margin-bottom:16pt">
+      <thead><tr>${['Date/Time','Order #','Division','Picker','Product Code','Qty','UOM'].map(thO).join('')}</tr></thead>
+      <tbody>
+        ${sorted.map((r,i)=>{
+          const bg=i%2===0?'#fff':'#fff7ed';
+          return `<tr style="background:${bg}">
+            <td style="padding:4pt 6pt;border-bottom:.5pt solid #fed7aa;font-size:7.5pt;color:#6b7280">${fmtDT(r.date||r.createdAt)}</td>
+            <td style="padding:4pt 6pt;border-bottom:.5pt solid #fed7aa;font-family:'Courier New',monospace;font-weight:700">${esc(r.orderNumber||'—')}</td>
+            <td style="padding:4pt 6pt;border-bottom:.5pt solid #fed7aa;font-family:'Courier New',monospace">${esc(r.division||'—')}</td>
+            <td style="padding:4pt 6pt;border-bottom:.5pt solid #fed7aa;font-weight:600">${esc(r.picker||'—')}</td>
+            <td style="padding:4pt 6pt;border-bottom:.5pt solid #fed7aa;font-family:'Courier New',monospace;font-weight:700">${esc(r.productCode||'—')}</td>
+            <td style="padding:4pt 6pt;border-bottom:.5pt solid #fed7aa;font-family:'Courier New',monospace;font-weight:700;color:#92400e">${r.qty||0}</td>
+            <td style="padding:4pt 6pt;border-bottom:.5pt solid #fed7aa;font-family:'Courier New',monospace">${esc(r.uom||'EA')}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table></div>
+
+    <div style="margin-top:20pt;padding-top:8pt;border-top:1pt solid #e5e7eb;font-size:7.5pt;color:#9ca3af;display:flex;justify-content:space-between">
+      <span>815 Operations &middot; C &amp; F Enterprises &middot; Chapman Warehouse</span>
+      <span>Printed ${today}</span>
+    </div>
+  </div>`;
+
+  $('printArea').innerHTML=html;
+  window.print();
+  setTimeout(()=>{$('printArea').innerHTML='';},500);
+}
+
 function startup(){applyTheme();initFirebase();$('sDate').value=nowLocalInput();loadPickerNames();if($('productLines'))addProductLine()}
 startup();
 </script>
