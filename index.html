@@ -207,7 +207,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
         </div>
       </div>
       <div class="actions"><button class="btn" onclick="opClearForm()">Clear Form</button><button class="btn primary" style="flex:1" onclick="opPromptMore()">Submit Over Pull</button></div>
-      <div class="actions" style="margin-top:8px"><button class="btn orange" style="width:100%" onclick="openPickedTwiceModal()" id="pickedTwiceBtn">&#9888; Report Duplicate Pick — Entire Order Picked Twice</button></div>
+      <div class="actions" style="margin-top:8px"><button class="btn orange" style="width:100%" onclick="openPickedTwiceModal()" id="pickedTwiceBtn"><span id="ptOpenBtnText">&#9888; Report Duplicate Pick — Entire Order Picked Twice</span></button></div>
     </div>
   </div>
 
@@ -225,7 +225,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
   </div>
 
 </div></section>
-<div id="pickedTwiceOverlay" class="overlay"><div class="modal"><div class="modal-head"><h3>&#9888; Report: Order Picked Twice / Duplicate Pick</h3><button onclick="closePickedTwiceModal()">&#215;</button></div><div class="modal-body"><div class="notice" style="background:var(--orange-l);border-color:rgba(251,146,60,.35);margin-bottom:16px"><b>What this does:</b> Flags an entire order as having been picked twice (over-pulled). No product lines needed — the whole order must be returned and investigated. This creates a Duplicate Pick record for IC and management review.</div><div class="form-row two"><div class="field"><label>Date &amp; Time <em>*</em></label><input id="ptDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="ptDiv"><option value="">Select</option><option value="NH">NH</option><option value="GT">GT</option><option value="FS">FS</option><option value="EE">EE</option><option value="BC">BC</option><option value="CF">CF</option><option value="VP">VP – VIP</option><option value="TP">TP – Transpac</option></select></div><div class="field"><label>Pick Demand # <em>*</em></label><input id="ptDemand" placeholder="e.g. NH00012345" oninput="ptAutoDivision()"></div><div class="field"><label>Picker Involved <em>*</em></label><select id="ptPickerSelect" onchange="onPickerSelectChange('ptPickerSelect','ptPickerNew','ptPicker')"><option value="">-- Select Picker --</option></select><div id="ptPickerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="ptPickerNew" placeholder="e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('ptPickerNew','picker');syncNewPersonToHidden('ptPickerNew','ptPicker')" onblur="validatePersonField('ptPickerNew','picker');syncNewPersonToHidden('ptPickerNew','ptPicker')" onkeydown="handleSuggestKey(event,'ptPickerNewSuggest')"><div class="suggest-box" id="ptPickerNewSuggest" style="display:none"></div></div></div><input id="ptPicker" type="hidden"></div></div><div class="field"><label>Shift</label><select id="ptShift"><option value="auto">Auto (use current time)</option><option value="1st">1st</option><option value="2nd">2nd</option><option value="3rd">3rd</option></select></div><div class="field"><label>Notes / Details <em>*</em></label><textarea id="ptNotes" placeholder="Describe what happened — where was the duplicate pick found, who reported it, what action was taken..."></textarea></div><div class="actions" style="margin-top:8px"><button class="btn primary" onclick="savePickedTwice()">&#9888; Submit Duplicate Pick Report</button><button class="btn" onclick="closePickedTwiceModal()">Cancel</button></div></div></div></div>
+<div id="pickedTwiceOverlay" class="overlay"><div class="modal"><div class="modal-head"><h3 id="ptModalTitle">&#9888; Report: Order Picked Twice / Duplicate Pick</h3><button onclick="closePickedTwiceModal()">&#215;</button></div><div class="modal-body"><div class="notice" style="background:var(--orange-l);border-color:rgba(251,146,60,.35);margin-bottom:16px"><b id="ptWhatDoes">What this does:</b> <span id="ptWhatDesc">Flags an entire order as having been picked twice (over-pulled). No product lines needed — the whole order must be returned and investigated. This creates a Duplicate Pick record for IC and management review.</span></div><div class="form-row two"><div class="field"><label>Date &amp; Time <em>*</em></label><input id="ptDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="ptDiv"><option value="">Select</option><option value="NH">NH</option><option value="GT">GT</option><option value="FS">FS</option><option value="EE">EE</option><option value="BC">BC</option><option value="CF">CF</option><option value="VP">VP – VIP</option><option value="TP">TP – Transpac</option></select></div><div class="field"><label>Pick Demand # <em>*</em></label><input id="ptDemand" placeholder="e.g. NH00012345" oninput="ptAutoDivision()"></div><div class="field"><label id="ptPickerLabel">Picker Involved <em>*</em></label><select id="ptPickerSelect" onchange="onPickerSelectChange('ptPickerSelect','ptPickerNew','ptPicker')"><option value="">-- Select Picker --</option></select><div id="ptPickerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="ptPickerNew" placeholder="e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('ptPickerNew','picker');syncNewPersonToHidden('ptPickerNew','ptPicker')" onblur="validatePersonField('ptPickerNew','picker');syncNewPersonToHidden('ptPickerNew','ptPicker')" onkeydown="handleSuggestKey(event,'ptPickerNewSuggest')"><div class="suggest-box" id="ptPickerNewSuggest" style="display:none"></div></div></div><input id="ptPicker" type="hidden"></div></div><div class="field"><label>Shift</label><select id="ptShift"><option value="auto">Auto (use current time)</option><option value="1st">1st</option><option value="2nd">2nd</option><option value="3rd">3rd</option></select></div><div class="field"><label id="ptNotesLabel">Notes / Details <em>*</em></label><textarea id="ptNotes" placeholder="Describe what happened — where was the duplicate pick found, who reported it, what action was taken..."></textarea></div><div class="actions" style="margin-top:8px"><button class="btn primary" onclick="savePickedTwice()" id="ptSubmitBtn">&#9888; Submit Duplicate Pick Report</button><button class="btn" onclick="closePickedTwiceModal()" id="ptCancelBtn">Cancel</button></div></div></div></div>
 <div id="editOverlay" class="overlay"><div class="modal"><div class="modal-head"><h3>Edit Shortage</h3><button onclick="closeEdit()">&#215;</button></div><div id="editBody" class="modal-body"></div></div></div>
 <div id="icConfirmOverlay" class="ic-confirm-overlay">
   <div class="ic-confirm-modal">
@@ -2057,7 +2057,7 @@ const LANGS={
     'nav.ic_portal':'IC Portal','nav.light_dark':'Light/Dark','nav.logout':'Logout',
     'nav.over_pull':'Over Pull',
     'viewmode.active':'Active','viewmode.archive':'Archived History','viewmode.both':'Active + Archived',
-    'form.duplicate_order':'Report: Order Picked Twice',
+    'form.duplicate_order':'Report: Order Picked Twice','dup.modal_title':'⚠ Report: Order Picked Twice / Duplicate Pick','dup.modal_btn':'⚠ Report Duplicate Pick — Entire Order Picked Twice','dup.what_does':'What this does:','dup.what_desc':'Flags an entire order as having been picked twice (over-pulled). No product lines needed — the whole order must be returned and investigated. This creates a Duplicate Pick record for IC and management review.','dup.picker_involved':'Picker Involved','dup.notes_label':'Notes / Details','dup.notes_ph':'Describe what happened — where was the duplicate pick found, who reported it, what action was taken...','dup.submit':'⚠ Submit Duplicate Pick Report','dup.cancel':'Cancel','dup.alert':'Duplicate pick report filed for order {0}.\nIC team and management have been flagged for investigation.',
   },
   es:{dir:'ltr',
     'login.title':'Portal de Control de Escasez','login.subtitle':'Aplicación separada de informes de escasez',
@@ -2109,7 +2109,7 @@ const LANGS={
     'nav.ic_portal':'Portal IC','nav.light_dark':'Claro/Oscuro','nav.logout':'Cerrar Sesión',
     'nav.over_pull':'Exceso de Retiro',
     'viewmode.active':'Activo','viewmode.archive':'Historial Archivado','viewmode.both':'Activo + Archivado',
-    'form.duplicate_order':'Reporte: Orden Doble',
+    'form.duplicate_order':'Reporte: Orden Doble','dup.modal_title':'⚠ Reporte: Orden Recogida Dos Veces','dup.modal_btn':'⚠ Reportar Recogida Duplicada — Orden Completa Recogida Dos Veces','dup.what_does':'¿Qué hace esto?','dup.what_desc':'Marca una orden completa como recogida dos veces (exceso). No se necesitan líneas de producto — toda la orden debe devolverse e investigarse. Crea un registro de Recogida Duplicada para revisión.','dup.picker_involved':'Recolector Involucrado','dup.notes_label':'Notas / Detalles','dup.notes_ph':'Describa qué pasó — dónde se encontró, quién lo reportó, qué acción se tomó...','dup.submit':'⚠ Enviar Reporte de Recogida Duplicada','dup.cancel':'Cancelar','dup.alert':'Reporte de recogida duplicada para orden {0}.\nEl equipo IC y la gerencia han sido notificados para investigación.',
   },
   fa:{dir:'rtl',
     'login.title':'پورتل کنترل کمبود','login.subtitle':'برنامه جداگانه گزارش کمبود',
@@ -2161,7 +2161,7 @@ const LANGS={
     'nav.ic_portal':'پورتل IC','nav.light_dark':'روشن/تیره','nav.logout':'خروج',
     'nav.over_pull':'ثبت مازاد',
     'viewmode.active':'فعال','viewmode.archive':'تاریخچه آرشیو','viewmode.both':'فعال + آرشیو',
-    'form.duplicate_order':'گزارش: سفارش دو بار برداشته شد',
+    'form.duplicate_order':'گزارش: سفارش دو بار برداشته شد','dup.modal_title':'⚠ گزارش: سفارش دو بار جمع‌آوری شد','dup.modal_btn':'⚠ گزارش برداشت تکراری — کل سفارش دو بار برداشته شد','dup.what_does':'این چه می‌کند:','dup.what_desc':'یک سفارش کامل را به عنوان دو بار جمع‌آوری شده (مازاد) علامت می‌زند. نیازی به خطوط محصول نیست — کل سفارش باید بازگشت داده شود و بررسی شود. این یک رکورد برداشت تکراری برای بررسی IC ایجاد می‌کند.','dup.picker_involved':'جمع‌آورنده مربوطه','dup.notes_label':'یادداشت‌ها / جزئیات','dup.notes_ph':'توضیح دهید چه اتفاقی افتاد — کجا پیدا شد، چه کسی گزارش داد، چه اقدامی انجام شد...','dup.submit':'⚠ ارسال گزارش برداشت تکراری','dup.cancel':'لغو','dup.alert':'گزارش برداشت تکراری برای سفارش {0} ثبت شد.\nتیم IC و مدیریت برای بررسی مطلع شدند.',
   },
   fil:{dir:'ltr',
     'login.title':'Portal ng Kontrol sa Kakulangan','login.subtitle':'Hiwalay na app para sa pag-uulat ng kakulangan',
@@ -2213,7 +2213,7 @@ const LANGS={
     'nav.ic_portal':'IC Portal','nav.light_dark':'Maliwanag/Madilim','nav.logout':'Mag-logout',
     'nav.over_pull':'Log ng Sobra',
     'viewmode.active':'Aktibo','viewmode.archive':'Kasaysayan ng Archive','viewmode.both':'Aktibo + Archive',
-    'form.duplicate_order':'Report: Dalawang Beses na na-pick',
+    'form.duplicate_order':'Report: Dalawang Beses na na-pick','dup.modal_title':'⚠ Report: Dalawang Beses na Na-pick ang Order','dup.modal_btn':'⚠ Mag-ulat ng Duplicate Pick — Buong Order na Na-pick ng Dalawang Beses','dup.what_does':'Ano ang gagawin nito:','dup.what_desc':'Magtatanda ng buong order bilang na-pick ng dalawang beses (sobrang kinuha). Hindi na kailangan ng mga linya ng produkto — ang buong order ay dapat ibalik at imbestigahan. Gumagawa ito ng Duplicate Pick record para sa IC at management review.','dup.picker_involved':'Tagapulot na Kasangkot','dup.notes_label':'Mga Tala / Detalye','dup.notes_ph':'Ilarawan kung ano ang nangyari — saan natagpuan ang duplicate pick, sino ang nag-ulat, anong aksyon ang ginawa...','dup.submit':'⚠ Isumite ang Duplicate Pick Report','dup.cancel':'Kanselahin','dup.alert':'Na-file ang duplicate pick report para sa order na {0}.\nNaabisuhan ang IC team at management para sa imbestigasyon.',
   },
   ar:{dir:'rtl',
     'login.title':'بوابة التحكم في النقص','login.subtitle':'تطبيق منفصل للإبلاغ عن النقص',
@@ -2233,7 +2233,7 @@ const LANGS={
     'form.uom':'وحدة القياس','form.notes':'ملاحظات',
     'form.add_line':'+ إضافة سطر','form.clear_form':'مسح النموذج','form.log_shortages':'+ تسجيل جميع النقصات',
     'form.required':'مطلوب',
-    'form.duplicate_order':'تكرار الطلب',
+    'form.duplicate_order':'تكرار الطلب','dup.modal_title':'⚠ تقرير: تم انتقاء الطلب مرتين','dup.modal_btn':'⚠ الإبلاغ عن انتقاء مكرر — تم انتقاء الطلب بالكامل مرتين','dup.what_does':'ماذا يفعل هذا:','dup.what_desc':'يُعلّم طلباً كاملاً على أنه تم انتقاؤه مرتين (زيادة في السحب). لا حاجة لخطوط المنتجات — يجب إعادة الطلب بالكامل والتحقيق فيه. يُنشئ هذا سجل انتقاء مكرر لمراجعة فريق IC والإدارة.','dup.picker_involved':'جامع البضائع المعني','dup.notes_label':'ملاحظات / تفاصيل','dup.notes_ph':'صف ما حدث — أين وُجد الانتقاء المكرر، من أبلغ عنه، ما الإجراء المتخذ...','dup.submit':'⚠ إرسال تقرير الانتقاء المكرر','dup.cancel':'إلغاء','dup.alert':'تم تقديم تقرير الانتقاء المكرر للطلب {0}.\nتم إشعار فريق IC والإدارة للتحقيق.',
     'list.search':'بحث حسب المنتج، الطلب، الجامع، القسم...',
     'list.active':'نشط','list.archive':'الأرشيف','list.both':'نشط + أرشيف',
     'list.refresh':'تحديث','list.no_shortages':'لا توجد نقصات لهذا الفلتر.',
@@ -2491,6 +2491,32 @@ function applyLangToForms(){
   const opRefresh=document.querySelector('button[onclick="opLoadRecords(true)"]');
   if(opRefresh)opRefresh.textContent=t('list.refresh');
 
+  // ── Picked Twice / Duplicate Pick modal ──
+  const ptOpenBtn=$('ptOpenBtnText');
+  if(ptOpenBtn)ptOpenBtn.innerHTML='&#9888; '+(t('dup.modal_btn')||'Report Duplicate Pick — Entire Order Picked Twice');
+  const ptMT=$('ptModalTitle');
+  if(ptMT)ptMT.innerHTML='&#9888; '+(t('dup.modal_title')||'Report: Order Picked Twice / Duplicate Pick');
+  const ptWD=$('ptWhatDoes');if(ptWD)ptWD.textContent=t('dup.what_does')||'What this does:';
+  const ptWDesc=$('ptWhatDesc');if(ptWDesc)ptWDesc.textContent=t('dup.what_desc')||'';
+  const ptPL=$('ptPickerLabel');
+  if(ptPL){ptPL.childNodes[0].textContent=(t('dup.picker_involved')||'Picker Involved')+' ';}
+  const ptNL=$('ptNotesLabel');
+  if(ptNL){ptNL.childNodes[0].textContent=(t('dup.notes_label')||'Notes / Details')+' ';}
+  const ptNotes=$('ptNotes');
+  if(ptNotes)ptNotes.placeholder=t('dup.notes_ph')||'Describe what happened...';
+  const ptSub=$('ptSubmitBtn');
+  if(ptSub)ptSub.innerHTML='&#9888; '+(t('dup.submit')||'Submit Duplicate Pick Report');
+  const ptCan=$('ptCancelBtn');
+  if(ptCan)ptCan.textContent=t('dup.cancel')||'Cancel';
+  // Also translate ptShift options (reuse form shift keys)
+  const ptSh=$('ptShift');
+  if(ptSh){
+    if(ptSh.options[0])ptSh.options[0].textContent=t('form.shift_auto');
+    if(ptSh.options[1])ptSh.options[1].textContent=t('form.shift_1st');
+    if(ptSh.options[2])ptSh.options[2].textContent=t('form.shift_2nd');
+    if(ptSh.options[3])ptSh.options[3].textContent=t('form.shift_3rd');
+  }
+
   // ── Highlight active lang button ──
   ['en','es','fa','ar','fil'].forEach(l=>{
     const id='lang'+l.charAt(0).toUpperCase()+l.slice(1);
@@ -2575,7 +2601,7 @@ async function savePickedTwice(){
     closePickedTwiceModal();
     await loadShortages(true);
     hideLoading();
-    alert(`Duplicate pick report filed for order ${demand}.\nIC team and management have been flagged for investigation.`);
+    alert((t('dup.alert')||'Duplicate pick report filed for order {0}.\nIC team and management have been flagged for investigation.').replace('{0}',demand));
   }catch(e){hideLoading();alert('Save failed: '+e.message);}
 }
 
