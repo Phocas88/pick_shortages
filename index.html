@@ -41,7 +41,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 <div id="topbar" class="topbar"><div class="brand">Shortage Control Portal</div><span id="roleChip" class="role-chip"></span><div id="nav" class="nav"></div></div>
 <section id="loginScreen" class="screen active"><div class="login-wrap"><div class="login-header"><h1>Shortage Control Portal</h1><p>Separate shortage reporting app</p></div><div class="login-group-label">Select role</div><div class="ic-btns"><button class="ic-login-btn" onclick="goPin('clerk')"><span class="ib-icon">&#128203;</span><span class="ib-title">Outbound Clerk</span><span class="ib-sub">Shortage Entry</span></button><button class="ic-login-btn" onclick="goPin('icteam')"><span class="ib-icon">&#128270;</span><span class="ib-title">IC Team</span><span class="ib-sub">Verify and Report</span></button><button class="ic-login-btn" onclick="goPin('manager')"><span class="ib-icon">&#9881;&#65039;</span><span class="ib-title">IC Manager</span><span class="ib-sub">Settings and Migration</span></button></div><div class="login-group-label" style="margin-top:16px">No Login Required</div><div style="display:grid;grid-template-columns:1fr;gap:10px"><button class="ic-login-btn" onclick="enterOverPull()" style="border-color:rgba(251,146,60,.4);background:var(--orange-l)"><span class="ib-icon">&#128202;</span><span class="ib-title" style="color:var(--orange)">Over Pull Log</span><span class="ib-sub">Operations — no PIN needed</span></button></div></div></section>
 <section id="pinScreen" class="screen"><div class="pin-card"><div id="pinBadge" class="pin-div-badge">Role</div><p style="color:var(--muted);font-size:12px">Enter PIN</p><div id="pinDots" class="pin-dots"><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span></div><div class="pin-keypad"><button class="pin-key" data-key="1" onclick="pinKey('1')">1</button><button class="pin-key" data-key="2" onclick="pinKey('2')">2</button><button class="pin-key" data-key="3" onclick="pinKey('3')">3</button><button class="pin-key" data-key="4" onclick="pinKey('4')">4</button><button class="pin-key" data-key="5" onclick="pinKey('5')">5</button><button class="pin-key" data-key="6" onclick="pinKey('6')">6</button><button class="pin-key" data-key="7" onclick="pinKey('7')">7</button><button class="pin-key" data-key="8" onclick="pinKey('8')">8</button><button class="pin-key" data-key="9" onclick="pinKey('9')">9</button><button class="pin-key clr" onclick="pinClear()">CLR</button><button class="pin-key" data-key="0" onclick="pinKey('0')">0</button><button class="pin-key clr" onclick="pinBack()">&#9003;</button></div><div id="pinError" class="pin-error"></div><button class="pin-back-btn" onclick="backToLogin()">Back</button></div></section>
-<section id="shortageScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Outbound</div><h1>Shortage Entry</h1><p>Log shortage lines and review active records.</p></div><div id="shortageTopActions" class="actions"></div></div><div class="card" id="entryCard"><div class="form-row four"><div class="field"><label>Date &amp; Time</label><input id="sDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="sDiv"><option value="">Select</option><option>NH</option><option>GT</option><option>FS</option><option>EE</option><option>BC</option><option>CF</option></select></div><div class="field"><label>Picker <em>*</em></label><div class="field-wrap"><input id="sPicker" placeholder="e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('sPicker','picker')" onblur="validatePersonField('sPicker','picker')" onkeydown="handleSuggestKey(event,'sPickerSuggest')"><div class="suggest-box" id="sPickerSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name (e.g. JDoe)</div></div><div class="field"><label>Packer</label><div class="field-wrap"><input id="sPacker" placeholder="e.g. MDoe" autocomplete="off" oninput="livePersonSuggest('sPacker','packer')" onblur="validatePersonField('sPacker','packer')" onkeydown="handleSuggestKey(event,'sPackerSuggest')"><div class="suggest-box" id="sPackerSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name (e.g. MDoe)</div></div><div class="field"><label>Pack Station</label><div class="field-wrap"><input id="sPackStation" placeholder="e.g. PS-01" autocomplete="off" oninput="liveStationSuggest()" onblur="savePackStation()" onkeydown="handleSuggestKey(event,'sPackStationSuggest')"><div class="suggest-box" id="sPackStationSuggest" style="display:none"></div></div></div><div class="field"><label>Pick Demand # <em>*</em></label><input id="sDemand" placeholder="e.g. NH00012345" oninput="autoDivisionFromDemand()"></div><div class="field"><label>Shift Override</label><select id="sShift"><option value="auto">Auto (use current time)</option><option value="1st">1st</option><option value="2nd">2nd</option><option value="3rd">3rd</option></select></div></div><div class="card-title">Product Lines</div><div id="productLines"></div><div class="actions"><button class="btn" onclick="addProductLine()">+ Add Line</button><button class="btn" onclick="clearEntry()">Clear Form</button><button class="btn primary" style="flex:1" onclick="saveShortage()">+ Log All Shortages</button></div><div class="field" style="margin-top:12px"><label>Notes</label><textarea id="sNotes"></textarea></div></div><div class="filters"><input id="filterText" class="search" placeholder="Search by product, order, picker, division..." oninput="renderShortages()"><select id="viewMode" onchange="loadShortages(true)"><option value="active">Active</option><option value="archive">Archived History</option><option value="both">Active + Archived</option></select><input id="filterStart" type="date" onchange="renderShortages()"><input id="filterEnd" type="date" onchange="renderShortages()"><button class="btn" onclick="loadShortages(true)">Refresh Data</button></div><div id="archiveActions" class="actions" style="margin-bottom:10px"></div><div id="shortageList" class="shortage-list"></div></div></section>
+<section id="shortageScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Outbound</div><h1>Shortage Entry</h1><p>Log shortage lines and review active records.</p></div><div id="shortageTopActions" class="actions"></div></div><div class="card" id="entryCard"><div class="form-row four"><div class="field"><label>Date &amp; Time</label><input id="sDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="sDiv"><option value="">Select</option><option>NH</option><option>GT</option><option>FS</option><option>EE</option><option>BC</option><option>CF</option></select></div><div class="field"><label>Picker <em>*</em></label><select id="sPickerSelect" onchange="onPickerSelectChange('sPickerSelect','sPickerNew','sPicker')"><option value="">-- Select Picker --</option></select><div id="sPickerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="sPickerNew" placeholder="FirstInitialLastName e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('sPickerNew','picker')" onblur="validatePersonField('sPickerNew','picker')" onkeydown="handleSuggestKey(event,'sPickerNewSuggest')"><div class="suggest-box" id="sPickerNewSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name</div></div><input id="sPicker" type="hidden"></div><div class="field"><label>Packer</label><select id="sPackerSelect" onchange="onPickerSelectChange('sPackerSelect','sPackerNew','sPacker')"><option value="">-- Select Packer --</option></select><div id="sPackerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="sPackerNew" placeholder="FirstInitialLastName e.g. MDoe" autocomplete="off" oninput="livePersonSuggest('sPackerNew','packer')" onblur="validatePersonField('sPackerNew','packer')" onkeydown="handleSuggestKey(event,'sPackerNewSuggest')"><div class="suggest-box" id="sPackerNewSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name</div></div><input id="sPacker" type="hidden"></div><div class="field"><label>Pack Station</label><div class="field-wrap"><input id="sPackStation" placeholder="e.g. PS-01" autocomplete="off" oninput="liveStationSuggest()" onblur="savePackStation()" onkeydown="handleSuggestKey(event,'sPackStationSuggest')"><div class="suggest-box" id="sPackStationSuggest" style="display:none"></div></div></div><div class="field"><label>Pick Demand # <em>*</em></label><input id="sDemand" placeholder="e.g. NH00012345" oninput="autoDivisionFromDemand()"></div><div class="field"><label>Shift Override</label><select id="sShift"><option value="auto">Auto (use current time)</option><option value="1st">1st</option><option value="2nd">2nd</option><option value="3rd">3rd</option></select></div></div><div class="card-title">Product Lines</div><div id="productLines"></div><div class="actions"><button class="btn" onclick="addProductLine()">+ Add Line</button><button class="btn" onclick="clearEntry()">Clear Form</button><button class="btn primary" style="flex:1" onclick="saveShortage()">+ Log All Shortages</button></div><div class="field" style="margin-top:12px"><label>Notes</label><textarea id="sNotes"></textarea></div></div><div class="filters"><input id="filterText" class="search" placeholder="Search by product, order, picker, division..." oninput="renderShortages()"><select id="viewMode" onchange="loadShortages(true)"><option value="active">Active</option><option value="archive">Archived History</option><option value="both">Active + Archived</option></select><input id="filterStart" type="date" onchange="renderShortages()"><input id="filterEnd" type="date" onchange="renderShortages()"><button class="btn" onclick="loadShortages(true)">Refresh Data</button></div><div id="archiveActions" class="actions" style="margin-bottom:10px"></div><div id="shortageList" class="shortage-list"></div></div></section>
 <section id="reportScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Reports</div><h1>Shortage Reports</h1><p>IC Team and IC Manager only.</p></div><div class="actions"><button class="btn primary" onclick="printSummaryReport()">Print Summary</button><button class="btn" onclick="printCheckReport()">Print IC Check Sheet</button></div></div><div class="card"><div class="form-row four"><div class="field"><label>Report Mode</label><select id="reportMode"><option value="active">Active Only</option><option value="archive">Archived History</option><option value="both">Active + Archived</option></select></div><div class="field"><label>Start Date</label><input id="reportStart" type="date"></div><div class="field"><label>End Date</label><input id="reportEnd" type="date"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="runReportPull()">Run Report</button></div></div></div><div id="reportBody"></div></div></section>
 <section id="restockScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Replenishment</div><h1>Replenishment Report</h1><p>IC Manager only.</p></div><button class="btn primary" onclick="printReplenReport()">Print</button></div><div class="card"><div class="card-title">Inventory Bin Report Import</div><p class="notice">Paste report columns: Bin Name, Product Code, Qty on Hand, Qty Allocated, Unit of Measure.</p><textarea id="binImport" style="width:100%;min-height:160px" placeholder="82-26-01&#9;DI1210&#9;12&#9;0&#9;EA"></textarea><div class="actions" style="margin-top:10px"><button class="btn primary" onclick="saveInventoryBinReport()">Import Bin Report</button></div></div><div id="restockBody"></div></div></section>
 <section id="pickerScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Personnel</div><h1>Manage Pickers &amp; Packers</h1><p>IC Manager only. Names stored as FirstInitialLastName (e.g. JDoe).</p></div></div><div class="card"><div class="card-title">Pickers</div><div class="form-row two"><div class="field"><label>Picker Name (FirstInitialLastName)</label><input id="pickerName" placeholder="JDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPickerManual()">Add Picker</button></div></div><div id="pickerList"></div></div><div class="card"><div class="card-title">Packers</div><div class="form-row two"><div class="field"><label>Packer Name (FirstInitialLastName)</label><input id="packerName" placeholder="MDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackerManual()">Add Packer</button></div></div><div id="packerList"></div></div><div class="card"><div class="card-title">Pack Stations</div><div class="form-row two"><div class="field"><label>Pack Station Name</label><input id="packStationName" placeholder="PS-01"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackStationManual()">Add Station</button></div></div><div id="packStationList"></div></div></div></section>
@@ -69,12 +69,12 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
     <div class="card"><div class="card-title">New Over Pull Entry</div>
       <div class="form-row three">
         <div class="field"><label>Date &amp; Time</label><input id="opDate" type="datetime-local"></div>
-        <div class="field"><label>Order Number <em>*</em></label><input id="opOrder" placeholder="e.g. NH00012345" autocomplete="off" oninput="opAutoDivision()"></div>
+        <div class="field"><label>Order Number <em>*</em></label><input id="opOrder" placeholder="e.g. NH.45433" autocomplete="off" oninput="opAutoDivision()" onblur="opBlurOrder()" style="font-family:var(--mono);font-weight:700;letter-spacing:.06em"><div id="opOrderHint" style="display:none;font-size:11px;color:var(--red);margin-top:3px"></div></div>
         <div class="field"><label>Division</label><input id="opDiv" placeholder="Auto-filled" readonly style="opacity:.7;cursor:default"></div>
       </div>
       <div class="form-row three">
-        <div class="field"><label>Packer Name <em>*</em></label><div class="field-wrap"><input id="opPacker" placeholder="e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('opPacker','packer')" onblur="validatePersonField('opPacker','packer')" onkeydown="handleSuggestKey(event,'opPackerSuggest')"><div class="suggest-box" id="opPackerSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name (e.g. JDoe)</div></div>
-        <div class="field"><label>Picker Name</label><div class="field-wrap"><input id="opPicker" placeholder="e.g. MDoe" autocomplete="off" oninput="livePersonSuggest('opPicker','picker')" onblur="validatePersonField('opPicker','picker')" onkeydown="handleSuggestKey(event,'opPickerSuggest')"><div class="suggest-box" id="opPickerSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name</div></div>
+        <div class="field"><label>Packer Name <em>*</em></label><select id="opPackerSelect" onchange="onPickerSelectChange('opPackerSelect','opPackerNew','opPacker')"><option value="">-- Select Packer --</option></select><div id="opPackerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="opPackerNew" placeholder="e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('opPackerNew','packer')" onblur="validatePersonField('opPackerNew','packer')" onkeydown="handleSuggestKey(event,'opPackerNewSuggest')"><div class="suggest-box" id="opPackerNewSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name</div></div><input id="opPacker" type="hidden"></div>
+        <div class="field"><label>Picker Name</label><select id="opPickerSelect" onchange="onPickerSelectChange('opPickerSelect','opPickerNew','opPicker')"><option value="">-- Select Picker --</option></select><div id="opPickerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="opPickerNew" placeholder="e.g. MDoe" autocomplete="off" oninput="livePersonSuggest('opPickerNew','picker')" onblur="validatePersonField('opPickerNew','picker')" onkeydown="handleSuggestKey(event,'opPickerNewSuggest')"><div class="suggest-box" id="opPickerNewSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name</div></div><input id="opPicker" type="hidden"></div>
         <div class="field"><label>Pack Station</label><div class="field-wrap"><input id="opPackStation" placeholder="e.g. PS-01" autocomplete="off" oninput="liveStationSuggest('opPackStation')" onblur="savePackStation()" onkeydown="handleSuggestKey(event,'opPackStationSuggest')"><div class="suggest-box" id="opPackStationSuggest" style="display:none"></div></div></div>
       </div>
       <div class="card-title" style="margin-top:4px">Items Over-Pulled</div>
@@ -118,6 +118,7 @@ const IC_PORTAL_URL='https://phocas88.github.io/Chapman_Inventory_Control_Portal
 const DEFAULT_NEW_CONFIG={apiKey:'AIzaSyB1CEylhHj4JoWH2VejdLoOt1nteztaqH8',authDomain:'shortage-control-portal.firebaseapp.com',projectId:'shortage-control-portal',storageBucket:'shortage-control-portal.firebasestorage.app',messagingSenderId:'791183009826',appId:'1:791183009826:web:76f397201bd0228e61ee38'};
 const OLD_CONFIG={apiKey:'AIzaSyA1m5P6MFUojFsEBqLXaSLumNiChgAH1Lw',authDomain:'inventory-control-portal.firebaseapp.com',projectId:'inventory-control-portal',storageBucket:'inventory-control-portal.firebasestorage.app',messagingSenderId:'925547075268',appId:'1:925547075268:web:e6ebce91417aa6885a1b91'};
 const DEFAULT_SETTINGS={firebaseConfig:DEFAULT_NEW_CONFIG,activeCollection:'shortages_active',archiveCollection:'shortages_archive',overpullCollection:'overpull_active'};
+const PRESET_PICKERS=['ABrooks','ABurford','ACarter','ACherry','AJbari','ANazari','APayton','BChristian','BClaiborne','BZeyfuh','CArtis','CDavis','DAlston','DCooper','DLagatuz','DLee','DMartin','EBaysa','EKelly','EMoore','GMunford','HAkridge','JBoothe','JCary','JDelacruz','JLinwood','JRobles','KGreenhow','KHill','KRoberts','KWatford','MButler','MGracia','MHunt','MSimon','MWalker','NLewis','OZiyallah','QSills','RAlston','RCoy','RJoyner','SFnu','TMorgan','TPerry','TRobertson','WCooke','WCruz','WSellers'];
 let role='',pinTarget='',pinBuf='',db=null,oldDb=null,shortages=[],visibleShortages=[],pickerNames=[],packerNames=[],packStations=[],inventoryBins=[],editingId=null,editingArchive=false,lastLoadMode='active';
 function esc(v){return String(v??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]))}
 function num(v){const n=Number(v);return isNaN(n)?0:n}function val(v){return v===undefined||v===null?'':v}
@@ -126,7 +127,7 @@ function getSettings(){try{return {...DEFAULT_SETTINGS,...JSON.parse(localStorag
 function initFirebase(){const s=getSettings();try{if(!firebase.apps.length)firebase.initializeApp(s.firebaseConfig);db=firebase.firestore();firebase.firestore().settings({ignoreUndefinedProperties:true});}catch(e){console.error(e);alert('Firebase connection failed. Check Settings. '+e.message)}}
 function showLoading(t){$('loadingText').textContent=t||'Loading...';$('loading').classList.add('show')}function hideLoading(){$('loading').classList.remove('show')}
 function applyTheme(){const light=localStorage.getItem('scp_theme')==='light';document.body.classList.toggle('light-mode',light);if($('themeToggle'))$('themeToggle').checked=light}function saveTheme(light){localStorage.setItem('scp_theme',light?'light':'dark');applyTheme()}
-function showScreen(name){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const el=$(name+'Screen');if(el)el.classList.add('active');$('topbar').classList.toggle('show',name!=='login'&&name!=='pin');document.querySelectorAll('.nav-btn[data-screen]').forEach(b=>b.classList.toggle('active',b.dataset.screen===name));if(name==='shortage')loadShortages(false);if(name==='report')renderReports();if(name==='picker')renderPickers();if(name==='restock')buildReplenishmentReport();if(name==='settings')loadSettingsForm();if(name==='overpull'){opInitForm();opSwitchTab('entry');}}
+function showScreen(name){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const el=$(name+'Screen');if(el)el.classList.add('active');$('topbar').classList.toggle('show',name!=='login'&&name!=='pin');document.querySelectorAll('.nav-btn[data-screen]').forEach(b=>b.classList.toggle('active',b.dataset.screen===name));if(name==='shortage')loadShortages(false);if(name==='report')renderReports();if(name==='picker')renderPickers();if(name==='restock')buildReplenishmentReport();if(name==='settings')loadSettingsForm();if(name==='overpull'){populatePickerSelects();opInitForm();opSwitchTab('entry');}}
 function goPin(target){pinTarget=target;pinBuf='';$('pinBadge').textContent=ROLE_LABELS[target];updateDots();$('pinError').textContent='';showScreen('pin')}
 function pinKey(k){if(pinBuf.length>=4)return;pinBuf+=k;updateDots();document.querySelectorAll('.pin-key').forEach(btn=>{if(btn.dataset.key===k){btn.classList.add('active-press');setTimeout(()=>btn.classList.remove('active-press'),140)}});if(pinBuf.length===4)setTimeout(checkPin,120)}
 function pinBack(){pinBuf=pinBuf.slice(0,-1);updateDots()}function pinClear(){pinBuf='';updateDots();$('pinError').textContent=''}function updateDots(){document.querySelectorAll('#pinDots .pin-dot').forEach((d,i)=>d.classList.toggle('filled',i<pinBuf.length))}
@@ -138,7 +139,9 @@ function buildNav(){let nav=[['shortage','Shortages']];if(canRunReports())nav.pu
 function login(r){role=r;$('roleChip').textContent=ROLE_LABELS[r];$('roleChip').className='role-chip '+(r==='manager'?'manager':r==='icteam'?'icteam':'clerk');buildNav();$('entryCard').classList.toggle('hide',r!=='clerk');$('shortageTopActions').innerHTML=canRunReports()?`<a class="btn" href="${IC_PORTAL_URL}" target="_blank">Open IC Portal Tickets</a>`:'';$('archiveActions').innerHTML=canRunReports()?`<button class="btn" onclick="selectVisible(true)">Select Visible</button><button class="btn" onclick="selectVisible(false)">Clear Selection</button><button class="btn orange" onclick="archiveSelected()">Archive Selected</button><button class="btn red" onclick="archiveFiltered()">Archive Filtered Active</button>`:'';showScreen('shortage')}
 function logout(){role='';shortages=[];visibleShortages=[];showScreen('login')}
 function loadAllPersonnel(){
-  pickerNames=JSON.parse(localStorage.getItem('scp_pickers')||'[]');
+  const saved=JSON.parse(localStorage.getItem('scp_pickers')||'null');
+  // Merge preset list with any saved additions; preset always included
+  pickerNames=[...new Set([...PRESET_PICKERS,...(saved||[])])].sort();
   packerNames=JSON.parse(localStorage.getItem('scp_packers')||'[]');
   packStations=JSON.parse(localStorage.getItem('scp_packstations')||'[]');
 }
@@ -358,7 +361,7 @@ function rowHtml(r){const chk=canRunReports()&&!r._archived?`<input class="sr-ch
 async function saveShortage(){autoDivisionFromDemand();validatePickerInput();const base={date:$('sDate').value||nowLocalInput(),division:$('sDiv').value,pickDemand:$('sDemand').value.trim().toUpperCase(),picker:normalizeName($('sPicker').value.trim()),packer:normalizeName($('sPacker').value.trim()),packStation:($('sPackStation').value.trim().toUpperCase()),shift:shiftValue(),uom:'EA',notes:$('sNotes').value.trim(),createdAt:new Date().toISOString(),createdBy:role,foundInShortedBin:false,secondLocationFilled:false,replenishedAfterPick:false,status:'open'};const lines=getProductLines();if(!base.pickDemand){alert('Pick Demand # is required.');return}if(!base.division){alert('Division is required. Enter or scan the Pick Demand # first.');return}if(!base.picker){alert('Picker is required.');return}if(base.picker&&!fuzzyMatchPerson(base.picker,'picker')){if(!confirm(`"${base.picker}" is not saved. Save as new picker?`)){$('sPicker').focus();return}savePerson(base.picker,'picker');}if(base.packer&&!fuzzyMatchPerson(base.packer,'packer')){if(!confirm(`"${base.packer}" is not saved. Save as new packer?`)){$('sPacker').focus();return}savePerson(base.packer,'packer');}if(!lines.length||lines.some(l=>!l.productCode||!l.shortedBin)){alert('Each product line needs Product Code and Bin Shorted.');return}
   const invalidBins=lines.filter(l=>l.shortedBin&&!validateBinFormat(l.shortedBin).ok);
   if(invalidBins.length){alert('Invalid bin format on one or more lines.\n\nValid formats:\n  ##-##-##  (e.g. 82-26-01)\n  ##-##-#   (e.g. 82-26-1)\n  P#####    (e.g. P12345)\n  BULK\n  ROOM\n  KEY ACCOUNT');return}showLoading('Saving shortages...');try{const batch=db.batch();const col=db.collection(getSettings().activeCollection);lines.forEach(line=>{batch.set(col.doc(),{...base,...line,uom:'EA'});});await batch.commit();clearCaches();clearEntry();await loadShortages(true)}catch(e){alert(e.message)}finally{hideLoading()}}
-function clearEntry(){['sDemand','sPicker','sPacker','sPackStation','sNotes'].forEach(id=>{if($(id))$(id).value='';});$('sDiv').value='';$('sShift').value='auto';$('sDate').value=nowLocalInput();$('productLines').innerHTML='';addProductLine();['sPickerSuggest','sPackerSuggest','sPackStationSuggest'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});}
+function clearEntry(){['sDemand','sPicker','sPacker','sPackStation','sNotes'].forEach(id=>{if($(id))$(id).value='';});['sPickerSelect','sPackerSelect'].forEach(id=>{const el=$(id);if(el)el.value='';});['sPickerNewWrap','sPackerNewWrap'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});$('sDiv').value='';$('sShift').value='auto';$('sDate').value=nowLocalInput();$('productLines').innerHTML='';addProductLine();['sPickerNewSuggest','sPackerNewSuggest','sPackStationSuggest'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});}
 function clearCaches(){Object.keys(localStorage).filter(k=>k.startsWith('scp_cache_')).forEach(k=>localStorage.removeItem(k))}
 async function updateRecord(id,data,archived=false){showLoading('Saving...');try{const s=getSettings();await db.collection(archived?s.archiveCollection:s.activeCollection).doc(id).set({...data,updatedAt:new Date().toISOString(),updatedBy:role},{merge:true});clearCaches();await loadShortages(true)}catch(e){alert(e.message)}finally{hideLoading()}}
 async function markErroneous(id){const r=shortages.find(x=>x.id===id&&!x._archived);if(!r)return;const qty=prompt('Qty found in the shorted bin:',r.icQtyFound||r.qtyShorted||'');if(qty===null)return;const uom=prompt('UOM:',r.icUom||r.uom||'EA');if(uom===null)return;await updateRecord(id,{foundInShortedBin:true,icQtyFound:num(qty),icUom:(uom||'EA').toUpperCase(),status:'located'},false)}
@@ -875,13 +878,53 @@ function enterOverPull(){
   }
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   $('overpullScreen').classList.add('active');
-  opInitForm();
+  populatePickerSelects();opInitForm();
   opSwitchTab('entry');
 }
 
+function normalizeOrderNumber(raw){
+  if(!raw)return{ok:false,val:'',msg:'Order number is required.'};
+  const v=raw.trim().toUpperCase().replace(/\s+/g,'');
+  // Extract letters prefix and numeric suffix
+  // Accept: NH.45433 | NH45433 | NH.00045433
+  const m=v.match(/^([A-Z]{2})\.?0*(\d+)$/);
+  if(!m)return{ok:false,val:v,msg:'Format must be Division + number, e.g. NH.45433'};
+  const div=m[1];
+  const num=m[2]; // leading zeros already stripped by 0*
+  const normalized=div+'.'+num;
+  return{ok:true,val:normalized,div};
+}
+
 function opAutoDivision(){
-  const v=($('opOrder').value||'').trim().slice(0,2).toUpperCase();
-  $('opDiv').value=v;
+  const raw=$('opOrder').value||'';
+  const result=normalizeOrderNumber(raw);
+  if(result.ok){
+    $('opOrder').value=result.val; // normalize in-place as they type
+    $('opDiv').value=result.div||result.val.slice(0,2);
+    $('opOrder').style.borderColor='rgba(16,185,129,.6)';
+    const hint=$('opOrderHint');if(hint){hint.textContent='';hint.style.display='none';}
+  } else {
+    $('opDiv').value=raw.trim().slice(0,2).toUpperCase();
+    $('opOrder').style.borderColor='';
+    const hint=$('opOrderHint');
+    if(hint&&raw.trim()){hint.textContent=result.msg;hint.style.display='block';}
+  }
+}
+
+function opBlurOrder(){
+  const raw=$('opOrder').value||'';
+  if(!raw.trim())return;
+  const result=normalizeOrderNumber(raw);
+  if(result.ok){
+    $('opOrder').value=result.val;
+    $('opDiv').value=result.div;
+    $('opOrder').style.borderColor='rgba(16,185,129,.6)';
+    const hint=$('opOrderHint');if(hint){hint.textContent='';hint.style.display='none';}
+  } else {
+    $('opOrder').style.borderColor='rgba(248,113,113,.6)';
+    const hint=$('opOrderHint');
+    if(hint){hint.textContent=result.msg+' (e.g. NH.45433)';hint.style.display='block';}
+  }
 }
 
 function opSwitchTab(tab){
@@ -900,7 +943,7 @@ function opSwitchTab(tab){
 function opInitForm(){
   const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());
   $('opDate').value=d.toISOString().slice(0,16);
-  ['opOrder','opDiv','opPacker','opPicker','opPackStation'].forEach(id=>{if($(id))$(id).value='';});
+  ['opOrder','opDiv','opPacker','opPicker','opPackStation'].forEach(id=>{if($(id))$(id).value='';}); ['opPackerSelect','opPickerSelect'].forEach(id=>{const el=$(id);if(el)el.value='';}); ['opPackerNewWrap','opPickerNewWrap'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});;
   $('opLines').innerHTML='';
   $('opMoreWrap').style.display='none';
   ['opPackerSuggest','opPickerSuggest','opPackStationSuggest'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});
@@ -937,8 +980,14 @@ function opGetLines(){
 }
 
 function opValidateHeader(){
-  if(!$('opOrder').value.trim()){alert('Order Number is required.');return false;}
-  if(!$('opPacker').value.trim()){alert('Packer Name is required.');return false;}
+  const orderRaw=$('opOrder').value.trim();
+  if(!orderRaw){alert('Order Number is required.');return false;}
+  const orderResult=normalizeOrderNumber(orderRaw);
+  if(!orderResult.ok){alert('Invalid order number format.\n\nRequired: Division + number, no leading zeros.\nExample: NH.45433\n\nGot: '+orderRaw);return false;}
+  $('opOrder').value=orderResult.val; // ensure normalized before save
+  $('opDiv').value=orderResult.div;
+  const packerVal=($('opPacker').value||'').trim();
+  if(!packerVal){alert('Packer Name is required.');return false;}
   return true;
 }
 
@@ -968,8 +1017,8 @@ async function opSaveEntry(){
   const s=getSettings();
   const col=s.overpullCollection||'overpull_active';
   // validate + save new packer/picker names before submitting
-  const rawPacker=normalizeName($('opPacker').value.trim());
-  const rawPicker=normalizeName($('opPicker').value.trim());
+  const rawPacker=normalizeName(($('opPacker').value||$('opPackerNew').value||'').trim());
+  const rawPicker=normalizeName(($('opPicker').value||$('opPickerNew').value||'').trim());
   const rawStation=($('opPackStation').value.trim()).toUpperCase();
   if(rawPacker&&!fuzzyMatchPerson(rawPacker,'packer')){if(confirm(`"${rawPacker}" is not saved. Save as new packer?`))savePerson(rawPacker,'packer');}
   if(rawPicker&&!fuzzyMatchPerson(rawPicker,'picker')){if(confirm(`"${rawPicker}" is not saved. Save as new picker?`))savePerson(rawPicker,'picker');}
@@ -1371,7 +1420,82 @@ function printOverPullReport(){
   setTimeout(()=>{$('printArea').innerHTML='';},500);
 }
 
-function startup(){applyTheme();initFirebase();$('sDate').value=nowLocalInput();loadAllPersonnel();if($('productLines'))addProductLine()}
+function populatePickerSelects(){
+  // Build option lists for all person selects
+  const pickerOpts=['<option value="">-- Select Picker --</option>',
+    ...pickerNames.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`),
+    '<option value="__new__">+ Add New Picker...</option>'
+  ].join('');
+  const packerOpts=['<option value="">-- Select Packer --</option>',
+    ...packerNames.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`),
+    '<option value="__new__">+ Add New Packer...</option>'
+  ].join('');
+
+  // Shortage pickers
+  const sp=$('sPickerSelect');if(sp){const cur=sp.value;sp.innerHTML=pickerOpts;if(cur)sp.value=cur;}
+  const spk=$('sPackerSelect');if(spk){const cur=spk.value;spk.innerHTML=packerOpts;if(cur)spk.value=cur;}
+  // Over Pull pickers
+  const op=$('opPackerSelect');if(op){const cur=op.value;op.innerHTML=packerOpts;if(cur)op.value=cur;}
+  const opp=$('opPickerSelect');if(opp){const cur=opp.value;opp.innerHTML=pickerOpts;if(cur)opp.value=cur;}
+}
+
+function onPickerSelectChange(selectId, newInputId, hiddenId){
+  const sel=$(selectId);
+  const newWrapId=selectId.replace('Select','NewWrap');
+  const newWrap=$(newWrapId);
+  const hidden=$(hiddenId);
+  if(!sel)return;
+  if(sel.value==='__new__'){
+    if(newWrap)newWrap.style.display='block';
+    if(hidden)hidden.value='';
+    const inp=$(newInputId);if(inp){inp.value='';inp.focus();}
+  } else {
+    if(newWrap)newWrap.style.display='none';
+    if(hidden)hidden.value=sel.value;
+    // Sync: when clearing, make sure hidden is empty
+  }
+}
+
+// Override savePerson to also refresh dropdowns after saving
+const _origSavePerson=savePerson;
+function savePerson(raw,type){
+  _origSavePerson(raw,type);
+  // After saving, add to the select and switch back from new-input mode
+  const normalized=normalizeName(raw);
+  if(type==='picker'){
+    // Update sPicker selects
+    ['sPickerSelect','opPickerSelect'].forEach(sid=>{
+      const sel=$(sid);if(!sel)return;
+      // check if option already exists
+      if(![...sel.options].some(o=>o.value===normalized)){
+        const opt=document.createElement('option');opt.value=normalized;opt.textContent=normalized;
+        sel.insertBefore(opt,sel.querySelector('option[value="__new__"]'));
+      }
+      sel.value=normalized;
+      onPickerSelectChange(sid,sid.replace('Select','New'),sid.replace('Select','').toLowerCase()+'picker');
+    });
+    // Set hidden fields
+    const sh=$('sPicker');if(sh)sh.value=normalized;
+    const oph=$('opPicker');if(oph)oph.value=normalized;
+    const wsp=$('sPickerNewWrap');if(wsp)wsp.style.display='none';
+    const wop=$('opPickerNewWrap');if(wop)wop.style.display='none';
+  } else {
+    ['sPackerSelect','opPackerSelect'].forEach(sid=>{
+      const sel=$(sid);if(!sel)return;
+      if(![...sel.options].some(o=>o.value===normalized)){
+        const opt=document.createElement('option');opt.value=normalized;opt.textContent=normalized;
+        sel.insertBefore(opt,sel.querySelector('option[value="__new__"]'));
+      }
+      sel.value=normalized;
+    });
+    const sh=$('sPacker');if(sh)sh.value=normalized;
+    const oph=$('opPacker');if(oph)oph.value=normalized;
+    const wsp=$('sPackerNewWrap');if(wsp)wsp.style.display='none';
+    const wop=$('opPackerNewWrap');if(wop)wop.style.display='none';
+  }
+}
+
+function startup(){applyTheme();initFirebase();$('sDate').value=nowLocalInput();loadAllPersonnel();populatePickerSelects();if($('productLines'))addProductLine()}
 startup();
 </script>
 </body>
