@@ -34,6 +34,27 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 .suggest-item .si-badge{font-family:var(--mono);font-size:10px;padding:2px 6px;border-radius:4px;background:var(--panel2);color:var(--muted)}
 .field-wrap{position:relative}
 
+.ic-confirm-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(10,15,35,.65);backdrop-filter:blur(8px);overflow-y:auto;padding:20px 16px}
+.ic-confirm-overlay.open{display:block}
+.ic-confirm-modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;max-width:1100px;margin:0 auto;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+.ic-confirm-head{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:10;border-radius:16px 16px 0 0}
+.ic-confirm-head h3{font-size:16px;font-weight:700}
+.ic-sheet-row{display:grid;grid-template-columns:24px 80px 130px 80px 1fr 160px 100px 1fr;gap:8px;align-items:center;padding:8px 14px;border-bottom:1px solid var(--border);font-size:12px}
+.ic-sheet-row:nth-child(even){background:var(--panel)}
+.ic-sheet-row.confirmed-row{background:rgba(16,185,129,.07);border-left:3px solid var(--green)}
+.ic-sheet-row.erroneous-row{background:rgba(245,158,11,.07);border-left:3px solid var(--yellow)}
+.ic-sheet-row.already-done{opacity:.55}
+.ic-sheet-head{background:var(--panel2)!important;font-family:var(--mono);font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;position:sticky;top:57px;z-index:9}
+.ic-result-select{background:var(--panel2);border:1.5px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;padding:5px 8px;width:100%}
+.ic-result-select.res-confirmed{border-color:rgba(16,185,129,.6);background:rgba(16,185,129,.08);color:var(--green);font-weight:700}
+.ic-result-select.res-erroneous{border-color:rgba(245,158,11,.6);background:rgba(245,158,11,.08);color:var(--yellow);font-weight:700}
+.ic-result-select.res-second{border-color:rgba(79,131,245,.6);background:rgba(79,131,245,.08);color:var(--accent);font-weight:700}
+.ic-qty-input{background:var(--panel2);border:1.5px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;padding:5px 8px;width:100%;font-family:var(--mono)}
+.ic-notes-input{background:var(--panel2);border:1.5px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;padding:5px 8px;width:100%}
+.ic-prog-bar{height:4px;background:var(--border);border-radius:2px;margin:0 22px 0}
+.ic-prog-fill{height:4px;background:var(--green);border-radius:2px;transition:width .3s}
+@media(max-width:900px){.ic-sheet-row{grid-template-columns:24px 70px 110px 60px 1fr 130px 80px}}
+
 @media print{body>*:not(.print-area){display:none!important}.print-area{display:block!important;color:#111;background:#fff;font-family:Arial,sans-serif}@page{size:letter portrait;margin:.55in}.card,.no-break,table,tr{break-inside:avoid;page-break-inside:avoid}.table th{background:#111827!important;color:#fff!important}}
 </style>
 </head>
@@ -106,6 +127,36 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 
 </div></section>
 <div id="editOverlay" class="overlay"><div class="modal"><div class="modal-head"><h3>Edit Shortage</h3><button onclick="closeEdit()">&#215;</button></div><div id="editBody" class="modal-body"></div></div></div>
+<div id="icConfirmOverlay" class="ic-confirm-overlay">
+  <div class="ic-confirm-modal">
+    <div class="ic-confirm-head">
+      <div>
+        <h3>&#128203; IC Verification Sheet</h3>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px" id="icConfirmSubhead">Loading shortages...</div>
+      </div>
+      <div class="actions" style="gap:8px">
+        <button class="btn green" onclick="icConfirmSubmitAll()" id="icConfirmSubmitBtn">&#10003; Save All Results</button>
+        <button class="btn" onclick="closeIcConfirm()">&#10005; Close</button>
+      </div>
+    </div>
+    <div class="ic-prog-bar"><div class="ic-prog-fill" id="icProgFill" style="width:0%"></div></div>
+    <div style="padding:10px 22px 6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <div style="font-size:11px;color:var(--muted)">Filter:</div>
+      <select id="icConfirmFilter" onchange="renderIcConfirmSheet()" style="background:var(--panel2);border:1.5px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;padding:5px 10px">
+        <option value="pending">Pending / Not Confirmed</option>
+        <option value="all">All Active Shortages</option>
+        <option value="confirmed">Already Confirmed</option>
+      </select>
+      <button class="btn" style="font-size:11px;padding:5px 10px" onclick="icMarkAllVisible('confirmed_short')">&#10003; Mark All Visible → Confirmed Short</button>
+      <div id="icConfirmStats" style="margin-left:auto;font-size:11px;color:var(--muted)"></div>
+    </div>
+    <div id="icConfirmSheet"></div>
+    <div style="padding:16px 22px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn green" onclick="icConfirmSubmitAll()">&#10003; Save All Results</button>
+      <button class="btn" onclick="closeIcConfirm()">Cancel</button>
+    </div>
+  </div>
+</div>
 <div id="loading" class="loading"><div class="loading-card" id="loadingText">Loading...</div></div>
 <div id="printArea" class="print-area"></div>
 <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
@@ -136,7 +187,7 @@ function backToLogin(){role='';pinTarget='';pinBuf='';showScreen('login')}
 document.addEventListener('keydown',e=>{if(!$('pinScreen').classList.contains('active'))return;if(e.key>='0'&&e.key<='9')pinKey(e.key);else if(e.key==='Backspace')pinBack();else if(e.key==='Escape')pinClear();else if(e.key==='Enter'&&pinBuf.length===4)checkPin()});
 function canRunReports(){return role==='icteam'||role==='manager'}function canSettings(){return role==='manager'}function canManage(){return role==='manager'}
 function buildNav(){let nav=[['shortage','Shortages']];if(canRunReports())nav.push(['report','Reports']);if(role==='manager')nav.push(['restock','Replenishment'],['picker','Manage Pickers'],['migration','Migration'],['settings','Settings']);nav.push(['overpull','Over Pull']);if(role==='icteam'||role==='manager')nav.push(['link','IC Portal']);nav.push(['theme','Light/Dark'],['logout','Logout']);$('nav').innerHTML=nav.map(n=>n[0]==='link'?`<a class="nav-btn" href="${IC_PORTAL_URL}" target="_blank">${n[1]}</a>`:n[0]==='logout'?`<button class="nav-btn lock" onclick="logout()">${n[1]}</button>`:n[0]==='theme'?`<button class="nav-btn" onclick="saveTheme(!document.body.classList.contains('light-mode'))">${n[1]}</button>`:n[0]==='overpull'?`<button class="nav-btn" data-screen="overpull" onclick="showScreen('overpull')" style="color:var(--orange)">${n[1]}</button>`:`<button class="nav-btn" data-screen="${n[0]}" onclick="showScreen('${n[0]}')">${n[1]}</button>`).join('')}
-function login(r){role=r;$('roleChip').textContent=ROLE_LABELS[r];$('roleChip').className='role-chip '+(r==='manager'?'manager':r==='icteam'?'icteam':'clerk');buildNav();$('entryCard').classList.toggle('hide',r!=='clerk');$('shortageTopActions').innerHTML=canRunReports()?`<a class="btn" href="${IC_PORTAL_URL}" target="_blank">Open IC Portal Tickets</a>`:'';$('archiveActions').innerHTML=canRunReports()?`<button class="btn" onclick="selectVisible(true)">Select Visible</button><button class="btn" onclick="selectVisible(false)">Clear Selection</button><button class="btn orange" onclick="archiveSelected()">Archive Selected</button><button class="btn red" onclick="archiveFiltered()">Archive Filtered Active</button>`:'';showScreen('shortage')}
+function login(r){role=r;$('roleChip').textContent=ROLE_LABELS[r];$('roleChip').className='role-chip '+(r==='manager'?'manager':r==='icteam'?'icteam':'clerk');buildNav();$('entryCard').classList.toggle('hide',r!=='clerk');$('shortageTopActions').innerHTML=canRunReports()?`<a class="btn" href="${IC_PORTAL_URL}" target="_blank">Open IC Portal Tickets</a>`:'';$('archiveActions').innerHTML=canRunReports()?`<button class="btn" onclick="selectVisible(true)">Select Visible</button><button class="btn" onclick="selectVisible(false)">Clear Selection</button><button class="btn orange" onclick="archiveSelected()">Archive Selected</button><button class="btn red" onclick="archiveFiltered()">Archive Filtered Active</button><button class="btn green" onclick="openIcConfirm()" style="margin-left:auto">&#128203; IC Verify Sheet</button>`:'';showScreen('shortage')}
 function logout(){role='';shortages=[];visibleShortages=[];showScreen('login')}
 function loadAllPersonnel(){
   const saved=JSON.parse(localStorage.getItem('scp_pickers')||'null');
@@ -355,7 +406,7 @@ function matchesDate(r,start,end){const d=normalizeDate(r.date||r.createdAt||r.t
 function filteredRows(forReport=false){const text=(forReport?'':$('filterText')?.value||'').toLowerCase().trim();const start=forReport?$('reportStart').value:$('filterStart')?.value;const end=forReport?$('reportEnd').value:$('filterEnd')?.value;return shortages.filter(r=>{if(!matchesDate(r,start,end))return false;if(!text)return true;return [r.productCode,r.shortedBin,r.picker,r.pickDemand,r.division,r.notes].join(' ').toLowerCase().includes(text)})}
 function renderShortages(){visibleShortages=filteredRows(false);$('shortageList').innerHTML=visibleShortages.length?visibleShortages.map(rowHtml).join(''):'<div class="empty">No shortages found for this filter.</div>';renderCheckPreview()}
 function isBackorderRisk(r){return !!r.foundInShortedBin&&!r.secondLocationFilled}
-function statusBadges(r){let b=[];if(r._archived)b.push('<span class="badge purple">Archived</span>');if(r.foundInShortedBin)b.push('<span class="badge yellow">Erroneous Bin</span>');if(isBackorderRisk(r))b.push('<span class="badge red">Backorder Risk</span>');if(r.secondLocationFilled)b.push('<span class="badge blue">Second Location Filled</span>');if(r.replenishedAfterPick)b.push('<span class="badge green">Replenished After Pick</span>');return b.join(' ')}
+function statusBadges(r){let b=[];if(r._archived)b.push('<span class="badge purple">Archived</span>');if(r.icConfirmed==='confirmed_short')b.push('<span class="badge green">&#10003; IC Confirmed Short</span>');if(r.icConfirmed==='erroneous')b.push('<span class="badge yellow">&#9888; Erroneous Bin</span>');else if(r.foundInShortedBin)b.push('<span class="badge yellow">Erroneous Bin</span>');if(isBackorderRisk(r))b.push('<span class="badge red">Backorder Risk</span>');if(r.secondLocationFilled)b.push('<span class="badge blue">Second Location Filled</span>');if(r.replenishedAfterPick)b.push('<span class="badge green">Replenished After Pick</span>');return b.join(' ')}
 function secondarySummary(r){const locs=Array.isArray(r.secondaryLocations)?r.secondaryLocations:[];return locs.map(x=>`${x.bin||'NO BIN'}: ${x.qty||0} ${x.uom||r.uom||'EA'}${x.icQtyOnHand?` (OH ${x.icQtyOnHand})`:''}${x.notes?` - ${x.notes}`:''}`).join(' | ')}
 function rowHtml(r){const chk=canRunReports()&&!r._archived?`<input class="sr-check" type="checkbox" data-id="${esc(r.id)}">`:'';const edit=`<button class="btn" onclick="openEdit('${esc(r.id)}',${r._archived})">Edit</button>`;const mark=!r._archived?`<button class="btn green" onclick="markErroneous('${esc(r.id)}')">Found in Shorted Bin / Count</button><button class="btn" onclick="toggleSecond('${esc(r.id)}')">Second Location Filled</button><button class="btn" onclick="toggleReplenished('${esc(r.id)}')">Bin Replenished After Pick?</button>`:'';const unarch=r._archived&&canRunReports()?`<button class="btn orange" onclick="unarchiveOne('${esc(r.id)}')">Unarchive</button>`:'';const sec=secondarySummary(r);return `<div class="shortage-row ${r._archived?'archived':''} ${r.foundInShortedBin?'erroneous':''}"><div class="sr-head">${chk}<div style="flex:1"><div class="sr-codes">${esc(r.productCode||'NO PRODUCT')} <span style="color:var(--muted)">&bull;</span> ${esc(r.shortedBin||'NO BIN')}</div><div class="sr-meta">${esc(r.date||'No date')} &bull; ${esc(r.division||'')} &bull; Qty ${esc(r.qtyShorted||'')} ${esc(r.uom||'')} &bull; Demand ${esc(r.pickDemand||'')} &bull; Picker ${esc(r.picker||'')}${r.packer?' &bull; Packer '+esc(r.packer):''}${r.packStation?' &bull; Station '+esc(r.packStation):''}</div><div class="sr-meta">IC Found: ${esc(r.icQtyFound||'')} ${esc(r.icUom||r.uom||'')} ${r.icNotes?'&bull; '+esc(r.icNotes):''}</div>${sec?`<div class="sr-meta"><b>Second location filled:</b> ${esc(sec)}</div>`:''}<div style="margin-top:6px">${statusBadges(r)}</div><div class="sr-actions">${edit}${mark}${unarch}</div></div></div></div>`}
 async function saveShortage(){autoDivisionFromDemand();validatePickerInput();const base={date:$('sDate').value||nowLocalInput(),division:$('sDiv').value,pickDemand:$('sDemand').value.trim().toUpperCase(),picker:normalizeName($('sPicker').value.trim()),packer:normalizeName($('sPacker').value.trim()),packStation:($('sPackStation').value.trim().toUpperCase()),shift:shiftValue(),uom:'EA',notes:$('sNotes').value.trim(),createdAt:new Date().toISOString(),createdBy:role,foundInShortedBin:false,secondLocationFilled:false,replenishedAfterPick:false,status:'open'};const lines=getProductLines();if(!base.pickDemand){alert('Pick Demand # is required.');return}if(!base.division){alert('Division is required. Enter or scan the Pick Demand # first.');return}if(!base.picker){alert('Picker is required.');return}if(base.picker&&!fuzzyMatchPerson(base.picker,'picker')){if(!confirm(`"${base.picker}" is not saved. Save as new picker?`)){$('sPicker').focus();return}savePerson(base.picker,'picker');}if(base.packer&&!fuzzyMatchPerson(base.packer,'packer')){if(!confirm(`"${base.packer}" is not saved. Save as new packer?`)){$('sPacker').focus();return}savePerson(base.packer,'packer');}if(!lines.length||lines.some(l=>!l.productCode||!l.shortedBin)){alert('Each product line needs Product Code and Bin Shorted.');return}
@@ -411,7 +462,7 @@ async function saveEdit(){const binRaw=$('eBin').value.trim();if(binRaw&&!valida
 function selectVisible(on){document.querySelectorAll('.sr-check:not(:disabled)').forEach(c=>c.checked=on)}function selectedIds(){return [...document.querySelectorAll('.sr-check:checked')].map(c=>c.dataset.id)}async function archiveSelected(){const ids=selectedIds();if(!ids.length){alert('Select shortages first.');return}await archiveIds(ids)}async function archiveFiltered(){const ids=visibleShortages.filter(r=>!r._archived).map(r=>r.id);if(!ids.length){alert('No active filtered shortages to archive.');return}if(!confirm(`Archive ${ids.length} active filtered shortages?`))return;await archiveIds(ids)}
 async function archiveIds(ids){showLoading('Archiving shortages...');try{const s=getSettings();const batch=db.batch();ids.forEach(id=>{const r=shortages.find(x=>x.id===id&&!x._archived);if(!r)return;const src=db.collection(s.activeCollection).doc(id);const dst=db.collection(s.archiveCollection).doc(id);const data={...r,archivedAt:new Date().toISOString(),archivedBy:role};delete data.id;delete data._archived;batch.set(dst,data,{merge:true});batch.delete(src)});await batch.commit();clearCaches();await loadShortages(true)}catch(e){alert(e.message)}finally{hideLoading()}}
 async function unarchiveOne(id){showLoading('Unarchiving...');try{const s=getSettings();const r=shortages.find(x=>x.id===id&&x._archived);const data={...r,unarchivedAt:new Date().toISOString()};delete data.id;delete data._archived;const batch=db.batch();batch.set(db.collection(s.activeCollection).doc(id),data,{merge:true});batch.delete(db.collection(s.archiveCollection).doc(id));await batch.commit();clearCaches();await loadShortages(true)}catch(e){alert(e.message)}finally{hideLoading()}}
-function reportStats(rows){return {total:rows.length,err:rows.filter(r=>r.foundInShortedBin).length,backorder:rows.filter(isBackorderRisk).length,second:rows.filter(r=>r.secondLocationFilled).length,replen:rows.filter(r=>r.replenishedAfterPick).length,archived:rows.filter(r=>r._archived).length}}
+function reportStats(rows){return {total:rows.length,confirmed:rows.filter(r=>r.icConfirmed==='confirmed_short').length,err:rows.filter(r=>r.foundInShortedBin||r.icConfirmed==='erroneous').length,backorder:rows.filter(isBackorderRisk).length,second:rows.filter(r=>r.secondLocationFilled||r.icConfirmed==='second_location').length,replen:rows.filter(r=>r.replenishedAfterPick).length,archived:rows.filter(r=>r._archived).length,pending:rows.filter(r=>!r.icConfirmed&&!r.foundInShortedBin&&!r.secondLocationFilled).length}}
 function table(headers,rows){if(!rows.length)return '<div class="empty">No records found.</div>';return `<div style="overflow:auto"><table class="table"><thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`}
 
 // Shift helper: 1=1st (6am-3:30pm), 2=2nd (3:30pm-midnight/overnight)
@@ -502,13 +553,13 @@ function renderReports(){
   $('reportBody').innerHTML=`
     <div class="stat-grid">
       <div class="stat-card"><div class="stat-num">${st.total}</div><div class="stat-lbl">Total Shortages</div></div>
+      <div class="stat-card" style="border-color:rgba(16,185,129,.45);background:rgba(16,185,129,.07)"><div class="stat-num" style="color:var(--green)">${st.confirmed}</div><div class="stat-lbl">&#10003; IC Confirmed Short</div></div>
+      <div class="stat-card" style="border-color:rgba(248,113,113,.4);background:rgba(248,113,113,.05)"><div class="stat-num" style="color:var(--red)">${st.pending}</div><div class="stat-lbl">Pending IC Verification</div></div>
       <div class="stat-card" style="border-color:rgba(16,185,129,.3)"><div class="stat-num" style="color:var(--green)">${st.second}</div><div class="stat-lbl">2nd Location Found</div></div>
-      <div class="stat-card" style="border-color:rgba(245,158,11,.3)"><div class="stat-num" style="color:var(--yellow)">${st.err} <span style="font-size:12px">(${pct(st.err,st.total)})</span></div><div class="stat-lbl">⚠ Erroneous Shorts</div></div>
+      <div class="stat-card" style="border-color:rgba(245,158,11,.3)"><div class="stat-num" style="color:var(--yellow)">${st.err} <span style="font-size:12px">(${pct(st.err,st.total)})</span></div><div class="stat-lbl">&#9888; Erroneous Shorts</div></div>
       <div class="stat-card" style="border-color:rgba(220,38,38,.4);background:rgba(220,38,38,.07)"><div class="stat-num" style="color:var(--red)">${st.backorder}</div><div class="stat-lbl">Erroneous Backorders</div></div>
       <div class="stat-card"><div class="stat-num">${rows.filter(r=>getShiftFromRecord(r)===1).length}</div><div class="stat-lbl">1st Shift</div></div>
       <div class="stat-card"><div class="stat-num">${rows.filter(r=>getShiftFromRecord(r)===2).length}</div><div class="stat-lbl">2nd Shift</div></div>
-      <div class="stat-card"><div class="stat-num">${st.replen}</div><div class="stat-lbl">Replenished After Pick</div></div>
-      <div class="stat-card"><div class="stat-num">${st.archived}</div><div class="stat-lbl">Archived</div></div>
     </div>
     <div class="card no-break">
       <div class="card-title">Division &amp; Shift Breakdown</div>
@@ -1492,6 +1543,190 @@ function savePerson(raw,type){
     const oph=$('opPacker');if(oph)oph.value=normalized;
     const wsp=$('sPackerNewWrap');if(wsp)wsp.style.display='none';
     const wop=$('opPackerNewWrap');if(wop)wop.style.display='none';
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   IC VERIFICATION SHEET MODULE
+   ═══════════════════════════════════════════════════════ */
+
+let icConfirmEdits={}; // id -> {result, icQtyFound, icNotes, secondBin}
+
+function openIcConfirm(){
+  if(!canRunReports()){alert('IC Team or Manager access required.');return;}
+  icConfirmEdits={};
+  $('icConfirmOverlay').classList.add('open');
+  renderIcConfirmSheet();
+}
+
+function closeIcConfirm(){
+  $('icConfirmOverlay').classList.remove('open');
+  icConfirmEdits={};
+}
+
+function icConfirmFilteredRows(){
+  const f=$('icConfirmFilter')?.value||'pending';
+  const active=shortages.filter(r=>!r._archived);
+  if(f==='pending') return active.filter(r=>!r.icConfirmed&&!r.foundInShortedBin&&!r.secondLocationFilled);
+  if(f==='confirmed') return active.filter(r=>r.icConfirmed);
+  return active; // all
+}
+
+function renderIcConfirmSheet(){
+  const rows=icConfirmFilteredRows().sort((a,b)=>(a.shortedBin||'').localeCompare(b.shortedBin||'')||(a.productCode||'').localeCompare(b.productCode||''));
+  const all=shortages.filter(r=>!r._archived);
+  const done=all.filter(r=>r.icConfirmed||r.foundInShortedBin||r.secondLocationFilled).length;
+  const pctDone=all.length?Math.round(done/all.length*100):0;
+
+  $('icConfirmSubhead').textContent=`${rows.length} shortages shown · ${done}/${all.length} verified (${pctDone}%)`;
+  $('icProgFill').style.width=pctDone+'%';
+  $('icConfirmStats').innerHTML=`<span style="color:var(--green);font-weight:700">${all.filter(r=>r.icConfirmed==='confirmed_short').length} confirmed</span> · <span style="color:var(--yellow);font-weight:700">${all.filter(r=>r.foundInShortedBin||r.icConfirmed==='erroneous').length} erroneous</span> · <span style="color:var(--accent);font-weight:700">${all.filter(r=>r.secondLocationFilled||r.icConfirmed==='second_location').length} 2nd loc</span> · <span style="color:var(--red);font-weight:700">${all.filter(r=>!r.icConfirmed&&!r.foundInShortedBin&&!r.secondLocationFilled).length} pending</span>`;
+
+  if(!rows.length){
+    $('icConfirmSheet').innerHTML='<div class="empty" style="padding:40px">No shortages match this filter.</div>';
+    return;
+  }
+
+  const headerRow=`<div class="ic-sheet-row ic-sheet-head" style="font-size:10px">
+    <div>#</div><div>BIN</div><div>PRODUCT</div><div>QTY</div><div>DEMAND · PICKER</div>
+    <div>IC RESULT</div><div>IC QTY FOUND</div><div>IC NOTES / 2ND BIN</div>
+  </div>`;
+
+  const dataRows=rows.map((r,i)=>{
+    const edit=icConfirmEdits[r.id]||{};
+    const alreadyDone=r.icConfirmed||r.foundInShortedBin||r.secondLocationFilled;
+    const curResult=edit.result||(r.icConfirmed||( r.foundInShortedBin?'erroneous':r.secondLocationFilled?'second_location':''));
+    const curQty=edit.icQtyFound!==undefined?edit.icQtyFound:(r.icQtyFound||'');
+    const curNotes=edit.icNotes!==undefined?edit.icNotes:(r.icNotes||'');
+    const curSecBin=edit.secondBin||'';
+    const rowClass=curResult==='confirmed_short'?'confirmed-row':curResult==='erroneous'?'erroneous-row':alreadyDone?'already-done':'';
+    const selectClass=curResult==='confirmed_short'?'res-confirmed':curResult==='erroneous'?'res-erroneous':curResult==='second_location'?'res-second':'';
+    return `<div class="ic-sheet-row ${rowClass}" data-id="${esc(r.id)}">
+      <div style="font-size:10px;color:var(--muted)">${i+1}</div>
+      <div style="font-family:var(--mono);font-weight:700;font-size:11px">${esc(r.shortedBin||'—')}</div>
+      <div style="font-family:var(--mono);font-weight:700;font-size:11px;color:var(--accent)">${esc(r.productCode||'—')}</div>
+      <div style="font-family:var(--mono);font-size:11px">${r.qtyShorted||0} ${esc(r.uom||'EA')}</div>
+      <div style="font-size:11px"><span style="font-family:var(--mono)">${esc(r.pickDemand||'—')}</span><br><span style="color:var(--muted)">${esc(r.picker||'—')}${r.packer?' / '+esc(r.packer):''}</span></div>
+      <div>
+        <select class="ic-result-select ${selectClass}" data-id="${esc(r.id)}" onchange="icResultChange(this)">
+          <option value="">— Pending —</option>
+          <option value="confirmed_short" ${curResult==='confirmed_short'?'selected':''}>&#10003; Confirmed Short</option>
+          <option value="erroneous" ${curResult==='erroneous'?'selected':''}>&#9888; Erroneous Bin</option>
+          <option value="second_location" ${curResult==='second_location'?'selected':''}>&#8634; 2nd Location Fill</option>
+          <option value="not_found" ${curResult==='not_found'?'selected':''}>&#10007; Not Found</option>
+          <option value="skip" ${curResult==='skip'?'selected':''}>&#8212; Skip / Review Later</option>
+        </select>
+      </div>
+      <div><input class="ic-qty-input" type="number" min="0" placeholder="qty" data-id="${esc(r.id)}" value="${esc(String(curQty))}" onchange="icFieldChange(this,'icQtyFound')"></div>
+      <div style="display:flex;gap:4px;flex-direction:column">
+        <input class="ic-notes-input" placeholder="IC notes..." data-id="${esc(r.id)}" value="${esc(curNotes)}" onchange="icFieldChange(this,'icNotes')">
+        ${curResult==='second_location'?`<input class="ic-notes-input" placeholder="2nd location bin..." data-id="${esc(r.id)}" value="${esc(curSecBin)}" onchange="icFieldChange(this,'secondBin')" style="font-family:var(--mono)">`:'' }
+      </div>
+    </div>`;
+  }).join('');
+
+  $('icConfirmSheet').innerHTML=headerRow+dataRows;
+}
+
+function icResultChange(sel){
+  const id=sel.dataset.id;
+  if(!icConfirmEdits[id])icConfirmEdits[id]={};
+  icConfirmEdits[id].result=sel.value;
+  // update select styling
+  sel.className='ic-result-select'+(sel.value==='confirmed_short'?' res-confirmed':sel.value==='erroneous'?' res-erroneous':sel.value==='second_location'?' res-second':'');
+  // re-render just this row to show/hide 2nd bin input
+  renderIcConfirmSheet();
+}
+
+function icFieldChange(input,field){
+  const id=input.dataset.id;
+  if(!icConfirmEdits[id])icConfirmEdits[id]={};
+  icConfirmEdits[id][field]=input.type==='number'?num(input.value):input.value;
+}
+
+function icMarkAllVisible(result){
+  const rows=icConfirmFilteredRows();
+  rows.forEach(r=>{
+    if(!icConfirmEdits[r.id])icConfirmEdits[r.id]={};
+    icConfirmEdits[r.id].result=result;
+  });
+  renderIcConfirmSheet();
+}
+
+async function icConfirmSubmitAll(){
+  const entries=Object.entries(icConfirmEdits).filter(([,e])=>e.result&&e.result!=='skip');
+  if(!entries.length){alert('No results to save. Set at least one shortage result first.');return;}
+
+  const confirm_ct=entries.filter(([,e])=>e.result==='confirmed_short').length;
+  const err_ct=entries.filter(([,e])=>e.result==='erroneous').length;
+  const sec_ct=entries.filter(([,e])=>e.result==='second_location').length;
+  const not_ct=entries.filter(([,e])=>e.result==='not_found').length;
+
+  if(!confirm(`Save IC verification results?\n\n✓ Confirmed Short: ${confirm_ct}\n⚠ Erroneous Bin: ${err_ct}\n↺ 2nd Location: ${sec_ct}\n✗ Not Found: ${not_ct}\n\nThis will update ${entries.length} shortage record(s).`))return;
+
+  showLoading('Saving IC verification results...');
+  try{
+    const s=getSettings();
+    // Batch in groups of 500
+    const batches=[];
+    let batch=db.batch();let count=0;
+    const verifiedAt=new Date().toISOString();
+    const verifiedBy=role;
+
+    for(const [id,edit] of entries){
+      const r=shortages.find(x=>x.id===id&&!x._archived);
+      if(!r)continue;
+      const ref=db.collection(s.activeCollection).doc(id);
+      const update={
+        icConfirmed:edit.result,
+        icConfirmedAt:verifiedAt,
+        icConfirmedBy:verifiedBy,
+        updatedAt:verifiedAt,
+        updatedBy:verifiedBy
+      };
+      if(edit.icQtyFound!==undefined&&edit.icQtyFound!=='')update.icQtyFound=num(edit.icQtyFound);
+      if(edit.icNotes!==undefined&&edit.icNotes!=='')update.icNotes=edit.icNotes;
+      // Apply result-specific flags
+      if(edit.result==='erroneous'){
+        update.foundInShortedBin=true;
+        update.status='located';
+      } else if(edit.result==='second_location'){
+        update.secondLocationFilled=true;
+        update.status='located';
+        if(edit.secondBin){
+          const r2=shortages.find(x=>x.id===id);
+          const existingLocs=Array.isArray(r2?.secondaryLocations)?r2.secondaryLocations:[];
+          update.secondaryLocations=[...existingLocs,{
+            bin:edit.secondBin.trim().toUpperCase(),
+            qty:num(edit.icQtyFound)||0,
+            uom:(r?.uom||'EA'),
+            notes:edit.icNotes||'Added via IC Verify Sheet',
+            enteredAt:verifiedAt,enteredBy:verifiedBy
+          }];
+        }
+      } else if(edit.result==='confirmed_short'){
+        update.status='confirmed_short';
+      } else if(edit.result==='not_found'){
+        update.status='open';
+      }
+      batch.set(ref,update,{merge:true});
+      count++;
+      if(count%499===0){batches.push(batch);batch=db.batch();count=0;}
+    }
+    if(count>0)batches.push(batch);
+    for(const b of batches)await b.commit();
+
+    clearCaches();
+    icConfirmEdits={};
+    await loadShortages(true);
+    renderIcConfirmSheet(); // refresh sheet with new statuses
+    if($('reportScreen').classList.contains('active'))renderReports();
+    hideLoading();
+    alert(`Saved! ${entries.length} shortage(s) verified.`);
+  }catch(e){
+    hideLoading();
+    alert('Save failed: '+e.message);
   }
 }
 
