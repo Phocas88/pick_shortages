@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shortage Control Portal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;700&family=DM+Sans:wght@300;400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;700&family=DM+Sans:wght@300;400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700;800&family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#181c27;--surface:#1e2334;--panel:#242840;--panel2:#2c3250;--border:#343d5c;--border2:#485070;--text:#dde2f0;--muted:#8892ac;--subtle:#5a6480;--accent:#4f83f5;--accent-l:rgba(79,131,245,.12);--green:#10b981;--green-l:rgba(16,185,129,.12);--yellow:#f59e0b;--yellow-l:rgba(245,158,11,.12);--red:#f87171;--red-l:rgba(248,113,113,.12);--orange:#fb923c;--orange-l:rgba(251,146,60,.12);--purple:#a78bfa;--purple-l:rgba(167,139,250,.12);--shadow:0 1px 4px rgba(0,0,0,.4),0 4px 20px rgba(0,0,0,.25);--radius:8px;--mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif}
 body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;--border:#d4d9e8;--border2:#bcc4d8;--text:#1a2038;--muted:#5a6480;--subtle:#8892ac;--accent:#2563eb;--green:#059669;--yellow:#d97706;--red:#dc2626;--orange:#ea580c;--purple:#7c3aed;--shadow:0 1px 4px rgba(0,0,0,.1),0 4px 16px rgba(0,0,0,.08)}
@@ -56,121 +56,102 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 @media(max-width:900px){.ic-sheet-row{grid-template-columns:24px 70px 110px 60px 1fr 130px 80px}}
 
 
-/* ── RTL / Dari (Persian) font overrides ── */
-[dir="rtl"] {
-  font-family: 'Noto Naskh Arabic', 'Noto Sans', 'Segoe UI', Tahoma, Arial, sans-serif;
-  font-size: 15px;
-  line-height: 1.8;
-  letter-spacing: 0;
-}
+/* ── RTL / Dari — Noto Naskh Arabic, high contrast, readable weights ── */
+:root { --dari-font: 'Noto Naskh Arabic', 'Noto Sans', 'Segoe UI', Tahoma, Arial, sans-serif; }
+
+/* Apply Dari font universally when RTL */
+[dir="rtl"],
 [dir="rtl"] body,
 [dir="rtl"] button,
 [dir="rtl"] input,
 [dir="rtl"] select,
-[dir="rtl"] textarea {
-  font-family: 'Noto Naskh Arabic', 'Noto Sans', 'Segoe UI', Tahoma, Arial, sans-serif;
-  font-size: 15px;
-  line-height: 1.8;
-  letter-spacing: 0;
+[dir="rtl"] textarea,
+[dir="rtl"] label,
+[dir="rtl"] p,
+[dir="rtl"] span,
+[dir="rtl"] div,
+[dir="rtl"] a,
+[dir="rtl"] h1,
+[dir="rtl"] h2,
+[dir="rtl"] h3 {
+  font-family: var(--dari-font) !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
 }
-/* Mono fields stay Latin in RTL — product codes, bins, numbers */
-[dir="rtl"] .sr-codes,
-[dir="rtl"] .ic-qty-input,
+
+/* Core sizing — bigger, heavier, more line height for Arabic script */
+[dir="rtl"] body { font-size: 16px; line-height: 1.9; }
+[dir="rtl"] h1 { font-size: 26px !important; font-weight: 800 !important; line-height: 1.4; }
+[dir="rtl"] label { font-size: 14px !important; font-weight: 700 !important; line-height: 1.6; }
+[dir="rtl"] button, [dir="rtl"] .btn { font-size: 14px !important; font-weight: 700 !important; line-height: 1.5; }
+[dir="rtl"] input, [dir="rtl"] select, [dir="rtl"] textarea { font-size: 15px !important; line-height: 1.7; }
+[dir="rtl"] p { font-size: 14px !important; line-height: 1.8; }
+
+/* Boost contrast — force white text on dark backgrounds */
+[dir="rtl"] .text, [dir="rtl"] .sr-meta { color: var(--text) !important; font-size: 14px !important; line-height: 1.8; }
+[dir="rtl"] .card-title { font-size: 14px !important; font-weight: 700 !important; }
+[dir="rtl"] .nav-btn { font-size: 14px !important; font-weight: 700 !important; }
+[dir="rtl"] .badge { font-size: 12px !important; font-weight: 700 !important; padding: 4px 10px !important; }
+[dir="rtl"] .eyebrow { font-size: 13px !important; font-weight: 700 !important; }
+[dir="rtl"] .login-group-label { font-size: 13px !important; font-weight: 700 !important; }
+[dir="rtl"] .ib-title { font-size: 16px !important; font-weight: 700 !important; }
+[dir="rtl"] .ib-sub { font-size: 13px !important; }
+[dir="rtl"] .stat-lbl { font-size: 13px !important; font-weight: 600 !important; line-height: 1.6; }
+[dir="rtl"] .stat-num { font-family: 'DM Mono', monospace !important; direction: ltr; font-size: 24px !important; }
+[dir="rtl"] .sr-codes { font-size: 14px !important; font-weight: 700 !important; }
+[dir="rtl"] .notice { font-size: 15px !important; line-height: 1.8; }
+[dir="rtl"] .empty { font-size: 15px !important; }
+[dir="rtl"] .table th { font-size: 13px !important; font-weight: 700 !important; }
+[dir="rtl"] .table td { font-size: 14px !important; }
+[dir="rtl"] .suggest-item { font-size: 15px !important; }
+[dir="rtl"] .ic-sheet-row { font-size: 14px !important; }
+[dir="rtl"] .ic-notes-input, [dir="rtl"] .ic-result-select { font-size: 14px !important; }
+[dir="rtl"] .muted, [dir="rtl"] [style*="color:var(--muted)"] { font-size: 13px !important; }
+
+/* Latin/numeric fields — keep LTR monospace for codes, bins, numbers */
 [dir="rtl"] input[id="opOrder"],
-[dir="rtl"] .op-product,
-[dir="rtl"] .line-product,
-[dir="rtl"] .line-qty,
-[dir="rtl"] .line-bin,
+[dir="rtl"] input[id="sDate"], [dir="rtl"] input[id="opDate"],
 [dir="rtl"] input[type="datetime-local"],
 [dir="rtl"] input[type="date"],
-[dir="rtl"] input[type="number"] {
-  font-family: 'DM Mono', monospace;
-  letter-spacing: .04em;
-  direction: ltr;
-  text-align: left;
+[dir="rtl"] input[type="number"],
+[dir="rtl"] .op-product, [dir="rtl"] .op-qty,
+[dir="rtl"] .line-product, [dir="rtl"] .line-qty, [dir="rtl"] .line-bin,
+[dir="rtl"] .ic-qty-input,
+[dir="rtl"] .sr-codes {
+  font-family: 'DM Mono', monospace !important;
+  direction: ltr !important;
+  text-align: left !important;
+  letter-spacing: .04em !important;
 }
-[dir="rtl"] label { font-size: 13px; font-weight: 600; }
-[dir="rtl"] h1 { font-size: 24px; font-weight: 700; }
-[dir="rtl"] .card-title {
-  font-family: 'Noto Naskh Arabic', 'Noto Sans', sans-serif;
-  font-size: 13px;
-  letter-spacing: 0;
-  text-transform: none;
+
+/* Bin format hints and error messages stay LTR */
+[dir="rtl"] .bin-format-hint,
+[dir="rtl"] .bin-format-err {
+  font-family: 'DM Mono', monospace !important;
+  direction: ltr !important;
+  text-align: left !important;
+  font-size: 11px !important;
 }
-[dir="rtl"] .nav-btn { font-size: 13px; font-weight: 600; letter-spacing: 0; }
-[dir="rtl"] .btn { font-size: 13px; letter-spacing: 0; }
-[dir="rtl"] .badge {
-  font-family: 'Noto Naskh Arabic', 'Noto Sans', sans-serif;
-  font-size: 11px;
-  letter-spacing: 0;
-  text-transform: none;
-}
-[dir="rtl"] .eyebrow {
-  font-family: 'Noto Naskh Arabic', 'Noto Sans', sans-serif;
-  font-size: 11px;
-  letter-spacing: 0;
-  text-transform: none;
-}
-[dir="rtl"] .sr-meta { font-size: 12px; line-height: 1.7; }
-[dir="rtl"] .stat-lbl {
-  font-family: 'Noto Naskh Arabic', 'Noto Sans', sans-serif;
-  font-size: 11px;
-  letter-spacing: 0;
-  text-transform: none;
-  line-height: 1.6;
-}
-[dir="rtl"] .stat-num {
-  font-family: 'DM Mono', monospace;
-  direction: ltr;
-}
-[dir="rtl"] .login-group-label {
-  font-family: 'Noto Naskh Arabic', 'Noto Sans', sans-serif;
-  letter-spacing: 0;
-  text-transform: none;
-  font-size: 12px;
-}
-[dir="rtl"] .ib-title { font-size: 15px; }
-[dir="rtl"] .ib-sub { font-size: 12px; }
-[dir="rtl"] .pin-key {
-  font-family: 'DM Mono', monospace;
-}
-[dir="rtl"] .field-wrap, [dir="rtl"] .bin-input-wrap { direction: ltr; }
-[dir="rtl"] .bin-format-hint, [dir="rtl"] .bin-format-err {
-  font-family: 'DM Mono', monospace;
-  direction: ltr;
-  text-align: left;
-  font-size: 10px;
-}
-[dir="rtl"] .suggest-item { font-size: 14px; }
-[dir="rtl"] .si-badge { font-family: 'DM Mono', monospace; }
-[dir="rtl"] .ic-sheet-row { font-size: 13px; }
-[dir="rtl"] .ic-sheet-head {
-  font-family: 'Noto Naskh Arabic', 'Noto Sans', sans-serif;
-  letter-spacing: 0;
-  text-transform: none;
-  font-size: 11px;
-}
-[dir="rtl"] .ic-result-select,
-[dir="rtl"] .ic-notes-input { font-size: 13px; font-family: 'Noto Naskh Arabic', 'Noto Sans', sans-serif; }
-[dir="rtl"] .table th {
-  font-family: 'Noto Naskh Arabic', 'Noto Sans', sans-serif;
-  letter-spacing: 0;
-  text-transform: none;
-  font-size: 11px;
-}
-[dir="rtl"] .table td { font-size: 13px; }
-[dir="rtl"] .notice, [dir="rtl"] .empty { font-size: 14px; }
-[dir="rtl"] select option {
-  font-family: 'Noto Naskh Arabic', 'Noto Sans', sans-serif;
-}
-/* Nav layout fix for RTL — keep left-to-right flow for buttons */
+
+/* Pin keypad stays numeric LTR */
+[dir="rtl"] .pin-key { font-family: 'DM Mono', monospace !important; direction: ltr; }
+[dir="rtl"] .si-badge { font-family: 'DM Mono', monospace !important; }
+
+/* Layout — flip flex rows for RTL but don't double-flip inner LTR areas */
 [dir="rtl"] .topbar { flex-direction: row-reverse; }
 [dir="rtl"] .nav { flex-direction: row-reverse; margin-left: 0; margin-right: auto; }
 [dir="rtl"] .page-head { flex-direction: row-reverse; }
-[dir="rtl"] .actions, [dir="rtl"] .filters { flex-direction: row-reverse; }
+[dir="rtl"] .actions { flex-direction: row-reverse; }
+[dir="rtl"] .filters { flex-direction: row-reverse; }
 [dir="rtl"] .card-title::after { order: -1; }
 [dir="rtl"] .sr-head { flex-direction: row-reverse; }
 [dir="rtl"] .sr-actions { flex-direction: row-reverse; }
+/* Don't flip form-row grids — labels & fields stay ordered by grid column */
+[dir="rtl"] .form-row { direction: rtl; }
+/* Product line grid stays LTR for code/qty/bin inputs */
+[dir="rtl"] .product-line-grid, [dir="rtl"] .op-item-line > div { direction: ltr; }
+/* Tab bar */
+[dir="rtl"] #overpullScreen > .wrap > div[style*="display:flex"] { flex-direction: row-reverse; }
 
 @media print{body>*:not(.print-area){display:none!important}.print-area{display:block!important;color:#111;background:#fff;font-family:Arial,sans-serif}@page{size:letter portrait;margin:.55in}.card,.no-break,table,tr{break-inside:avoid;page-break-inside:avoid}.table th{background:#111827!important;color:#fff!important}}
 </style>
