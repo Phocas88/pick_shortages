@@ -17,6 +17,36 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 14px;border-radius:8px;border:1.5px solid var(--border);background:var(--panel2);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;text-decoration:none}.btn:hover{border-color:var(--accent)}.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}.btn.green{background:var(--green-l);border-color:rgba(16,185,129,.35);color:var(--green)}.btn.red{background:var(--red-l);border-color:rgba(248,113,113,.35);color:var(--red)}.btn.orange{background:var(--orange-l);border-color:rgba(251,146,60,.35);color:var(--orange)}.btn.purple{background:var(--purple-l);border-color:rgba(167,139,250,.35);color:var(--purple)}.actions,.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.filters{margin:12px 0}.filters input,.filters select{background:var(--panel2);border:1.5px solid var(--border);border-radius:8px;color:var(--text);padding:8px 10px;font-size:12px}.filters .search{flex:1;min-width:220px}
 .shortage-list{display:flex;flex-direction:column;gap:8px}.shortage-row{background:var(--panel);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px}.shortage-row.erroneous{border-color:rgba(245,158,11,.38);background:rgba(245,158,11,.06)}.shortage-row.archived{opacity:.72}.sr-head{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap}.sr-codes{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent)}.sr-meta{font-size:11px;color:var(--muted);margin-top:3px}.sr-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.sr-actions .btn{font-size:11px;padding:5px 9px}.sr-check{margin-top:3px;accent-color:var(--accent)}.badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;letter-spacing:.04em;border:1px solid var(--border);color:var(--muted)}.badge.green{color:var(--green);background:var(--green-l);border-color:rgba(16,185,129,.25)}.badge.red{color:var(--red);background:var(--red-l);border-color:rgba(248,113,113,.25)}.badge.yellow{color:var(--yellow);background:var(--yellow-l);border-color:rgba(245,158,11,.25)}.badge.blue{color:var(--accent);background:var(--accent-l);border-color:rgba(79,131,245,.25)}.badge.purple{color:var(--purple);background:var(--purple-l);border-color:rgba(167,139,250,.25)}.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:14px}.stat-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-align:center}.stat-num{font-family:var(--mono);font-size:24px;font-weight:700}.stat-lbl{font-size:10px;color:var(--muted);margin-top:3px}.table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}.table th{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;padding:10px;text-align:left;background:var(--panel);border-bottom:1px solid var(--border)}.table td{padding:10px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:top}.notice{background:var(--accent-l);border:1px solid rgba(79,131,245,.25);border-radius:10px;padding:10px 12px;font-size:12px;margin-bottom:12px}.empty{text-align:center;color:var(--muted);padding:30px 18px}
 .overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(15,20,40,.5);backdrop-filter:blur(6px);justify-content:center;align-items:flex-start;overflow-y:auto;padding:24px 16px}.overlay.open{display:flex}.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:100%;max-width:820px;box-shadow:var(--shadow)}.modal-head{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;border-bottom:1px solid var(--border)}.modal-head button{background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer}.modal-body{padding:20px}.loading{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.45);align-items:center;justify-content:center}.loading.show{display:flex}.loading-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 26px;box-shadow:var(--shadow)}.print-area{display:none}
+
+/* ── Over Pull mobile scanner styles ── */
+#overpullScreen .op-mobile-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:14px;box-shadow:var(--shadow)}
+#overpullScreen .op-field-big input,#overpullScreen .op-field-big select{font-size:18px;padding:13px 14px;border-radius:10px;font-family:var(--mono);font-weight:700;letter-spacing:.06em}
+#overpullScreen .op-field-big label{font-size:13px;font-weight:700;margin-bottom:6px}
+#overpullScreen .op-item-line{background:var(--panel);border:1.5px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px}
+#overpullScreen .op-item-line.valid-bin{border-color:rgba(16,185,129,.5);}
+#overpullScreen .op-item-line.invalid-bin{border-color:rgba(248,113,113,.5);}
+#overpullScreen .op-bin-hint{font-size:10px;color:var(--muted);margin-top:4px;font-family:var(--mono)}
+#overpullScreen .op-bin-err{font-size:11px;color:var(--red);margin-top:4px;display:none}
+#overpullScreen .op-big-btn{width:100%;padding:16px;font-size:16px;font-weight:700;border-radius:12px;border:none;cursor:pointer;margin-bottom:10px}
+#overpullScreen .op-big-btn.primary{background:var(--accent);color:#fff}
+#overpullScreen .op-big-btn.green{background:var(--green);color:#fff}
+#overpullScreen .op-big-btn.ghost{background:var(--panel2);color:var(--text);border:1.5px solid var(--border)}
+#overpullScreen .op-step-label{font-size:10px;font-family:var(--mono);font-weight:700;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
+.bin-input-wrap{position:relative}
+.bin-valid-icon{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none;display:none}
+@media(max-width:600px){
+  #overpullScreen .wrap{padding:12px 10px 80px}
+  #overpullScreen .page-head h1{font-size:18px}
+  #overpullScreen .op-field-big input,#overpullScreen .op-field-big select{font-size:20px;padding:15px 14px}
+}
+/* bin validation feedback on shortage form */
+.line-bin.bin-ok{border-color:rgba(16,185,129,.6)!important;background:rgba(16,185,129,.05)!important}
+.line-bin.bin-bad{border-color:rgba(248,113,113,.6)!important;background:rgba(248,113,113,.05)!important}
+#eBin.bin-ok{border-color:rgba(16,185,129,.6)!important;background:rgba(16,185,129,.05)!important}
+#eBin.bin-bad{border-color:rgba(248,113,113,.6)!important;background:rgba(248,113,113,.05)!important}
+.bin-format-hint{font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)}
+.bin-format-err{font-size:11px;color:var(--red);margin-top:3px;display:none}
+
 @media print{body>*:not(.print-area){display:none!important}.print-area{display:block!important;color:#111;background:#fff;font-family:Arial,sans-serif}@page{size:letter portrait;margin:.55in}.card,.no-break,table,tr{break-inside:avoid;page-break-inside:avoid}.table th{background:#111827!important;color:#fff!important}}
 </style>
 </head>
@@ -30,43 +60,74 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 <section id="pickerScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Pickers</div><h1>Manage Pickers</h1><p>IC Manager only.</p></div></div><div class="card"><div class="form-row two"><div class="field"><label>Picker Name</label><input id="pickerName" placeholder="Dmartin"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPicker()">Add Picker</button></div></div><div id="pickerList"></div></div></div></section>
 <section id="migrationScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Migration</div><h1>Old Firebase Migration</h1><p>Copies old shortage records into the new shortage database. Does not delete the old database.</p></div></div><div class="card"><div class="notice">Source: <b>inventory-control-portal</b> collection <b>shortages</b>. Destination: current active collection.</div><div class="form-row three"><div class="field"><label>Old Collection</label><input id="oldCollection" value="shortages"></div><div class="field"><label>Limit</label><input id="migLimit" type="number" value="5000"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="runMigration()">Run Migration</button></div></div><div id="migrationResult"></div></div></div></section>
 <section id="settingsScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Settings</div><h1>Firebase Settings</h1><p>IC Manager only.</p></div></div><div class="card"><div class="form-row two"><div class="field"><label>API Key</label><input id="cfgApiKey"></div><div class="field"><label>Auth Domain</label><input id="cfgAuthDomain"></div><div class="field"><label>Project ID</label><input id="cfgProjectId"></div><div class="field"><label>Storage Bucket</label><input id="cfgStorageBucket"></div><div class="field"><label>Messaging Sender ID</label><input id="cfgSenderId"></div><div class="field"><label>App ID</label><input id="cfgAppId"></div><div class="field"><label>Active Collection</label><input id="cfgActiveCollection"></div><div class="field"><label>Archive Collection</label><input id="cfgArchiveCollection"></div></div><label class="toggle"><input id="themeToggle" type="checkbox" onchange="saveTheme(this.checked)"> Light mode</label><div class="actions" style="margin-top:14px"><button class="btn primary" onclick="saveSettings()">Save Settings</button></div></div></div></section>
-<section id="overpullScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow" style="color:var(--orange);background:var(--orange-l);border-color:rgba(251,146,60,.25)">Operations</div><h1>Over Pull Log</h1><p>No login required — log items pulled in excess of the pick demand.</p></div><div class="actions"><button class="btn orange" onclick="printOverPullReport()">&#128438; Print KPI Report</button></div></div>
-<div class="card">
-  <div class="card-title">New Over Pull Entry</div>
-  <div class="form-row three">
-    <div class="field"><label>Date &amp; Time</label><input id="opDate" type="datetime-local"></div>
-    <div class="field"><label>Order Number <em>*</em></label><input id="opOrder" placeholder="e.g. NH00012345" oninput="opAutoDivision()"></div>
-    <div class="field"><label>Division</label><input id="opDiv" placeholder="Auto-filled" readonly style="opacity:.7;cursor:default"></div>
-  </div>
-  <div class="form-row two">
-    <div class="field"><label>Picker First Name <em>*</em></label><input id="opFirst" placeholder="First"></div>
-    <div class="field"><label>Picker Last Name <em>*</em></label><input id="opLast" placeholder="Last"></div>
-  </div>
-  <div class="card-title" style="margin-top:4px">Items Over-Pulled</div>
-  <div id="opLines"></div>
-  <div class="actions" style="margin-bottom:14px">
-    <button class="btn" onclick="opAddLine()">+ Add Item</button>
-  </div>
-  <div id="opMoreWrap" style="display:none;background:var(--panel);border:1.5px solid var(--accent);border-radius:10px;padding:16px 18px;margin-bottom:14px">
-    <div style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--accent)">&#10067; Are there more items to add to this entry?</div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn" onclick="opYesMore()">&#10133; Yes — Add Another Item</button>
-      <button class="btn primary" onclick="opFinishEntry()">&#10003; No — Submit This Entry</button>
+<section id="overpullScreen" class="screen"><div class="wrap">
+  <div class="page-head">
+    <div>
+      <div class="eyebrow" style="color:var(--orange);background:var(--orange-l);border-color:rgba(251,146,60,.25)">Operations</div>
+      <h1>Over Pull Log</h1>
+      <p>No login required &mdash; log items pulled in excess of the pick demand.</p>
+    </div>
+    <div class="actions">
+      <button class="btn orange" onclick="printOverPullReport()">&#128438; Print KPI Report</button>
     </div>
   </div>
-  <div class="actions">
-    <button class="btn" onclick="opClearForm()">Clear Form</button>
-    <button class="btn primary" style="flex:1" onclick="opPromptMore()">Submit Over Pull</button>
+
+  <!-- STEP 1: Order + Picker -->
+  <div class="op-mobile-card" id="opStep1Card">
+    <div class="op-step-label">Step 1 &mdash; Order &amp; Picker</div>
+    <div class="field op-field-big">
+      <label>Order Number <em>*</em></label>
+      <input id="opOrder" placeholder="e.g. NH00012345" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" oninput="opAutoDivision()" onkeydown="if(event.key==='Enter')$('opFirst').focus()">
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px">
+      <div style="background:var(--panel2);border:1.5px solid var(--border);border-radius:8px;padding:9px 14px;font-family:var(--mono);font-size:18px;font-weight:700;min-width:80px;text-align:center" id="opDivDisplay">&mdash;</div>
+      <div style="font-size:12px;color:var(--muted)">Division auto-filled from order #</div>
+    </div>
+    <input id="opDiv" type="hidden">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="field op-field-big" style="margin-bottom:0">
+        <label>First Name <em>*</em></label>
+        <input id="opFirst" placeholder="First" autocomplete="off" autocorrect="off" autocapitalize="words" onkeydown="if(event.key==='Enter')$('opLast').focus()">
+      </div>
+      <div class="field op-field-big" style="margin-bottom:0">
+        <label>Last Name <em>*</em></label>
+        <input id="opLast" placeholder="Last" autocomplete="off" autocorrect="off" autocapitalize="words" onkeydown="if(event.key==='Enter')opFocusFirstItem()">
+      </div>
+    </div>
+    <div style="margin-top:6px">
+      <input id="opDate" type="datetime-local" style="width:100%;background:var(--panel2);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;padding:7px 10px">
+    </div>
   </div>
-</div>
-<div class="filters">
-  <input id="opFilterText" class="search" placeholder="Search by picker, order, product, division..." oninput="opRenderList()">
-  <input id="opFilterStart" type="date" onchange="opRenderList()">
-  <input id="opFilterEnd" type="date" onchange="opRenderList()">
-  <button class="btn" onclick="opLoadRecords(true)">Refresh</button>
-</div>
-<div id="opKpiBar" class="stat-grid" style="margin-bottom:14px"></div>
-<div id="opList" class="shortage-list"></div>
+
+  <!-- STEP 2: Items -->
+  <div class="op-mobile-card">
+    <div class="op-step-label">Step 2 &mdash; Items Over-Pulled</div>
+    <div id="opLines"></div>
+    <button class="op-big-btn ghost" onclick="opAddLine()" style="margin-top:4px">&#43; Add Another Item</button>
+  </div>
+
+  <!-- More items prompt -->
+  <div id="opMoreWrap" style="display:none;background:var(--panel);border:2px solid var(--accent);border-radius:14px;padding:18px 16px;margin-bottom:14px;text-align:center">
+    <div style="font-size:16px;font-weight:700;margin-bottom:14px;color:var(--accent)">&#10067; More items to add?</div>
+    <button class="op-big-btn ghost" onclick="opYesMore()" style="margin-bottom:10px">&#10133; Yes &mdash; Add Another Item</button>
+    <button class="op-big-btn green" onclick="opFinishEntry()">&#10003; No &mdash; Submit Entry</button>
+  </div>
+
+  <!-- Submit bar -->
+  <div style="position:sticky;bottom:0;background:var(--bg);padding:12px 0 16px;border-top:1px solid var(--border);display:flex;gap:10px;z-index:10">
+    <button class="btn" onclick="opClearForm()">Clear</button>
+    <button class="op-big-btn primary" style="flex:1;margin-bottom:0;padding:13px" onclick="opPromptMore()">Submit Over Pull</button>
+  </div>
+
+  <!-- Records -->
+  <div style="margin-top:8px" class="filters">
+    <input id="opFilterText" class="search" placeholder="Search picker, order, product..." oninput="opRenderList()">
+    <input id="opFilterStart" type="date" onchange="opRenderList()">
+    <input id="opFilterEnd" type="date" onchange="opRenderList()">
+    <button class="btn" onclick="opLoadRecords(true)">Refresh</button>
+  </div>
+  <div id="opKpiBar" class="stat-grid" style="margin-bottom:14px"></div>
+  <div id="opList" class="shortage-list"></div>
 </div></section>
 <div id="editOverlay" class="overlay"><div class="modal"><div class="modal-head"><h3>Edit Shortage</h3><button onclick="closeEdit()">&#215;</button></div><div id="editBody" class="modal-body"></div></div></div>
 <div id="loading" class="loading"><div class="loading-card" id="loadingText">Loading...</div></div>
@@ -104,7 +165,7 @@ async function loadPickerNames(){pickerNames=JSON.parse(localStorage.getItem('sc
 function nowLocalInput(){const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,16)}
 function demandDivision(v){return String(v||'').trim().slice(0,2).toUpperCase()}
 function autoDivisionFromDemand(){const div=demandDivision($('sDemand').value);if(div&&[...$('sDiv').options].some(o=>o.value===div||o.textContent===div))$('sDiv').value=div}
-function addProductLine(data={}){const wrap=$('productLines');const row=document.createElement('div');row.className='product-line-card';row.innerHTML=`<div class="product-line-grid"><div class="field"><label>Product Code <em>*</em></label><input class="line-product" placeholder="E.G. 123456" value="${esc(data.productCode||'')}"></div><div class="field"><label>Qty (Each) <em>*</em></label><input class="line-qty" type="number" min="0" step="1" value="${esc(data.qtyShorted??0)}"></div><div class="field"><label>Bin Shorted <em>*</em></label><input class="line-bin" placeholder="E.G. A-01-01" value="${esc(data.shortedBin||'')}"></div><button class="btn remove-line-btn" onclick="removeProductLine(this)">&times;</button></div>`;wrap.appendChild(row)}
+function addProductLine(data={}){const wrap=$('productLines');const row=document.createElement('div');row.className='product-line-card';row.innerHTML=`<div class="product-line-grid"><div class="field"><label>Product Code <em>*</em></label><input class="line-product" placeholder="E.G. DI1210" value="${esc(data.productCode||'')}"></div><div class="field"><label>Qty (Each) <em>*</em></label><input class="line-qty" type="number" min="0" step="1" value="${esc(data.qtyShorted??0)}"></div><div class="field"><label>Bin Shorted <em>*</em></label><div class="bin-input-wrap"><input class="line-bin" placeholder="82-26-01 / P12345 / BULK" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" value="${esc(data.shortedBin||'')}" oninput="liveBinValidate(this)" onblur="strictBinValidate(this)"><span class="bin-valid-icon"></span></div><div class="bin-format-hint">##-##-## &nbsp;·&nbsp; ##-##-# &nbsp;·&nbsp; P##### &nbsp;·&nbsp; BULK &nbsp;·&nbsp; ROOM &nbsp;·&nbsp; KEY ACCOUNT</div><div class="bin-format-err"></div></div><button class="btn remove-line-btn" onclick="removeProductLine(this)">&times;</button></div>`;wrap.appendChild(row);if(data.shortedBin){const binEl=row.querySelector('.line-bin');liveBinValidate(binEl);};}
 function removeProductLine(btn){const rows=$('productLines').querySelectorAll('.product-line-card');if(rows.length<=1){alert('At least one product line is required.');return}btn.closest('.product-line-card').remove()}
 function getProductLines(){return [...$('productLines').querySelectorAll('.product-line-card')].map(row=>({productCode:row.querySelector('.line-product').value.trim().toUpperCase(),qtyShorted:num(row.querySelector('.line-qty').value),shortedBin:row.querySelector('.line-bin').value.trim().toUpperCase()})).filter(x=>x.productCode||x.shortedBin||x.qtyShorted)}
 function shiftValue(){const ov=$('sShift').value;if(ov&&ov!=='auto')return ov;const h=new Date().getHours();if(h>=6&&h<14)return '1st';if(h>=14&&h<22)return '2nd';return '3rd'}
@@ -163,7 +224,9 @@ function isBackorderRisk(r){return !!r.foundInShortedBin&&!r.secondLocationFille
 function statusBadges(r){let b=[];if(r._archived)b.push('<span class="badge purple">Archived</span>');if(r.foundInShortedBin)b.push('<span class="badge yellow">Erroneous Bin</span>');if(isBackorderRisk(r))b.push('<span class="badge red">Backorder Risk</span>');if(r.secondLocationFilled)b.push('<span class="badge blue">Second Location Filled</span>');if(r.replenishedAfterPick)b.push('<span class="badge green">Replenished After Pick</span>');return b.join(' ')}
 function secondarySummary(r){const locs=Array.isArray(r.secondaryLocations)?r.secondaryLocations:[];return locs.map(x=>`${x.bin||'NO BIN'}: ${x.qty||0} ${x.uom||r.uom||'EA'}${x.icQtyOnHand?` (OH ${x.icQtyOnHand})`:''}${x.notes?` - ${x.notes}`:''}`).join(' | ')}
 function rowHtml(r){const chk=canRunReports()&&!r._archived?`<input class="sr-check" type="checkbox" data-id="${esc(r.id)}">`:'';const edit=`<button class="btn" onclick="openEdit('${esc(r.id)}',${r._archived})">Edit</button>`;const mark=!r._archived?`<button class="btn green" onclick="markErroneous('${esc(r.id)}')">Found in Shorted Bin / Count</button><button class="btn" onclick="toggleSecond('${esc(r.id)}')">Second Location Filled</button><button class="btn" onclick="toggleReplenished('${esc(r.id)}')">Bin Replenished After Pick?</button>`:'';const unarch=r._archived&&canRunReports()?`<button class="btn orange" onclick="unarchiveOne('${esc(r.id)}')">Unarchive</button>`:'';const sec=secondarySummary(r);return `<div class="shortage-row ${r._archived?'archived':''} ${r.foundInShortedBin?'erroneous':''}"><div class="sr-head">${chk}<div style="flex:1"><div class="sr-codes">${esc(r.productCode||'NO PRODUCT')} <span style="color:var(--muted)">&bull;</span> ${esc(r.shortedBin||'NO BIN')}</div><div class="sr-meta">${esc(r.date||'No date')} &bull; ${esc(r.division||'')} &bull; Qty ${esc(r.qtyShorted||'')} ${esc(r.uom||'')} &bull; Demand ${esc(r.pickDemand||'')} &bull; Picker ${esc(r.picker||'')}</div><div class="sr-meta">IC Found: ${esc(r.icQtyFound||'')} ${esc(r.icUom||r.uom||'')} ${r.icNotes?'&bull; '+esc(r.icNotes):''}</div>${sec?`<div class="sr-meta"><b>Second location filled:</b> ${esc(sec)}</div>`:''}<div style="margin-top:6px">${statusBadges(r)}</div><div class="sr-actions">${edit}${mark}${unarch}</div></div></div></div>`}
-async function saveShortage(){autoDivisionFromDemand();validatePickerInput();const base={date:$('sDate').value||nowLocalInput(),division:$('sDiv').value,pickDemand:$('sDemand').value.trim().toUpperCase(),picker:$('sPicker').value.trim(),shift:shiftValue(),uom:'EA',notes:$('sNotes').value.trim(),createdAt:new Date().toISOString(),createdBy:role,foundInShortedBin:false,secondLocationFilled:false,replenishedAfterPick:false,status:'open'};const lines=getProductLines();if(!base.pickDemand){alert('Pick Demand # is required.');return}if(!base.division){alert('Division is required. Enter or scan the Pick Demand # first.');return}if(!base.picker){alert('Picker is required.');return}if(!lines.length||lines.some(l=>!l.productCode||!l.shortedBin)){alert('Each product line needs Product Code and Bin Shorted.');return}showLoading('Saving shortages...');try{const batch=db.batch();const col=db.collection(getSettings().activeCollection);lines.forEach(line=>{batch.set(col.doc(),{...base,...line,uom:'EA'});});await batch.commit();clearCaches();clearEntry();await loadShortages(true)}catch(e){alert(e.message)}finally{hideLoading()}}
+async function saveShortage(){autoDivisionFromDemand();validatePickerInput();const base={date:$('sDate').value||nowLocalInput(),division:$('sDiv').value,pickDemand:$('sDemand').value.trim().toUpperCase(),picker:$('sPicker').value.trim(),shift:shiftValue(),uom:'EA',notes:$('sNotes').value.trim(),createdAt:new Date().toISOString(),createdBy:role,foundInShortedBin:false,secondLocationFilled:false,replenishedAfterPick:false,status:'open'};const lines=getProductLines();if(!base.pickDemand){alert('Pick Demand # is required.');return}if(!base.division){alert('Division is required. Enter or scan the Pick Demand # first.');return}if(!base.picker){alert('Picker is required.');return}if(!lines.length||lines.some(l=>!l.productCode||!l.shortedBin)){alert('Each product line needs Product Code and Bin Shorted.');return}
+  const invalidBins=lines.filter(l=>l.shortedBin&&!validateBinFormat(l.shortedBin).ok);
+  if(invalidBins.length){alert('Invalid bin format on one or more lines.\n\nValid formats:\n  ##-##-##  (e.g. 82-26-01)\n  ##-##-#   (e.g. 82-26-1)\n  P#####    (e.g. P12345)\n  BULK\n  ROOM\n  KEY ACCOUNT');return}showLoading('Saving shortages...');try{const batch=db.batch();const col=db.collection(getSettings().activeCollection);lines.forEach(line=>{batch.set(col.doc(),{...base,...line,uom:'EA'});});await batch.commit();clearCaches();clearEntry();await loadShortages(true)}catch(e){alert(e.message)}finally{hideLoading()}}
 function clearEntry(){['sDemand','sPicker','sNotes'].forEach(id=>$(id).value='');$('sDiv').value='';$('sShift').value='auto';$('sDate').value=nowLocalInput();$('productLines').innerHTML='';addProductLine()}
 function clearCaches(){Object.keys(localStorage).filter(k=>k.startsWith('scp_cache_')).forEach(k=>localStorage.removeItem(k))}
 async function updateRecord(id,data,archived=false){showLoading('Saving...');try{const s=getSettings();await db.collection(archived?s.archiveCollection:s.activeCollection).doc(id).set({...data,updatedAt:new Date().toISOString(),updatedBy:role},{merge:true});clearCaches();await loadShortages(true)}catch(e){alert(e.message)}finally{hideLoading()}}
@@ -208,9 +271,9 @@ async function toggleSecond(id){
   }
 }
 async function toggleReplenished(id){const r=shortages.find(x=>x.id===id&&!x._archived);if(r)await updateRecord(id,{replenishedAfterPick:!r.replenishedAfterPick})}
-function openEdit(id,archived){const r=shortages.find(x=>x.id===id&&x._archived===archived);if(!r)return;editingId=id;editingArchive=archived;$('editBody').innerHTML=`<div class="form-row two"><div class="field"><label>Date</label><input id="eDate" type="date" value="${esc(normalizeDate(r.date)||'')}"></div><div class="field"><label>Division</label><input id="eDiv" value="${esc(r.division||'')}"></div><div class="field"><label>Product Code</label><input id="eProduct" value="${esc(r.productCode||'')}"></div><div class="field"><label>Shorted Bin</label><input id="eBin" value="${esc(r.shortedBin||'')}"></div><div class="field"><label>Qty Shorted</label><input id="eQty" type="number" value="${val(r.qtyShorted)}"></div><div class="field"><label>UOM</label><input id="eUom" value="${esc(r.uom||'')}"></div><div class="field"><label>Demand / Order</label><input id="eDemand" value="${esc(r.pickDemand||'')}"></div><div class="field"><label>Picker</label><input id="ePicker" value="${esc(r.picker||'')}"></div><div class="field"><label>IC Qty Found</label><input id="eIcQty" type="number" value="${val(r.icQtyFound)}"></div><div class="field"><label>IC UOM</label><input id="eIcUom" value="${esc(r.icUom||r.uom||'EA')}"></div></div><div class="form-row one"><div class="field"><label>Notes</label><textarea id="eNotes">${esc(r.notes||'')}</textarea></div><div class="field"><label>IC Notes</label><textarea id="eIcNotes">${esc(r.icNotes||'')}</textarea></div></div><label class="toggle"><input id="eErr" type="checkbox" ${r.foundInShortedBin?'checked':''}> Mark as erroneous bin short</label><br><label class="toggle"><input id="eSecond" type="checkbox" ${r.secondLocationFilled?'checked':''}> Product was filled from second location</label><div class="notice" style="margin-top:8px"><b>Second-location bins:</b> ${esc(secondarySummary(r)||'None saved. Use the Second Location Filled button on the row to add one or more bins with qty.')}</div><br><label class="toggle"><input id="eRep" type="checkbox" ${r.replenishedAfterPick?'checked':''}> Bin was replenished after pick</label><div class="actions" style="margin-top:14px"><button class="btn primary" onclick="saveEdit()">Save Changes</button><button class="btn" onclick="closeEdit()">Cancel</button></div>`;$('editOverlay').classList.add('open')}
+function openEdit(id,archived){const r=shortages.find(x=>x.id===id&&x._archived===archived);if(!r)return;editingId=id;editingArchive=archived;$('editBody').innerHTML=`<div class="form-row two"><div class="field"><label>Date</label><input id="eDate" type="date" value="${esc(normalizeDate(r.date)||'')}"></div><div class="field"><label>Division</label><input id="eDiv" value="${esc(r.division||'')}"></div><div class="field"><label>Product Code</label><input id="eProduct" value="${esc(r.productCode||'')}"></div><div class="field"><label>Shorted Bin</label><div class="bin-input-wrap"><input id="eBin" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" value="${esc(r.shortedBin||'')}" oninput="liveBinValidate(this)" onblur="strictBinValidate(this)"><span class="bin-valid-icon"></span></div><div class="bin-format-hint">##-##-## &nbsp;·&nbsp; ##-##-# &nbsp;·&nbsp; P##### &nbsp;·&nbsp; BULK &nbsp;·&nbsp; ROOM &nbsp;·&nbsp; KEY ACCOUNT</div><div class="bin-format-err"></div></div><div class="field"><label>Qty Shorted</label><input id="eQty" type="number" value="${val(r.qtyShorted)}"></div><div class="field"><label>UOM</label><input id="eUom" value="${esc(r.uom||'')}"></div><div class="field"><label>Demand / Order</label><input id="eDemand" value="${esc(r.pickDemand||'')}"></div><div class="field"><label>Picker</label><input id="ePicker" value="${esc(r.picker||'')}"></div><div class="field"><label>IC Qty Found</label><input id="eIcQty" type="number" value="${val(r.icQtyFound)}"></div><div class="field"><label>IC UOM</label><input id="eIcUom" value="${esc(r.icUom||r.uom||'EA')}"></div></div><div class="form-row one"><div class="field"><label>Notes</label><textarea id="eNotes">${esc(r.notes||'')}</textarea></div><div class="field"><label>IC Notes</label><textarea id="eIcNotes">${esc(r.icNotes||'')}</textarea></div></div><label class="toggle"><input id="eErr" type="checkbox" ${r.foundInShortedBin?'checked':''}> Mark as erroneous bin short</label><br><label class="toggle"><input id="eSecond" type="checkbox" ${r.secondLocationFilled?'checked':''}> Product was filled from second location</label><div class="notice" style="margin-top:8px"><b>Second-location bins:</b> ${esc(secondarySummary(r)||'None saved. Use the Second Location Filled button on the row to add one or more bins with qty.')}</div><br><label class="toggle"><input id="eRep" type="checkbox" ${r.replenishedAfterPick?'checked':''}> Bin was replenished after pick</label><div class="actions" style="margin-top:14px"><button class="btn primary" onclick="saveEdit()">Save Changes</button><button class="btn" onclick="closeEdit()">Cancel</button></div>`;$('editOverlay').classList.add('open')}
 function closeEdit(){$('editOverlay').classList.remove('open');editingId=null}
-async function saveEdit(){const data={date:$('eDate').value,division:$('eDiv').value.trim().toUpperCase(),productCode:$('eProduct').value.trim().toUpperCase(),shortedBin:$('eBin').value.trim().toUpperCase(),qtyShorted:num($('eQty').value),uom:$('eUom').value.trim().toUpperCase(),pickDemand:$('eDemand').value.trim(),picker:$('ePicker').value.trim(),notes:$('eNotes').value.trim(),icQtyFound:num($('eIcQty').value),icUom:$('eIcUom').value.trim().toUpperCase(),icNotes:$('eIcNotes').value.trim(),foundInShortedBin:$('eErr').checked,secondLocationFilled:$('eSecond').checked,replenishedAfterPick:$('eRep').checked,status:$('eErr').checked?'located':'open'};if(!data.foundInShortedBin){data.icQtyFound=0;data.icUom='';data.icNotes=data.icNotes}await updateRecord(editingId,data,editingArchive);closeEdit()}
+async function saveEdit(){const binRaw=$('eBin').value.trim();if(binRaw&&!validateBinFormat(binRaw).ok){alert('Invalid bin format.\n\nValid: ##-##-##, ##-##-#, P#####, BULK, ROOM, KEY ACCOUNT');return}const data={date:$('eDate').value,division:$('eDiv').value.trim().toUpperCase(),productCode:$('eProduct').value.trim().toUpperCase(),shortedBin:binRaw.toUpperCase(),qtyShorted:num($('eQty').value),uom:$('eUom').value.trim().toUpperCase(),pickDemand:$('eDemand').value.trim(),picker:$('ePicker').value.trim(),notes:$('eNotes').value.trim(),icQtyFound:num($('eIcQty').value),icUom:$('eIcUom').value.trim().toUpperCase(),icNotes:$('eIcNotes').value.trim(),foundInShortedBin:$('eErr').checked,secondLocationFilled:$('eSecond').checked,replenishedAfterPick:$('eRep').checked,status:$('eErr').checked?'located':'open'};if(!data.foundInShortedBin){data.icQtyFound=0;data.icUom='';data.icNotes=data.icNotes}await updateRecord(editingId,data,editingArchive);closeEdit()}
 function selectVisible(on){document.querySelectorAll('.sr-check:not(:disabled)').forEach(c=>c.checked=on)}function selectedIds(){return [...document.querySelectorAll('.sr-check:checked')].map(c=>c.dataset.id)}async function archiveSelected(){const ids=selectedIds();if(!ids.length){alert('Select shortages first.');return}await archiveIds(ids)}async function archiveFiltered(){const ids=visibleShortages.filter(r=>!r._archived).map(r=>r.id);if(!ids.length){alert('No active filtered shortages to archive.');return}if(!confirm(`Archive ${ids.length} active filtered shortages?`))return;await archiveIds(ids)}
 async function archiveIds(ids){showLoading('Archiving shortages...');try{const s=getSettings();const batch=db.batch();ids.forEach(id=>{const r=shortages.find(x=>x.id===id&&!x._archived);if(!r)return;const src=db.collection(s.activeCollection).doc(id);const dst=db.collection(s.archiveCollection).doc(id);const data={...r,archivedAt:new Date().toISOString(),archivedBy:role};delete data.id;delete data._archived;batch.set(dst,data,{merge:true});batch.delete(src)});await batch.commit();clearCaches();await loadShortages(true)}catch(e){alert(e.message)}finally{hideLoading()}}
 async function unarchiveOne(id){showLoading('Unarchiving...');try{const s=getSettings();const r=shortages.find(x=>x.id===id&&x._archived);const data={...r,unarchivedAt:new Date().toISOString()};delete data.id;delete data._archived;const batch=db.batch();batch.set(db.collection(s.activeCollection).doc(id),data,{merge:true});batch.delete(db.collection(s.archiveCollection).doc(id));await batch.commit();clearCaches();await loadShortages(true)}catch(e){alert(e.message)}finally{hideLoading()}}
@@ -566,6 +629,61 @@ async function runMigration(){
   }finally{hideLoading()}
 }
 
+
+/* ─── Bin Location Validation ─────────────────────────────
+   Valid formats:
+     ##-##-##   (two digits, dash, two digits, dash, two digits)
+     ##-##-#    (two digits, dash, two digits, dash, one digit)
+     P#####     (letter P followed by 1-6 digits)
+     BULK       (exact word)
+     ROOM       (exact word)
+     KEY ACCOUNT (exact phrase)
+   ──────────────────────────────────────────────────────── */
+function validateBinFormat(raw){
+  const v=(raw||'').trim().toUpperCase();
+  if(!v)return{ok:false,msg:''};
+  // ##-##-## or ##-##-#
+  if(/^\d{2}-\d{2}-\d{1,2}$/.test(v))return{ok:true,val:v};
+  // P followed by 1-6 digits
+  if(/^P\d{1,6}$/.test(v))return{ok:true,val:v};
+  // Keywords
+  if(v==='BULK'||v==='ROOM'||v==='KEY ACCOUNT')return{ok:true,val:v};
+  // Close matches for hint
+  let hint='';
+  if(/^\d/.test(v))hint='Format: ##-##-## or ##-##-#  (e.g. 82-26-01)';
+  else if(v.startsWith('P'))hint='Format: P followed by digits  (e.g. P12345)';
+  else hint='Valid: ##-##-##, ##-##-#, P#####, BULK, ROOM, KEY ACCOUNT';
+  return{ok:false,msg:hint,val:v};
+}
+
+function liveBinValidate(input){
+  const {ok,msg}=validateBinFormat(input.value);
+  if(!input.value.trim()){
+    input.classList.remove('bin-ok','bin-bad');
+    const err=input.parentElement.querySelector('.bin-format-err');
+    if(err)err.style.display='none';
+    return;
+  }
+  input.classList.toggle('bin-ok',ok);
+  input.classList.toggle('bin-bad',!ok);
+  const err=input.parentElement.querySelector('.bin-format-err');
+  if(err){err.textContent=ok?'':msg;err.style.display=ok?'none':'block';}
+  // show valid icon
+  const icon=input.parentElement.querySelector('.bin-valid-icon');
+  if(icon){icon.textContent=ok?'✓':'';icon.style.display=ok?'block':'none';icon.style.color='var(--green)';}
+}
+
+function strictBinValidate(input){
+  const {ok,msg,val}=validateBinFormat(input.value);
+  if(ok)input.value=val; // normalize to uppercase
+  else if(input.value.trim()){
+    input.classList.add('bin-bad');
+    const err=input.parentElement.querySelector('.bin-format-err');
+    if(err){err.textContent=msg;err.style.display='block';}
+  }
+  return ok||!input.value.trim();
+}
+
 /* ═══════════════════════════════════════════════════════
    OVER PULL MODULE
    ═══════════════════════════════════════════════════════ */
@@ -589,6 +707,8 @@ function enterOverPull(){
 function opAutoDivision(){
   const v=($('opOrder').value||'').trim().slice(0,2).toUpperCase();
   $('opDiv').value=v;
+  const disp=$('opDivDisplay');
+  if(disp){disp.textContent=v||'\u2014';disp.style.color=v?'var(--accent)':'var(--muted)';}
 }
 
 function opInitForm(){
@@ -600,31 +720,61 @@ function opInitForm(){
   $('opLast').value='';
   $('opLines').innerHTML='';
   $('opMoreWrap').style.display='none';
+  const disp=$('opDivDisplay');if(disp){disp.textContent='\u2014';disp.style.color='var(--muted)';}
   opAddLine();
+}
+function opFocusFirstItem(){
+  const first=$('opLines').querySelector('.op-product');
+  if(first)first.focus();
 }
 
 function opAddLine(data={}){
   const wrap=$('opLines');
+  const idx=wrap.querySelectorAll('.op-item-line').length+1;
   const row=document.createElement('div');
-  row.className='product-line-card';
-  row.innerHTML=`<div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;align-items:end">
-    <div class="field" style="margin-bottom:0"><label>Product Code <em>*</em></label><input class="op-product" placeholder="e.g. 123456" value="${esc(data.productCode||'')}"></div>
-    <div class="field" style="margin-bottom:0"><label>Qty <em>*</em></label><input class="op-qty" type="number" min="0" step="1" value="${esc(data.qty??1)}"></div>
-    <div class="field" style="margin-bottom:0"><label>UOM</label><select class="op-uom"><option value="EA"${(!data.uom||data.uom==='EA')?' selected':''}>EA</option><option value="CS"${data.uom==='CS'?' selected':''}>CS</option><option value="PK"${data.uom==='PK'?' selected':''}>PK</option><option value="PR"${data.uom==='PR'?' selected':''}>PR</option><option value="BX"${data.uom==='BX'?' selected':''}>BX</option><option value="DZ"${data.uom==='DZ'?' selected':''}>DZ</option></select></div>
-    <button class="btn remove-line-btn" style="margin-bottom:0" onclick="opRemoveLine(this)">&times;</button>
-  </div>`;
+  row.className='op-item-line';
+  row.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <span style="font-size:10px;font-family:var(--mono);font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase">Item ${idx}</span>
+      <button class="btn" style="padding:4px 10px;font-size:11px" onclick="opRemoveLine(this)">&times; Remove</button>
+    </div>
+    <div class="field op-field-big" style="margin-bottom:10px">
+      <label>Product Code <em>*</em></label>
+      <input class="op-product" placeholder="e.g. DI1210" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" value="${esc(data.productCode||'')}" onkeydown="if(event.key==='Enter')this.closest('.op-item-line').querySelector('.op-qty').focus()">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="field op-field-big" style="margin-bottom:0">
+        <label>Qty <em>*</em></label>
+        <input class="op-qty" type="number" min="1" step="1" inputmode="numeric" value="${esc(data.qty??1)}" onkeydown="if(event.key==='Enter')this.closest('.op-item-line').querySelector('.op-uom').focus()">
+      </div>
+      <div class="field op-field-big" style="margin-bottom:0">
+        <label>UOM</label>
+        <select class="op-uom">
+          <option value="EA"${(!data.uom||data.uom==='EA')?' selected':''}>EA</option>
+          <option value="CS"${data.uom==='CS'?' selected':''}>CS</option>
+          <option value="PK"${data.uom==='PK'?' selected':''}>PK</option>
+          <option value="PR"${data.uom==='PR'?' selected':''}>PR</option>
+          <option value="BX"${data.uom==='BX'?' selected':''}>BX</option>
+          <option value="DZ"${data.uom==='DZ'?' selected':''}>DZ</option>
+        </select>
+      </div>
+    </div>`;
   wrap.appendChild(row);
-  row.querySelector('.op-product').focus();
+  setTimeout(()=>row.querySelector('.op-product').focus(),80);
 }
 
 function opRemoveLine(btn){
-  const rows=$('opLines').querySelectorAll('.product-line-card');
+  const rows=$('opLines').querySelectorAll('.op-item-line');
   if(rows.length<=1){alert('At least one item is required.');return;}
-  btn.closest('.product-line-card').remove();
+  btn.closest('.op-item-line').remove();
+  // renumber
+  $('opLines').querySelectorAll('.op-item-line').forEach((el,i)=>{
+    const lbl=el.querySelector('span');if(lbl&&lbl.textContent.startsWith('Item'))lbl.textContent='Item '+(i+1);
+  });
 }
 
 function opGetLines(){
-  return [...$('opLines').querySelectorAll('.product-line-card')].map(row=>({
+  return [...$('opLines').querySelectorAll('.op-item-line')].map(row=>({
     productCode:row.querySelector('.op-product').value.trim().toUpperCase(),
     qty:num(row.querySelector('.op-qty').value),
     uom:row.querySelector('.op-uom').value
