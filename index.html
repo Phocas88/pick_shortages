@@ -148,6 +148,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
         <option value="confirmed">Already Confirmed</option>
       </select>
       <button class="btn" style="font-size:11px;padding:5px 10px" onclick="icMarkAllVisible('confirmed_short')">&#10003; Mark All Visible → Confirmed Short</button>
+      <button class="btn orange" style="font-size:11px;padding:5px 10px" onclick="icMassConfirmNonErroneous()">&#9889; One-Time: Confirm All Non-Erroneous</button>
       <div id="icConfirmStats" style="margin-left:auto;font-size:11px;color:var(--muted)"></div>
     </div>
     <div id="icConfirmSheet"></div>
@@ -1551,7 +1552,14 @@ function savePerson(raw,type){
    IC VERIFICATION SHEET MODULE
    ═══════════════════════════════════════════════════════ */
 
-let icConfirmEdits={}; // id -> {result, icQtyFound, icNotes, secondBin}
+// icConfirmEdits[id] = {
+//   result: 'confirmed_short'|'erroneous'|'second_location'|'not_found'|'skip',
+//   icCounts: [{qty, uom, notes}],   // multiple count lines per shortage
+//   icNotes: string,
+//   secondBin: string
+// }
+let icConfirmEdits={};
+const IC_UOMS=['EA','CS','IN','PK','PR','BX','DZ'];
 
 function openIcConfirm(){
   if(!canRunReports()){alert('IC Team or Manager access required.');return;}
@@ -1570,58 +1578,92 @@ function icConfirmFilteredRows(){
   const active=shortages.filter(r=>!r._archived);
   if(f==='pending') return active.filter(r=>!r.icConfirmed&&!r.foundInShortedBin&&!r.secondLocationFilled);
   if(f==='confirmed') return active.filter(r=>r.icConfirmed);
-  return active; // all
+  return active;
+}
+
+function icUpdateStats(){
+  const all=shortages.filter(r=>!r._archived);
+  const done=all.filter(r=>r.icConfirmed||r.foundInShortedBin||r.secondLocationFilled).length;
+  const pctDone=all.length?Math.round(done/all.length*100):0;
+  const shown=icConfirmFilteredRows().length;
+  $('icConfirmSubhead').textContent=`${shown} shortages shown · ${done}/${all.length} verified (${pctDone}%)`;
+  $('icProgFill').style.width=pctDone+'%';
+  $('icConfirmStats').innerHTML=`
+    <span style="color:var(--green);font-weight:700">${all.filter(r=>r.icConfirmed==='confirmed_short').length} confirmed</span> ·
+    <span style="color:var(--yellow);font-weight:700">${all.filter(r=>r.foundInShortedBin||r.icConfirmed==='erroneous').length} erroneous</span> ·
+    <span style="color:var(--accent);font-weight:700">${all.filter(r=>r.secondLocationFilled||r.icConfirmed==='second_location').length} 2nd loc</span> ·
+    <span style="color:var(--red);font-weight:700">${all.filter(r=>!r.icConfirmed&&!r.foundInShortedBin&&!r.secondLocationFilled).length} pending</span>`;
+}
+
+function uomSelect(name,val){
+  return `<select class="ic-qty-input" style="width:70px;padding:4px 4px" name="${name}" onchange="icSyncEdits()">
+    ${IC_UOMS.map(u=>`<option value="${u}" ${u===(val||'EA')?'selected':''}>${u}</option>`).join('')}
+  </select>`;
 }
 
 function renderIcConfirmSheet(){
   const rows=icConfirmFilteredRows().sort((a,b)=>(a.shortedBin||'').localeCompare(b.shortedBin||'')||(a.productCode||'').localeCompare(b.productCode||''));
-  const all=shortages.filter(r=>!r._archived);
-  const done=all.filter(r=>r.icConfirmed||r.foundInShortedBin||r.secondLocationFilled).length;
-  const pctDone=all.length?Math.round(done/all.length*100):0;
-
-  $('icConfirmSubhead').textContent=`${rows.length} shortages shown · ${done}/${all.length} verified (${pctDone}%)`;
-  $('icProgFill').style.width=pctDone+'%';
-  $('icConfirmStats').innerHTML=`<span style="color:var(--green);font-weight:700">${all.filter(r=>r.icConfirmed==='confirmed_short').length} confirmed</span> · <span style="color:var(--yellow);font-weight:700">${all.filter(r=>r.foundInShortedBin||r.icConfirmed==='erroneous').length} erroneous</span> · <span style="color:var(--accent);font-weight:700">${all.filter(r=>r.secondLocationFilled||r.icConfirmed==='second_location').length} 2nd loc</span> · <span style="color:var(--red);font-weight:700">${all.filter(r=>!r.icConfirmed&&!r.foundInShortedBin&&!r.secondLocationFilled).length} pending</span>`;
+  icUpdateStats();
 
   if(!rows.length){
     $('icConfirmSheet').innerHTML='<div class="empty" style="padding:40px">No shortages match this filter.</div>';
     return;
   }
 
-  const headerRow=`<div class="ic-sheet-row ic-sheet-head" style="font-size:10px">
-    <div>#</div><div>BIN</div><div>PRODUCT</div><div>QTY</div><div>DEMAND · PICKER</div>
-    <div>IC RESULT</div><div>IC QTY FOUND</div><div>IC NOTES / 2ND BIN</div>
+  const headerRow=`<div class="ic-sheet-row ic-sheet-head" style="font-size:10px;grid-template-columns:28px 90px 120px 90px 1fr 170px 1fr">
+    <div>#</div><div>BIN</div><div>PRODUCT</div><div>SHORTED QTY</div><div>DEMAND · PICKER</div>
+    <div>IC RESULT</div><div>IC COUNTS &amp; NOTES</div>
   </div>`;
 
   const dataRows=rows.map((r,i)=>{
     const edit=icConfirmEdits[r.id]||{};
-    const alreadyDone=r.icConfirmed||r.foundInShortedBin||r.secondLocationFilled;
-    const curResult=edit.result||(r.icConfirmed||( r.foundInShortedBin?'erroneous':r.secondLocationFilled?'second_location':''));
-    const curQty=edit.icQtyFound!==undefined?edit.icQtyFound:(r.icQtyFound||'');
+    const alreadyDone=!!(r.icConfirmed||r.foundInShortedBin||r.secondLocationFilled);
+    const curResult=edit.result||(r.icConfirmed||(r.foundInShortedBin?'erroneous':r.secondLocationFilled?'second_location':''));
+    // IC counts — multi-line
+    const counts=edit.icCounts||[{qty:'',uom:r.uom||'EA',notes:''}];
     const curNotes=edit.icNotes!==undefined?edit.icNotes:(r.icNotes||'');
     const curSecBin=edit.secondBin||'';
     const rowClass=curResult==='confirmed_short'?'confirmed-row':curResult==='erroneous'?'erroneous-row':alreadyDone?'already-done':'';
     const selectClass=curResult==='confirmed_short'?'res-confirmed':curResult==='erroneous'?'res-erroneous':curResult==='second_location'?'res-second':'';
-    return `<div class="ic-sheet-row ${rowClass}" data-id="${esc(r.id)}">
-      <div style="font-size:10px;color:var(--muted)">${i+1}</div>
-      <div style="font-family:var(--mono);font-weight:700;font-size:11px">${esc(r.shortedBin||'—')}</div>
-      <div style="font-family:var(--mono);font-weight:700;font-size:11px;color:var(--accent)">${esc(r.productCode||'—')}</div>
-      <div style="font-family:var(--mono);font-size:11px">${r.qtyShorted||0} ${esc(r.uom||'EA')}</div>
-      <div style="font-size:11px"><span style="font-family:var(--mono)">${esc(r.pickDemand||'—')}</span><br><span style="color:var(--muted)">${esc(r.picker||'—')}${r.packer?' / '+esc(r.packer):''}</span></div>
-      <div>
+
+    // Build count lines
+    const countLines=counts.map((c,ci)=>`
+      <div style="display:flex;gap:4px;align-items:center;margin-bottom:4px">
+        <input class="ic-qty-input" type="number" min="0" placeholder="qty" style="width:60px"
+          data-id="${esc(r.id)}" data-ci="${ci}" data-field="qty" value="${esc(String(c.qty))}" onchange="icCountChange(this)">
+        ${uomSelect(`uom_${esc(r.id)}_${ci}`,c.uom)}
+        <input class="ic-notes-input" placeholder="notes (optional)" style="flex:1"
+          data-id="${esc(r.id)}" data-ci="${ci}" data-field="notes" value="${esc(c.notes||'')}" onchange="icCountChange(this)">
+        ${ci>0?`<button class="btn" style="padding:2px 7px;font-size:11px;min-width:unset" onclick="icRemoveCount('${esc(r.id)}',${ci})">×</button>`:''}
+      </div>`).join('');
+
+    return `<div class="ic-sheet-row ${rowClass}" data-id="${esc(r.id)}" style="grid-template-columns:28px 90px 120px 90px 1fr 170px 1fr;align-items:start">
+      <div style="font-size:10px;color:var(--muted);padding-top:6px">${i+1}</div>
+      <div style="font-family:var(--mono);font-weight:700;font-size:11px;padding-top:6px">${esc(r.shortedBin||'—')}</div>
+      <div style="font-family:var(--mono);font-weight:700;font-size:11px;color:var(--accent);padding-top:6px">${esc(r.productCode||'—')}</div>
+      <div style="font-family:var(--mono);font-size:11px;padding-top:6px;color:var(--yellow);font-weight:600">${r.qtyShorted||0} <span style="color:var(--muted)">${esc(r.uom||'EA')}</span></div>
+      <div style="font-size:11px;padding-top:6px"><span style="font-family:var(--mono)">${esc(r.pickDemand||'—')}</span><br><span style="color:var(--muted);font-size:10px">${esc(r.picker||'—')}${r.packer?' / '+esc(r.packer):''}</span></div>
+      <div style="padding-top:4px">
         <select class="ic-result-select ${selectClass}" data-id="${esc(r.id)}" onchange="icResultChange(this)">
           <option value="">— Pending —</option>
-          <option value="confirmed_short" ${curResult==='confirmed_short'?'selected':''}>&#10003; Confirmed Short</option>
-          <option value="erroneous" ${curResult==='erroneous'?'selected':''}>&#9888; Erroneous Bin</option>
-          <option value="second_location" ${curResult==='second_location'?'selected':''}>&#8634; 2nd Location Fill</option>
-          <option value="not_found" ${curResult==='not_found'?'selected':''}>&#10007; Not Found</option>
-          <option value="skip" ${curResult==='skip'?'selected':''}>&#8212; Skip / Review Later</option>
+          <option value="confirmed_short" ${curResult==='confirmed_short'?'selected':''}>✓ Confirmed Short</option>
+          <option value="erroneous" ${curResult==='erroneous'?'selected':''}>⚠ Erroneous Bin</option>
+          <option value="second_location" ${curResult==='second_location'?'selected':''}>↺ 2nd Location Fill</option>
+          <option value="not_found" ${curResult==='not_found'?'selected':''}>✗ Not Found</option>
+          <option value="skip" ${curResult==='skip'?'selected':''}>— Skip / Review Later</option>
         </select>
+        ${alreadyDone&&!edit.result?`<div style="font-size:10px;color:var(--muted);margin-top:4px;font-style:italic">Previously: ${curResult||'verified'}</div>`:''}
       </div>
-      <div><input class="ic-qty-input" type="number" min="0" placeholder="qty" data-id="${esc(r.id)}" value="${esc(String(curQty))}" onchange="icFieldChange(this,'icQtyFound')"></div>
-      <div style="display:flex;gap:4px;flex-direction:column">
-        <input class="ic-notes-input" placeholder="IC notes..." data-id="${esc(r.id)}" value="${esc(curNotes)}" onchange="icFieldChange(this,'icNotes')">
-        ${curResult==='second_location'?`<input class="ic-notes-input" placeholder="2nd location bin..." data-id="${esc(r.id)}" value="${esc(curSecBin)}" onchange="icFieldChange(this,'secondBin')" style="font-family:var(--mono)">`:'' }
+      <div>
+        ${countLines}
+        <button class="btn" style="font-size:11px;padding:3px 8px;margin-top:2px" onclick="icAddCount('${esc(r.id)}',${esc(JSON.stringify(r.uom||'EA'))})">+ Add Count Line</button>
+        <div style="margin-top:6px">
+          <input class="ic-notes-input" placeholder="General IC notes..." data-id="${esc(r.id)}" data-field="icNotes"
+            value="${esc(curNotes)}" onchange="icNoteChange(this)" style="width:100%">
+        </div>
+        ${curResult==='second_location'?`<div style="margin-top:4px"><input class="ic-notes-input" placeholder="2nd location bin (e.g. 82-26-01)..."
+          data-id="${esc(r.id)}" data-field="secondBin" value="${esc(curSecBin)}" onchange="icNoteChange(this)"
+          style="width:100%;font-family:var(--mono)"></div>`:''}
       </div>
     </div>`;
   }).join('');
@@ -1631,32 +1673,112 @@ function renderIcConfirmSheet(){
 
 function icResultChange(sel){
   const id=sel.dataset.id;
-  if(!icConfirmEdits[id])icConfirmEdits[id]={};
+  if(!icConfirmEdits[id])icConfirmEdits[id]={icCounts:[{qty:'',uom:'EA',notes:''}]};
   icConfirmEdits[id].result=sel.value;
-  // update select styling
   sel.className='ic-result-select'+(sel.value==='confirmed_short'?' res-confirmed':sel.value==='erroneous'?' res-erroneous':sel.value==='second_location'?' res-second':'');
-  // re-render just this row to show/hide 2nd bin input
+  // Only re-render this one row's right column to show/hide 2nd bin field
+  // Re-render whole sheet to keep it simple and accurate
+  renderIcConfirmSheet();
+  icUpdateStats();
+}
+
+function icCountChange(input){
+  const id=input.dataset.id;
+  const ci=parseInt(input.dataset.ci);
+  const field=input.dataset.field;
+  if(!icConfirmEdits[id])icConfirmEdits[id]={icCounts:[{qty:'',uom:'EA',notes:''}]};
+  const edit=icConfirmEdits[id];
+  if(!edit.icCounts)edit.icCounts=[{qty:'',uom:'EA',notes:''}];
+  while(edit.icCounts.length<=ci)edit.icCounts.push({qty:'',uom:'EA',notes:''});
+  edit.icCounts[ci][field]=field==='qty'?num(input.value):input.value;
+  // sync UOM selects (they have name= attributes, not data-field)
+  // UOM changes handled by icSyncEdits on the select onchange
+}
+
+function icSyncEdits(){
+  // Called by UOM selects — sync all UOM values from the DOM into icConfirmEdits
+  document.querySelectorAll('.ic-sheet-row:not(.ic-sheet-head)').forEach(row=>{
+    const id=row.dataset.id;
+    if(!id||!icConfirmEdits[id])return;
+    const selects=row.querySelectorAll('select[name^="uom_"]');
+    selects.forEach(sel=>{
+      const parts=sel.name.split('_'); // uom_ID_CI
+      const ci=parseInt(parts[parts.length-1]);
+      if(!icConfirmEdits[id].icCounts)icConfirmEdits[id].icCounts=[{qty:'',uom:'EA',notes:''}];
+      while(icConfirmEdits[id].icCounts.length<=ci)icConfirmEdits[id].icCounts.push({qty:'',uom:'EA',notes:''});
+      icConfirmEdits[id].icCounts[ci].uom=sel.value;
+    });
+  });
+}
+
+function icNoteChange(input){
+  const id=input.dataset.id;
+  const field=input.dataset.field;
+  if(!icConfirmEdits[id])icConfirmEdits[id]={icCounts:[{qty:'',uom:'EA',notes:''}]};
+  icConfirmEdits[id][field]=input.value;
+}
+
+function icAddCount(id,defaultUom){
+  if(!icConfirmEdits[id])icConfirmEdits[id]={icCounts:[{qty:'',uom:defaultUom||'EA',notes:''}]};
+  if(!icConfirmEdits[id].icCounts)icConfirmEdits[id].icCounts=[{qty:'',uom:defaultUom||'EA',notes:''}];
+  icSyncEdits(); // save current state before re-render
+  icConfirmEdits[id].icCounts.push({qty:'',uom:defaultUom||'EA',notes:''});
   renderIcConfirmSheet();
 }
 
-function icFieldChange(input,field){
-  const id=input.dataset.id;
-  if(!icConfirmEdits[id])icConfirmEdits[id]={};
-  icConfirmEdits[id][field]=input.type==='number'?num(input.value):input.value;
+function icRemoveCount(id,ci){
+  if(!icConfirmEdits[id]||!icConfirmEdits[id].icCounts)return;
+  icSyncEdits();
+  icConfirmEdits[id].icCounts.splice(ci,1);
+  if(!icConfirmEdits[id].icCounts.length)icConfirmEdits[id].icCounts=[{qty:'',uom:'EA',notes:''}];
+  renderIcConfirmSheet();
 }
 
 function icMarkAllVisible(result){
+  icSyncEdits();
   const rows=icConfirmFilteredRows();
   rows.forEach(r=>{
-    if(!icConfirmEdits[r.id])icConfirmEdits[r.id]={};
+    if(!icConfirmEdits[r.id])icConfirmEdits[r.id]={icCounts:[{qty:'',uom:r.uom||'EA',notes:''}]};
     icConfirmEdits[r.id].result=result;
   });
   renderIcConfirmSheet();
 }
 
+// ── One-time mass confirm: mark all active non-erroneous as confirmed_short ──
+async function icMassConfirmNonErroneous(){
+  const targets=shortages.filter(r=>!r._archived&&!r.foundInShortedBin&&!r.icConfirmed);
+  if(!targets.length){alert('No unconfirmed, non-erroneous shortages found.');return;}
+  if(!confirm(`This will mark ${targets.length} shortage(s) as "Confirmed Short".\n\nThese are all active shortages that are NOT already flagged as erroneous.\n\nProceed?`))return;
+  showLoading(`Confirming ${targets.length} shortages...`);
+  try{
+    const s=getSettings();
+    const verifiedAt=new Date().toISOString();
+    const verifiedBy=role;
+    let batch=db.batch();let count=0;const batches=[];
+    for(const r of targets){
+      batch.set(db.collection(s.activeCollection).doc(r.id),{
+        icConfirmed:'confirmed_short',icConfirmedAt:verifiedAt,icConfirmedBy:verifiedBy,
+        status:'confirmed_short',updatedAt:verifiedAt,updatedBy:verifiedBy
+      },{merge:true});
+      count++;
+      if(count%499===0){batches.push(batch);batch=db.batch();count=0;}
+    }
+    if(count>0)batches.push(batch);
+    for(const b of batches)await b.commit();
+    clearCaches();
+    icConfirmEdits={};
+    await loadShortages(true);
+    renderIcConfirmSheet();
+    if($('reportScreen').classList.contains('active'))renderReports();
+    hideLoading();
+    alert(`Done! ${targets.length} shortages marked as Confirmed Short.`);
+  }catch(e){hideLoading();alert('Failed: '+e.message);}
+}
+
 async function icConfirmSubmitAll(){
+  icSyncEdits(); // capture any UOM changes before reading edits
   const entries=Object.entries(icConfirmEdits).filter(([,e])=>e.result&&e.result!=='skip');
-  if(!entries.length){alert('No results to save. Set at least one shortage result first.');return;}
+  if(!entries.length){alert('No results to save. Set at least one IC result first.');return;}
 
   const confirm_ct=entries.filter(([,e])=>e.result==='confirmed_short').length;
   const err_ct=entries.filter(([,e])=>e.result==='erroneous').length;
@@ -1668,9 +1790,7 @@ async function icConfirmSubmitAll(){
   showLoading('Saving IC verification results...');
   try{
     const s=getSettings();
-    // Batch in groups of 500
-    const batches=[];
-    let batch=db.batch();let count=0;
+    let batch=db.batch();let count=0;const batches=[];
     const verifiedAt=new Date().toISOString();
     const verifiedBy=role;
 
@@ -1678,6 +1798,13 @@ async function icConfirmSubmitAll(){
       const r=shortages.find(x=>x.id===id&&!x._archived);
       if(!r)continue;
       const ref=db.collection(s.activeCollection).doc(id);
+
+      // Build icErroneousCounts array from multi-line count entries
+      const validCounts=(edit.icCounts||[]).filter(c=>c.qty!==''&&c.qty!==undefined&&num(c.qty)>0);
+      const totalIcQty=validCounts.reduce((s,c)=>s+num(c.qty),0);
+      // Summary string for icNotes
+      const countSummary=validCounts.map(c=>`${c.qty} ${c.uom}${c.notes?' ('+c.notes+')':''}`).join(', ');
+
       const update={
         icConfirmed:edit.result,
         icConfirmedAt:verifiedAt,
@@ -1685,9 +1812,14 @@ async function icConfirmSubmitAll(){
         updatedAt:verifiedAt,
         updatedBy:verifiedBy
       };
-      if(edit.icQtyFound!==undefined&&edit.icQtyFound!=='')update.icQtyFound=num(edit.icQtyFound);
-      if(edit.icNotes!==undefined&&edit.icNotes!=='')update.icNotes=edit.icNotes;
-      // Apply result-specific flags
+      if(validCounts.length){
+        update.icErroneousCounts=validCounts.map(c=>({qty:num(c.qty),uom:c.uom,notes:c.notes||'',enteredAt:verifiedAt}));
+        update.icQtyFound=totalIcQty;
+        update.icUom=validCounts[0].uom;
+      }
+      if(edit.icNotes||(countSummary&&!edit.icNotes)){
+        update.icNotes=[edit.icNotes,countSummary].filter(Boolean).join(' | ')||r.icNotes||'';
+      }
       if(edit.result==='erroneous'){
         update.foundInShortedBin=true;
         update.status='located';
@@ -1695,13 +1827,12 @@ async function icConfirmSubmitAll(){
         update.secondLocationFilled=true;
         update.status='located';
         if(edit.secondBin){
-          const r2=shortages.find(x=>x.id===id);
-          const existingLocs=Array.isArray(r2?.secondaryLocations)?r2.secondaryLocations:[];
+          const existingLocs=Array.isArray(r.secondaryLocations)?r.secondaryLocations:[];
           update.secondaryLocations=[...existingLocs,{
             bin:edit.secondBin.trim().toUpperCase(),
-            qty:num(edit.icQtyFound)||0,
-            uom:(r?.uom||'EA'),
-            notes:edit.icNotes||'Added via IC Verify Sheet',
+            qty:totalIcQty||0,
+            uom:validCounts[0]?.uom||r.uom||'EA',
+            notes:edit.icNotes||countSummary||'Added via IC Verify Sheet',
             enteredAt:verifiedAt,enteredBy:verifiedBy
           }];
         }
@@ -1720,7 +1851,7 @@ async function icConfirmSubmitAll(){
     clearCaches();
     icConfirmEdits={};
     await loadShortages(true);
-    renderIcConfirmSheet(); // refresh sheet with new statuses
+    renderIcConfirmSheet();
     if($('reportScreen').classList.contains('active'))renderReports();
     hideLoading();
     alert(`Saved! ${entries.length} shortage(s) verified.`);
