@@ -178,10 +178,305 @@ async function archiveIds(ids){showLoading('Archiving shortages...');try{const s
 async function unarchiveOne(id){showLoading('Unarchiving...');try{const s=getSettings();const r=shortages.find(x=>x.id===id&&x._archived);const data={...r,unarchivedAt:new Date().toISOString()};delete data.id;delete data._archived;const batch=db.batch();batch.set(db.collection(s.activeCollection).doc(id),data,{merge:true});batch.delete(db.collection(s.archiveCollection).doc(id));await batch.commit();clearCaches();await loadShortages(true)}catch(e){alert(e.message)}finally{hideLoading()}}
 function reportStats(rows){return {total:rows.length,err:rows.filter(r=>r.foundInShortedBin).length,backorder:rows.filter(isBackorderRisk).length,second:rows.filter(r=>r.secondLocationFilled).length,replen:rows.filter(r=>r.replenishedAfterPick).length,archived:rows.filter(r=>r._archived).length}}
 function table(headers,rows){if(!rows.length)return '<div class="empty">No records found.</div>';return `<div style="overflow:auto"><table class="table"><thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`}
-function renderReports(){if(!canRunReports()){showScreen('shortage');return}const rows=filteredRows(true);const st=reportStats(rows);const duplicate=Object.values(rows.reduce((a,r)=>{const key=(r.shortedBin||'')+'::'+(r.productCode||'');a[key]=a[key]||{bin:r.shortedBin,product:r.productCode,count:0,pickers:new Set()};a[key].count++;if(r.picker)a[key].pickers.add(r.picker);return a},{})).filter(x=>x.count>1).sort((a,b)=>b.count-a.count);$('reportBody').innerHTML=`<div class="stat-grid"><div class="stat-card"><div class="stat-num">${st.total}</div><div class="stat-lbl">Total In Pull</div></div><div class="stat-card"><div class="stat-num">${st.err}</div><div class="stat-lbl">Erroneous Shorts</div></div><div class="stat-card"><div class="stat-num">${st.backorder}</div><div class="stat-lbl">Erroneous Backorders</div></div><div class="stat-card"><div class="stat-num">${st.second}</div><div class="stat-lbl">Second Location Filled</div></div><div class="stat-card"><div class="stat-num">${st.replen}</div><div class="stat-lbl">Replenished After Pick</div></div><div class="stat-card"><div class="stat-num">${st.archived}</div><div class="stat-lbl">Archived In Pull</div></div></div><div class="card no-break"><div class="card-title">Erroneous Shortages That Likely Became Backorders</div>${table(['Product Code','Bin Location','Qty Shorted','IC Qty Found','UOM','Demand','Picker','Date'],rows.filter(isBackorderRisk).map(r=>[r.productCode,r.shortedBin,r.qtyShorted,r.icQtyFound,r.icUom||r.uom,r.pickDemand,r.picker,normalizeDate(r.date)]))}</div><div class="card no-break"><div class="card-title">Second Location Filled Details</div>${table(['Product Code','Shorted Bin','Second Location Bin(s)','Qty Filled','Demand','Picker','Date'],rows.filter(r=>r.secondLocationFilled).map(r=>[r.productCode,r.shortedBin,secondarySummary(r),Array.isArray(r.secondaryLocations)?r.secondaryLocations.reduce((sum,x)=>sum+num(x.qty),0):'',r.pickDemand,r.picker,normalizeDate(r.date)]))}</div><div class="card no-break"><div class="card-title">IC Shortage Check List</div>${table(['Product Code','Bin Location','Qty Shorted','UOM','Demand','Picker','Date','IC Result'],rows.map(r=>[r.productCode,r.shortedBin,r.qtyShorted,r.uom,r.pickDemand,r.picker,normalizeDate(r.date),r.foundInShortedBin?'Found in shorted bin':r.secondLocationFilled?'Filled from second location':'Pending / Not found']))}</div><div class="card no-break"><div class="card-title">Duplicate Bin / Product Alerts</div>${table(['Product Code','Bin Location','Occurrences','Pickers'],duplicate.map(d=>[d.product,d.bin,d.count,[...d.pickers].join(', ')]))}</div>`}
+
+// Shift helper: 1=1st (6am-3:30pm), 2=2nd (3:30pm-midnight/overnight)
+function getShiftNum(dateStr){
+  const d=new Date(dateStr);
+  if(isNaN(d))return 0;
+  const h=d.getHours(),m=d.getMinutes();
+  if(h>=6&&(h<15||(h===15&&m<30)))return 1;
+  return 2;
+}
+function getShiftFromRecord(r){
+  const sv=r.shift||'';
+  if(sv==='1st'||sv===1||sv==='1')return 1;
+  if(sv==='2nd'||sv===2||sv==='2')return 2;
+  if(sv==='3rd'||sv===3||sv==='3')return 2; // treat 3rd as 2nd for reporting
+  return getShiftNum(r.date||r.createdAt||'');
+}
+function hasSecondLocationEvidence(r){
+  const locs=Array.isArray(r.secondaryLocations)?r.secondaryLocations:[];
+  return r.secondLocationFilled||locs.length>0;
+}
+function isErrBackorder(r){return !!r.foundInShortedBin&&!hasSecondLocationEvidence(r);}
+
+function renderReports(){
+  if(!canRunReports()){showScreen('shortage');return}
+  const rows=filteredRows(true);
+  const st=reportStats(rows);
+  const duplicate=Object.values(rows.reduce((a,r)=>{
+    const key=(r.shortedBin||'')+'::'+(r.productCode||'');
+    a[key]=a[key]||{bin:r.shortedBin,product:r.productCode,count:0,pickers:new Set()};
+    a[key].count++;if(r.picker)a[key].pickers.add(r.picker);return a;
+  },{})).filter(x=>x.count>1).sort((a,b)=>b.count-a.count);
+
+  // by division
+  const divs=[...new Set(rows.map(r=>r.division))].filter(Boolean).sort();
+  const byDiv={};
+  divs.forEach(d=>{byDiv[d]={total:0,s1:0,s2:0,located:0,erroneous:0,notLoc:0};});
+  rows.forEach(r=>{
+    const d=r.division||'??';
+    if(!byDiv[d])byDiv[d]={total:0,s1:0,s2:0,located:0,erroneous:0,notLoc:0};
+    byDiv[d].total++;
+    if(getShiftFromRecord(r)===1)byDiv[d].s1++;else byDiv[d].s2++;
+    if(r.foundInShortedBin)byDiv[d].erroneous++;
+    else if(r.secondLocationFilled)byDiv[d].located++;
+    else byDiv[d].notLoc++;
+  });
+
+  // by picker
+  const byPicker={};
+  rows.forEach(r=>{
+    const p=r.picker||'Unknown';
+    if(!byPicker[p])byPicker[p]={total:0,located:0,erroneous:0,notLoc:0};
+    byPicker[p].total++;
+    if(r.foundInShortedBin)byPicker[p].erroneous++;
+    else if(r.secondLocationFilled)byPicker[p].located++;
+    else byPicker[p].notLoc++;
+  });
+  const pickerRows=Object.entries(byPicker).sort((a,b)=>b[1].total-a[1].total);
+
+  // by day
+  const byDay={};
+  rows.forEach(r=>{
+    const ds=normalizeDate(r.date||r.createdAt||'')||'Unknown';
+    if(!byDay[ds])byDay[ds]={total:0,located:0,erroneous:0,s1:0,s2:0};
+    byDay[ds].total++;
+    if(r.foundInShortedBin)byDay[ds].erroneous++;
+    else if(r.secondLocationFilled)byDay[ds].located++;
+    if(getShiftFromRecord(r)===1)byDay[ds].s1++;else byDay[ds].s2++;
+  });
+
+  function pct(a,b){return b?Math.round(a/b*100)+'%':'—';}
+
+  const divTableRows=Object.keys(byDiv).map((d,i)=>{
+    const row=byDiv[d];const ep=pct(row.erroneous,row.total);const bg=i%2===0?'':' style="background:rgba(255,255,255,.03)"';
+    return `<tr${bg}><td>${esc(d)}</td><td>${row.total}</td><td>${row.s1}</td><td>${row.s2}</td><td style="color:var(--green);font-weight:600">${row.located}</td><td style="color:var(--yellow);font-weight:600">${row.erroneous}</td><td style="color:var(--red);font-weight:600">${row.notLoc}</td><td style="font-weight:600">${ep}</td></tr>`;
+  }).join('');
+
+  const pickerTableRows=pickerRows.map(([picker,row],i)=>{
+    const ep=pct(row.erroneous,row.total);const bg=i%2===0?'':' style="background:rgba(255,255,255,.03)"';
+    return `<tr${bg}><td>${esc(picker)}</td><td>${row.total}</td><td style="color:var(--green);font-weight:600">${row.located}</td><td style="color:var(--yellow);font-weight:600">${row.erroneous}</td><td style="color:var(--red);font-weight:600">${row.notLoc}</td><td style="font-weight:600">${ep}</td></tr>`;
+  }).join('');
+
+  const dayTableRows=Object.keys(byDay).sort().map((d,i)=>{
+    const row=byDay[d];const bg=i%2===0?'':' style="background:rgba(255,255,255,.03)"';
+    return `<tr${bg}><td>${esc(d)}</td><td>${row.total}</td><td>${row.s1}</td><td>${row.s2}</td><td style="color:var(--green);font-weight:600">${row.located}</td><td style="color:var(--yellow);font-weight:600">${row.erroneous}</td></tr>`;
+  }).join('');
+
+  $('reportBody').innerHTML=`
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-num">${st.total}</div><div class="stat-lbl">Total Shortages</div></div>
+      <div class="stat-card" style="border-color:rgba(16,185,129,.3)"><div class="stat-num" style="color:var(--green)">${st.second}</div><div class="stat-lbl">2nd Location Found</div></div>
+      <div class="stat-card" style="border-color:rgba(245,158,11,.3)"><div class="stat-num" style="color:var(--yellow)">${st.err} <span style="font-size:12px">(${pct(st.err,st.total)})</span></div><div class="stat-lbl">⚠ Erroneous Shorts</div></div>
+      <div class="stat-card" style="border-color:rgba(220,38,38,.4);background:rgba(220,38,38,.07)"><div class="stat-num" style="color:var(--red)">${st.backorder}</div><div class="stat-lbl">Erroneous Backorders</div></div>
+      <div class="stat-card"><div class="stat-num">${rows.filter(r=>getShiftFromRecord(r)===1).length}</div><div class="stat-lbl">1st Shift</div></div>
+      <div class="stat-card"><div class="stat-num">${rows.filter(r=>getShiftFromRecord(r)===2).length}</div><div class="stat-lbl">2nd Shift</div></div>
+      <div class="stat-card"><div class="stat-num">${st.replen}</div><div class="stat-lbl">Replenished After Pick</div></div>
+      <div class="stat-card"><div class="stat-num">${st.archived}</div><div class="stat-lbl">Archived</div></div>
+    </div>
+    <div class="card no-break">
+      <div class="card-title">Division &amp; Shift Breakdown</div>
+      <div style="overflow:auto"><table class="table"><thead><tr><th>Division</th><th>Total</th><th>1st Shift</th><th>2nd Shift</th><th>2nd Location</th><th>⚠ Erroneous</th><th>Not Located</th><th>Error Rate</th></tr></thead><tbody>${divTableRows}</tbody></table></div>
+    </div>
+    <div class="card no-break">
+      <div class="card-title">Picker Performance</div>
+      <div style="overflow:auto"><table class="table"><thead><tr><th>Picker</th><th>Total Shorts</th><th>2nd Location</th><th>⚠ Erroneous</th><th>Not Located</th><th>Error Rate</th></tr></thead><tbody>${pickerTableRows}</tbody></table></div>
+    </div>
+    <div class="card no-break">
+      <div class="card-title">Daily Summary</div>
+      <div style="overflow:auto"><table class="table"><thead><tr><th>Date</th><th>Total</th><th>1st Shift</th><th>2nd Shift</th><th>2nd Location</th><th>⚠ Erroneous</th></tr></thead><tbody>${dayTableRows}</tbody></table></div>
+    </div>
+    ${duplicate.length?`<div class="card no-break"><div class="card-title">⚠ Duplicate Bin / Product Alerts</div>${table(['Product Code','Bin Location','Occurrences','Pickers'],duplicate.map(d=>[d.product,d.bin,d.count,[...d.pickers].join(', ')]))}</div>`:''}
+    ${rows.filter(isErrBackorder).length?`<div class="card no-break"><div class="card-title" style="color:var(--red)">Erroneous Shortages That Likely Became Backorders</div>${table(['Product Code','Bin Location','Qty Shorted','IC Qty Found','UOM','Demand','Picker','Date'],rows.filter(isErrBackorder).map(r=>[r.productCode,r.shortedBin,r.qtyShorted,r.icQtyFound,r.icUom||r.uom,r.pickDemand,r.picker,normalizeDate(r.date)]))}</div>`:''}
+    ${rows.filter(r=>r.secondLocationFilled).length?`<div class="card no-break"><div class="card-title" style="color:var(--green)">2nd Location Finds — Inventory Adjustment Reference</div>${table(['Product Code','Div','Original Bin (Shorted)','2nd Location Bin(s)','Qty Filled','Demand','Picker','Date'],rows.filter(r=>r.secondLocationFilled).map(r=>[r.productCode,r.division,r.shortedBin,secondarySummary(r),Array.isArray(r.secondaryLocations)?r.secondaryLocations.reduce((sum,x)=>sum+num(x.qty),0):'',r.pickDemand,r.picker,normalizeDate(r.date)]))}</div>`:''}
+  `;
+}
+
 function renderCheckPreview(){}
-function printSummaryReport(){renderReports();$('printArea').innerHTML=`<h1>Outbound Summary Report</h1><p>Mode: ${esc($('reportMode')?.value||lastLoadMode)} | Date: ${esc($('reportStart')?.value||'All')} to ${esc($('reportEnd')?.value||'All')}</p>${$('reportBody').innerHTML}`;window.print()}
-function printCheckReport(){const rows=filteredRows(true);$('printArea').innerHTML=`<h1>IC Shortage Check List</h1>${table(['Product Code','Bin Location','Qty Shorted','UOM','Demand','Picker','Date','IC Result'],rows.map(r=>[r.productCode,r.shortedBin,r.qtyShorted,r.uom,r.pickDemand,r.picker,normalizeDate(r.date),r.foundInShortedBin?'Found in shorted bin':r.secondLocationFilled?'Filled from second location':'Pending / Not found']))}`;window.print()}
+
+function printSummaryReport(){
+  const fromStr=$('reportStart')?.value;
+  const toStr=$('reportEnd')?.value;
+  const mode=$('reportMode')?.value||lastLoadMode;
+  const fmtD=d=>new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  const from=fromStr?new Date(fromStr+'T00:00:00'):new Date(0);
+  const to=toStr?new Date(toStr+'T23:59:59'):new Date();
+  const dateRange=fromStr||toStr?fmtD(from)+' \u2014 '+fmtD(to):'All Dates';
+  const today=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  const rows=filteredRows(true);
+  const total=rows.length;
+  const located2nd=rows.filter(r=>r.secondLocationFilled).length;
+  const erroneous=rows.filter(r=>r.foundInShortedBin).length;
+  const errFullyShorted=rows.filter(isErrBackorder).length;
+  const notLoc=rows.filter(r=>!r.secondLocationFilled&&!r.foundInShortedBin).length;
+  const shift1c=rows.filter(r=>getShiftFromRecord(r)===1).length;
+  const shift2c=rows.filter(r=>getShiftFromRecord(r)===2).length;
+  const locPct=total?Math.round(located2nd/total*100):0;
+  const errPct=total?Math.round(erroneous/total*100):0;
+  function pct(a,b){return b?Math.round(a/b*100)+'%':'—';}
+
+  const divs=[...new Set(rows.map(r=>r.division))].filter(Boolean).sort();
+  const byDiv={};
+  divs.forEach(d=>{byDiv[d]={total:0,s1:0,s2:0,located:0,erroneous:0,notLoc:0};});
+  rows.forEach(r=>{
+    const d=r.division||'??';if(!byDiv[d])byDiv[d]={total:0,s1:0,s2:0,located:0,erroneous:0,notLoc:0};
+    byDiv[d].total++;if(getShiftFromRecord(r)===1)byDiv[d].s1++;else byDiv[d].s2++;
+    if(r.foundInShortedBin)byDiv[d].erroneous++;else if(r.secondLocationFilled)byDiv[d].located++;else byDiv[d].notLoc++;
+  });
+  const byPicker={};
+  rows.forEach(r=>{
+    const p=r.picker||'Unknown';if(!byPicker[p])byPicker[p]={total:0,located:0,erroneous:0,notLoc:0};
+    byPicker[p].total++;if(r.foundInShortedBin)byPicker[p].erroneous++;else if(r.secondLocationFilled)byPicker[p].located++;else byPicker[p].notLoc++;
+  });
+  const pickerRows=Object.entries(byPicker).sort((a,b)=>b[1].total-a[1].total);
+  const byDay={};
+  rows.forEach(r=>{
+    const ds=normalizeDate(r.date||r.createdAt||'')||'Unknown';
+    if(!byDay[ds])byDay[ds]={total:0,located:0,erroneous:0,s1:0,s2:0};
+    byDay[ds].total++;if(r.foundInShortedBin)byDay[ds].erroneous++;else if(r.secondLocationFilled)byDay[ds].located++;
+    if(getShiftFromRecord(r)===1)byDay[ds].s1++;else byDay[ds].s2++;
+  });
+  const binProductMap={};
+  rows.forEach(r=>{const key=(r.shortedBin||'')+'::'+r.productCode;if(!binProductMap[key])binProductMap[key]=[];binProductMap[key].push(r);});
+  const duplicates=Object.entries(binProductMap).filter(([k,v])=>v.length>1).sort((a,b)=>b[1].length-a[1].length);
+
+  const th=h=>`<th style="background:#1a2038;color:#fff;padding:5pt 8pt;text-align:left;font-size:8pt;font-weight:600;letter-spacing:.04em">${h}</th>`;
+  const html=`<div style="font-family:'Segoe UI',Arial,sans-serif;color:#111;font-size:10pt;line-height:1.4">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;border-bottom:2.5pt solid #1a2038;padding-bottom:12pt;margin-bottom:18pt">
+      <div>
+        <div style="font-size:8pt;font-weight:700;color:#6b7280;letter-spacing:.12em;text-transform:uppercase;margin-bottom:4pt">C &amp; F Enterprises &middot; 815 Chapman Warehouse</div>
+        <div style="font-size:20pt;font-weight:700;color:#1a2038;line-height:1.1">Outbound Shortage Report</div>
+        <div style="font-size:10pt;color:#6b7280;margin-top:4pt">${esc(dateRange)} &nbsp;&middot;&nbsp; Mode: ${esc(mode)}</div>
+      </div>
+      <div style="text-align:right;font-size:8.5pt;color:#6b7280;line-height:1.8;padding-top:4pt">
+        <div><span style="font-weight:600;color:#374151">Generated:</span> ${today}</div>
+        <div><span style="font-weight:600;color:#374151">Prepared by:</span> 815 Inventory Control</div>
+        <div><span style="font-weight:600;color:#374151">Total Records:</span> ${total}</div>
+      </div>
+    </div>
+    <div style="font-size:8pt;font-weight:700;color:#374151;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #e5e7eb;padding-bottom:4pt;margin-bottom:10pt">Executive Summary</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8pt;margin-bottom:18pt">
+      ${[['Total Shortages',total,'#1a2038'],['2nd Location Found',located2nd+'  ('+locPct+'%)','#047857'],['⚠ Erroneous Shorts',erroneous+'  ('+errPct+'%)','#92400e'],['Erroneous Backorders',errFullyShorted,'#b91c1c'],['Not Located',notLoc,'#b91c1c'],['1st Shift',shift1c,'#1d4ed8'],['2nd Shift',shift2c,'#1d4ed8'],['Replenished After Pick',rows.filter(r=>r.replenishedAfterPick).length,'#047857']].map(([lbl,val,color])=>`
+        <div style="border:1pt solid #d1d5db;border-radius:4pt;padding:10pt;background:#f9fafb;text-align:center;break-inside:avoid">
+          <div style="font-size:20pt;font-weight:700;color:${color};line-height:1.1">${val}</div>
+          <div style="font-size:7pt;color:#6b7280;margin-top:3pt;text-transform:uppercase;letter-spacing:.06em">${lbl}</div>
+        </div>`).join('')}
+    </div>
+    <div style="font-size:8pt;font-weight:700;color:#374151;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #e5e7eb;padding-bottom:4pt;margin:14pt 0 8pt">Division &amp; Shift Breakdown</div>
+    <table style="width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:16pt"><thead><tr>${['Division','Total','1st Shift','2nd Shift','2nd Location','⚠ Erroneous','Not Located','Error Rate'].map(th).join('')}</tr></thead><tbody>
+      ${Object.keys(byDiv).map((d,i)=>{const row=byDiv[d];const ep=pct(row.erroneous,row.total);const bg=i%2===0?'#fff':'#f3f4f6';const epC=row.total&&row.erroneous/row.total>0.2?'#b91c1c':row.total&&row.erroneous/row.total>0.1?'#92400e':'#111';return`<tr style="background:${bg}"><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-weight:700">${esc(d)}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${row.total}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${row.s1}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${row.s2}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;color:#047857;font-weight:600">${row.located}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;color:#92400e;font-weight:600">${row.erroneous}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;color:#b91c1c;font-weight:600">${row.notLoc}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;color:${epC};font-weight:600">${ep}</td></tr>`;}).join('')}
+      <tr style="background:#1a2038;color:#fff"><td style="padding:5pt 8pt;font-weight:700">TOTAL</td><td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700">${total}</td><td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700">${shift1c}</td><td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700">${shift2c}</td><td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700;color:#6ee7b7">${located2nd}</td><td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700;color:#fcd34d">${erroneous}</td><td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700;color:#fca5a5">${notLoc}</td><td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700;color:#fcd34d">${pct(erroneous,total)}</td></tr>
+    </tbody></table>
+    <div style="page-break-inside:avoid">
+    <div style="font-size:8pt;font-weight:700;color:#374151;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #e5e7eb;padding-bottom:4pt;margin:14pt 0 8pt">Picker Performance</div>
+    <table style="width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:16pt"><thead><tr>${['Picker','Total Shorts','2nd Location','⚠ Erroneous','Not Located','Error Rate'].map(th).join('')}</tr></thead><tbody>
+      ${pickerRows.map(([picker,row],i)=>{const ep=pct(row.erroneous,row.total);const epC=row.total&&row.erroneous/row.total>0.25?'#b91c1c':row.total&&row.erroneous/row.total>0.15?'#92400e':'#111';const bg=i%2===0?'#fff':'#f3f4f6';return`<tr style="background:${bg}"><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-weight:600">${esc(picker)}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${row.total}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;color:#047857;font-weight:600">${row.located}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;color:#92400e;font-weight:600">${row.erroneous}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;color:#b91c1c;font-weight:600">${row.notLoc}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;color:${epC};font-weight:600">${ep}</td></tr>`;}).join('')}
+    </tbody></table></div>
+    ${duplicates.length?`<div style="page-break-before:always"><div style="font-size:8pt;font-weight:700;color:#374151;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #e5e7eb;padding-bottom:4pt;margin:14pt 0 8pt">⚠ Duplicate Bin / Product Alerts</div><div style="font-size:8.5pt;color:#6b7280;margin-bottom:8pt">Multiple pickers shorted the same item from the same bin location.</div><table style="width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:16pt"><thead><tr>${['Product Code','Bin Location','# Occurrences','Pickers Involved','Dates'].map(h=>`<th style="background:#7f1d1d;color:#fff;padding:5pt 8pt;text-align:left;font-size:8pt;font-weight:600;letter-spacing:.04em">${h}</th>`).join('')}</tr></thead><tbody>${duplicates.map(([key,rs],i)=>{const[bin,code]=key.split('::');const pickers=[...new Set(rs.map(r=>r.picker))].join(', ');const dates=[...new Set(rs.map(r=>normalizeDate(r.date||r.createdAt||'')))].join(', ');const bg=i%2===0?'#fff5f5':'#fee2e2';return`<tr style="background:${bg}"><td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-family:'Courier New',monospace;font-weight:700;color:#1a2038">${esc(code)}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-family:'Courier New',monospace">${esc(bin)}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-family:'Courier New',monospace;font-weight:700;color:#b91c1c">${rs.length}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-size:8.5pt">${esc(pickers)}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-size:8.5pt;color:#6b7280">${esc(dates)}</td></tr>`;}).join('')}</tbody></table></div>`:''}
+    ${rows.filter(r=>r.secondLocationFilled&&r.secondaryLocations&&r.secondaryLocations.length).length?`<div style="page-break-before:always;page-break-inside:avoid"><div style="font-size:8pt;font-weight:700;color:#374151;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #e5e7eb;padding-bottom:4pt;margin:14pt 0 8pt">2nd Location Finds — Inventory Adjustment Reference</div><div style="font-size:8.5pt;color:#6b7280;margin-bottom:8pt">All items located at a secondary bin — use for Apprise positive adjustment.</div><table style="width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:16pt"><thead><tr>${['Product Code','Division','Original Bin (Shorted)','2nd Location Bin(s)','Qty Filled','Demand','Picker','Date'].map(h=>`<th style="background:#047857;color:#fff;padding:5pt 8pt;text-align:left;font-size:8pt;font-weight:600;letter-spacing:.04em">${h}</th>`).join('')}</tr></thead><tbody>${rows.filter(r=>r.secondLocationFilled).sort((a,b)=>(a.productCode||'').localeCompare(b.productCode||'')).map((r,i)=>{const bg=i%2===0?'#fff':'#f0fdf4';return`<tr style="background:${bg}"><td style="padding:4pt 8pt;border-bottom:.5pt solid #dcfce7;font-family:'Courier New',monospace;font-weight:700;color:#1a2038">${esc(r.productCode)}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #dcfce7;font-family:'Courier New',monospace">${esc(r.division)}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #dcfce7;font-family:'Courier New',monospace;color:#b91c1c">${esc(r.shortedBin||'—')}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #dcfce7;font-family:'Courier New',monospace;font-weight:700;color:#047857">${esc(secondarySummary(r)||'—')}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #dcfce7;font-family:'Courier New',monospace">${Array.isArray(r.secondaryLocations)?r.secondaryLocations.reduce((s,x)=>s+num(x.qty),0):'—'}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #dcfce7;font-family:'Courier New',monospace">${esc(r.pickDemand||'—')}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #dcfce7;font-size:8.5pt">${esc(r.picker||'—')}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #dcfce7;font-size:8pt;color:#6b7280">${esc(normalizeDate(r.date||r.createdAt||''))}</td></tr>`;}).join('')}</tbody></table></div>`:''}
+    ${rows.filter(isErrBackorder).length?`<div style="page-break-before:always;page-break-inside:avoid"><div style="font-size:8pt;font-weight:700;color:#7f1d1d;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #fecaca;padding-bottom:4pt;margin:14pt 0 8pt">Erroneous Shortages That Likely Became Backorders</div><div style="font-size:8.5pt;color:#6b7280;margin-bottom:8pt">Found by IC in the original shorted bin, no secondary location fill recorded. Customer line likely stayed short.</div><table style="width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:16pt"><thead><tr>${['Product Code','Division','Shorted Bin','Qty Shorted','IC Qty Found','UOM','Pick Demand','Picker','Date'].map(h=>`<th style="background:#7f1d1d;color:#fff;padding:5pt 8pt;text-align:left;font-size:8pt;font-weight:600;letter-spacing:.04em">${h}</th>`).join('')}</tr></thead><tbody>${rows.filter(isErrBackorder).sort((a,b)=>(a.shortedBin||'').localeCompare(b.shortedBin||'')).map((r,i)=>{const bg=i%2===0?'#fff5f5':'#fee2e2';return`<tr style="background:${bg}"><td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-family:'Courier New',monospace;font-weight:700;color:#1a2038">${esc(r.productCode)}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-family:'Courier New',monospace">${esc(r.division)}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-family:'Courier New',monospace;font-weight:700;color:#7f1d1d">${esc(r.shortedBin||'—')}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-family:'Courier New',monospace">${r.qtyShorted||0}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-family:'Courier New',monospace;font-weight:700;color:#7f1d1d">${r.icQtyFound||'—'}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-family:'Courier New',monospace">${esc(r.icUom||r.uom||'EA')}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-family:'Courier New',monospace">${esc(r.pickDemand||'—')}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-size:8.5pt">${esc(r.picker||'—')}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-size:8pt;color:#6b7280">${esc(normalizeDate(r.date||r.createdAt||''))}</td></tr>`;}).join('')}</tbody></table></div>`:''}
+    <div style="page-break-before:always;page-break-inside:avoid">
+    <div style="font-size:8pt;font-weight:700;color:#374151;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #e5e7eb;padding-bottom:4pt;margin:14pt 0 8pt">Daily Summary</div>
+    <table style="width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:16pt"><thead><tr>${['Date','Total','1st Shift','2nd Shift','2nd Location','⚠ Erroneous'].map(th).join('')}</tr></thead><tbody>
+      ${Object.keys(byDay).sort().map((d,i)=>{const bg=i%2===0?'#fff':'#f3f4f6';return`<tr style="background:${bg}"><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${d}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${byDay[d].total}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${byDay[d].s1}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${byDay[d].s2}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;color:#047857;font-weight:600">${byDay[d].located}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;color:#92400e;font-weight:600">${byDay[d].erroneous}</td></tr>`;}).join('')}
+    </tbody></table></div>
+    <div style="margin-top:20pt;padding-top:8pt;border-top:1pt solid #e5e7eb;font-size:7.5pt;color:#9ca3af;display:flex;justify-content:space-between">
+      <span>815 Inventory Control Portal &middot; C &amp; F Enterprises &middot; Chapman Warehouse</span>
+      <span>Printed ${today}</span>
+    </div>
+  </div>`;
+  $('printArea').innerHTML=html;
+  window.print();
+  setTimeout(()=>{$('printArea').innerHTML='';},500);
+}
+
+function printCheckReport(){
+  const fromStr=$('reportStart')?.value;
+  const toStr=$('reportEnd')?.value;
+  const today=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  const fmtD=d=>new Date(d).toLocaleDateString('en-US',{month:'2-digit',day:'2-digit'});
+  const fmtT=d=>new Date(d).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  const rows=filteredRows(true).sort((a,b)=>(a.shortedBin||'').localeCompare(b.shortedBin||'')||(a.productCode||'').localeCompare(b.productCode||''));
+  if(!rows.length){alert('No shortage records in selected range.');return;}
+  const binProdCount={};
+  rows.forEach(r=>{const k=(r.shortedBin||'')+'|'+(r.productCode||'');binProdCount[k]=(binProdCount[k]||0)+1;});
+  const totalDups=Object.values(binProdCount).filter(v=>v>1).length;
+  const totalPending=rows.filter(r=>!r.foundInShortedBin&&!r.secondLocationFilled).length;
+  const tableRows=rows.map((r,i)=>{
+    const isDup=(binProdCount[(r.shortedBin||'')+'|'+(r.productCode||'')]||0)>1;
+    const status=r.foundInShortedBin?'Erroneous':r.secondLocationFilled?'Located (2nd)':'Pending';
+    const statusColor=r.foundInShortedBin?'#92400e':r.secondLocationFilled?'#047857':'#374151';
+    const bg=i%2===0?'#fff':'#f9fafb';
+    const dateVal=r.date||r.createdAt||'';
+    const dateDisplay=dateVal?fmtD(dateVal)+' '+fmtT(dateVal):'—';
+    const shiftLbl='Shift '+(getShiftFromRecord(r)===1?'1':'2');
+    return `<tr style="background:${bg}${isDup?';border-left:3pt solid #f87171':''}">
+      <td style="padding:4pt 5pt;border-bottom:.5pt solid #e5e7eb;text-align:center;font-size:7pt;color:#9ca3af">${i+1}</td>
+      <td style="padding:4pt 5pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;font-weight:700;font-size:8.5pt${isDup?';color:#b91c1c':''}">${esc(r.shortedBin||'—')}${isDup?' ⚠':''}</td>
+      <td style="padding:4pt 5pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;font-weight:700;font-size:8.5pt">${esc(r.productCode)}</td>
+      <td style="padding:4pt 5pt;border-bottom:.5pt solid #e5e7eb;font-size:8pt;font-family:'Courier New',monospace">${r.qtyShorted||0}</td>
+      <td style="padding:4pt 5pt;border-bottom:.5pt solid #e5e7eb;font-size:8pt">${esc(r.picker||'—')}</td>
+      <td style="padding:4pt 5pt;border-bottom:.5pt solid #e5e7eb;font-size:8pt;font-family:'Courier New',monospace">${esc(r.division||'—')}</td>
+      <td style="padding:4pt 5pt;border-bottom:.5pt solid #e5e7eb;font-size:7pt;font-family:'Courier New',monospace">${esc(shiftLbl)}</td>
+      <td style="padding:4pt 5pt;border-bottom:.5pt solid #e5e7eb;font-size:7.5pt;color:#6b7280">${esc(dateDisplay)}</td>
+      <td style="padding:4pt 5pt;border-bottom:.5pt solid #e5e7eb;font-size:7.5pt;font-weight:600;color:${statusColor}">${status}</td>
+      <td style="padding:4pt 5pt;border-bottom:.5pt solid #e5e7eb;font-size:7.5pt;color:${r.replenishedAfterPick?'#047857':'#9ca3af'}">${r.replenishedAfterPick?'✓ Yes':'—'}</td>
+      <td style="padding:4pt 5pt;border-bottom:.5pt solid #e5e7eb;border:1pt solid #e5e7eb;min-width:45pt"></td>
+      <td style="padding:4pt 5pt;border-bottom:.5pt solid #e5e7eb;border:1pt solid #e5e7eb;min-width:50pt;text-align:center"></td>
+      <td style="padding:4pt 5pt;border-bottom:.5pt solid #e5e7eb;border:1pt solid #e5e7eb;min-width:60pt"></td>
+    </tr>`;
+  }).join('');
+  const html=`<div style="font-family:'Segoe UI',Arial,sans-serif;color:#111;font-size:9pt">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;border-bottom:2.5pt solid #1a2038;padding-bottom:10pt;margin-bottom:12pt">
+      <div>
+        <div style="font-size:7.5pt;font-weight:700;color:#6b7280;letter-spacing:.12em;text-transform:uppercase;margin-bottom:3pt">C &amp; F Enterprises &middot; 815 Chapman Warehouse</div>
+        <div style="font-size:16pt;font-weight:700;color:#1a2038">IC Shortage Verification Sheet</div>
+        <div style="font-size:9pt;color:#6b7280;margin-top:3pt">${fromStr||'All dates'} to ${toStr||'today'}</div>
+      </div>
+      <div style="text-align:right;font-size:8pt;color:#6b7280;line-height:1.8">
+        <div><span style="font-weight:600;color:#374151">Printed:</span> ${today}</div>
+        <div><span style="font-weight:600;color:#374151">Total:</span> ${rows.length} shortages</div>
+        <div style="color:#b91c1c;font-weight:600">⚠ Duplicate Bins: ${totalDups}</div>
+        <div style="color:#92400e;font-weight:600">Pending: ${totalPending}</div>
+      </div>
+    </div>
+    <div style="background:#f0f9ff;border:1pt solid #bae6fd;border-radius:3pt;padding:6pt 10pt;margin-bottom:10pt;font-size:8pt;color:#075985">
+      <strong>IC Instructions:</strong> Walk each bin location. Confirm qty on-hand. Mark Confirmed ✓ or Erroneous ✗ in the write-in columns. ⚠ Red-border rows = duplicate bin/product — multiple pickers, investigate first.
+    </div>
+    <table style="width:100%;border-collapse:collapse">
+      <thead>
+        <tr style="background:#1a2038;color:#fff">
+          <th style="padding:5pt 5pt;font-size:7pt;font-weight:600;letter-spacing:.04em;text-align:center">#</th>
+          <th style="padding:5pt 5pt;font-size:7pt;font-weight:600;letter-spacing:.04em">BIN LOCATION</th>
+          <th style="padding:5pt 5pt;font-size:7pt;font-weight:600;letter-spacing:.04em">PRODUCT CODE</th>
+          <th style="padding:5pt 5pt;font-size:7pt;font-weight:600;letter-spacing:.04em">QTY</th>
+          <th style="padding:5pt 5pt;font-size:7pt;font-weight:600;letter-spacing:.04em">PICKER</th>
+          <th style="padding:5pt 5pt;font-size:7pt;font-weight:600;letter-spacing:.04em">DIV</th>
+          <th style="padding:5pt 5pt;font-size:7pt;font-weight:600;letter-spacing:.04em">SHIFT</th>
+          <th style="padding:5pt 5pt;font-size:7pt;font-weight:600;letter-spacing:.04em">DATE / TIME</th>
+          <th style="padding:5pt 5pt;font-size:7pt;font-weight:600;letter-spacing:.04em">STATUS</th>
+          <th style="padding:5pt 5pt;font-size:7pt;font-weight:600;letter-spacing:.04em">REPLENISHED?</th>
+          <th style="padding:5pt 5pt;font-size:7pt;font-weight:600;letter-spacing:.04em;background:#374151">IC QTY ON-HAND</th>
+          <th style="padding:5pt 5pt;font-size:7pt;font-weight:600;letter-spacing:.04em;background:#374151;text-align:center">CONFIRMED ✓ / ✗</th>
+          <th style="padding:5pt 5pt;font-size:7pt;font-weight:600;letter-spacing:.04em;background:#374151">IC NOTES</th>
+        </tr>
+      </thead>
+      <tbody>${tableRows}</tbody>
+    </table>
+    <div style="margin-top:20pt;display:flex;gap:36pt;border-top:1pt solid #e5e7eb;padding-top:10pt">
+      <div style="flex:1"><div style="border-bottom:1pt solid #374151;height:16pt;margin-bottom:3pt"></div><div style="font-size:7.5pt;color:#6b7280">IC Team Member</div></div>
+      <div style="flex:1"><div style="border-bottom:1pt solid #374151;height:16pt;margin-bottom:3pt"></div><div style="font-size:7.5pt;color:#6b7280">Date Verified</div></div>
+      <div style="flex:1"><div style="border-bottom:1pt solid #374151;height:16pt;margin-bottom:3pt"></div><div style="font-size:7.5pt;color:#6b7280">Supervisor Initials</div></div>
+    </div>
+    <div style="margin-top:10pt;padding-top:6pt;border-top:1pt solid #e5e7eb;font-size:7pt;color:#9ca3af;text-align:center">
+      815 Inventory Control &middot; C &amp; F Enterprises &middot; Chapman Warehouse &middot; ${today}
+    </div>
+  </div>`;
+  $('printArea').innerHTML=html;
+  window.print();
+  setTimeout(()=>{$('printArea').innerHTML='';},500);
+}
 function saveInventoryBinReport(){inventoryBins=parseBinImport($('binImport').value);localStorage.setItem('scp_inventory_bins',JSON.stringify(inventoryBins));alert(`Saved ${inventoryBins.length} inventory bin rows.`);buildReplenishmentReport()}function parseBinImport(text){return text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean).map(l=>{const p=l.split(/\t|,/);return{bin:(p[0]||'').trim().toUpperCase(),product:(p[1]||'').trim().toUpperCase(),onHand:num(p[2]),allocated:num(p[3]),uom:(p[4]||'').trim().toUpperCase()}}).filter(r=>r.bin&&r.product)}
 function buildReplenishmentReport(){if(!canManage())return;inventoryBins=JSON.parse(localStorage.getItem('scp_inventory_bins')||'[]');if($('binImport')&&!$('binImport').value&&inventoryBins.length)$('binImport').value=inventoryBins.map(r=>[r.bin,r.product,r.onHand,r.allocated,r.uom].join('\t')).join('\n');const active=shortages.filter(r=>!r._archived);const moves=[],noRes=[];active.forEach(s=>{const reserves=inventoryBins.filter(b=>b.product===(s.productCode||'').toUpperCase()&&b.bin!==(s.shortedBin||'').toUpperCase()&&b.onHand>0&&b.allocated<=0).sort((a,b)=>a.bin.localeCompare(b.bin));if(reserves.length)moves.push({product:s.productCode,toBin:s.shortedBin,fromBin:reserves[0].bin,qty:Math.min(num(s.qtyShorted)||1,reserves[0].onHand),uom:reserves[0].uom||s.uom});else noRes.push(s)});$('restockBody').innerHTML=`<div class="card"><div class="card-title">Replenishment Moves</div>${table(['Product Code','From Reserve Bin','To Shorted Bin','Qty','UOM'],moves.sort((a,b)=>a.fromBin.localeCompare(b.fromBin)).map(m=>[m.product,m.fromBin,m.toBin,m.qty,m.uom]))}</div><div class="card"><div class="card-title">Products With No Reserve Bins</div>${table(['Product Code','Shorted Bin','Qty Shorted','UOM'],noRes.map(r=>[r.productCode,r.shortedBin,r.qtyShorted,r.uom]))}</div>`}function printReplenReport(){buildReplenishmentReport();$('printArea').innerHTML=`<h1>Replenishment Report</h1>${$('restockBody').innerHTML}`;window.print()}
 function renderPickers(){if(!canManage())return;$('pickerList').innerHTML=pickerNames.length?table(['Picker','Action'],pickerNames.map(p=>[p,`<button onclick="removePicker('${esc(p)}')">Remove</button>`])).replaceAll('&lt;button','<button').replaceAll('&lt;/button&gt;','</button>').replaceAll('&gt;','>'):'<div class="empty">No pickers saved.</div>'}function addPicker(){const n=$('pickerName').value.trim();if(!n)return;pickerNames=[...new Set([...pickerNames,n])].sort();localStorage.setItem('scp_pickers',JSON.stringify(pickerNames));$('pickerName').value='';loadPickerNames();renderPickers()}function removePicker(n){pickerNames=pickerNames.filter(p=>p!==n);localStorage.setItem('scp_pickers',JSON.stringify(pickerNames));loadPickerNames();renderPickers()}
