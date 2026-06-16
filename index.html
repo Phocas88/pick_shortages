@@ -18,34 +18,21 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 .shortage-list{display:flex;flex-direction:column;gap:8px}.shortage-row{background:var(--panel);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px}.shortage-row.erroneous{border-color:rgba(245,158,11,.38);background:rgba(245,158,11,.06)}.shortage-row.archived{opacity:.72}.sr-head{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap}.sr-codes{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent)}.sr-meta{font-size:11px;color:var(--muted);margin-top:3px}.sr-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.sr-actions .btn{font-size:11px;padding:5px 9px}.sr-check{margin-top:3px;accent-color:var(--accent)}.badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;letter-spacing:.04em;border:1px solid var(--border);color:var(--muted)}.badge.green{color:var(--green);background:var(--green-l);border-color:rgba(16,185,129,.25)}.badge.red{color:var(--red);background:var(--red-l);border-color:rgba(248,113,113,.25)}.badge.yellow{color:var(--yellow);background:var(--yellow-l);border-color:rgba(245,158,11,.25)}.badge.blue{color:var(--accent);background:var(--accent-l);border-color:rgba(79,131,245,.25)}.badge.purple{color:var(--purple);background:var(--purple-l);border-color:rgba(167,139,250,.25)}.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:14px}.stat-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-align:center}.stat-num{font-family:var(--mono);font-size:24px;font-weight:700}.stat-lbl{font-size:10px;color:var(--muted);margin-top:3px}.table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}.table th{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;padding:10px;text-align:left;background:var(--panel);border-bottom:1px solid var(--border)}.table td{padding:10px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:top}.notice{background:var(--accent-l);border:1px solid rgba(79,131,245,.25);border-radius:10px;padding:10px 12px;font-size:12px;margin-bottom:12px}.empty{text-align:center;color:var(--muted);padding:30px 18px}
 .overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(15,20,40,.5);backdrop-filter:blur(6px);justify-content:center;align-items:flex-start;overflow-y:auto;padding:24px 16px}.overlay.open{display:flex}.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:100%;max-width:820px;box-shadow:var(--shadow)}.modal-head{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;border-bottom:1px solid var(--border)}.modal-head button{background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer}.modal-body{padding:20px}.loading{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.45);align-items:center;justify-content:center}.loading.show{display:flex}.loading-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 26px;box-shadow:var(--shadow)}.print-area{display:none}
 
-/* ── Over Pull mobile scanner styles ── */
-#overpullScreen .op-mobile-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:14px;box-shadow:var(--shadow)}
-#overpullScreen .op-field-big input,#overpullScreen .op-field-big select{font-size:18px;padding:13px 14px;border-radius:10px;font-family:var(--mono);font-weight:700;letter-spacing:.06em}
-#overpullScreen .op-field-big label{font-size:13px;font-weight:700;margin-bottom:6px}
-#overpullScreen .op-item-line{background:var(--panel);border:1.5px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px}
-#overpullScreen .op-item-line.valid-bin{border-color:rgba(16,185,129,.5);}
-#overpullScreen .op-item-line.invalid-bin{border-color:rgba(248,113,113,.5);}
-#overpullScreen .op-bin-hint{font-size:10px;color:var(--muted);margin-top:4px;font-family:var(--mono)}
-#overpullScreen .op-bin-err{font-size:11px;color:var(--red);margin-top:4px;display:none}
-#overpullScreen .op-big-btn{width:100%;padding:16px;font-size:16px;font-weight:700;border-radius:12px;border:none;cursor:pointer;margin-bottom:10px}
-#overpullScreen .op-big-btn.primary{background:var(--accent);color:#fff}
-#overpullScreen .op-big-btn.green{background:var(--green);color:#fff}
-#overpullScreen .op-big-btn.ghost{background:var(--panel2);color:var(--text);border:1.5px solid var(--border)}
-#overpullScreen .op-step-label{font-size:10px;font-family:var(--mono);font-weight:700;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
+/* ── bin validation feedback ── */
 .bin-input-wrap{position:relative}
 .bin-valid-icon{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none;display:none}
-@media(max-width:600px){
-  #overpullScreen .wrap{padding:12px 10px 80px}
-  #overpullScreen .page-head h1{font-size:18px}
-  #overpullScreen .op-field-big input,#overpullScreen .op-field-big select{font-size:20px;padding:15px 14px}
-}
-/* bin validation feedback on shortage form */
 .line-bin.bin-ok{border-color:rgba(16,185,129,.6)!important;background:rgba(16,185,129,.05)!important}
 .line-bin.bin-bad{border-color:rgba(248,113,113,.6)!important;background:rgba(248,113,113,.05)!important}
 #eBin.bin-ok{border-color:rgba(16,185,129,.6)!important;background:rgba(16,185,129,.05)!important}
 #eBin.bin-bad{border-color:rgba(248,113,113,.6)!important;background:rgba(248,113,113,.05)!important}
 .bin-format-hint{font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)}
 .bin-format-err{font-size:11px;color:var(--red);margin-top:3px;display:none}
+/* ── suggest dropdown ── */
+.suggest-box{position:absolute;z-index:100;background:var(--surface);border:1.5px solid var(--accent);border-radius:8px;box-shadow:var(--shadow);min-width:100%;max-height:180px;overflow-y:auto;left:0;top:100%;margin-top:2px}
+.suggest-item{padding:8px 12px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:8px}
+.suggest-item:hover,.suggest-item.active{background:var(--accent-l)}
+.suggest-item .si-badge{font-family:var(--mono);font-size:10px;padding:2px 6px;border-radius:4px;background:var(--panel2);color:var(--muted)}
+.field-wrap{position:relative}
 
 @media print{body>*:not(.print-area){display:none!important}.print-area{display:block!important;color:#111;background:#fff;font-family:Arial,sans-serif}@page{size:letter portrait;margin:.55in}.card,.no-break,table,tr{break-inside:avoid;page-break-inside:avoid}.table th{background:#111827!important;color:#fff!important}}
 </style>
@@ -54,80 +41,39 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 <div id="topbar" class="topbar"><div class="brand">Shortage Control Portal</div><span id="roleChip" class="role-chip"></span><div id="nav" class="nav"></div></div>
 <section id="loginScreen" class="screen active"><div class="login-wrap"><div class="login-header"><h1>Shortage Control Portal</h1><p>Separate shortage reporting app</p></div><div class="login-group-label">Select role</div><div class="ic-btns"><button class="ic-login-btn" onclick="goPin('clerk')"><span class="ib-icon">&#128203;</span><span class="ib-title">Outbound Clerk</span><span class="ib-sub">Shortage Entry</span></button><button class="ic-login-btn" onclick="goPin('icteam')"><span class="ib-icon">&#128270;</span><span class="ib-title">IC Team</span><span class="ib-sub">Verify and Report</span></button><button class="ic-login-btn" onclick="goPin('manager')"><span class="ib-icon">&#9881;&#65039;</span><span class="ib-title">IC Manager</span><span class="ib-sub">Settings and Migration</span></button></div><div class="login-group-label" style="margin-top:16px">No Login Required</div><div style="display:grid;grid-template-columns:1fr;gap:10px"><button class="ic-login-btn" onclick="enterOverPull()" style="border-color:rgba(251,146,60,.4);background:var(--orange-l)"><span class="ib-icon">&#128202;</span><span class="ib-title" style="color:var(--orange)">Over Pull Log</span><span class="ib-sub">Operations — no PIN needed</span></button></div></div></section>
 <section id="pinScreen" class="screen"><div class="pin-card"><div id="pinBadge" class="pin-div-badge">Role</div><p style="color:var(--muted);font-size:12px">Enter PIN</p><div id="pinDots" class="pin-dots"><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span></div><div class="pin-keypad"><button class="pin-key" data-key="1" onclick="pinKey('1')">1</button><button class="pin-key" data-key="2" onclick="pinKey('2')">2</button><button class="pin-key" data-key="3" onclick="pinKey('3')">3</button><button class="pin-key" data-key="4" onclick="pinKey('4')">4</button><button class="pin-key" data-key="5" onclick="pinKey('5')">5</button><button class="pin-key" data-key="6" onclick="pinKey('6')">6</button><button class="pin-key" data-key="7" onclick="pinKey('7')">7</button><button class="pin-key" data-key="8" onclick="pinKey('8')">8</button><button class="pin-key" data-key="9" onclick="pinKey('9')">9</button><button class="pin-key clr" onclick="pinClear()">CLR</button><button class="pin-key" data-key="0" onclick="pinKey('0')">0</button><button class="pin-key clr" onclick="pinBack()">&#9003;</button></div><div id="pinError" class="pin-error"></div><button class="pin-back-btn" onclick="backToLogin()">Back</button></div></section>
-<section id="shortageScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Outbound</div><h1>Shortage Entry</h1><p>Log shortage lines and review active records.</p></div><div id="shortageTopActions" class="actions"></div></div><div class="card" id="entryCard"><div class="form-row four"><div class="field"><label>Date &amp; Time</label><input id="sDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="sDiv"><option value="">Select</option><option>NH</option><option>GT</option><option>FS</option><option>EE</option><option>BC</option><option>CF</option></select></div><div class="field"><label>Picker <em>*</em></label><input id="sPicker" list="pickerOptions" placeholder="Scan picker badge..." onblur="validatePickerInput()"><datalist id="pickerOptions"></datalist></div><div class="field"><label>Pick Demand # <em>*</em></label><input id="sDemand" placeholder="e.g. NH00012345" oninput="autoDivisionFromDemand()"></div><div class="field"><label>Shift Override</label><select id="sShift"><option value="auto">Auto (use current time)</option><option value="1st">1st</option><option value="2nd">2nd</option><option value="3rd">3rd</option></select></div></div><div class="card-title">Product Lines</div><div id="productLines"></div><div class="actions"><button class="btn" onclick="addProductLine()">+ Add Line</button><button class="btn" onclick="clearEntry()">Clear Form</button><button class="btn primary" style="flex:1" onclick="saveShortage()">+ Log All Shortages</button></div><div class="field" style="margin-top:12px"><label>Notes</label><textarea id="sNotes"></textarea></div></div><div class="filters"><input id="filterText" class="search" placeholder="Search by product, order, picker, division..." oninput="renderShortages()"><select id="viewMode" onchange="loadShortages(true)"><option value="active">Active</option><option value="archive">Archived History</option><option value="both">Active + Archived</option></select><input id="filterStart" type="date" onchange="renderShortages()"><input id="filterEnd" type="date" onchange="renderShortages()"><button class="btn" onclick="loadShortages(true)">Refresh Data</button></div><div id="archiveActions" class="actions" style="margin-bottom:10px"></div><div id="shortageList" class="shortage-list"></div></div></section>
+<section id="shortageScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Outbound</div><h1>Shortage Entry</h1><p>Log shortage lines and review active records.</p></div><div id="shortageTopActions" class="actions"></div></div><div class="card" id="entryCard"><div class="form-row four"><div class="field"><label>Date &amp; Time</label><input id="sDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="sDiv"><option value="">Select</option><option>NH</option><option>GT</option><option>FS</option><option>EE</option><option>BC</option><option>CF</option></select></div><div class="field"><label>Picker <em>*</em></label><div class="field-wrap"><input id="sPicker" placeholder="e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('sPicker','picker')" onblur="validatePersonField('sPicker','picker')" onkeydown="handleSuggestKey(event,'sPickerSuggest')"><div class="suggest-box" id="sPickerSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name (e.g. JDoe)</div></div><div class="field"><label>Packer</label><div class="field-wrap"><input id="sPacker" placeholder="e.g. MDoe" autocomplete="off" oninput="livePersonSuggest('sPacker','packer')" onblur="validatePersonField('sPacker','packer')" onkeydown="handleSuggestKey(event,'sPackerSuggest')"><div class="suggest-box" id="sPackerSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name (e.g. MDoe)</div></div><div class="field"><label>Pack Station</label><div class="field-wrap"><input id="sPackStation" placeholder="e.g. PS-01" autocomplete="off" oninput="liveStationSuggest()" onblur="savePackStation()" onkeydown="handleSuggestKey(event,'sPackStationSuggest')"><div class="suggest-box" id="sPackStationSuggest" style="display:none"></div></div></div><div class="field"><label>Pick Demand # <em>*</em></label><input id="sDemand" placeholder="e.g. NH00012345" oninput="autoDivisionFromDemand()"></div><div class="field"><label>Shift Override</label><select id="sShift"><option value="auto">Auto (use current time)</option><option value="1st">1st</option><option value="2nd">2nd</option><option value="3rd">3rd</option></select></div></div><div class="card-title">Product Lines</div><div id="productLines"></div><div class="actions"><button class="btn" onclick="addProductLine()">+ Add Line</button><button class="btn" onclick="clearEntry()">Clear Form</button><button class="btn primary" style="flex:1" onclick="saveShortage()">+ Log All Shortages</button></div><div class="field" style="margin-top:12px"><label>Notes</label><textarea id="sNotes"></textarea></div></div><div class="filters"><input id="filterText" class="search" placeholder="Search by product, order, picker, division..." oninput="renderShortages()"><select id="viewMode" onchange="loadShortages(true)"><option value="active">Active</option><option value="archive">Archived History</option><option value="both">Active + Archived</option></select><input id="filterStart" type="date" onchange="renderShortages()"><input id="filterEnd" type="date" onchange="renderShortages()"><button class="btn" onclick="loadShortages(true)">Refresh Data</button></div><div id="archiveActions" class="actions" style="margin-bottom:10px"></div><div id="shortageList" class="shortage-list"></div></div></section>
 <section id="reportScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Reports</div><h1>Shortage Reports</h1><p>IC Team and IC Manager only.</p></div><div class="actions"><button class="btn primary" onclick="printSummaryReport()">Print Summary</button><button class="btn" onclick="printCheckReport()">Print IC Check Sheet</button></div></div><div class="card"><div class="form-row four"><div class="field"><label>Report Mode</label><select id="reportMode"><option value="active">Active Only</option><option value="archive">Archived History</option><option value="both">Active + Archived</option></select></div><div class="field"><label>Start Date</label><input id="reportStart" type="date"></div><div class="field"><label>End Date</label><input id="reportEnd" type="date"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="runReportPull()">Run Report</button></div></div></div><div id="reportBody"></div></div></section>
 <section id="restockScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Replenishment</div><h1>Replenishment Report</h1><p>IC Manager only.</p></div><button class="btn primary" onclick="printReplenReport()">Print</button></div><div class="card"><div class="card-title">Inventory Bin Report Import</div><p class="notice">Paste report columns: Bin Name, Product Code, Qty on Hand, Qty Allocated, Unit of Measure.</p><textarea id="binImport" style="width:100%;min-height:160px" placeholder="82-26-01&#9;DI1210&#9;12&#9;0&#9;EA"></textarea><div class="actions" style="margin-top:10px"><button class="btn primary" onclick="saveInventoryBinReport()">Import Bin Report</button></div></div><div id="restockBody"></div></div></section>
-<section id="pickerScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Pickers</div><h1>Manage Pickers</h1><p>IC Manager only.</p></div></div><div class="card"><div class="form-row two"><div class="field"><label>Picker Name</label><input id="pickerName" placeholder="Dmartin"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPicker()">Add Picker</button></div></div><div id="pickerList"></div></div></div></section>
+<section id="pickerScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Personnel</div><h1>Manage Pickers &amp; Packers</h1><p>IC Manager only. Names stored as FirstInitialLastName (e.g. JDoe).</p></div></div><div class="card"><div class="card-title">Pickers</div><div class="form-row two"><div class="field"><label>Picker Name (FirstInitialLastName)</label><input id="pickerName" placeholder="JDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPickerManual()">Add Picker</button></div></div><div id="pickerList"></div></div><div class="card"><div class="card-title">Packers</div><div class="form-row two"><div class="field"><label>Packer Name (FirstInitialLastName)</label><input id="packerName" placeholder="MDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackerManual()">Add Packer</button></div></div><div id="packerList"></div></div><div class="card"><div class="card-title">Pack Stations</div><div class="form-row two"><div class="field"><label>Pack Station Name</label><input id="packStationName" placeholder="PS-01"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackStationManual()">Add Station</button></div></div><div id="packStationList"></div></div></div></section>
 <section id="migrationScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Migration</div><h1>Old Firebase Migration</h1><p>Copies old shortage records into the new shortage database. Does not delete the old database.</p></div></div><div class="card"><div class="notice">Source: <b>inventory-control-portal</b> collection <b>shortages</b>. Destination: current active collection.</div><div class="form-row three"><div class="field"><label>Old Collection</label><input id="oldCollection" value="shortages"></div><div class="field"><label>Limit</label><input id="migLimit" type="number" value="5000"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="runMigration()">Run Migration</button></div></div><div id="migrationResult"></div></div></div></section>
 <section id="settingsScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Settings</div><h1>Firebase Settings</h1><p>IC Manager only.</p></div></div><div class="card"><div class="form-row two"><div class="field"><label>API Key</label><input id="cfgApiKey"></div><div class="field"><label>Auth Domain</label><input id="cfgAuthDomain"></div><div class="field"><label>Project ID</label><input id="cfgProjectId"></div><div class="field"><label>Storage Bucket</label><input id="cfgStorageBucket"></div><div class="field"><label>Messaging Sender ID</label><input id="cfgSenderId"></div><div class="field"><label>App ID</label><input id="cfgAppId"></div><div class="field"><label>Active Collection</label><input id="cfgActiveCollection"></div><div class="field"><label>Archive Collection</label><input id="cfgArchiveCollection"></div></div><label class="toggle"><input id="themeToggle" type="checkbox" onchange="saveTheme(this.checked)"> Light mode</label><div class="actions" style="margin-top:14px"><button class="btn primary" onclick="saveSettings()">Save Settings</button></div></div></div></section>
-<section id="overpullScreen" class="screen"><div class="wrap">
-  <div class="page-head">
-    <div>
-      <div class="eyebrow" style="color:var(--orange);background:var(--orange-l);border-color:rgba(251,146,60,.25)">Operations</div>
-      <h1>Over Pull Log</h1>
-      <p>No login required &mdash; log items pulled in excess of the pick demand.</p>
-    </div>
-    <div class="actions">
-      <button class="btn orange" onclick="printOverPullReport()">&#128438; Print KPI Report</button>
-    </div>
+<section id="overpullScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow" style="color:var(--orange);background:var(--orange-l);border-color:rgba(251,146,60,.25)">Operations</div><h1>Over Pull Log</h1><p>No login required &mdash; log items pulled in excess of the pick demand.</p></div><div class="actions"><button class="btn orange" onclick="printOverPullReport()">&#128438; Print KPI Report</button></div></div>
+<div class="card"><div class="card-title">New Over Pull Entry</div>
+  <div class="form-row three">
+    <div class="field"><label>Date &amp; Time</label><input id="opDate" type="datetime-local"></div>
+    <div class="field"><label>Order Number <em>*</em></label><input id="opOrder" placeholder="e.g. NH00012345" autocomplete="off" oninput="opAutoDivision()"></div>
+    <div class="field"><label>Division</label><input id="opDiv" placeholder="Auto-filled" readonly style="opacity:.7;cursor:default"></div>
   </div>
-
-  <!-- STEP 1: Order + Picker -->
-  <div class="op-mobile-card" id="opStep1Card">
-    <div class="op-step-label">Step 1 &mdash; Order &amp; Picker</div>
-    <div class="field op-field-big">
-      <label>Order Number <em>*</em></label>
-      <input id="opOrder" placeholder="e.g. NH00012345" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" oninput="opAutoDivision()" onkeydown="if(event.key==='Enter')$('opFirst').focus()">
-    </div>
-    <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px">
-      <div style="background:var(--panel2);border:1.5px solid var(--border);border-radius:8px;padding:9px 14px;font-family:var(--mono);font-size:18px;font-weight:700;min-width:80px;text-align:center" id="opDivDisplay">&mdash;</div>
-      <div style="font-size:12px;color:var(--muted)">Division auto-filled from order #</div>
-    </div>
-    <input id="opDiv" type="hidden">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div class="field op-field-big" style="margin-bottom:0">
-        <label>First Name <em>*</em></label>
-        <input id="opFirst" placeholder="First" autocomplete="off" autocorrect="off" autocapitalize="words" onkeydown="if(event.key==='Enter')$('opLast').focus()">
-      </div>
-      <div class="field op-field-big" style="margin-bottom:0">
-        <label>Last Name <em>*</em></label>
-        <input id="opLast" placeholder="Last" autocomplete="off" autocorrect="off" autocapitalize="words" onkeydown="if(event.key==='Enter')opFocusFirstItem()">
-      </div>
-    </div>
-    <div style="margin-top:6px">
-      <input id="opDate" type="datetime-local" style="width:100%;background:var(--panel2);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;padding:7px 10px">
+  <div class="form-row three">
+    <div class="field"><label>Packer Name <em>*</em></label><div class="field-wrap"><input id="opPacker" placeholder="e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('opPacker','packer')" onblur="validatePersonField('opPacker','packer')" onkeydown="handleSuggestKey(event,'opPackerSuggest')"><div class="suggest-box" id="opPackerSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name (e.g. JDoe)</div></div>
+    <div class="field"><label>Picker Name</label><div class="field-wrap"><input id="opPicker" placeholder="e.g. MDoe" autocomplete="off" oninput="livePersonSuggest('opPicker','picker')" onblur="validatePersonField('opPicker','picker')" onkeydown="handleSuggestKey(event,'opPickerSuggest')"><div class="suggest-box" id="opPickerSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name</div></div>
+    <div class="field"><label>Pack Station</label><div class="field-wrap"><input id="opPackStation" placeholder="e.g. PS-01" autocomplete="off" oninput="liveStationSuggest('opPackStation')" onblur="savePackStation()" onkeydown="handleSuggestKey(event,'opPackStationSuggest')"><div class="suggest-box" id="opPackStationSuggest" style="display:none"></div></div></div>
+  </div>
+  <div class="card-title" style="margin-top:4px">Items Over-Pulled</div>
+  <div id="opLines"></div>
+  <div class="actions" style="margin-bottom:14px"><button class="btn" onclick="opAddLine()">+ Add Item</button></div>
+  <div id="opMoreWrap" style="display:none;background:var(--panel);border:1.5px solid var(--accent);border-radius:10px;padding:16px 18px;margin-bottom:14px">
+    <div style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--accent)">&#10067; Are there more items to add to this entry?</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn" onclick="opYesMore()">&#10133; Yes &mdash; Add Another Item</button>
+      <button class="btn primary" onclick="opFinishEntry()">&#10003; No &mdash; Submit This Entry</button>
     </div>
   </div>
-
-  <!-- STEP 2: Items -->
-  <div class="op-mobile-card">
-    <div class="op-step-label">Step 2 &mdash; Items Over-Pulled</div>
-    <div id="opLines"></div>
-    <button class="op-big-btn ghost" onclick="opAddLine()" style="margin-top:4px">&#43; Add Another Item</button>
-  </div>
-
-  <!-- More items prompt -->
-  <div id="opMoreWrap" style="display:none;background:var(--panel);border:2px solid var(--accent);border-radius:14px;padding:18px 16px;margin-bottom:14px;text-align:center">
-    <div style="font-size:16px;font-weight:700;margin-bottom:14px;color:var(--accent)">&#10067; More items to add?</div>
-    <button class="op-big-btn ghost" onclick="opYesMore()" style="margin-bottom:10px">&#10133; Yes &mdash; Add Another Item</button>
-    <button class="op-big-btn green" onclick="opFinishEntry()">&#10003; No &mdash; Submit Entry</button>
-  </div>
-
-  <!-- Submit bar -->
-  <div style="position:sticky;bottom:0;background:var(--bg);padding:12px 0 16px;border-top:1px solid var(--border);display:flex;gap:10px;z-index:10">
-    <button class="btn" onclick="opClearForm()">Clear</button>
-    <button class="op-big-btn primary" style="flex:1;margin-bottom:0;padding:13px" onclick="opPromptMore()">Submit Over Pull</button>
-  </div>
-
-  <!-- Records -->
-  <div style="margin-top:8px" class="filters">
-    <input id="opFilterText" class="search" placeholder="Search picker, order, product..." oninput="opRenderList()">
-    <input id="opFilterStart" type="date" onchange="opRenderList()">
-    <input id="opFilterEnd" type="date" onchange="opRenderList()">
-    <button class="btn" onclick="opLoadRecords(true)">Refresh</button>
-  </div>
-  <div id="opKpiBar" class="stat-grid" style="margin-bottom:14px"></div>
-  <div id="opList" class="shortage-list"></div>
+  <div class="actions"><button class="btn" onclick="opClearForm()">Clear Form</button><button class="btn primary" style="flex:1" onclick="opPromptMore()">Submit Over Pull</button></div>
+</div>
+<div class="filters"><input id="opFilterText" class="search" placeholder="Search by packer, picker, order, product, division..." oninput="opRenderList()"><input id="opFilterStart" type="date" onchange="opRenderList()"><input id="opFilterEnd" type="date" onchange="opRenderList()"><button class="btn" onclick="opLoadRecords(true)">Refresh</button></div>
+<div id="opKpiBar" class="stat-grid" style="margin-bottom:14px"></div>
+<div id="opList" class="shortage-list"></div>
 </div></section>
 <div id="editOverlay" class="overlay"><div class="modal"><div class="modal-head"><h3>Edit Shortage</h3><button onclick="closeEdit()">&#215;</button></div><div id="editBody" class="modal-body"></div></div></div>
 <div id="loading" class="loading"><div class="loading-card" id="loadingText">Loading...</div></div>
@@ -142,7 +88,7 @@ const IC_PORTAL_URL='https://phocas88.github.io/Chapman_Inventory_Control_Portal
 const DEFAULT_NEW_CONFIG={apiKey:'AIzaSyB1CEylhHj4JoWH2VejdLoOt1nteztaqH8',authDomain:'shortage-control-portal.firebaseapp.com',projectId:'shortage-control-portal',storageBucket:'shortage-control-portal.firebasestorage.app',messagingSenderId:'791183009826',appId:'1:791183009826:web:76f397201bd0228e61ee38'};
 const OLD_CONFIG={apiKey:'AIzaSyA1m5P6MFUojFsEBqLXaSLumNiChgAH1Lw',authDomain:'inventory-control-portal.firebaseapp.com',projectId:'inventory-control-portal',storageBucket:'inventory-control-portal.firebasestorage.app',messagingSenderId:'925547075268',appId:'1:925547075268:web:e6ebce91417aa6885a1b91'};
 const DEFAULT_SETTINGS={firebaseConfig:DEFAULT_NEW_CONFIG,activeCollection:'shortages_active',archiveCollection:'shortages_archive',overpullCollection:'overpull_active'};
-let role='',pinTarget='',pinBuf='',db=null,oldDb=null,shortages=[],visibleShortages=[],pickerNames=[],inventoryBins=[],editingId=null,editingArchive=false,lastLoadMode='active';
+let role='',pinTarget='',pinBuf='',db=null,oldDb=null,shortages=[],visibleShortages=[],pickerNames=[],packerNames=[],packStations=[],inventoryBins=[],editingId=null,editingArchive=false,lastLoadMode='active';
 function esc(v){return String(v??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]))}
 function num(v){const n=Number(v);return isNaN(n)?0:n}function val(v){return v===undefined||v===null?'':v}
 function today(){return new Date().toISOString().slice(0,10)}
@@ -161,7 +107,162 @@ function canRunReports(){return role==='icteam'||role==='manager'}function canSe
 function buildNav(){let nav=[['shortage','Shortages']];if(canRunReports())nav.push(['report','Reports']);if(role==='manager')nav.push(['restock','Replenishment'],['picker','Manage Pickers'],['migration','Migration'],['settings','Settings']);nav.push(['overpull','Over Pull']);if(role==='icteam'||role==='manager')nav.push(['link','IC Portal']);nav.push(['theme','Light/Dark'],['logout','Logout']);$('nav').innerHTML=nav.map(n=>n[0]==='link'?`<a class="nav-btn" href="${IC_PORTAL_URL}" target="_blank">${n[1]}</a>`:n[0]==='logout'?`<button class="nav-btn lock" onclick="logout()">${n[1]}</button>`:n[0]==='theme'?`<button class="nav-btn" onclick="saveTheme(!document.body.classList.contains('light-mode'))">${n[1]}</button>`:n[0]==='overpull'?`<button class="nav-btn" data-screen="overpull" onclick="showScreen('overpull')" style="color:var(--orange)">${n[1]}</button>`:`<button class="nav-btn" data-screen="${n[0]}" onclick="showScreen('${n[0]}')">${n[1]}</button>`).join('')}
 function login(r){role=r;$('roleChip').textContent=ROLE_LABELS[r];$('roleChip').className='role-chip '+(r==='manager'?'manager':r==='icteam'?'icteam':'clerk');buildNav();$('entryCard').classList.toggle('hide',r!=='clerk');$('shortageTopActions').innerHTML=canRunReports()?`<a class="btn" href="${IC_PORTAL_URL}" target="_blank">Open IC Portal Tickets</a>`:'';$('archiveActions').innerHTML=canRunReports()?`<button class="btn" onclick="selectVisible(true)">Select Visible</button><button class="btn" onclick="selectVisible(false)">Clear Selection</button><button class="btn orange" onclick="archiveSelected()">Archive Selected</button><button class="btn red" onclick="archiveFiltered()">Archive Filtered Active</button>`:'';showScreen('shortage')}
 function logout(){role='';shortages=[];visibleShortages=[];showScreen('login')}
-async function loadPickerNames(){pickerNames=JSON.parse(localStorage.getItem('scp_pickers')||'[]');$('pickerOptions').innerHTML=pickerNames.map(p=>`<option value="${esc(p)}"></option>`).join('')}
+function loadAllPersonnel(){
+  pickerNames=JSON.parse(localStorage.getItem('scp_pickers')||'[]');
+  packerNames=JSON.parse(localStorage.getItem('scp_packers')||'[]');
+  packStations=JSON.parse(localStorage.getItem('scp_packstations')||'[]');
+}
+async function loadPickerNames(){loadAllPersonnel();}
+
+// Normalize name: trim, collapse spaces, capitalize first letter of each word segment
+// Forces FirstInitialLastName format — just uppercase the whole thing consistently
+function normalizeName(raw){
+  if(!raw)return'';
+  // Remove spaces, capitalize first char, lowercase rest → JDoe style
+  const v=raw.replace(/\s+/g,'');
+  if(!v)return'';
+  return v.charAt(0).toUpperCase()+v.slice(1);
+}
+
+// Levenshtein distance for fuzzy matching
+function levenshtein(a,b){
+  a=a.toLowerCase();b=b.toLowerCase();
+  const m=a.length,n=b.length;
+  const dp=Array.from({length:m+1},(_,i)=>[i,...Array(n).fill(0)]);
+  for(let j=0;j<=n;j++)dp[0][j]=j;
+  for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+  return dp[m][n];
+}
+
+// Find close matches in a list (within edit distance 2, or starts-with match)
+function fuzzyMatches(raw, list){
+  const norm=normalizeName(raw).toLowerCase();
+  if(!norm)return[];
+  return list.filter(name=>{
+    const n=name.toLowerCase();
+    return n===norm||n.startsWith(norm)||norm.startsWith(n)||levenshtein(norm,n)<=2;
+  });
+}
+
+// Returns true if exact match exists (case-insensitive)
+function fuzzyMatchPerson(raw, type){
+  const list=type==='picker'?pickerNames:packerNames;
+  const norm=normalizeName(raw).toLowerCase();
+  return list.some(n=>n.toLowerCase()===norm);
+}
+
+function savePerson(raw, type){
+  const n=normalizeName(raw);
+  if(!n)return;
+  if(type==='picker'){
+    pickerNames=[...new Set([...pickerNames,n])].sort();
+    localStorage.setItem('scp_pickers',JSON.stringify(pickerNames));
+  } else {
+    packerNames=[...new Set([...packerNames,n])].sort();
+    localStorage.setItem('scp_packers',JSON.stringify(packerNames));
+  }
+}
+
+function savePackStation(skipBlur){
+  const el=$('sPackStation');
+  if(!el)return;
+  const raw=(el.value||'').trim().toUpperCase();
+  if(!raw)return;
+  if(!packStations.includes(raw)){
+    packStations=[...new Set([...packStations,raw])].sort();
+    localStorage.setItem('scp_packstations',JSON.stringify(packStations));
+  }
+}
+
+// Live suggest as user types
+function livePersonSuggest(fieldId, type){
+  const input=$(fieldId);
+  const boxId=fieldId+'Suggest';
+  const box=$(boxId);
+  if(!input||!box)return;
+  const raw=input.value;
+  const norm=normalizeName(raw).toLowerCase();
+  if(!norm||norm.length<1){box.style.display='none';return;}
+  const list=type==='picker'?pickerNames:packerNames;
+  const matches=list.filter(n=>{
+    const nl=n.toLowerCase();
+    return nl.startsWith(norm)||levenshtein(norm,nl)<=2;
+  });
+  if(!matches.length){box.style.display='none';return;}
+  box.innerHTML=matches.map(m=>`<div class="suggest-item" onmousedown="selectSuggest('${fieldId}','${m}','${type}')">${esc(m)} <span class="si-badge">saved ${type}</span></div>`).join('');
+  box.style.display='block';
+}
+
+function liveStationSuggest(fieldId){
+  const id=fieldId||'sPackStation';
+  const input=$(id);
+  const box=$(id+'Suggest');
+  if(!input||!box)return;
+  const raw=(input.value||'').trim().toUpperCase();
+  if(!raw||raw.length<1){box.style.display='none';return;}
+  const matches=packStations.filter(s=>s.startsWith(raw)||levenshtein(raw.toLowerCase(),s.toLowerCase())<=2);
+  if(!matches.length){box.style.display='none';return;}
+  box.innerHTML=matches.map(m=>`<div class="suggest-item" onmousedown="selectStationSuggest('${m}','${id}')">${esc(m)} <span class="si-badge">saved station</span></div>`).join('');
+  box.style.display='block';
+}
+
+function selectSuggest(fieldId, value, type){
+  const input=$(fieldId);
+  if(input)input.value=value;
+  const box=$(fieldId+'Suggest');
+  if(box)box.style.display='none';
+}
+
+function selectStationSuggest(value,fieldId){
+  const id=fieldId||'sPackStation';
+  const input=$(id);
+  if(input)input.value=value;
+  const box=$(id+'Suggest');
+  if(box)box.style.display='none';
+}
+
+function handleSuggestKey(e, boxId){
+  const box=$(boxId);
+  if(!box||box.style.display==='none')return;
+  const items=[...box.querySelectorAll('.suggest-item')];
+  const cur=box.querySelector('.suggest-item.active');
+  let idx=cur?items.indexOf(cur):-1;
+  if(e.key==='ArrowDown'){e.preventDefault();idx=Math.min(idx+1,items.length-1);}
+  else if(e.key==='ArrowUp'){e.preventDefault();idx=Math.max(idx-1,0);}
+  else if(e.key==='Enter'&&cur){e.preventDefault();cur.dispatchEvent(new MouseEvent('mousedown'));return;}
+  else if(e.key==='Escape'){box.style.display='none';return;}
+  else return;
+  items.forEach((el,i)=>el.classList.toggle('active',i===idx));
+  if(items[idx])items[idx].scrollIntoView({block:'nearest'});
+}
+
+// Close suggest boxes on outside click
+document.addEventListener('click',e=>{
+  ['sPickerSuggest','sPackerSuggest','sPackStationSuggest','opPackerSuggest','opPickerSuggest','opPackStationSuggest'].forEach(id=>{
+    const box=$(id);if(box&&!box.closest('.field-wrap')?.contains(e.target))box.style.display='none';
+  });
+});
+
+// Validate on blur: normalize value, prompt to save if new, suggest close match
+function validatePersonField(fieldId, type){
+  const input=$(fieldId);
+  if(!input)return;
+  const raw=(input.value||'').trim();
+  if(!raw){const box=$(fieldId+'Suggest');if(box)box.style.display='none';return;}
+  const normalized=normalizeName(raw);
+  input.value=normalized;
+  const list=type==='picker'?pickerNames:packerNames;
+  const exactMatch=list.some(n=>n.toLowerCase()===normalized.toLowerCase());
+  if(exactMatch){const found=list.find(n=>n.toLowerCase()===normalized.toLowerCase());input.value=found;const box=$(fieldId+'Suggest');if(box)box.style.display='none';return;}
+  // Check fuzzy — might be a typo of a saved name
+  const close=fuzzyMatches(normalized,list).filter(n=>n.toLowerCase()!==normalized.toLowerCase());
+  if(close.length){
+    const msg=`"${normalized}" is not saved.\n\nDid you mean: ${close.slice(0,3).join(', ')}?\n\nClick OK to use "${close[0]}", or Cancel to keep "${normalized}" (you'll be asked to save it on submit).`;
+    if(confirm(msg)){input.value=close[0];const box=$(fieldId+'Suggest');if(box)box.style.display='none';return;}
+  }
+  // Not saved, not a typo — will be prompted to save on submit (no annoying popup on every blur)
+  const box=$(fieldId+'Suggest');if(box)box.style.display='none';
+}
 function nowLocalInput(){const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,16)}
 function demandDivision(v){return String(v||'').trim().slice(0,2).toUpperCase()}
 function autoDivisionFromDemand(){const div=demandDivision($('sDemand').value);if(div&&[...$('sDiv').options].some(o=>o.value===div||o.textContent===div))$('sDiv').value=div}
@@ -223,11 +324,11 @@ function renderShortages(){visibleShortages=filteredRows(false);$('shortageList'
 function isBackorderRisk(r){return !!r.foundInShortedBin&&!r.secondLocationFilled}
 function statusBadges(r){let b=[];if(r._archived)b.push('<span class="badge purple">Archived</span>');if(r.foundInShortedBin)b.push('<span class="badge yellow">Erroneous Bin</span>');if(isBackorderRisk(r))b.push('<span class="badge red">Backorder Risk</span>');if(r.secondLocationFilled)b.push('<span class="badge blue">Second Location Filled</span>');if(r.replenishedAfterPick)b.push('<span class="badge green">Replenished After Pick</span>');return b.join(' ')}
 function secondarySummary(r){const locs=Array.isArray(r.secondaryLocations)?r.secondaryLocations:[];return locs.map(x=>`${x.bin||'NO BIN'}: ${x.qty||0} ${x.uom||r.uom||'EA'}${x.icQtyOnHand?` (OH ${x.icQtyOnHand})`:''}${x.notes?` - ${x.notes}`:''}`).join(' | ')}
-function rowHtml(r){const chk=canRunReports()&&!r._archived?`<input class="sr-check" type="checkbox" data-id="${esc(r.id)}">`:'';const edit=`<button class="btn" onclick="openEdit('${esc(r.id)}',${r._archived})">Edit</button>`;const mark=!r._archived?`<button class="btn green" onclick="markErroneous('${esc(r.id)}')">Found in Shorted Bin / Count</button><button class="btn" onclick="toggleSecond('${esc(r.id)}')">Second Location Filled</button><button class="btn" onclick="toggleReplenished('${esc(r.id)}')">Bin Replenished After Pick?</button>`:'';const unarch=r._archived&&canRunReports()?`<button class="btn orange" onclick="unarchiveOne('${esc(r.id)}')">Unarchive</button>`:'';const sec=secondarySummary(r);return `<div class="shortage-row ${r._archived?'archived':''} ${r.foundInShortedBin?'erroneous':''}"><div class="sr-head">${chk}<div style="flex:1"><div class="sr-codes">${esc(r.productCode||'NO PRODUCT')} <span style="color:var(--muted)">&bull;</span> ${esc(r.shortedBin||'NO BIN')}</div><div class="sr-meta">${esc(r.date||'No date')} &bull; ${esc(r.division||'')} &bull; Qty ${esc(r.qtyShorted||'')} ${esc(r.uom||'')} &bull; Demand ${esc(r.pickDemand||'')} &bull; Picker ${esc(r.picker||'')}</div><div class="sr-meta">IC Found: ${esc(r.icQtyFound||'')} ${esc(r.icUom||r.uom||'')} ${r.icNotes?'&bull; '+esc(r.icNotes):''}</div>${sec?`<div class="sr-meta"><b>Second location filled:</b> ${esc(sec)}</div>`:''}<div style="margin-top:6px">${statusBadges(r)}</div><div class="sr-actions">${edit}${mark}${unarch}</div></div></div></div>`}
-async function saveShortage(){autoDivisionFromDemand();validatePickerInput();const base={date:$('sDate').value||nowLocalInput(),division:$('sDiv').value,pickDemand:$('sDemand').value.trim().toUpperCase(),picker:$('sPicker').value.trim(),shift:shiftValue(),uom:'EA',notes:$('sNotes').value.trim(),createdAt:new Date().toISOString(),createdBy:role,foundInShortedBin:false,secondLocationFilled:false,replenishedAfterPick:false,status:'open'};const lines=getProductLines();if(!base.pickDemand){alert('Pick Demand # is required.');return}if(!base.division){alert('Division is required. Enter or scan the Pick Demand # first.');return}if(!base.picker){alert('Picker is required.');return}if(!lines.length||lines.some(l=>!l.productCode||!l.shortedBin)){alert('Each product line needs Product Code and Bin Shorted.');return}
+function rowHtml(r){const chk=canRunReports()&&!r._archived?`<input class="sr-check" type="checkbox" data-id="${esc(r.id)}">`:'';const edit=`<button class="btn" onclick="openEdit('${esc(r.id)}',${r._archived})">Edit</button>`;const mark=!r._archived?`<button class="btn green" onclick="markErroneous('${esc(r.id)}')">Found in Shorted Bin / Count</button><button class="btn" onclick="toggleSecond('${esc(r.id)}')">Second Location Filled</button><button class="btn" onclick="toggleReplenished('${esc(r.id)}')">Bin Replenished After Pick?</button>`:'';const unarch=r._archived&&canRunReports()?`<button class="btn orange" onclick="unarchiveOne('${esc(r.id)}')">Unarchive</button>`:'';const sec=secondarySummary(r);return `<div class="shortage-row ${r._archived?'archived':''} ${r.foundInShortedBin?'erroneous':''}"><div class="sr-head">${chk}<div style="flex:1"><div class="sr-codes">${esc(r.productCode||'NO PRODUCT')} <span style="color:var(--muted)">&bull;</span> ${esc(r.shortedBin||'NO BIN')}</div><div class="sr-meta">${esc(r.date||'No date')} &bull; ${esc(r.division||'')} &bull; Qty ${esc(r.qtyShorted||'')} ${esc(r.uom||'')} &bull; Demand ${esc(r.pickDemand||'')} &bull; Picker ${esc(r.picker||'')}${r.packer?' &bull; Packer '+esc(r.packer):''}${r.packStation?' &bull; Station '+esc(r.packStation):''}</div><div class="sr-meta">IC Found: ${esc(r.icQtyFound||'')} ${esc(r.icUom||r.uom||'')} ${r.icNotes?'&bull; '+esc(r.icNotes):''}</div>${sec?`<div class="sr-meta"><b>Second location filled:</b> ${esc(sec)}</div>`:''}<div style="margin-top:6px">${statusBadges(r)}</div><div class="sr-actions">${edit}${mark}${unarch}</div></div></div></div>`}
+async function saveShortage(){autoDivisionFromDemand();validatePickerInput();const base={date:$('sDate').value||nowLocalInput(),division:$('sDiv').value,pickDemand:$('sDemand').value.trim().toUpperCase(),picker:normalizeName($('sPicker').value.trim()),packer:normalizeName($('sPacker').value.trim()),packStation:($('sPackStation').value.trim().toUpperCase()),shift:shiftValue(),uom:'EA',notes:$('sNotes').value.trim(),createdAt:new Date().toISOString(),createdBy:role,foundInShortedBin:false,secondLocationFilled:false,replenishedAfterPick:false,status:'open'};const lines=getProductLines();if(!base.pickDemand){alert('Pick Demand # is required.');return}if(!base.division){alert('Division is required. Enter or scan the Pick Demand # first.');return}if(!base.picker){alert('Picker is required.');return}if(base.picker&&!fuzzyMatchPerson(base.picker,'picker')){if(!confirm(`"${base.picker}" is not saved. Save as new picker?`)){$('sPicker').focus();return}savePerson(base.picker,'picker');}if(base.packer&&!fuzzyMatchPerson(base.packer,'packer')){if(!confirm(`"${base.packer}" is not saved. Save as new packer?`)){$('sPacker').focus();return}savePerson(base.packer,'packer');}if(!lines.length||lines.some(l=>!l.productCode||!l.shortedBin)){alert('Each product line needs Product Code and Bin Shorted.');return}
   const invalidBins=lines.filter(l=>l.shortedBin&&!validateBinFormat(l.shortedBin).ok);
   if(invalidBins.length){alert('Invalid bin format on one or more lines.\n\nValid formats:\n  ##-##-##  (e.g. 82-26-01)\n  ##-##-#   (e.g. 82-26-1)\n  P#####    (e.g. P12345)\n  BULK\n  ROOM\n  KEY ACCOUNT');return}showLoading('Saving shortages...');try{const batch=db.batch();const col=db.collection(getSettings().activeCollection);lines.forEach(line=>{batch.set(col.doc(),{...base,...line,uom:'EA'});});await batch.commit();clearCaches();clearEntry();await loadShortages(true)}catch(e){alert(e.message)}finally{hideLoading()}}
-function clearEntry(){['sDemand','sPicker','sNotes'].forEach(id=>$(id).value='');$('sDiv').value='';$('sShift').value='auto';$('sDate').value=nowLocalInput();$('productLines').innerHTML='';addProductLine()}
+function clearEntry(){['sDemand','sPicker','sPacker','sPackStation','sNotes'].forEach(id=>{if($(id))$(id).value='';});$('sDiv').value='';$('sShift').value='auto';$('sDate').value=nowLocalInput();$('productLines').innerHTML='';addProductLine();['sPickerSuggest','sPackerSuggest','sPackStationSuggest'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});}
 function clearCaches(){Object.keys(localStorage).filter(k=>k.startsWith('scp_cache_')).forEach(k=>localStorage.removeItem(k))}
 async function updateRecord(id,data,archived=false){showLoading('Saving...');try{const s=getSettings();await db.collection(archived?s.archiveCollection:s.activeCollection).doc(id).set({...data,updatedAt:new Date().toISOString(),updatedBy:role},{merge:true});clearCaches();await loadShortages(true)}catch(e){alert(e.message)}finally{hideLoading()}}
 async function markErroneous(id){const r=shortages.find(x=>x.id===id&&!x._archived);if(!r)return;const qty=prompt('Qty found in the shorted bin:',r.icQtyFound||r.qtyShorted||'');if(qty===null)return;const uom=prompt('UOM:',r.icUom||r.uom||'EA');if(uom===null)return;await updateRecord(id,{foundInShortedBin:true,icQtyFound:num(qty),icUom:(uom||'EA').toUpperCase(),status:'located'},false)}
@@ -580,7 +681,51 @@ function printCheckReport(){
 }
 function saveInventoryBinReport(){inventoryBins=parseBinImport($('binImport').value);localStorage.setItem('scp_inventory_bins',JSON.stringify(inventoryBins));alert(`Saved ${inventoryBins.length} inventory bin rows.`);buildReplenishmentReport()}function parseBinImport(text){return text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean).map(l=>{const p=l.split(/\t|,/);return{bin:(p[0]||'').trim().toUpperCase(),product:(p[1]||'').trim().toUpperCase(),onHand:num(p[2]),allocated:num(p[3]),uom:(p[4]||'').trim().toUpperCase()}}).filter(r=>r.bin&&r.product)}
 function buildReplenishmentReport(){if(!canManage())return;inventoryBins=JSON.parse(localStorage.getItem('scp_inventory_bins')||'[]');if($('binImport')&&!$('binImport').value&&inventoryBins.length)$('binImport').value=inventoryBins.map(r=>[r.bin,r.product,r.onHand,r.allocated,r.uom].join('\t')).join('\n');const active=shortages.filter(r=>!r._archived);const moves=[],noRes=[];active.forEach(s=>{const reserves=inventoryBins.filter(b=>b.product===(s.productCode||'').toUpperCase()&&b.bin!==(s.shortedBin||'').toUpperCase()&&b.onHand>0&&b.allocated<=0).sort((a,b)=>a.bin.localeCompare(b.bin));if(reserves.length)moves.push({product:s.productCode,toBin:s.shortedBin,fromBin:reserves[0].bin,qty:Math.min(num(s.qtyShorted)||1,reserves[0].onHand),uom:reserves[0].uom||s.uom});else noRes.push(s)});$('restockBody').innerHTML=`<div class="card"><div class="card-title">Replenishment Moves</div>${table(['Product Code','From Reserve Bin','To Shorted Bin','Qty','UOM'],moves.sort((a,b)=>a.fromBin.localeCompare(b.fromBin)).map(m=>[m.product,m.fromBin,m.toBin,m.qty,m.uom]))}</div><div class="card"><div class="card-title">Products With No Reserve Bins</div>${table(['Product Code','Shorted Bin','Qty Shorted','UOM'],noRes.map(r=>[r.productCode,r.shortedBin,r.qtyShorted,r.uom]))}</div>`}function printReplenReport(){buildReplenishmentReport();$('printArea').innerHTML=`<h1>Replenishment Report</h1>${$('restockBody').innerHTML}`;window.print()}
-function renderPickers(){if(!canManage())return;$('pickerList').innerHTML=pickerNames.length?table(['Picker','Action'],pickerNames.map(p=>[p,`<button onclick="removePicker('${esc(p)}')">Remove</button>`])).replaceAll('&lt;button','<button').replaceAll('&lt;/button&gt;','</button>').replaceAll('&gt;','>'):'<div class="empty">No pickers saved.</div>'}function addPicker(){const n=$('pickerName').value.trim();if(!n)return;pickerNames=[...new Set([...pickerNames,n])].sort();localStorage.setItem('scp_pickers',JSON.stringify(pickerNames));$('pickerName').value='';loadPickerNames();renderPickers()}function removePicker(n){pickerNames=pickerNames.filter(p=>p!==n);localStorage.setItem('scp_pickers',JSON.stringify(pickerNames));loadPickerNames();renderPickers()}
+function renderPickers(){
+  if(!canManage())return;
+  $('pickerList').innerHTML=pickerNames.length
+    ?pickerNames.map(p=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)"><span style="font-family:var(--mono);font-size:13px;font-weight:700;flex:1">${esc(p)}</span><button class="btn red" style="padding:4px 10px;font-size:11px" onclick="removePicker('${esc(p)}')">Remove</button></div>`).join('')
+    :'<div class="empty">No pickers saved.</div>';
+  $('packerList').innerHTML=packerNames.length
+    ?packerNames.map(p=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)"><span style="font-family:var(--mono);font-size:13px;font-weight:700;flex:1">${esc(p)}</span><button class="btn red" style="padding:4px 10px;font-size:11px" onclick="removePacker('${esc(p)}')">Remove</button></div>`).join('')
+    :'<div class="empty">No packers saved.</div>';
+  $('packStationList').innerHTML=packStations.length
+    ?packStations.map(s=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)"><span style="font-family:var(--mono);font-size:13px;font-weight:700;flex:1">${esc(s)}</span><button class="btn red" style="padding:4px 10px;font-size:11px" onclick="removePackStation('${esc(s)}')">Remove</button></div>`).join('')
+    :'<div class="empty">No pack stations saved.</div>';
+}
+function addPickerManual(){
+  const raw=$('pickerName').value.trim();
+  if(!raw)return;
+  const n=normalizeName(raw);
+  if(!n){alert('Enter a valid name (e.g. JDoe)');return;}
+  pickerNames=[...new Set([...pickerNames,n])].sort();
+  localStorage.setItem('scp_pickers',JSON.stringify(pickerNames));
+  $('pickerName').value='';
+  renderPickers();
+}
+function addPackerManual(){
+  const raw=$('packerName').value.trim();
+  if(!raw)return;
+  const n=normalizeName(raw);
+  if(!n){alert('Enter a valid name (e.g. MDoe)');return;}
+  packerNames=[...new Set([...packerNames,n])].sort();
+  localStorage.setItem('scp_packers',JSON.stringify(packerNames));
+  $('packerName').value='';
+  renderPickers();
+}
+function addPackStationManual(){
+  const raw=($('packStationName').value.trim()).toUpperCase();
+  if(!raw)return;
+  packStations=[...new Set([...packStations,raw])].sort();
+  localStorage.setItem('scp_packstations',JSON.stringify(packStations));
+  $('packStationName').value='';
+  renderPickers();
+}
+function removePicker(n){pickerNames=pickerNames.filter(p=>p!==n);localStorage.setItem('scp_pickers',JSON.stringify(pickerNames));renderPickers();}
+function removePacker(n){packerNames=packerNames.filter(p=>p!==n);localStorage.setItem('scp_packers',JSON.stringify(packerNames));renderPickers();}
+function removePackStation(s){packStations=packStations.filter(p=>p!==s);localStorage.setItem('scp_packstations',JSON.stringify(packStations));renderPickers();}
+// Keep old addPicker alias for any legacy calls
+function addPicker(){addPickerManual();}
 function loadSettingsForm(){if(!canSettings()){showScreen('shortage');return}const s=getSettings();$('cfgApiKey').value=s.firebaseConfig.apiKey||'';$('cfgAuthDomain').value=s.firebaseConfig.authDomain||'';$('cfgProjectId').value=s.firebaseConfig.projectId||'';$('cfgStorageBucket').value=s.firebaseConfig.storageBucket||'';$('cfgSenderId').value=s.firebaseConfig.messagingSenderId||'';$('cfgAppId').value=s.firebaseConfig.appId||'';$('cfgActiveCollection').value=s.activeCollection;$('cfgArchiveCollection').value=s.archiveCollection;applyTheme()}
 function saveSettings(){const s={firebaseConfig:{apiKey:$('cfgApiKey').value.trim(),authDomain:$('cfgAuthDomain').value.trim(),projectId:$('cfgProjectId').value.trim(),storageBucket:$('cfgStorageBucket').value.trim(),messagingSenderId:$('cfgSenderId').value.trim(),appId:$('cfgAppId').value.trim()},activeCollection:$('cfgActiveCollection').value.trim()||'shortages_active',archiveCollection:$('cfgArchiveCollection').value.trim()||'shortages_archive'};localStorage.setItem('scp_settings',JSON.stringify(s));alert('Settings saved. Reloading Firebase connection.');location.reload()}
 async function runMigration(){
@@ -707,70 +852,37 @@ function enterOverPull(){
 function opAutoDivision(){
   const v=($('opOrder').value||'').trim().slice(0,2).toUpperCase();
   $('opDiv').value=v;
-  const disp=$('opDivDisplay');
-  if(disp){disp.textContent=v||'\u2014';disp.style.color=v?'var(--accent)':'var(--muted)';}
 }
 
 function opInitForm(){
   const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());
   $('opDate').value=d.toISOString().slice(0,16);
-  $('opOrder').value='';
-  $('opDiv').value='';
-  $('opFirst').value='';
-  $('opLast').value='';
+  ['opOrder','opDiv','opPacker','opPicker','opPackStation'].forEach(id=>{if($(id))$(id).value='';});
   $('opLines').innerHTML='';
   $('opMoreWrap').style.display='none';
-  const disp=$('opDivDisplay');if(disp){disp.textContent='\u2014';disp.style.color='var(--muted)';}
+  ['opPackerSuggest','opPickerSuggest','opPackStationSuggest'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});
   opAddLine();
-}
-function opFocusFirstItem(){
-  const first=$('opLines').querySelector('.op-product');
-  if(first)first.focus();
 }
 
 function opAddLine(data={}){
   const wrap=$('opLines');
   const idx=wrap.querySelectorAll('.op-item-line').length+1;
   const row=document.createElement('div');
-  row.className='op-item-line';
-  row.innerHTML=`
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-      <span style="font-size:10px;font-family:var(--mono);font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase">Item ${idx}</span>
-      <button class="btn" style="padding:4px 10px;font-size:11px" onclick="opRemoveLine(this)">&times; Remove</button>
-    </div>
-    <div class="field op-field-big" style="margin-bottom:10px">
-      <label>Product Code <em>*</em></label>
-      <input class="op-product" placeholder="e.g. DI1210" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" value="${esc(data.productCode||'')}" onkeydown="if(event.key==='Enter')this.closest('.op-item-line').querySelector('.op-qty').focus()">
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div class="field op-field-big" style="margin-bottom:0">
-        <label>Qty <em>*</em></label>
-        <input class="op-qty" type="number" min="1" step="1" inputmode="numeric" value="${esc(data.qty??1)}" onkeydown="if(event.key==='Enter')this.closest('.op-item-line').querySelector('.op-uom').focus()">
-      </div>
-      <div class="field op-field-big" style="margin-bottom:0">
-        <label>UOM</label>
-        <select class="op-uom">
-          <option value="EA"${(!data.uom||data.uom==='EA')?' selected':''}>EA</option>
-          <option value="CS"${data.uom==='CS'?' selected':''}>CS</option>
-          <option value="PK"${data.uom==='PK'?' selected':''}>PK</option>
-          <option value="PR"${data.uom==='PR'?' selected':''}>PR</option>
-          <option value="BX"${data.uom==='BX'?' selected':''}>BX</option>
-          <option value="DZ"${data.uom==='DZ'?' selected':''}>DZ</option>
-        </select>
-      </div>
-    </div>`;
+  row.className='product-line-card op-item-line';
+  row.innerHTML=`<div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;align-items:end">
+    <div class="field" style="margin-bottom:0"><label>Product Code <em>*</em></label><input class="op-product" placeholder="e.g. DI1210" autocomplete="off" value="${esc(data.productCode||'')}"></div>
+    <div class="field" style="margin-bottom:0"><label>Qty <em>*</em></label><input class="op-qty" type="number" min="1" step="1" value="${esc(data.qty??1)}"></div>
+    <div class="field" style="margin-bottom:0"><label>UOM</label><select class="op-uom"><option value="EA"${(!data.uom||data.uom==='EA')?' selected':''}>EA</option><option value="CS"${data.uom==='CS'?' selected':''}>CS</option><option value="PK"${data.uom==='PK'?' selected':''}>PK</option><option value="PR"${data.uom==='PR'?' selected':''}>PR</option><option value="BX"${data.uom==='BX'?' selected':''}>BX</option><option value="DZ"${data.uom==='DZ'?' selected':''}>DZ</option></select></div>
+    <button class="btn remove-line-btn" style="margin-bottom:0" onclick="opRemoveLine(this)">&times;</button>
+  </div>`;
   wrap.appendChild(row);
-  setTimeout(()=>row.querySelector('.op-product').focus(),80);
+  row.querySelector('.op-product').focus();
 }
 
 function opRemoveLine(btn){
   const rows=$('opLines').querySelectorAll('.op-item-line');
   if(rows.length<=1){alert('At least one item is required.');return;}
   btn.closest('.op-item-line').remove();
-  // renumber
-  $('opLines').querySelectorAll('.op-item-line').forEach((el,i)=>{
-    const lbl=el.querySelector('span');if(lbl&&lbl.textContent.startsWith('Item'))lbl.textContent='Item '+(i+1);
-  });
 }
 
 function opGetLines(){
@@ -783,7 +895,7 @@ function opGetLines(){
 
 function opValidateHeader(){
   if(!$('opOrder').value.trim()){alert('Order Number is required.');return false;}
-  if(!$('opFirst').value.trim()||!$('opLast').value.trim()){alert('Picker first and last name are required.');return false;}
+  if(!$('opPacker').value.trim()){alert('Packer Name is required.');return false;}
   return true;
 }
 
@@ -812,13 +924,20 @@ async function opSaveEntry(){
   if(!lines.length){alert('Add at least one item with a product code and qty.');return;}
   const s=getSettings();
   const col=s.overpullCollection||'overpull_active';
+  // validate + save new packer/picker names before submitting
+  const rawPacker=normalizeName($('opPacker').value.trim());
+  const rawPicker=normalizeName($('opPicker').value.trim());
+  const rawStation=($('opPackStation').value.trim()).toUpperCase();
+  if(rawPacker&&!fuzzyMatchPerson(rawPacker,'packer')){if(confirm(`"${rawPacker}" is not saved. Save as new packer?`))savePerson(rawPacker,'packer');}
+  if(rawPicker&&!fuzzyMatchPerson(rawPicker,'picker')){if(confirm(`"${rawPicker}" is not saved. Save as new picker?`))savePerson(rawPicker,'picker');}
+  if(rawStation&&!packStations.includes(rawStation)){packStations=[...new Set([...packStations,rawStation])].sort();localStorage.setItem('scp_packstations',JSON.stringify(packStations));}
   const base={
     date:$('opDate').value||nowLocalInput(),
     orderNumber:$('opOrder').value.trim().toUpperCase(),
     division:$('opDiv').value.trim().toUpperCase(),
-    pickerFirst:$('opFirst').value.trim(),
-    pickerLast:$('opLast').value.trim(),
-    picker:($('opFirst').value.trim()+' '+$('opLast').value.trim()).trim(),
+    packer:rawPacker,
+    picker:rawPicker,
+    packStation:rawStation,
     createdAt:new Date().toISOString(),
     source:'overpull'
   };
@@ -873,7 +992,7 @@ function opFilteredRows(){
     if(start&&d<start)return false;
     if(end&&d>end)return false;
     if(!text)return true;
-    return [r.picker,r.orderNumber,r.productCode,r.division].join(' ').toLowerCase().includes(text);
+    return [r.packer,r.picker,r.packStation,r.orderNumber,r.productCode,r.division].join(' ').toLowerCase().includes(text);
   });
 }
 
@@ -881,12 +1000,14 @@ function opRenderKpi(){
   const rows=opFilteredRows();
   const totalLines=rows.length;
   const totalQty=rows.reduce((s,r)=>s+num(r.qty),0);
-  const pickers=new Set(rows.map(r=>r.picker)).size;
+  const packers=new Set(rows.map(r=>r.packer||r.picker||'').filter(Boolean)).size;
+  const pickers=new Set(rows.map(r=>r.picker||'').filter(Boolean)).size;
   const orders=new Set(rows.map(r=>r.orderNumber)).size;
   const divs=new Set(rows.map(r=>r.division)).size;
   $('opKpiBar').innerHTML=`
     <div class="stat-card"><div class="stat-num">${totalLines}</div><div class="stat-lbl">Over Pull Lines</div></div>
     <div class="stat-card" style="border-color:rgba(251,146,60,.3)"><div class="stat-num" style="color:var(--orange)">${totalQty}</div><div class="stat-lbl">Total Units Over-Pulled</div></div>
+    <div class="stat-card"><div class="stat-num">${packers}</div><div class="stat-lbl">Packers Involved</div></div>
     <div class="stat-card"><div class="stat-num">${pickers}</div><div class="stat-lbl">Pickers Involved</div></div>
     <div class="stat-card"><div class="stat-num">${orders}</div><div class="stat-lbl">Orders Affected</div></div>
     <div class="stat-card"><div class="stat-num">${divs}</div><div class="stat-lbl">Divisions</div></div>
@@ -912,7 +1033,7 @@ function opRenderList(){
       <div class="sr-head">
         <div style="flex:1">
           <div class="sr-codes" style="color:var(--orange)">${esc(g.orderNumber||'NO ORDER')} <span style="color:var(--muted)">&bull;</span> <span style="font-size:11px">${esc(g.division||'')}</span></div>
-          <div class="sr-meta">${esc(dateDisp)} &bull; Picker: <strong>${esc(g.picker)}</strong></div>
+          <div class="sr-meta">${esc(dateDisp)}${g.packer?' &bull; Packer: <strong>'+esc(g.packer)+'</strong>':''}${g.picker?' &bull; Picker: <strong>'+esc(g.picker)+'</strong>':''}${g.packStation?' &bull; Station: <strong>'+esc(g.packStation)+'</strong>':''}</div>
           <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:2px">${lineHtml}</div>
         </div>
       </div>
@@ -931,15 +1052,16 @@ function printOverPullReport(){
   const totalLines=rows.length;
   const totalQty=rows.reduce((s,r)=>s+num(r.qty),0);
 
-  // By picker
+  // By packer (primary person responsible)
   const byPicker={};
   rows.forEach(r=>{
-    const p=r.picker||'Unknown';
-    if(!byPicker[p])byPicker[p]={lines:0,qty:0,orders:new Set(),divs:new Set()};
+    const p=r.packer||r.picker||'Unknown';
+    if(!byPicker[p])byPicker[p]={lines:0,qty:0,orders:new Set(),divs:new Set(),pickers:new Set()};
     byPicker[p].lines++;
     byPicker[p].qty+=num(r.qty);
     if(r.orderNumber)byPicker[p].orders.add(r.orderNumber);
     if(r.division)byPicker[p].divs.add(r.division);
+    if(r.picker)byPicker[p].pickers.add(r.picker);
   });
   const pickerRows=Object.entries(byPicker).sort((a,b)=>b[1].qty-a[1].qty);
 
@@ -1004,7 +1126,7 @@ function printOverPullReport(){
 
     <div style="font-size:8pt;font-weight:700;color:#374151;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #e5e7eb;padding-bottom:4pt;margin:14pt 0 8pt">Picker Performance — Over Pull KPI</div>
     <table style="width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:16pt">
-      <thead><tr>${['Picker','Total Lines','Total Units Over-Pulled','Orders Affected','Divisions'].map(th).join('')}</tr></thead>
+      <thead><tr>${['Packer','Total Lines','Total Units Over-Pulled','Orders Affected','Divisions','Pickers'].map(th).join('')}</tr></thead>
       <tbody>
         ${pickerRows.map(([picker,row],i)=>{
           const bg=i%2===0?'#fff':'#f3f4f6';
@@ -1015,6 +1137,7 @@ function printOverPullReport(){
             <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;font-weight:700;color:${qtyColor}">${row.qty}</td>
             <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${row.orders.size}</td>
             <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-size:8.5pt">${[...row.divs].join(', ')}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-size:8.5pt;color:#6b7280">${row.pickers?[...row.pickers].join(', '):'—'}</td>
           </tr>`;
         }).join('')}
         <tr style="background:#1a2038;color:#fff">
@@ -1023,6 +1146,7 @@ function printOverPullReport(){
           <td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700;color:#fcd34d">${totalQty}</td>
           <td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700">${new Set(rows.map(r=>r.orderNumber)).size}</td>
           <td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700">${Object.keys(byDiv).length}</td>
+          <td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700">${new Set(rows.map(r=>r.picker||'').filter(Boolean)).size}</td>
         </tr>
       </tbody>
     </table>
@@ -1093,7 +1217,7 @@ function printOverPullReport(){
   setTimeout(()=>{$('printArea').innerHTML='';},500);
 }
 
-function startup(){applyTheme();initFirebase();$('sDate').value=nowLocalInput();loadPickerNames();if($('productLines'))addProductLine()}
+function startup(){applyTheme();initFirebase();$('sDate').value=nowLocalInput();loadAllPersonnel();if($('productLines'))addProductLine()}
 startup();
 </script>
 </body>
