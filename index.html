@@ -176,7 +176,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 <section id="restockScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Replenishment</div><h1>Replenishment Report</h1><p>IC Manager only.</p></div><button class="btn primary" onclick="printReplenReport()">Print</button></div><div class="card"><div class="card-title">Inventory Bin Report Import</div><p class="notice">Paste report columns: Bin Name, Product Code, Qty on Hand, Qty Allocated, Unit of Measure.</p><textarea id="binImport" style="width:100%;min-height:160px" placeholder="82-26-01&#9;DI1210&#9;12&#9;0&#9;EA"></textarea><div class="actions" style="margin-top:10px"><button class="btn primary" onclick="saveInventoryBinReport()">Import Bin Report</button></div></div><div id="restockBody"></div></div></section>
 <section id="pickerScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Personnel</div><h1>Manage Pickers &amp; Packers</h1><p>IC Manager only. Names stored as FirstInitialLastName (e.g. JDoe).</p></div></div><div class="card"><div class="card-title">Pickers</div><div class="form-row two"><div class="field"><label>Picker Name (FirstInitialLastName)</label><input id="pickerName" placeholder="JDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPickerManual()">Add Picker</button></div></div><div id="pickerList"></div></div><div class="card"><div class="card-title">Packers</div><div class="form-row two"><div class="field"><label>Packer Name (FirstInitialLastName)</label><input id="packerName" placeholder="MDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackerManual()">Add Packer</button></div></div><div id="packerList"></div></div><div class="card"><div class="card-title">Pack Stations</div><div class="form-row two"><div class="field"><label>Pack Station Name</label><input id="packStationName" placeholder="PS-01"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackStationManual()">Add Station</button></div></div><div id="packStationList"></div></div></div></section>
 <section id="migrationScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Migration</div><h1>Old Firebase Migration</h1><p>Copies old shortage records into the new shortage database. Does not delete the old database.</p></div></div><div class="card"><div class="notice">Source: <b>inventory-control-portal</b> collection <b>shortages</b>. Destination: current active collection.</div><div class="form-row three"><div class="field"><label>Old Collection</label><input id="oldCollection" value="shortages"></div><div class="field"><label>Limit</label><input id="migLimit" type="number" value="5000"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="runMigration()">Run Migration</button></div></div><div id="migrationResult"></div></div></div></section>
-<section id="settingsScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Settings</div><h1>Firebase Settings</h1><p>IC Manager only.</p></div></div><div class="card"><div class="form-row two"><div class="field"><label>API Key</label><input id="cfgApiKey"></div><div class="field"><label>Auth Domain</label><input id="cfgAuthDomain"></div><div class="field"><label>Project ID</label><input id="cfgProjectId"></div><div class="field"><label>Storage Bucket</label><input id="cfgStorageBucket"></div><div class="field"><label>Messaging Sender ID</label><input id="cfgSenderId"></div><div class="field"><label>App ID</label><input id="cfgAppId"></div><div class="field"><label>Active Collection</label><input id="cfgActiveCollection"></div><div class="field"><label>Archive Collection</label><input id="cfgArchiveCollection"></div></div><label class="toggle"><input id="themeToggle" type="checkbox" onchange="saveTheme(this.checked)"> Light mode</label><div class="actions" style="margin-top:14px"><button class="btn primary" onclick="saveSettings()">Save Settings</button><button class="btn red" onclick="forceReloadAllClients()" style="margin-left:auto">&#128257; Force Reload All Open Instances</button></div></div></div></section>
+<section id="settingsScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Settings</div><h1>Firebase Settings</h1><p>IC Manager only.</p></div></div><div class="card"><div class="form-row two"><div class="field"><label>API Key</label><input id="cfgApiKey"></div><div class="field"><label>Auth Domain</label><input id="cfgAuthDomain"></div><div class="field"><label>Project ID</label><input id="cfgProjectId"></div><div class="field"><label>Storage Bucket</label><input id="cfgStorageBucket"></div><div class="field"><label>Messaging Sender ID</label><input id="cfgSenderId"></div><div class="field"><label>App ID</label><input id="cfgAppId"></div><div class="field"><label>Active Collection</label><input id="cfgActiveCollection"></div><div class="field"><label>Archive Collection</label><input id="cfgArchiveCollection"></div></div><label class="toggle"><input id="themeToggle" type="checkbox" onchange="saveTheme(this.checked)"> Light mode</label><div class="actions" style="margin-top:14px"><button class="btn primary" onclick="saveSettings()">Save Settings</button><button class="btn" onclick="testFirebaseConnection()">&#128268; Test Connection</button><button class="btn red" onclick="forceReloadAllClients()" style="margin-left:auto">&#128257; Force Reload All Open Instances</button></div></div></div></section>
 <section id="overpullScreen" class="screen"><div class="wrap">
 
   <!-- Header -->
@@ -200,7 +200,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
     <div class="card"><div class="card-title">New Over Pull Entry</div>
       <div class="form-row three">
         <div class="field"><label>Date &amp; Time</label><input id="opDate" type="datetime-local"></div>
-        <div class="field"><label>Order Number <em>*</em></label><input id="opOrder" placeholder="e.g. NH.45433" autocomplete="off" oninput="opAutoDivision()" onblur="opBlurOrder()" style="font-family:var(--mono);font-weight:700;letter-spacing:.06em"><div id="opOrderHint" style="display:none;font-size:11px;color:var(--red);margin-top:3px"></div></div>
+        <div class="field"><label>Order Number <em>*</em></label><input id="opOrder" placeholder="e.g. NH.45433" autocomplete="off" autocapitalize="characters" spellcheck="false" oninput="opAutoDivision()" onblur="opBlurOrder()" style="font-family:var(--mono);font-weight:700;letter-spacing:.06em"><div id="opOrderHint" style="display:none;font-size:11px;color:var(--red);margin-top:3px"></div></div>
         <div class="field"><label>Division</label><input id="opDiv" placeholder="Auto-filled" readonly style="opacity:.7;cursor:default"></div>
       </div>
       <div class="form-row three">
@@ -262,7 +262,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
       </div>
       <div class="form-row two">
         <div class="field"><label>Product Code <em>*</em></label>
-          <input id="bpProduct" placeholder="e.g. DI1210" autocomplete="off"
+          <input id="bpProduct" placeholder="e.g. DI1210" autocomplete="off" autocapitalize="characters" spellcheck="false"
             style="font-family:var(--mono);font-weight:700;font-size:15px;letter-spacing:.06em"></div>
         <div class="field"><label>Notes</label><textarea id="bpNotes" placeholder="Additional context about this batch pick..."></textarea></div>
       </div>
@@ -357,7 +357,53 @@ function esc(v){return String(v??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&l
 function num(v){const n=Number(v);return isNaN(n)?0:n}function val(v){return v===undefined||v===null?'':v}
 function today(){return new Date().toISOString().slice(0,10)}
 function getSettings(){try{return {...DEFAULT_SETTINGS,...JSON.parse(localStorage.getItem('scp_settings')||'{}')}}catch(e){return DEFAULT_SETTINGS}}
-function initFirebase(){const s=getSettings();try{if(!firebase.apps.length)firebase.initializeApp(s.firebaseConfig);db=firebase.firestore();firebase.firestore().settings({ignoreUndefinedProperties:true});}catch(e){console.error(e);alert('Firebase connection failed. Check Settings. '+e.message)}}
+function initFirebase(){
+  const s=getSettings();
+  try{
+    // Always delete any existing app to ensure we init with current config
+    if(firebase.apps.length){
+      firebase.apps.forEach(app=>{try{app.delete();}catch(x){}});
+    }
+    firebase.initializeApp(s.firebaseConfig);
+    db=firebase.firestore();
+    db.settings({ignoreUndefinedProperties:true});
+    console.log('[Firebase] Connected to project:',s.firebaseConfig.projectId);
+    updateDbStatus(true);
+  }catch(e){
+    db=null;
+    console.error('[Firebase] Init failed:',e);
+    updateDbStatus(false,e.message);
+  }
+}
+
+function updateDbStatus(ok,msg){
+  // Show a small status indicator in the topbar
+  let el=$('dbStatus');
+  if(!el){
+    el=document.createElement('span');
+    el.id='dbStatus';
+    el.style.cssText='font-size:10px;padding:2px 8px;border-radius:10px;font-family:var(--mono);margin-left:4px;';
+    const brand=document.querySelector('.brand');
+    if(brand)brand.after(el);
+  }
+  if(ok){
+    el.textContent='● DB';
+    el.style.color='var(--green)';
+    el.title='Firebase connected';
+  } else {
+    el.textContent='● DB ERROR';
+    el.style.color='var(--red)';
+    el.title='Firebase error: '+(msg||'unknown');
+  }
+}
+
+function ensureDb(){
+  if(db)return true;
+  // Try to reconnect
+  initFirebase();
+  if(!db){alert('Database not connected. Go to IC Manager → Settings and verify your Firebase config.');return false;}
+  return true;
+}
 function showLoading(t){$('loadingText').textContent=t||'Loading...';$('loading').classList.add('show')}function hideLoading(){$('loading').classList.remove('show')}
 function applyTheme(){const light=localStorage.getItem('scp_theme')==='light';document.body.classList.toggle('light-mode',light);if($('themeToggle'))$('themeToggle').checked=light}function saveTheme(light){localStorage.setItem('scp_theme',light?'light':'dark');applyTheme()}
 function showScreen(name){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const el=$(name+'Screen');if(el)el.classList.add('active');$('topbar').classList.toggle('show',name!=='login'&&name!=='pin');document.querySelectorAll('.nav-btn[data-screen]').forEach(b=>b.classList.toggle('active',b.dataset.screen===name));if(name==='shortage'){loadShortages(false);populateStationSelects();}if(name==='report')renderReports();if(name==='picker')renderPickers();if(name==='restock')buildReplenishmentReport();if(name==='settings')loadSettingsForm();if(name==='overpull'){if(role==='icteam'){alert('Over Pull access is not available for IC Team.');showScreen('shortage');return;}populatePickerSelects();populateStationSelects();opInitForm();opSwitchTab('entry');}}
@@ -582,7 +628,7 @@ function validatePersonField(fieldId, type){
 function nowLocalInput(){const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,16)}
 function demandDivision(v){return String(v||'').trim().slice(0,2).toUpperCase()}
 function autoDivisionFromDemand(){const div=demandDivision($('sDemand').value);if(div&&[...$('sDiv').options].some(o=>o.value===div||o.textContent.startsWith(div)))$('sDiv').value=div}
-function addProductLine(data={}){const wrap=$('productLines');const row=document.createElement('div');row.className='product-line-card';row.innerHTML=`<div class="product-line-grid"><div class="field"><label>Product Code <em>*</em></label><input class="line-product" placeholder="E.G. DI1210" value="${esc(data.productCode||'')}"></div><div class="field"><label>Qty (Each) <em>*</em></label><input class="line-qty" type="number" min="0" step="1" value="${esc(data.qtyShorted??0)}"></div><div class="field"><label>Bin Shorted <em>*</em></label><div class="bin-input-wrap"><input class="line-bin" placeholder="82-26-01 / P12345 / BULK" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" value="${esc(data.shortedBin||'')}" oninput="liveBinValidate(this)" onblur="strictBinValidate(this)"><span class="bin-valid-icon"></span></div><div class="bin-format-hint">##-##-## &nbsp;·&nbsp; ##-##-# &nbsp;·&nbsp; P##### &nbsp;·&nbsp; BULK &nbsp;·&nbsp; ROOM &nbsp;·&nbsp; KEY ACCOUNT</div><div class="bin-format-err"></div></div><button class="btn remove-line-btn" onclick="removeProductLine(this)">&times;</button></div>`;wrap.appendChild(row);if(data.shortedBin){const binEl=row.querySelector('.line-bin');liveBinValidate(binEl);};}
+function addProductLine(data={}){const wrap=$('productLines');const row=document.createElement('div');row.className='product-line-card';row.innerHTML=`<div class="product-line-grid"><div class="field"><label>Product Code <em>*</em></label><input class="line-product" placeholder="E.G. DI1210" autocapitalize="characters" spellcheck="false" style="text-transform:uppercase" value="${esc(data.productCode||'')}"></div><div class="field"><label>Qty (Each) <em>*</em></label><input class="line-qty" type="number" min="0" step="1" value="${esc(data.qtyShorted??0)}"></div><div class="field"><label>Bin Shorted <em>*</em></label><div class="bin-input-wrap"><input class="line-bin" placeholder="82-26-01 / P12345 / BULK" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" value="${esc(data.shortedBin||'')}" oninput="liveBinValidate(this)" onblur="strictBinValidate(this)"><span class="bin-valid-icon"></span></div><div class="bin-format-hint">##-##-## &nbsp;·&nbsp; ##-##-# &nbsp;·&nbsp; P##### &nbsp;·&nbsp; BULK &nbsp;·&nbsp; ROOM &nbsp;·&nbsp; KEY ACCOUNT</div><div class="bin-format-err"></div></div><button class="btn remove-line-btn" onclick="removeProductLine(this)">&times;</button></div>`;wrap.appendChild(row);if(data.shortedBin){const binEl=row.querySelector('.line-bin');liveBinValidate(binEl);};}
 function removeProductLine(btn){const rows=$('productLines').querySelectorAll('.product-line-card');if(rows.length<=1){alert('At least one product line is required.');return}btn.closest('.product-line-card').remove()}
 function getProductLines(){return [...$('productLines').querySelectorAll('.product-line-card')].map(row=>({productCode:row.querySelector('.line-product').value.trim().toUpperCase(),qtyShorted:num(row.querySelector('.line-qty').value),shortedBin:row.querySelector('.line-bin').value.trim().toUpperCase()})).filter(x=>x.productCode||x.shortedBin||x.qtyShorted)}
 function shiftValue(){
@@ -644,7 +690,7 @@ function normalizeShortage(raw,id,arch){
   return r
 }
 function shortageSortValue(r){const d=r.date||r.createdAt||r.timestamp||'';if(d&&d.toDate)return d.toDate().getTime();const t=Date.parse(d);return isNaN(t)?0:t}
-async function loadShortages(force){if(!db)return;const mode=$('viewMode')?.value||lastLoadMode||'active';if(!force&&useCache(mode))return;showLoading('Loading shortages...');try{const s=getSettings();let rows=[];async function getCol(col,arch){const snap=await db.collection(col).limit(2500).get();return snap.docs.map(d=>normalizeShortage(d.data(),d.id,arch))}if(mode==='active'||mode==='both')rows=rows.concat(await getCol(s.activeCollection,false));if(mode==='archive'||mode==='both')rows=rows.concat(await getCol(s.archiveCollection,true));rows.sort((a,b)=>shortageSortValue(b)-shortageSortValue(a));shortages=rows;lastLoadMode=mode;localStorage.setItem(cacheKey(mode),JSON.stringify({t:Date.now(),rows}));renderShortages();if($('reportScreen').classList.contains('active'))renderReports()}catch(e){alert('Load failed: '+e.message)}finally{hideLoading()}}
+async function loadShortages(force){if(!db){if(force){alert('Not connected to Firebase. Log in as IC Manager → Settings and save your Firebase config.');} return;}const mode=$('viewMode')?.value||lastLoadMode||'active';if(!force&&useCache(mode))return;showLoading('Loading shortages...');try{const s=getSettings();let rows=[];async function getCol(col,arch){const snap=await db.collection(col).limit(2500).get();return snap.docs.map(d=>normalizeShortage(d.data(),d.id,arch))}if(mode==='active'||mode==='both')rows=rows.concat(await getCol(s.activeCollection,false));if(mode==='archive'||mode==='both')rows=rows.concat(await getCol(s.archiveCollection,true));rows.sort((a,b)=>shortageSortValue(b)-shortageSortValue(a));shortages=rows;lastLoadMode=mode;localStorage.setItem(cacheKey(mode),JSON.stringify({t:Date.now(),rows}));renderShortages();if($('reportScreen').classList.contains('active'))renderReports()}catch(e){alert('Load failed: '+e.message)}finally{hideLoading()}}
 async function runReportPull(){
   const mode=$('reportMode').value;
   const hasDateRange=!!($('reportStart').value||$('reportEnd').value);
@@ -707,7 +753,7 @@ function rowHtml(r){
       </div>
     </div>
   </div>`}
-async function saveShortage(){autoDivisionFromDemand();validatePickerInput();const base={date:$('sDate').value||nowLocalInput(),division:$('sDiv').value,pickDemand:$('sDemand').value.trim().toUpperCase(),picker:normalizeName(($('sPicker').value||$('sPickerNew').value||'').trim()),packStation:($('sPackStation').value.trim().toUpperCase()),shift:shiftValue(),uom:'EA',notes:$('sNotes').value.trim(),createdAt:new Date().toISOString(),createdBy:role,foundInShortedBin:false,secondLocationFilled:false,replenishedAfterPick:false,status:'open'};const lines=getProductLines();if(!base.pickDemand){alert('Pick Demand # is required.');return}if(!base.division){alert('Division is required. Enter or scan the Pick Demand # first.');return}if(!base.picker){alert('Picker is required.');return}if(base.picker&&!fuzzyMatchPerson(base.picker,'picker')){if(!confirm(`"${base.picker}" is not saved. Save as new picker?`)){$('sPicker').focus();return}savePerson(base.picker,'picker');}if(!lines.length||lines.some(l=>!l.productCode||!l.shortedBin)){alert('Each product line needs Product Code and Bin Shorted.');return}
+async function saveShortage(){if(!ensureDb())return;autoDivisionFromDemand();validatePickerInput();const base={date:$('sDate').value||nowLocalInput(),division:$('sDiv').value,pickDemand:$('sDemand').value.trim().toUpperCase(),picker:normalizeName(($('sPicker').value||$('sPickerNew').value||'').trim()),packStation:($('sPackStation').value.trim().toUpperCase()),shift:shiftValue(),uom:'EA',notes:$('sNotes').value.trim(),createdAt:new Date().toISOString(),createdBy:role,foundInShortedBin:false,secondLocationFilled:false,replenishedAfterPick:false,status:'open'};const lines=getProductLines();if(!base.pickDemand){alert('Pick Demand # is required.');return}if(!base.division){alert('Division is required. Enter or scan the Pick Demand # first.');return}if(!base.picker){alert('Picker is required.');return}if(base.picker&&!fuzzyMatchPerson(base.picker,'picker')){if(!confirm(`"${base.picker}" is not saved. Save as new picker?`)){$('sPicker').focus();return}savePerson(base.picker,'picker');}if(!lines.length||lines.some(l=>!l.productCode||!l.shortedBin)){alert('Each product line needs Product Code and Bin Shorted.');return}
   const invalidBins=lines.filter(l=>l.shortedBin&&!validateBinFormat(l.shortedBin).ok);
   if(invalidBins.length){alert('Invalid bin format on one or more lines.\n\nValid formats:\n  ##-##-##  (e.g. 82-26-01)\n  ##-##-#   (e.g. 82-26-1)\n  P#####    (e.g. P12345)\n  BULK\n  ROOM\n  KEY ACCOUNT');return}showLoading('Saving shortages...');try{const batch=db.batch();const col=db.collection(getSettings().activeCollection);lines.forEach(line=>{batch.set(col.doc(),{...base,...line,uom:'EA'});});await batch.commit();clearCaches();clearEntry();await loadShortages(true)}catch(e){alert(e.message)}finally{hideLoading()}}
 function clearEntry(){['sDemand','sPicker','sNotes'].forEach(id=>{if($(id))$(id).value='';});['sPickerSelect','sPackStation'].forEach(id=>{const el=$(id);if(el)el.value='';});['sPickerNewWrap'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});$('sDiv').value='';$('sShift').value='auto';$('sDate').value=nowLocalInput();$('productLines').innerHTML='';addProductLine();['sPickerNewSuggest','sPackStationSuggest'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});}
@@ -754,7 +800,7 @@ async function toggleSecond(id){
   }
 }
 async function toggleReplenished(id){const r=shortages.find(x=>x.id===id&&!x._archived);if(r)await updateRecord(id,{replenishedAfterPick:!r.replenishedAfterPick})}
-function openEdit(id,archived){const r=shortages.find(x=>x.id===id&&x._archived===archived);if(!r)return;editingId=id;editingArchive=archived;$('editBody').innerHTML=`<div class="form-row two"><div class="field"><label>Date</label><input id="eDate" type="date" value="${esc(normalizeDate(r.date)||'')}"></div><div class="field"><label>Division</label><input id="eDiv" value="${esc(r.division||'')}"></div><div class="field"><label>Product Code</label><input id="eProduct" value="${esc(r.productCode||'')}"></div><div class="field"><label>Shorted Bin</label><div class="bin-input-wrap"><input id="eBin" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" value="${esc(r.shortedBin||'')}" oninput="liveBinValidate(this)" onblur="strictBinValidate(this)"><span class="bin-valid-icon"></span></div><div class="bin-format-hint">##-##-## &nbsp;·&nbsp; ##-##-# &nbsp;·&nbsp; P##### &nbsp;·&nbsp; BULK &nbsp;·&nbsp; ROOM &nbsp;·&nbsp; KEY ACCOUNT</div><div class="bin-format-err"></div></div><div class="field"><label>Qty Shorted</label><input id="eQty" type="number" value="${val(r.qtyShorted)}"></div><div class="field"><label>UOM</label><input id="eUom" value="${esc(r.uom||'')}"></div><div class="field"><label>Demand / Order</label><input id="eDemand" value="${esc(r.pickDemand||'')}"></div><div class="field"><label>Picker</label><input id="ePicker" value="${esc(r.picker||'')}"></div><div class="field"><label>IC Qty Found</label><input id="eIcQty" type="number" value="${val(r.icQtyFound)}"></div><div class="field"><label>IC UOM</label><input id="eIcUom" value="${esc(r.icUom||r.uom||'EA')}"></div></div><div class="form-row one"><div class="field"><label>Notes</label><textarea id="eNotes">${esc(r.notes||'')}</textarea></div><div class="field"><label>IC Notes</label><textarea id="eIcNotes">${esc(r.icNotes||'')}</textarea></div></div><label class="toggle"><input id="eErr" type="checkbox" ${r.foundInShortedBin?'checked':''}> Mark as erroneous bin short</label><br><label class="toggle"><input id="eSecond" type="checkbox" ${r.secondLocationFilled?'checked':''}> Product was filled from second location</label><div class="notice" style="margin-top:8px"><b>Second-location bins:</b> ${esc(secondarySummary(r)||'None saved. Use the Second Location Filled button on the row to add one or more bins with qty.')}</div><br><label class="toggle"><input id="eRep" type="checkbox" ${r.replenishedAfterPick?'checked':''}> Bin was replenished after pick</label><div class="actions" style="margin-top:14px"><button class="btn primary" onclick="saveEdit()">Save Changes</button><button class="btn" onclick="closeEdit()">Cancel</button></div>`;$('editOverlay').classList.add('open')}
+function openEdit(id,archived){const r=shortages.find(x=>x.id===id&&x._archived===archived);if(!r)return;editingId=id;editingArchive=archived;$('editBody').innerHTML=`<div class="form-row two"><div class="field"><label>Date</label><input id="eDate" type="date" value="${esc(normalizeDate(r.date)||'')}"></div><div class="field"><label>Division</label><input id="eDiv" value="${esc(r.division||'')}"></div><div class="field"><label>Product Code</label><input id="eProduct" autocapitalize="characters" spellcheck="false" style="text-transform:uppercase" value="${esc(r.productCode||'')}"></div><div class="field"><label>Shorted Bin</label><div class="bin-input-wrap"><input id="eBin" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" value="${esc(r.shortedBin||'')}" oninput="liveBinValidate(this)" onblur="strictBinValidate(this)"><span class="bin-valid-icon"></span></div><div class="bin-format-hint">##-##-## &nbsp;·&nbsp; ##-##-# &nbsp;·&nbsp; P##### &nbsp;·&nbsp; BULK &nbsp;·&nbsp; ROOM &nbsp;·&nbsp; KEY ACCOUNT</div><div class="bin-format-err"></div></div><div class="field"><label>Qty Shorted</label><input id="eQty" type="number" value="${val(r.qtyShorted)}"></div><div class="field"><label>UOM</label><input id="eUom" value="${esc(r.uom||'')}"></div><div class="field"><label>Demand / Order</label><input id="eDemand" value="${esc(r.pickDemand||'')}"></div><div class="field"><label>Picker</label><input id="ePicker" value="${esc(r.picker||'')}"></div><div class="field"><label>IC Qty Found</label><input id="eIcQty" type="number" value="${val(r.icQtyFound)}"></div><div class="field"><label>IC UOM</label><input id="eIcUom" value="${esc(r.icUom||r.uom||'EA')}"></div></div><div class="form-row one"><div class="field"><label>Notes</label><textarea id="eNotes">${esc(r.notes||'')}</textarea></div><div class="field"><label>IC Notes</label><textarea id="eIcNotes">${esc(r.icNotes||'')}</textarea></div></div><label class="toggle"><input id="eErr" type="checkbox" ${r.foundInShortedBin?'checked':''}> Mark as erroneous bin short</label><br><label class="toggle"><input id="eSecond" type="checkbox" ${r.secondLocationFilled?'checked':''}> Product was filled from second location</label><div class="notice" style="margin-top:8px"><b>Second-location bins:</b> ${esc(secondarySummary(r)||'None saved. Use the Second Location Filled button on the row to add one or more bins with qty.')}</div><br><label class="toggle"><input id="eRep" type="checkbox" ${r.replenishedAfterPick?'checked':''}> Bin was replenished after pick</label><div class="actions" style="margin-top:14px"><button class="btn primary" onclick="saveEdit()">Save Changes</button><button class="btn" onclick="closeEdit()">Cancel</button></div>`;$('editOverlay').classList.add('open')}
 function closeEdit(){$('editOverlay').classList.remove('open');editingId=null}
 async function saveEdit(){const binRaw=$('eBin').value.trim();if(binRaw&&!validateBinFormat(binRaw).ok){alert('Invalid bin format.\n\nValid: ##-##-##, ##-##-#, P#####, BULK, ROOM, KEY ACCOUNT');return}const data={date:$('eDate').value,division:$('eDiv').value.trim().toUpperCase(),productCode:$('eProduct').value.trim().toUpperCase(),shortedBin:binRaw.toUpperCase(),qtyShorted:num($('eQty').value),uom:$('eUom').value.trim().toUpperCase(),pickDemand:$('eDemand').value.trim(),picker:$('ePicker').value.trim(),notes:$('eNotes').value.trim(),icQtyFound:num($('eIcQty').value),icUom:$('eIcUom').value.trim().toUpperCase(),icNotes:$('eIcNotes').value.trim(),foundInShortedBin:$('eErr').checked,secondLocationFilled:$('eSecond').checked,replenishedAfterPick:$('eRep').checked,status:$('eErr').checked?'located':'open'};if(!data.foundInShortedBin){data.icQtyFound=0;data.icUom='';data.icNotes=data.icNotes}await updateRecord(editingId,data,editingArchive);closeEdit()}
 function selectVisible(on){document.querySelectorAll('.sr-check:not(:disabled)').forEach(c=>c.checked=on)}function selectedIds(){return [...document.querySelectorAll('.sr-check:checked')].map(c=>c.dataset.id)}async function archiveSelected(){const ids=selectedIds();if(!ids.length){alert('Select shortages first.');return}await archiveIds(ids)}async function archiveFiltered(){const ids=visibleShortages.filter(r=>!r._archived).map(r=>r.id);if(!ids.length){alert('No active filtered shortages to archive.');return}if(!confirm(`Archive ${ids.length} active filtered shortages?`))return;await archiveIds(ids)}
@@ -1255,63 +1301,8 @@ function removePackStation(s){packStations=packStations.filter(p=>p!==s);localSt
 // Keep old addPicker alias for any legacy calls
 function addPicker(){addPickerManual();}
 function loadSettingsForm(){if(!canSettings()){showScreen('shortage');return}const s=getSettings();$('cfgApiKey').value=s.firebaseConfig.apiKey||'';$('cfgAuthDomain').value=s.firebaseConfig.authDomain||'';$('cfgProjectId').value=s.firebaseConfig.projectId||'';$('cfgStorageBucket').value=s.firebaseConfig.storageBucket||'';$('cfgSenderId').value=s.firebaseConfig.messagingSenderId||'';$('cfgAppId').value=s.firebaseConfig.appId||'';$('cfgActiveCollection').value=s.activeCollection;$('cfgArchiveCollection').value=s.archiveCollection;applyTheme()}
-function saveSettings(){const s={firebaseConfig:{apiKey:$('cfgApiKey').value.trim(),authDomain:$('cfgAuthDomain').value.trim(),projectId:$('cfgProjectId').value.trim(),storageBucket:$('cfgStorageBucket').value.trim(),messagingSenderId:$('cfgSenderId').value.trim(),appId:$('cfgAppId').value.trim()},activeCollection:$('cfgActiveCollection').value.trim()||'shortages_active',archiveCollection:$('cfgArchiveCollection').value.trim()||'shortages_archive'};localStorage.setItem('scp_settings',JSON.stringify(s));alert('Settings saved. Reloading Firebase connection.');location.reload()}
-async function runMigration(){
-  if(!canSettings())return;
-  if(!confirm('Copy old shortages into the new shortage app? This will not delete old records.'))return;
-  showLoading('Migrating old shortages...');
-  try{
-    let oldApp=firebase.apps.find(a=>a.name==='oldShortageSource')||firebase.initializeApp(OLD_CONFIG,'oldShortageSource');
-    oldDb=oldApp.firestore();
-    const oldCol=$('oldCollection').value.trim()||'shortages';
-    const limit=num($('migLimit').value)||5000;
-    const s=getSettings();
-    let count=0,erroneous=0,backorders=0,secondFilled=0,replenished=0;
-    let lastDoc=null;
-    while(count<limit){
-      let q=oldDb.collection(oldCol).orderBy(firebase.firestore.FieldPath.documentId()).limit(Math.min(400,limit-count));
-      if(lastDoc)q=q.startAfter(lastDoc);
-      const snap=await q.get();
-      if(snap.empty)break;
-      let batch=db.batch();
-      for(const d of snap.docs){
-        const normalized=normalizeShortage(d.data(),d.id,false);
-        const data={...d.data(),...normalized,migratedAt:new Date().toISOString(),migratedFrom:'inventory-control-portal/'+oldCol,sourceDocId:d.id};
-        delete data.id;delete data._archived;
-        batch.set(db.collection(s.activeCollection).doc(d.id),data,{merge:true});
-        if(data.foundInShortedBin)erroneous++;
-        if(data.erroneousBackorder)backorders++;
-        if(data.secondLocationFilled)secondFilled++;
-        if(data.replenishedAfterPick)replenished++;
-        count++;
-        lastDoc=d;
-      }
-      await batch.commit();
-      $('migrationResult').innerHTML=`<div class="notice">Migrating... ${count} records copied so far.</div>`;
-      if(snap.size<400)break;
-    }
-    const verify=await db.collection(s.activeCollection).where('migratedFrom','==','inventory-control-portal/'+oldCol).limit(1).get();
-    clearCaches();
-    $('viewMode').value='active';
-    await loadShortages(true);
-    $('migrationResult').innerHTML=`<div class="notice"><b>Migration complete.</b><br>Copied ${count} records into <b>${esc(s.activeCollection)}</b>.<br>Verified new database write: <b>${verify.empty?'NO, check new Firebase rules/settings':'YES'}</b><br>Erroneous shorts carried over: <b>${erroneous}</b><br>Erroneous backorders carried over: <b>${backorders}</b><br>Second-location filled carried over: <b>${secondFilled}</b><br>Replenished-after-pick carried over: <b>${replenished}</b><br>Old database was not deleted.</div>`;
-  }catch(e){
-    console.error(e);
-    $('migrationResult').innerHTML=`<div class="notice" style="background:var(--red-l);border-color:rgba(248,113,113,.35)"><b>Migration failed:</b> ${esc(e.message)}<br>Old Firebase must allow read on <b>shortages</b>. New Firebase must allow write on <b>shortages_active</b>.</div>`;
-    alert('Migration failed: '+e.message);
-  }finally{hideLoading()}
-}
+function saveSettings(){const s={firebaseConfig:{apiKey:$('cfgApiKey').value.trim(),authDomain:$('cfgAuthDomain').value.trim(),projectId:$('cfgProjectId').value.trim(),storageBucket:$('cfgStorageBucket').value.trim(),messagingSenderId:$('cfgSenderId').value.trim(),appId:$('cfgAppId').value.trim()},activeCollection:$('cfgActiveCollection').value.trim()||'shortages_active',archiveCollection:$('cfgArchiveCollection').value.trim()||'shortages_archive',overpullCollection:'overpull_active'};localStorage.setItem('scp_settings',JSON.stringify(s));db=null;initFirebase();clearCaches();alert('Settings saved. Connected to project: '+s.firebaseConfig.projectId);}
 
-
-/* ─── Bin Location Validation ─────────────────────────────
-   Valid formats:
-     ##-##-##   (two digits, dash, two digits, dash, two digits)
-     ##-##-#    (two digits, dash, two digits, dash, one digit)
-     P#####     (letter P followed by 1-6 digits)
-     BULK       (exact word)
-     ROOM       (exact word)
-     KEY ACCOUNT (exact phrase)
-   ──────────────────────────────────────────────────────── */
 function validateBinFormat(raw){
   const v=(raw||'').trim().toUpperCase();
   if(!v)return{ok:false,msg:''};
@@ -1454,7 +1445,7 @@ function opAddLine(data={}){
   const row=document.createElement('div');
   row.className='product-line-card op-item-line';
   row.innerHTML=`<div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;align-items:end">
-    <div class="field" style="margin-bottom:0"><label>Product Code <em>*</em></label><input class="op-product" placeholder="e.g. DI1210" autocomplete="off" value="${esc(data.productCode||'')}"></div>
+    <div class="field" style="margin-bottom:0"><label>Product Code <em>*</em></label><input class="op-product" placeholder="e.g. DI1210" autocomplete="off" autocapitalize="characters" spellcheck="false" style="text-transform:uppercase" value="${esc(data.productCode||'')}"></div>
     <div class="field" style="margin-bottom:0"><label>Qty <em>*</em></label><input class="op-qty" type="number" min="1" step="1" value="${esc(data.qty??1)}"></div>
     <div class="field" style="margin-bottom:0"><label>UOM</label><select class="op-uom"><option value="EA"${(!data.uom||data.uom==='EA')?' selected':''}>EA</option><option value="CS"${data.uom==='CS'?' selected':''}>CS</option><option value="PK"${data.uom==='PK'?' selected':''}>PK</option><option value="PR"${data.uom==='PR'?' selected':''}>PR</option><option value="BX"${data.uom==='BX'?' selected':''}>BX</option><option value="DZ"${data.uom==='DZ'?' selected':''}>DZ</option></select></div>
     <button class="btn remove-line-btn" style="margin-bottom:0" onclick="opRemoveLine(this)">&times;</button>
@@ -1524,6 +1515,7 @@ function opFinishEntry(){
 }
 
 async function opSaveEntry(){
+  if(!ensureDb())return;
   if(!opValidateHeader())return;
   const lines=opGetLines();
   if(!lines.length){alert('Add at least one item with a product code and qty.');return;}
@@ -2359,7 +2351,7 @@ const LANGS={
     'row.qty':'Qty','row.demand':'Demand','row.picker':'Picker',
     'pin.incorrect':'Incorrect PIN',
     'op.title':'Over Pull Log','op.subtitle':'No login required — log items pulled in excess of the pick demand.',
-    'op.tab_entry':'📝 Log Entry','op.tab_batch':'📋 Batch Pick Sheet','op.tab_records':'📊 Records & Stats',
+    'op.tab_entry':'📝 Log Entry','op.tab_batch':'📋 Batch Pick Sheet','op.batch_title':'Mga Detalye ng Batch Pick','op.batch_orders_title':'Mga Order sa Batch Pick na ito','op.batch_add_order':'+ Magdagdag ng Order','op.batch_submit':'+ I-log ang Batch Pick Shortage','op.batch_title':'Batch Pick Details','op.batch_orders_title':'Orders in this Batch Pick','op.batch_add_order':'+ Add Order','op.batch_submit':'+ Log Batch Pick Shortage','op.tab_records':'📊 Records & Stats',
     'op.new_entry':'New Over Pull Entry','op.order_num':'Order Number',
     'op.packer_name':'Packer Name','op.picker_name':'Picker Name','op.pack_station':'Pack Station',
     'op.items_title':'Items Over-Pulled','op.add_item':'+ Add Item','op.clear':'Clear Form',
@@ -2411,7 +2403,7 @@ const LANGS={
     'row.qty':'Cant.','row.demand':'Demanda','row.picker':'Recolector',
     'pin.incorrect':'PIN Incorrecto',
     'op.title':'Registro de Exceso','op.subtitle':'Sin inicio de sesión — registre artículos en exceso.',
-    'op.tab_entry':'📝 Entrada','op.tab_batch':'📋 Hoja de Recogida por Lotes','op.tab_records':'📊 Registros y Estadísticas',
+    'op.tab_entry':'📝 Entrada','op.tab_batch':'📋 Hoja de Recogida por Lotes','op.batch_title':'Detalles de Recogida por Lotes','op.batch_orders_title':'Órdenes en esta Recogida por Lotes','op.batch_add_order':'+ Agregar Orden','op.batch_submit':'+ Registrar Recogida por Lotes','op.tab_records':'📊 Registros y Estadísticas',
     'op.new_entry':'Nueva Entrada de Exceso','op.order_num':'Número de Orden',
     'op.packer_name':'Nombre del Empacador','op.picker_name':'Nombre del Recolector','op.pack_station':'Estación de Empaque',
     'op.items_title':'Artículos en Exceso','op.add_item':'+ Agregar Artículo','op.clear':'Limpiar',
@@ -2463,7 +2455,7 @@ const LANGS={
     'row.qty':'تعداد','row.demand':'تقاضا','row.picker':'جمع‌آورنده',
     'pin.incorrect':'پین نادرست است',
     'op.title':'ثبت مازاد','op.subtitle':'بدون ورود — اقلام مازاد را ثبت کنید.',
-    'op.tab_entry':'📝 ورود داده','op.tab_batch':'📋 برگه برداشت دسته‌ای','op.tab_records':'📊 سوابق و آمار',
+    'op.tab_entry':'📝 ورود داده','op.tab_batch':'📋 برگه برداشت دسته‌ای','op.batch_title':'جزئیات برداشت دسته‌ای','op.batch_orders_title':'سفارش‌ها در این برداشت دسته‌ای','op.batch_add_order':'+ افزودن سفارش','op.batch_submit':'+ ثبت کمبود برداشت دسته‌ای','op.tab_records':'📊 سوابق و آمار',
     'op.new_entry':'ورود مازاد جدید','op.order_num':'شماره سفارش',
     'op.packer_name':'نام بسته‌بند','op.picker_name':'نام جمع‌آورنده','op.pack_station':'ایستگاه بسته‌بندی',
     'op.items_title':'اقلام مازاد','op.add_item':'+ افزودن قلم','op.clear':'پاک کردن',
@@ -2568,7 +2560,7 @@ const LANGS={
     'row.qty':'الكمية','row.demand':'الطلب','row.picker':'جامع البضائع',
     'pin.incorrect':'رمز PIN غير صحيح',
     'op.title':'سجل الزيادة','op.subtitle':'بدون تسجيل دخول — سجّل العناصر التي تم سحبها بزيادة.',
-    'op.tab_entry':'📝 إدخال البيانات','op.tab_batch':'📋 ورقة الانتقاء الدُفعي','op.tab_records':'📊 السجلات والإحصاءات',
+    'op.tab_entry':'📝 إدخال البيانات','op.tab_batch':'📋 ورقة الانتقاء الدُفعي','op.batch_title':'تفاصيل الانتقاء الدُفعي','op.batch_orders_title':'الطلبات في هذا الانتقاء الدُفعي','op.batch_add_order':'+ إضافة طلب','op.batch_submit':'+ تسجيل نقص الانتقاء الدُفعي','op.tab_records':'📊 السجلات والإحصاءات',
     'op.new_entry':'إدخال زيادة جديد','op.order_num':'رقم الطلب',
     'op.packer_name':'اسم المعبّئ','op.picker_name':'اسم الجامع','op.pack_station':'محطة التعبئة',
     'op.items_title':'العناصر الزائدة','op.add_item':'+ إضافة عنصر','op.clear':'مسح النموذج',
@@ -2767,9 +2759,9 @@ function applyLangToForms(){
   if(opTitle)opTitle.textContent=t('op.title');
   const opDesc=document.querySelector('#overpullScreen .page-head p');
   if(opDesc)opDesc.textContent=t('op.subtitle');
-  const et=$('opTab-entry');if(et)et.textContent=t('op.tab_entry');
-  const bt=$('opTab-batch');if(bt)bt.textContent='&#128203; '+(t('op.tab_batch')||'Batch Pick Sheet');
-  const rt=$('opTab-records');if(rt)rt.textContent=t('op.tab_records');
+  const et=$('opTab-entry');if(et)et.innerHTML=t('op.tab_entry')||'&#128221; Log Entry';
+  const bt=$('opTab-batch');if(bt)bt.innerHTML='&#128203; '+(t('op.tab_batch')||'Batch Pick Sheet');
+  const rt=$('opTab-records');if(rt)rt.innerHTML=t('op.tab_records')||'&#128202; Records &amp; Stats';
   lbl('opOrder','op.order_num');
   lbl('opPackerSelect','op.packer_name');
   lbl('opPickerSelect','op.picker_name');
@@ -2839,6 +2831,41 @@ function applyLangToForms(){
     if(ptSh.options[2])ptSh.options[2].textContent=t('form.shift_2nd');
     if(ptSh.options[3])ptSh.options[3].textContent=t('form.shift_wot');
   }
+
+  // ── Batch Pick Sheet labels ──
+  const bpCardTitle=document.querySelector('#opPane-batch .card-title');
+  if(bpCardTitle)bpCardTitle.childNodes[0].textContent=(t('op.batch_title')||'Batch Pick Details')+' ';
+  const bpOrdersTitle=document.querySelectorAll('#opPane-batch .card-title')[1];
+  if(bpOrdersTitle)bpOrdersTitle.childNodes[0].textContent=(t('op.batch_orders_title')||'Orders in this Batch Pick')+' ';
+  // Labels in batch pick form
+  const bpLabelMap={
+    'bpDate':t('form.date_time'),'bpDiv':t('form.division'),
+    'bpPickerSelect':t('form.picker'),'bpPackerSelect':t('form.packer'),
+    'bpProduct':t('op.product_code'),'bpUom':t('op.uom'),'bpShift':t('form.shift_override'),
+    'bpNotes':t('form.notes'),
+  };
+  Object.entries(bpLabelMap).forEach(([id,lbl])=>{
+    const el=$(id);if(!el)return;
+    const field=el.closest('.field');if(!field)return;
+    const lab=field.querySelector('label');if(!lab)return;
+    lab.childNodes[0].textContent=lbl+' ';
+  });
+  // Batch pick buttons
+  const bpAddBtn=document.querySelector('button[onclick="bpAddOrderLine()"]');
+  if(bpAddBtn)bpAddBtn.textContent=(t('op.batch_add_order')||'+ Add Order');
+  const bpClearBtn=document.querySelector('button[onclick="bpClearForm()"]');
+  if(bpClearBtn)bpClearBtn.textContent=t('form.clear_form')||'Clear Form';
+  const bpSubmitBtn=document.querySelector('button[onclick="saveBatchPick()"]');
+  if(bpSubmitBtn)bpSubmitBtn.textContent=(t('op.batch_submit')||'+ Log Batch Pick Shortage');
+  // Batch picker/packer select placeholders
+  ['bpPickerSelect','bpPackerSelect'].forEach((id,i)=>{
+    const sel=$(id);if(!sel||!sel.options.length)return;
+    if(sel.options[0]&&sel.options[0].value==='')sel.options[0].textContent=
+      '-- '+(i===0?t('form.picker'):t('form.packer'))+' --';
+  });
+  // Batch shift options
+  const bpSh=$('bpShift');
+  if(bpSh){optText(bpSh,0,'form.shift_auto');optText(bpSh,1,'form.shift_1st');optText(bpSh,2,'form.shift_2nd');optText(bpSh,3,'form.shift_wot');}
 
   // ── Highlight active lang button ──
   ['en','es','fa','ar','fil'].forEach(l=>{
@@ -2953,6 +2980,37 @@ function startResetListener(){
   }catch(e){console.warn('Reset listener failed:',e);}
 }
 
+async function testFirebaseConnection(){
+  showLoading('Testing Firebase connection...');
+  try{
+    // Re-init with current form values (not saved settings)
+    const cfg={
+      apiKey:$('cfgApiKey').value.trim(),
+      authDomain:$('cfgAuthDomain').value.trim(),
+      projectId:$('cfgProjectId').value.trim(),
+      storageBucket:$('cfgStorageBucket').value.trim(),
+      messagingSenderId:$('cfgSenderId').value.trim(),
+      appId:$('cfgAppId').value.trim(),
+    };
+    // Try connecting with these values
+    if(firebase.apps.length){firebase.apps.forEach(app=>{try{app.delete();}catch(x){}});}
+    firebase.initializeApp(cfg);
+    const testDb=firebase.firestore();
+    testDb.settings({ignoreUndefinedProperties:true});
+    // Try a read
+    const testSnap=await testDb.collection($('cfgActiveCollection').value.trim()||'shortages_active').limit(1).get();
+    db=testDb;
+    updateDbStatus(true);
+    hideLoading();
+    alert('✓ Connection successful!\n\nProject: '+cfg.projectId+'\nRead test: '+testSnap.size+' doc(s) returned.\n\nClick Save Settings to apply.');
+  }catch(e){
+    hideLoading();
+    db=null;
+    updateDbStatus(false,e.message);
+    alert('✗ Connection failed:\n\n'+e.message+'\n\nCheck your API key and Project ID.');
+  }
+}
+
 async function forceReloadAllClients(){
   if(!canSettings()){alert('IC Manager access required.');return;}
   if(!confirm('Force reload ALL open instances of this app on every computer?\n\nThis will refresh everyone\'s browser within ~2 seconds.'))return;
@@ -2998,17 +3056,23 @@ function bpPopulatePickers(){
     const cur=psel.value;psel.innerHTML=popts;if(cur)psel.value=cur;
   }
 }
+function bpAutoDiv(input){
+  const raw=(input.value||'').replace('.','').slice(0,2).toUpperCase();
+  const divSel=$('bpDiv');
+  if(divSel&&!divSel.value&&raw.length===2&&/^[A-Z]{2}$/.test(raw))divSel.value=raw;
+}
+
 function bpAddOrderLine(data={}){
   const wrap=$('bpOrderLines');if(!wrap)return;
   const row=document.createElement('div');row.className='product-line-card bp-order-line';
   const ov=esc(data.orderNumber||'');const qv=esc(String(data.qty||''));
   row.innerHTML='<div style="display:grid;grid-template-columns:2fr 1fr auto;gap:10px;align-items:end">'
-    +'<div class="field" style="margin-bottom:0"><label>Order # <em>*</em></label>'
-    +'<input class="bp-order" placeholder="e.g. NH.45433" autocomplete="off"'
-    +' style="font-family:var(--mono);font-weight:700;letter-spacing:.04em"'
-    +' value="'+ov+'" onblur="bpNormalizeOrder(this)">'
+    +'<div class="field" style="margin-bottom:0"><label>Order Number <em>*</em></label>'
+    +'<input class="bp-order" placeholder="e.g. NH.45433" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false"'
+    +' style="font-family:var(--mono);font-weight:700;letter-spacing:.04em;text-transform:uppercase"'
+    +' value="'+ov+'" oninput="bpAutoDiv(this)" onblur="bpNormalizeOrder(this)">'
     +'<div style="font-size:10px;color:var(--muted);margin-top:2px;font-family:var(--mono)" class="bp-div-hint"></div></div>'
-    +'<div class="field" style="margin-bottom:0"><label>Qty Shorted <em>*</em></label>'
+    +'<div class="field" style="margin-bottom:0"><label>Qty Over-Pulled <em>*</em></label>'
     +'<input class="bp-qty" type="number" min="1" step="1" value="'+qv+'"></div>'
     +'<button class="btn remove-line-btn" style="margin-bottom:0" onclick="bpRemoveOrderLine(this)">&times;</button></div>';
   wrap.appendChild(row);
@@ -3021,11 +3085,21 @@ function bpRemoveOrderLine(btn){
 function bpNormalizeOrder(input){
   const raw=(input.value||'').trim();if(!raw)return;
   const result=normalizeOrderNumber(raw);
-  if(result.ok){input.value=result.val;input.style.borderColor='rgba(16,185,129,.6)';}
-  else input.style.borderColor='';
-  const div=raw.replace(/[^A-Za-z]/g,'').slice(0,2).toUpperCase();
+  if(result.ok){
+    input.value=result.val;
+    input.style.borderColor='rgba(16,185,129,.6)';
+    // Auto-fill division from first order line entered
+    const divSel=$('bpDiv');
+    if(divSel&&!divSel.value&&result.div)divSel.value=result.div;
+  } else {
+    input.style.borderColor='';
+    const div=raw.replace(/[^A-Za-z]/g,'').slice(0,2).toUpperCase();
+    const divSel=$('bpDiv');
+    if(divSel&&!divSel.value&&div)divSel.value=div;
+  }
+  const div2=(result.ok?result.div:(raw.replace(/[^A-Za-z]/g,'').slice(0,2).toUpperCase()));
   const hint=input.closest('.bp-order-line')?.querySelector('.bp-div-hint');
-  if(hint&&div.length>=2)hint.textContent='Div: '+div;
+  if(hint&&div2)hint.textContent='Div: '+div2;
 }
 function bpGetOrderLines(){
   return [...$('bpOrderLines').querySelectorAll('.bp-order-line')].map(row=>({
@@ -3060,6 +3134,7 @@ async function saveBatchPick(){
   if(normalPacker&&!fuzzyMatchPerson(normalPacker,'packer')){
     if(confirm('Save "'+normalPacker+'" as new packer?'))savePerson(normalPacker,'packer');
   }
+  if(!ensureDb())return;
   showLoading('Logging '+orders.length+' batch pick shortages...');
   try{
     const s=getSettings();
@@ -3092,6 +3167,18 @@ async function saveBatchPick(){
   }catch(e){alert('Save failed: '+e.message);}finally{hideLoading();}
 }
 function bpClearForm(){bpInitForm();}
+
+// Auto-uppercase product codes and order numbers typed into any matching input
+document.addEventListener('input',function(e){
+  const el=e.target;
+  if(!el||el.tagName!=='INPUT')return;
+  const cls=el.className||'';
+  if(cls.includes('bp-order')||cls.includes('op-product')||cls.includes('line-product')||cls.includes('line-bin')||el.id==='opOrder'||el.id==='bpProduct'||el.id==='sDemand'||el.id==='ptDemand'){
+    const pos=el.selectionStart;
+    el.value=el.value.toUpperCase();
+    try{el.setSelectionRange(pos,pos);}catch(x){}
+  }
+});
 
 function startup(){applyTheme();initFirebase();$('sDate').value=nowLocalInput();loadAllPersonnel();populatePickerSelects();populateStationSelects();if($('productLines'))addProductLine();const sl=localStorage.getItem('scp_lang')||'en';setLang(sl);startResetListener();}
 startup();
