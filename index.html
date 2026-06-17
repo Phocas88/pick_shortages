@@ -1018,6 +1018,10 @@ function renderReports(){
 function renderCheckPreview(){}
 
 function printSummaryReport(){
+  if(!shortages.length){
+    runReportPull().then(()=>setTimeout(printSummaryReport,600));
+    return;
+  }
   const fromStr=$('reportStart')?.value;
   const toStr=$('reportEnd')?.value;
   const mode=$('reportMode')?.value||lastLoadMode;
@@ -1201,6 +1205,10 @@ function printSummaryReport(){
 
 
 function printCheckReport(){
+  if(!shortages.length){
+    runReportPull().then(()=>setTimeout(printCheckReport,600));
+    return;
+  }
   const fromStr=$('reportStart')?.value;
   const toStr=$('reportEnd')?.value;
   const today=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
@@ -2166,6 +2174,191 @@ function onPickerSelectChange(selectId, newInputId, hiddenId){
   }
 }
 
+
+/* ── IC VERIFY SHEET ────────────────────────────────── */
+let icConfirmEdits={};
+
+function icConfirmFilteredRows(){
+  const f=$('icConfirmFilter')?.value||'pending';
+  const active=shortages.filter(r=>!r._archived&&r.type!=='duplicate_pick');
+  if(f==='pending') return active.filter(r=>!r.icConfirmed&&!r.foundInShortedBin&&!r.secondLocationFilled);
+  if(f==='confirmed') return active.filter(r=>r.icConfirmed==='confirmed_short');
+  if(f==='erroneous') return active.filter(r=>r.foundInShortedBin||r.icConfirmed==='erroneous');
+  return active;
+}
+
+function uomSelect(id,cur){
+  const uoms=['EA','CS','IN','PK','PR','BX','DZ'];
+  return `<select id="${id}" class="ic-qty-input" style="width:60px" onchange="icCountChange(this)" data-id="${id.split('_')[1]||''}" data-field="uom">
+    ${uoms.map(u=>`<option value="${u}"${u===(cur||'EA')?' selected':''}>${u}</option>`).join('')}
+  </select>`;
+}
+
+function openIcConfirm(){
+  if(!canRunReports()){alert('IC Team or Manager access required.');return;}
+  icConfirmEdits={};
+  if(!shortages.length){
+    loadShortages(true).then(()=>{renderIcConfirmSheet();$('icConfirmOverlay').classList.add('open');});
+    return;
+  }
+  renderIcConfirmSheet();
+  $('icConfirmOverlay').classList.add('open');
+}
+
+function closeIcConfirm(){
+  $('icConfirmOverlay').classList.remove('open');
+  icConfirmEdits={};
+}
+
+function renderIcConfirmSheet(){
+  const rows=icConfirmFilteredRows();
+  const total=shortages.filter(r=>!r._archived&&r.type!=='duplicate_pick').length;
+  const done=shortages.filter(r=>!r._archived&&(r.icConfirmed||r.foundInShortedBin||r.secondLocationFilled)).length;
+  const pct=total?Math.round(done/total*100):0;
+  const prog=$('icProgress');
+  if(prog)prog.innerHTML=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+    <div style="flex:1;background:var(--border);border-radius:4px;height:8px">
+      <div style="width:${pct}%;background:var(--green);height:8px;border-radius:4px;transition:width .3s"></div>
+    </div>
+    <span style="font-size:12px;color:var(--muted);white-space:nowrap">${done}/${total} verified (${pct}%)</span>
+  </div>`;
+
+  if(!rows.length){
+    $('icConfirmSheet').innerHTML='<div class="empty" style="padding:32px;text-align:center">No shortages in this filter.</div>';
+    return;
+  }
+
+  const dataRows=rows.map((r,i)=>{
+    const edit=icConfirmEdits[r.id]||{};
+    const alreadyDone=!!(r.icConfirmed||r.foundInShortedBin||r.secondLocationFilled);
+    const curResult=edit.result||(r.icConfirmed||(r.foundInShortedBin?'erroneous':r.secondLocationFilled?'second_location':''));
+    const counts=edit.icCounts||[{qty:'',uom:r.uom||'EA',notes:''}];
+    const curNotes=edit.icNotes!==undefined?edit.icNotes:(r.icNotes||'');
+    const rowClass=curResult==='confirmed_short'?'confirmed-row':curResult==='erroneous'?'erroneous-row':alreadyDone?'already-done':'';
+    const selectClass=curResult==='confirmed_short'?'res-confirmed':curResult==='erroneous'?'res-erroneous':'';
+    const countLines=counts.map((c,ci)=>`
+      <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">
+        <input class="ic-qty-input" type="number" min="0" placeholder="Qty" style="width:70px;font-size:15px;padding:8px"
+          data-id="${esc(r.id)}" data-ci="${ci}" data-field="qty" value="${esc(String(c.qty))}" onchange="icCountChange(this)">
+        ${uomSelect(`uom_${esc(r.id)}_${ci}`,c.uom)}
+        <input class="ic-notes-input" placeholder="Notes..." style="flex:1;font-size:13px;padding:8px"
+          data-id="${esc(r.id)}" data-ci="${ci}" data-field="notes" value="${esc(c.notes||'')}" onchange="icCountChange(this)">
+        ${ci>0?`<button class="btn" style="padding:4px 10px;font-size:13px" onclick="icRemoveCount('${esc(r.id)}',${ci})">&times;</button>`:''}
+      </div>`).join('');
+    return `<div class="ic-sheet-row ${rowClass}" data-id="${esc(r.id)}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div>
+          <div style="font-family:var(--mono);font-size:15px;font-weight:800;color:var(--accent)">${esc(r.shortedBin||'—')}</div>
+          <div style="font-family:var(--mono);font-size:13px;font-weight:700;margin-top:2px">${esc(r.productCode||'—')}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:13px;font-weight:700;color:var(--yellow)">${r.qtyShorted||0} ${esc(r.uom||'EA')}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">#${i+1} of ${rows.length}</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:10px;border-bottom:1px solid var(--border);padding-bottom:8px">
+        <span style="font-family:var(--mono)">${esc(r.pickDemand||'—')}</span> &bull; ${esc(r.division||'')} &bull; ${esc(r.picker||'—')}
+        ${alreadyDone&&!edit.result?`<span style="margin-left:8px;color:var(--green);font-weight:600">&#10003; Previously: ${curResult||'verified'}</span>`:''}
+      </div>
+      <div style="margin-bottom:10px">
+        <select class="ic-result-select ${selectClass}" data-id="${esc(r.id)}" onchange="icResultChange(this)"
+          style="width:100%;font-size:15px;padding:10px 12px;font-weight:700;border-radius:8px">
+          <option value="">— Pending —</option>
+          <option value="confirmed_short" ${curResult==='confirmed_short'?'selected':''}>&#10003; Confirmed Short Bin</option>
+          <option value="erroneous" ${curResult==='erroneous'?'selected':''}>&#9888; Erroneous Short</option>
+          <option value="skip" ${curResult==='skip'?'selected':''}>&#8634; Skip (Review Next Pass)</option>
+        </select>
+      </div>
+      <div style="margin-bottom:6px">${countLines}
+        <button class="btn" style="font-size:12px;padding:6px 12px" onclick="icAddCount('${esc(r.id)}',${esc(JSON.stringify(r.uom||'EA'))})">+ Add Count Line</button>
+      </div>
+      <input class="ic-notes-input" placeholder="IC notes..." data-id="${esc(r.id)}" data-field="icNotes"
+        value="${esc(curNotes)}" onchange="icNoteChange(this)" style="width:100%;font-size:13px;padding:8px">
+    </div>`;
+  }).join('');
+  $('icConfirmSheet').innerHTML=dataRows;
+}
+
+function icResultChange(sel){
+  const id=sel.dataset.id;
+  if(!icConfirmEdits[id])icConfirmEdits[id]={};
+  icConfirmEdits[id].result=sel.value;
+  // Re-color the select
+  sel.className='ic-result-select'+(sel.value==='confirmed_short'?' res-confirmed':sel.value==='erroneous'?' res-erroneous':'');
+  // Re-color the card
+  const card=sel.closest('.ic-sheet-row');
+  if(card){card.className='ic-sheet-row'+(sel.value==='confirmed_short'?' confirmed-row':sel.value==='erroneous'?' erroneous-row':'');}
+}
+
+function icCountChange(inp){
+  const id=inp.dataset.id;const ci=parseInt(inp.dataset.ci||'0');const field=inp.dataset.field;
+  if(!icConfirmEdits[id])icConfirmEdits[id]={};
+  if(!icConfirmEdits[id].icCounts){
+    const r=shortages.find(x=>x.id===id);
+    icConfirmEdits[id].icCounts=[{qty:'',uom:r?.uom||'EA',notes:''}];
+  }
+  while(icConfirmEdits[id].icCounts.length<=ci)icConfirmEdits[id].icCounts.push({qty:'',uom:'EA',notes:''});
+  icConfirmEdits[id].icCounts[ci][field]=field==='qty'?inp.value:inp.value;
+}
+
+function icNoteChange(inp){
+  const id=inp.dataset.id;const field=inp.dataset.field;
+  if(!icConfirmEdits[id])icConfirmEdits[id]={};
+  icConfirmEdits[id][field]=inp.value;
+}
+
+function icAddCount(id,uom){
+  if(!icConfirmEdits[id])icConfirmEdits[id]={};
+  if(!icConfirmEdits[id].icCounts)icConfirmEdits[id].icCounts=[{qty:'',uom:uom||'EA',notes:''}];
+  icConfirmEdits[id].icCounts.push({qty:'',uom:uom||'EA',notes:''});
+  renderIcConfirmSheet();
+}
+
+function icRemoveCount(id,ci){
+  if(!icConfirmEdits[id]||!icConfirmEdits[id].icCounts)return;
+  icConfirmEdits[id].icCounts.splice(ci,1);
+  renderIcConfirmSheet();
+}
+
+async function icConfirmSubmitAll(){
+  const entries=Object.entries(icConfirmEdits).filter(([,e])=>e.result&&e.result!=='skip');
+  const skip_ct=Object.entries(icConfirmEdits).filter(([,e])=>e.result==='skip').length;
+  if(!entries.length){alert('No results to save. Select a result for each bin first.');return;}
+  const confirm_ct=entries.filter(([,e])=>e.result==='confirmed_short').length;
+  const err_ct=entries.filter(([,e])=>e.result==='erroneous').length;
+  if(!confirm(`Save IC verification results?\n\n✓ Confirmed Short Bin: ${confirm_ct}\n⚠ Erroneous Short: ${err_ct}\n↺ Skip (next pass): ${skip_ct}\n\nThis will update ${entries.length} shortage record(s).`))return;
+  showLoading('Saving IC verification...');
+  try{
+    const s=getSettings();
+    const verifiedAt=new Date().toISOString();
+    const verifiedBy=role||'icteam';
+    const batch=db.batch();
+    for(const [id,edit] of entries){
+      const r=shortages.find(x=>x.id===id);if(!r)continue;
+      const counts=edit.icCounts||[];
+      const validCounts=counts.filter(c=>num(c.qty)>0);
+      const totalIcQty=validCounts.reduce((s,x)=>s+num(x.qty),0);
+      const countSummary=validCounts.map(x=>`${x.qty} ${x.uom}${x.notes?' ('+x.notes+')':''}`).join(', ');
+      let update={icConfirmed:edit.result,icConfirmedAt:verifiedAt,icConfirmedBy:verifiedBy};
+      if(totalIcQty>0){update.icQtyFound=totalIcQty;update.icUom=validCounts[0]?.uom||r.uom||'EA';}
+      if(edit.icNotes)update.icNotes=edit.icNotes;
+      if(edit.result==='erroneous'){
+        update.foundInShortedBin=true;update.status='located';
+      } else if(edit.result==='confirmed_short'){
+        update.status='confirmed_short';
+      }
+      const ref=db.collection(r._archived?s.archiveCollection:s.activeCollection).doc(id);
+      batch.set(ref,update,{merge:true});
+    }
+    await batch.commit();
+    clearCaches();
+    await loadShortages(true);
+    hideLoading();
+    icConfirmEdits={};
+    renderIcConfirmSheet();
+    alert(`IC verification saved. ${confirm_ct} confirmed short, ${err_ct} erroneous.`);
+  }catch(e){hideLoading();alert('Save failed: '+e.message);}
+}
 
 let currentLang='en';
 const LANGS={
