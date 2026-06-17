@@ -1071,9 +1071,9 @@ function renderCheckPreview(){}
 
 async function printSummaryReport(){
   if(!shortages.length){await runReportPull();if(!shortages.length){alert('No shortage data found. Click Run Report first.');return;}}
-  const allRows=filteredRows(true);
-  console.log('[printSummaryReport] shortages=',shortages.length,'filtered rows=',allRows.length);
-  if(!allRows.length){alert('No shortages match the current date filter.\n\nTip: Clear the Start/End date fields to see all shortages.');return;}
+  const rows=filteredRows(true);
+  console.log('[printSummaryReport] shortages=',shortages.length,'filtered rows=',rows.length);
+  if(!rows.length){alert('No shortages match the current date filter.\n\nTip: Clear the Start/End date fields to see all shortages.');return;}
   const fromStr=$('reportStart')?.value;
   const toStr=$('reportEnd')?.value;
   const mode=$('reportMode')?.value||lastLoadMode;
@@ -1257,16 +1257,14 @@ async function printSummaryReport(){
 
 async function printCheckReport(){
   if(!shortages.length){await runReportPull();if(!shortages.length){alert('No shortage data found. Click Run Report first.');return;}}
-  const allRows=filteredRows(true);
-  console.log('[printCheckReport] shortages=',shortages.length,'filtered rows=',allRows.length);
-  if(!allRows.length){alert('No shortages match the current date filter.\n\nTip: Clear the Start/End date fields to see all shortages.');return;}
+  const rows=filteredRows(true).sort((a,b)=>(a.shortedBin||'').localeCompare(b.shortedBin||'')||(a.productCode||'').localeCompare(b.productCode||''));
+  console.log('[printCheckReport] shortages=',shortages.length,'filtered rows=',rows.length);
+  if(!rows.length){alert('No shortages match the current date filter. Tip: Clear the Start/End date fields to see all shortages.');return;}
   const fromStr=$('reportStart')?.value;
   const toStr=$('reportEnd')?.value;
   const today=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
   const fmtD=d=>new Date(d).toLocaleDateString('en-US',{month:'2-digit',day:'2-digit'});
   const fmtT=d=>new Date(d).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
-  const rows=filteredRows(true).sort((a,b)=>(a.shortedBin||'').localeCompare(b.shortedBin||'')||(a.productCode||'').localeCompare(b.productCode||''));
-  if(!rows.length){alert('No shortage records in selected range.');return;}
   const binProdCount={};
   rows.forEach(r=>{const k=(r.shortedBin||'')+'|'+(r.productCode||'');binProdCount[k]=(binProdCount[k]||0)+1;});
   const totalDups=Object.values(binProdCount).filter(v=>v>1).length;
@@ -2864,13 +2862,17 @@ function applyLangToForms(){
   const refreshBtn=document.querySelector('button[onclick="loadShortages(true)"]');
   if(refreshBtn)refreshBtn.textContent=t('list.refresh');
 
-  // Archive action buttons
+  // Archive action buttons — identify by onclick, not position
   const archAct=$('archiveActions');
   if(archAct){
-    const btns=archAct.querySelectorAll('button');
-    const labels=['list.select_visible','list.clear_selection','list.archive_selected','list.archive_filtered','list.ic_verify'];
-    btns.forEach((b,i)=>{if(labels[i]&&!b.onclick?.toString().includes('openIcConfirm'))b.textContent=t(labels[i]);
-      else if(b.onclick?.toString().includes('openIcConfirm'))b.textContent='📋 '+t('list.ic_verify');});
+    archAct.querySelectorAll('button').forEach(b=>{
+      const oc=b.getAttribute('onclick')||'';
+      if(oc.includes('openIcConfirm'))       b.textContent='📋 '+t('list.ic_verify');
+      else if(oc.includes('selectVisible(true'))  b.textContent=t('list.select_visible');
+      else if(oc.includes('selectVisible(false')) b.textContent=t('list.clear_selection');
+      else if(oc.includes('archiveSelected'))     b.textContent=t('list.archive_selected');
+      else if(oc.includes('archiveFiltered'))     b.textContent=t('list.archive_filtered');
+    });
   }
 
   // Shortage top actions IC portal button
