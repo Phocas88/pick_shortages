@@ -2247,23 +2247,41 @@ function onPickerSelectChange(selectId, newInputId, hiddenId){
 function openIcConfirm(){
   if(!canRunReports()){alert('IC Team or Manager access required.');return;}
   icConfirmEdits={};
-  // Reset filter to 'all' so user sees everything immediately
   const filt=$('icConfirmFilter');
   if(filt)filt.value='all';
-  // Always reload to get latest data
-  showLoading('Loading IC sheet...');
-  loadShortages(true).then(()=>{
-    hideLoading();
-    $('icConfirmOverlay').classList.add('open');
+  // Remove and recreate the IC overlay dynamically like editModal
+  let el=document.getElementById('icModalDynamic');
+  if(el)el.remove();
+  const doOpen=()=>{
+    // Build the overlay dynamically on body
+    el=document.createElement('div');
+    el.id='icModalDynamic';
+    el.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;z-index:99998;background:rgba(10,15,35,.75);overflow-y:auto;padding:16px;box-sizing:border-box';
+    // Copy content from static icConfirmOverlay
+    const staticOv=document.getElementById('icConfirmOverlay');
+    const modal=staticOv?staticOv.querySelector('.ic-confirm-modal'):null;
+    if(modal){
+      el.appendChild(modal.cloneNode(true));
+    } else {
+      el.innerHTML='<div style="background:var(--surface,#fff);border-radius:16px;max-width:1100px;margin:0 auto;padding:20px"><p>IC Confirm Modal not found</p></div>';
+    }
+    document.body.appendChild(el);
+    // Re-wire close button
+    el.querySelectorAll('[onclick="closeIcConfirm()"]').forEach(b=>b.onclick=closeIcConfirm);
+    el.querySelectorAll('[onclick="icConfirmSubmitAll()"]').forEach(b=>b.onclick=icConfirmSubmitAll);
     renderIcConfirmSheet();
-  }).catch(e=>{
-    hideLoading();
-    alert('Failed to load shortages: '+e.message);
-  });
+  };
+  if(!shortages.length){
+    showLoading('Loading shortages...');
+    loadShortages(false).then(()=>{hideLoading();doOpen();}).catch(e=>{hideLoading();alert('Load failed: '+e.message);});
+  } else {
+    doOpen();
+  }
 }
 
 function closeIcConfirm(){
-  $('icConfirmOverlay').classList.remove('open');
+  const el=document.getElementById('icModalDynamic');
+  if(el)el.remove();
   icConfirmEdits={};
 }
 
@@ -2281,16 +2299,17 @@ function icUpdateStats(){
   const done=all.filter(r=>r.icConfirmed||r.foundInShortedBin||r.secondLocationFilled).length;
   const pctDone=all.length?Math.round(done/all.length*100):0;
   const shown=icConfirmFilteredRows().length;
-  $('icConfirmSubhead').textContent=`${shown} shortages shown · ${done}/${all.length} verified (${pctDone}%)`;
-  $('icProgFill').style.width=pctDone+'%';
-  $('icConfirmStats').innerHTML=`
-    <span style="color:var(--green);font-weight:700">${all.filter(r=>r.icConfirmed==='confirmed_short').length} confirmed</span> ·
-    <span style="color:var(--yellow);font-weight:700">${all.filter(r=>r.foundInShortedBin||r.icConfirmed==='erroneous').length} erroneous</span> ·
-    <span style="color:var(--accent);font-weight:700">${all.filter(r=>r.secondLocationFilled||r.icConfirmed==='second_location').length} 2nd loc</span> ·
-    <span style="color:var(--red);font-weight:700">${all.filter(r=>!r.icConfirmed&&!r.foundInShortedBin&&!r.secondLocationFilled).length} pending</span>`;
+  // Target dynamic modal if open, else static
+  const dyn=document.getElementById('icModalDynamic');
+  const q=id=>dyn?(dyn.querySelector('#'+id)||document.getElementById(id)):document.getElementById(id);
+  const subhead=q('icConfirmSubhead');
+  if(subhead)subhead.textContent=shown+' shortages shown · '+done+'/'+all.length+' verified ('+pctDone+'%)';
+  const fill=q('icProgFill');
+  if(fill)fill.style.width=pctDone+'%';
+  const stats=q('icConfirmStats');
+  if(stats)stats.textContent=done+'/'+all.length+' verified ('+pctDone+'%)';
 }
 
-const IC_UOMS=['EA','CS','IN','PK','PR','BX','DZ'];
 function uomSelect(name,val){
   return `<select class="ic-qty-input" style="width:70px;padding:4px 4px" name="${name}" onchange="icSyncEdits()">
     ${IC_UOMS.map(u=>`<option value="${u}" ${u===(val||'EA')?'selected':''}>${u}</option>`).join('')}
@@ -2362,7 +2381,10 @@ function renderIcConfirmSheet(){
     </div>`;
   }).join('');
 
-  $('icConfirmSheet').innerHTML=dataRows;
+  // Target the dynamic modal's sheet if open, else the static one
+  const dynModal=document.getElementById('icModalDynamic');
+  const sheet=dynModal?dynModal.querySelector('#icConfirmSheet'):$('icConfirmSheet');
+  if(sheet)sheet.innerHTML=dataRows;
 }
 
 function icResultChange(sel){
