@@ -306,7 +306,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
   </div>
 
 </div></section>
-<div id="pickedTwiceOverlay" class="overlay"><div class="modal"><div class="modal-head"><h3 id="ptModalTitle">&#9888; Report: Order Picked Twice / Duplicate Pick</h3><button onclick="closePickedTwiceModal()">&#215;</button></div><div class="modal-body"><div class="notice" style="background:var(--orange-l);border-color:rgba(251,146,60,.35);margin-bottom:16px"><b id="ptWhatDoes">What this does:</b> <span id="ptWhatDesc">Flags an entire order as having been picked twice (over-pulled). No product lines needed — the whole order must be returned and investigated. This creates a Duplicate Pick record for IC and management review.</span></div><div class="form-row two"><div class="field"><label>Date &amp; Time <em>*</em></label><input id="ptDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="ptDiv"><option value="">Select</option><option value="NH">NH</option><option value="GT">GT</option><option value="FS">FS</option><option value="EE">EE</option><option value="BC">BC</option><option value="CF">CF</option><option value="VP">VP – VIP</option><option value="TP">TP – Transpac</option></select></div><div class="field"><label>Pick Demand # <em>*</em></label><input id="ptDemand" placeholder="e.g. NH00012345" oninput="ptAutoDivision()"></div><div class="field"><label id="ptPickerLabel">Picker Involved <em>*</em></label><select id="ptPickerSelect" onchange="onPickerSelectChange('ptPickerSelect','ptPickerNew','ptPicker')"><option value="">-- Select Picker --</option></select><div id="ptPickerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="ptPickerNew" placeholder="e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('ptPickerNew','picker');syncNewPersonToHidden('ptPickerNew','ptPicker')" onblur="validatePersonField('ptPickerNew','picker');syncNewPersonToHidden('ptPickerNew','ptPicker')" onkeydown="handleSuggestKey(event,'ptPickerNewSuggest')"><div class="suggest-box" id="ptPickerNewSuggest" style="display:none"></div></div></div><input id="ptPicker" type="hidden"></div></div><div class="field"><label>Shift</label><select id="ptShift"><option value="auto">Auto (use current time)</option><option value="1st">1st Shift (6am–3:30pm)</option><option value="2nd">2nd Shift (3:30pm–12am)</option><option value="weekend_ot">Weekend OT (6am–12am)</option></select></div><div class="field"><label id="ptNotesLabel">Notes / Details <em>*</em></label><textarea id="ptNotes" placeholder="Describe what happened — where was the duplicate pick found, who reported it, what action was taken..."></textarea></div><div class="actions" style="margin-top:8px"><button class="btn primary" onclick="savePickedTwice()" id="ptSubmitBtn">&#9888; Submit Duplicate Pick Report</button><button class="btn" onclick="closePickedTwiceModal()" id="ptCancelBtn">Cancel</button></div></div></div></div>
+<div id="pickedTwiceOverlay" class="overlay"><div class="modal"><div class="modal-head"><h3 id="ptModalTitle">&#9888; Report: Order Picked Twice / Duplicate Pick</h3><button onclick="closePickedTwiceModal()">&#215;</button></div><div class="modal-body"><div class="notice" style="background:var(--orange-l);border-color:rgba(251,146,60,.35);margin-bottom:16px"><b id="ptWhatDoes">What this does:</b> <span id="ptWhatDesc">Flags an entire order as having been picked twice (over-pulled). No product lines needed — the whole order must be returned and investigated. This creates a Duplicate Pick record for IC and management review.</span></div><div class="form-row two"><div class="field"><label>Date &amp; Time <em>*</em></label><input id="ptDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="ptDiv"><option value="">Select</option><option value="NH">NH</option><option value="GT">GT</option><option value="FS">FS</option><option value="EE">EE</option><option value="BC">BC</option><option value="CF">CF</option><option value="VP">VP &ndash; VIP</option><option value="TP">TP &ndash; Transpac</option></select></div><div class="field"><label>Order Number <em>*</em></label><input id="ptDemand" placeholder="e.g. NH.45433" autocomplete="off" autocapitalize="characters" spellcheck="false" style="font-family:var(--mono);font-weight:700;letter-spacing:.06em" oninput="ptAutoDivision()" onblur="ptBlurOrder()"><div id="ptOrderHint" style="display:none;font-size:11px;color:var(--red);margin-top:3px"></div></div><div class="field"><label id="ptPickerLabel">Picker Involved <em>*</em></label><select id="ptPickerSelect" onchange="onPickerSelectChange('ptPickerSelect','ptPickerNew','ptPicker')"><option value="">-- Select Picker --</option></select><label style="display:inline-flex;align-items:center;gap:5px;margin-top:5px;font-size:11px;color:var(--orange);cursor:pointer;font-weight:600;background:var(--orange-l);border:1px solid rgba(251,146,60,.3);border-radius:6px;padding:3px 8px"><input type="checkbox" id="ptPickerUnknown" onchange="toggleUnknownPicker('ptPickerSelect','ptPickerNewWrap','ptPicker',this)" style="accent-color:var(--orange);width:14px;height:14px"> &#9888; Unknown Picker</label><div id="ptPickerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="ptPickerNew" placeholder="e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('ptPickerNew','picker');syncNewPersonToHidden('ptPickerNew','ptPicker')" onblur="validatePersonField('ptPickerNew','picker');syncNewPersonToHidden('ptPickerNew','ptPicker')" onkeydown="handleSuggestKey(event,'ptPickerNewSuggest')"><div class="suggest-box" id="ptPickerNewSuggest" style="display:none"></div></div></div><input id="ptPicker" type="hidden"></div></div><div class="field"><label>Shift</label><select id="ptShift"><option value="auto">Auto (use current time)</option><option value="1st">1st Shift (6am&ndash;3:30pm)</option><option value="2nd">2nd Shift (3:30pm&ndash;12am)</option><option value="weekend_ot">Weekend OT (6am&ndash;12am)</option></select></div><div class="field"><label id="ptNotesLabel">Notes / Details <em>*</em></label><textarea id="ptNotes" placeholder="Describe what happened — where was the duplicate pick found, who reported it, what action was taken..."></textarea></div><div class="actions" style="margin-top:8px"><button class="btn primary" onclick="savePickedTwice()" id="ptSubmitBtn">&#9888; Submit Duplicate Pick Report</button><button class="btn" onclick="closePickedTwiceModal()" id="ptCancelBtn">Cancel</button></div></div></div>
 <div id="editOverlay" class="overlay"><div class="modal"><div class="modal-head"><h3>Edit Shortage</h3><button onclick="closeEdit()">&#215;</button></div><div id="editBody" class="modal-body"></div></div></div>
 <div id="icConfirmOverlay" class="ic-confirm-overlay">
   <div class="ic-confirm-modal">
@@ -779,7 +779,10 @@ async function saveShortage(){if(!ensureDb())return;autoDivisionFromDemand();val
   const base={date:$('sDate').value||nowLocalInput(),division:$('sDiv').value,pickDemand:$('sDemand').value.trim().toUpperCase(),picker:normalizeName(_pickerVal),packStation:_station,shift:shiftValue(),uom:'EA',notes:($('sNotes')?.value||'').trim(),createdAt:new Date().toISOString(),createdBy:role,foundInShortedBin:false,secondLocationFilled:false,replenishedAfterPick:false,status:'open'};const lines=getProductLines();if(!base.pickDemand){alert('Pick Demand # is required.');return}if(!base.division){alert('Division is required. Enter or scan the Pick Demand # first.');return}if(!base.picker){alert('Picker is required. Select a picker from the dropdown.');return;}
   if(base.picker&&base.picker!==UNKNOWN_PICKER&&!fuzzyMatchPerson(base.picker,'picker'))savePerson(base.picker,'picker');if(!lines.length||lines.some(l=>!l.productCode||!l.shortedBin)){alert('Each product line needs Product Code and Bin Shorted.');return}
   const invalidBins=lines.filter(l=>l.shortedBin&&!validateBinFormat(l.shortedBin).ok);
-  if(invalidBins.length){alert('Invalid bin format on one or more lines.\n\nValid formats:\n  ##-##-##  (e.g. 82-26-01)\n  ##-##-#   (e.g. 82-26-1)\n  P#####    (e.g. P12345)\n  BULK\n  ROOM\n  KEY ACCOUNT');return}showLoading('Saving shortages...');try{const batch=db.batch();const col=db.collection(getSettings().activeCollection);lines.forEach(line=>{batch.set(col.doc(),{...base,...line,uom:'EA'});});await batch.commit();clearCaches();clearEntry();await loadShortages(true)}catch(e){hideLoading();console.error('saveShortage error:',e);alert('Save failed: '+e.message);}}
+  if(invalidBins.length){alert('Invalid bin format on one or more lines.\n\nValid formats:\n  ##-##-##  (e.g. 82-26-01)\n  ##-##-#   (e.g. 82-26-1)\n  P#####    (e.g. P12345)\n  BULK\n  ROOM\n  KEY ACCOUNT');return}showLoading('Saving shortages...');try{const batch=db.batch();const col=db.collection(getSettings().activeCollection);lines.forEach(line=>{batch.set(col.doc(),{...base,...line,uom:'EA'});});await batch.commit();clearCaches();clearEntry();
+    // Reset viewMode to active before reloading to avoid archive permission issues
+    const vm=$('viewMode');if(vm)vm.value='active';
+    await loadShortages(true)}catch(e){hideLoading();console.error('saveShortage error:',e);alert('Save failed: '+e.message);}}
 function clearEntry(){['sDemand','sPicker','sNotes'].forEach(id=>{if($(id))$(id).value='';});['sPickerSelect','sPackStation'].forEach(id=>{const el=$(id);if(el){el.value='';el.disabled=false;el.style.opacity='';}});
   const spu=$('sPickerUnknown');if(spu)spu.checked=false;['sPickerNewWrap'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});$('sDiv').value='';$('sShift').value='auto';$('sDate').value=nowLocalInput();$('productLines').innerHTML='';addProductLine();['sPickerNewSuggest','sPackStationSuggest'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});}
 function clearCaches(){Object.keys(localStorage).filter(k=>k.startsWith('scp_cache_')).forEach(k=>localStorage.removeItem(k))}
@@ -3057,10 +3060,17 @@ function openPickedTwiceModal(){
   $('ptDate').value=d.toISOString().slice(0,16);
   $('ptDemand').value='';$('ptDiv').value='';$('ptNotes').value='';$('ptShift').value='auto';
   $('ptPicker').value='';
-  const sel=$('ptPickerSelect');if(sel)sel.value='';
+  const sel=$('ptPickerSelect');
+  if(sel){sel.value='';sel.disabled=false;sel.style.opacity='';}
   const wrap=$('ptPickerNewWrap');if(wrap)wrap.style.display='none';
+  const ptUnk=$('ptPickerUnknown');if(ptUnk)ptUnk.checked=false;
+  const ptHint=$('ptOrderHint');if(ptHint){ptHint.style.display='none';}
   // Pre-fill from Over Pull form fields if filled
-  const d2=$('opOrder').value;if(d2){$('ptDemand').value=d2.replace('.','');ptAutoDivision();}
+  const d2=$('opOrder').value;
+  if(d2){
+    $('ptDemand').value=d2;
+    ptBlurOrder(); // normalize + fill division
+  }
   const pv=$('opPacker').value||$('opPackerNew').value||$('opPicker').value||$('opPickerNew').value;
   // Populate picker dropdown
   const pickerOpts=['<option value="">-- Select Picker --</option>',
@@ -3081,18 +3091,45 @@ function closePickedTwiceModal(){
 }
 
 function ptAutoDivision(){
-  const v=($('ptDemand').value||'').trim().slice(0,2).toUpperCase();
-  $('ptDiv').value=v;
+  const raw=($('ptDemand').value||'').trim();
+  const div=raw.replace(/[^A-Za-z]/g,'').slice(0,2).toUpperCase();
+  if(div.length===2)$('ptDiv').value=div;
+}
+
+function ptBlurOrder(){
+  const raw=($('ptDemand').value||'').trim();
+  if(!raw)return;
+  const result=normalizeOrderNumber(raw);
+  const hint=$('ptOrderHint');
+  if(result.ok){
+    $('ptDemand').value=result.val;
+    $('ptDiv').value=result.div;
+    $('ptDemand').style.borderColor='rgba(16,185,129,.6)';
+    if(hint){hint.textContent='';hint.style.display='none';}
+  } else {
+    $('ptDemand').style.borderColor='';
+    if(hint){hint.textContent='Format: NH.45433';hint.style.display='block';}
+    ptAutoDivision();
+  }
 }
 
 async function savePickedTwice(){
+  if(!ensureDb())return;
+  // Normalize order number first
+  ptBlurOrder();
   const demand=($('ptDemand').value||'').trim().toUpperCase();
-  const picker=($('ptPicker').value||$('ptPickerNew').value||'').trim();
-  const notes=($('ptNotes').value||'').trim();
   const div=($('ptDiv').value||'').trim().toUpperCase();
-  if(!demand){alert('Pick Demand # is required.');return;}
-  if(!div){alert('Division is required.');return;}
-  if(!picker){alert('Picker is required.');return;}
+  const notes=($('ptNotes').value||'').trim();
+  // Read picker from hidden, new input, or select
+  const ptSel=$('ptPickerSelect');
+  const pickerRaw=($('ptPicker').value||'').trim()||
+    ($('ptPickerNewWrap')?.style.display!=='none'?($('ptPickerNew')?.value||'').trim():'')||
+    (ptSel&&ptSel.value&&ptSel.value!=='__new__'?ptSel.value:'')||
+    ($('ptPickerUnknown')?.checked?UNKNOWN_PICKER:'');
+  const picker=normalizeName(pickerRaw)||pickerRaw;
+  if(!demand){alert('Order Number is required.');return;}
+  if(!div){alert('Division is required. Enter a valid order number like NH.45433.');return;}
+  if(!picker){alert('Please select a picker or check Unknown Picker.');return;}
   if(!notes){alert('Notes are required — describe what happened.');return;}
   const shiftV=(()=>{const ov=$('ptShift').value;if(ov&&ov!=='auto')return ov;return shiftValue();})();
   showLoading('Saving duplicate pick report...');
@@ -3103,25 +3140,20 @@ async function savePickedTwice(){
       date:$('ptDate').value||nowLocalInput(),
       pickDemand:demand,
       division:div,
-      picker:normalizeName(picker),
+      picker,
       shift:shiftV,
       notes,
       status:'open',
       createdAt:new Date().toISOString(),
-      createdBy:role,
+      createdBy:role||'overpull',
       requiresInvestigation:true,
     };
-    if(db){
-      await db.collection(s.activeCollection).add(record);
-    } else {
-      alert('Firebase not connected. Record not saved.');hideLoading();return;
-    }
-    clearCaches();
-    closePickedTwiceModal();
-    await loadShortages(true);
+    await db.collection(s.activeCollection).add(record);
     hideLoading();
-    alert((t('dup.alert')||'Duplicate pick report filed for order {0}.\nIC team and management have been flagged for investigation.').replace('{0}',demand));
-  }catch(e){hideLoading();alert('Save failed: '+e.message);}
+    closePickedTwiceModal();
+    clearCaches();
+    alert('Duplicate pick report filed for order '+demand+'.');
+  }catch(e){hideLoading();console.error('[savePickedTwice] error:',e);alert('Save failed: '+e.message);}
 }
 
 /* ── GLOBAL RESET / FORCE RELOAD ALL CLIENTS ───────── */
