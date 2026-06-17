@@ -1069,6 +1069,27 @@ function renderReports(){
 
 function renderCheckPreview(){}
 
+function doPrint(htmlContent){
+  // Use Blob URL — avoids Edge/Chrome tracking prevention and backtick collisions
+  const fullHtml='<!DOCTYPE html><html><head><meta charset="utf-8"><title>Report</title>'
+    +'<style>'+"*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',Arial,sans-serif;color:#111;font-size:10pt;background:#fff;padding:.55in}@media print{body{padding:0}@page{size:letter portrait;margin:.55in}}table{width:100%;border-collapse:collapse;margin-bottom:14pt}th{background:#1a2038;color:#fff;padding:5pt 8pt;text-align:left;font-size:8pt;font-weight:600}td{padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-size:9pt}tr:nth-child(even) td{background:#f9fafb}.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8pt;margin-bottom:16pt}.kpi{border:1pt solid #e5e7eb;border-radius:6pt;padding:8pt;text-align:center}.kpi-num{font-size:20pt;font-weight:700}.kpi-lbl{font-size:7.5pt;color:#6b7280;text-transform:uppercase;letter-spacing:.06em}.footer{margin-top:20pt;padding-top:6pt;border-top:1pt solid #e5e7eb;font-size:7.5pt;color:#9ca3af;display:flex;justify-content:space-between}.page-break{page-break-before:always;break-before:page}"+'</style></head><body>'+htmlContent+'</body></html>';
+  const blob=new Blob([fullHtml],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  const win=window.open(url,'_blank');
+  if(!win){
+    // Popup blocked — fallback: download as HTML file
+    const a=document.createElement('a');
+    a.href=url;a.download='report.html';a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),5000);
+    return;
+  }
+  // Revoke blob URL after window loads
+  win.addEventListener('load',()=>{
+    setTimeout(()=>{win.print();},300);
+    setTimeout(()=>URL.revokeObjectURL(url),60000);
+  });
+}
+
 async function printSummaryReport(){
   if(!shortages.length){await runReportPull();if(!shortages.length){alert('No shortage data found. Click Run Report first.');return;}}
   const rows=filteredRows(true);
@@ -1245,14 +1266,7 @@ async function printSummaryReport(){
       <span>Printed ${today}</span>
     </div>
   </div>`;
-  $('printArea').innerHTML=html;
-  // Force browser to render the printArea before opening dialog
-  void $('printArea').offsetHeight;
-  window.addEventListener('afterprint',function onAP(){
-    $('printArea').innerHTML='';
-    window.removeEventListener('afterprint',onAP);
-  });
-  setTimeout(()=>window.print(),80);
+  doPrint(html);
 }
 
 async function printCheckReport(){
@@ -1339,17 +1353,10 @@ async function printCheckReport(){
       815 Inventory Control &middot; C &amp; F Enterprises &middot; Chapman Warehouse &middot; ${today}
     </div>
   </div>`;
-  $('printArea').innerHTML=html;
-  // Force browser to render the printArea before opening dialog
-  void $('printArea').offsetHeight;
-  window.addEventListener('afterprint',function onAP(){
-    $('printArea').innerHTML='';
-    window.removeEventListener('afterprint',onAP);
-  });
-  setTimeout(()=>window.print(),80);
+  doPrint(html);
 }
 function saveInventoryBinReport(){inventoryBins=parseBinImport($('binImport').value);localStorage.setItem('scp_inventory_bins',JSON.stringify(inventoryBins));alert(`Saved ${inventoryBins.length} inventory bin rows.`);buildReplenishmentReport()}function parseBinImport(text){return text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean).map(l=>{const p=l.split(/\t|,/);return{bin:(p[0]||'').trim().toUpperCase(),product:(p[1]||'').trim().toUpperCase(),onHand:num(p[2]),allocated:num(p[3]),uom:(p[4]||'').trim().toUpperCase()}}).filter(r=>r.bin&&r.product)}
-function buildReplenishmentReport(){if(!canManage())return;inventoryBins=JSON.parse(localStorage.getItem('scp_inventory_bins')||'[]');if($('binImport')&&!$('binImport').value&&inventoryBins.length)$('binImport').value=inventoryBins.map(r=>[r.bin,r.product,r.onHand,r.allocated,r.uom].join('\t')).join('\n');const active=shortages.filter(r=>!r._archived);const moves=[],noRes=[];active.forEach(s=>{const reserves=inventoryBins.filter(b=>b.product===(s.productCode||'').toUpperCase()&&b.bin!==(s.shortedBin||'').toUpperCase()&&b.onHand>0&&b.allocated<=0).sort((a,b)=>a.bin.localeCompare(b.bin));if(reserves.length)moves.push({product:s.productCode,toBin:s.shortedBin,fromBin:reserves[0].bin,qty:Math.min(num(s.qtyShorted)||1,reserves[0].onHand),uom:reserves[0].uom||s.uom});else noRes.push(s)});$('restockBody').innerHTML=`<div class="card"><div class="card-title">Replenishment Moves</div>${table(['Product Code','From Reserve Bin','To Shorted Bin','Qty','UOM'],moves.sort((a,b)=>a.fromBin.localeCompare(b.fromBin)).map(m=>[m.product,m.fromBin,m.toBin,m.qty,m.uom]))}</div><div class="card"><div class="card-title">Products With No Reserve Bins</div>${table(['Product Code','Shorted Bin','Qty Shorted','UOM'],noRes.map(r=>[r.productCode,r.shortedBin,r.qtyShorted,r.uom]))}</div>`}function printReplenReport(){buildReplenishmentReport();$('printArea').innerHTML=`<h1>Replenishment Report</h1>${$('restockBody').innerHTML}`;void $('printArea').offsetHeight;setTimeout(()=>window.print(),80);}
+function buildReplenishmentReport(){if(!canManage())return;inventoryBins=JSON.parse(localStorage.getItem('scp_inventory_bins')||'[]');if($('binImport')&&!$('binImport').value&&inventoryBins.length)$('binImport').value=inventoryBins.map(r=>[r.bin,r.product,r.onHand,r.allocated,r.uom].join('\t')).join('\n');const active=shortages.filter(r=>!r._archived);const moves=[],noRes=[];active.forEach(s=>{const reserves=inventoryBins.filter(b=>b.product===(s.productCode||'').toUpperCase()&&b.bin!==(s.shortedBin||'').toUpperCase()&&b.onHand>0&&b.allocated<=0).sort((a,b)=>a.bin.localeCompare(b.bin));if(reserves.length)moves.push({product:s.productCode,toBin:s.shortedBin,fromBin:reserves[0].bin,qty:Math.min(num(s.qtyShorted)||1,reserves[0].onHand),uom:reserves[0].uom||s.uom});else noRes.push(s)});$('restockBody').innerHTML=`<div class="card"><div class="card-title">Replenishment Moves</div>${table(['Product Code','From Reserve Bin','To Shorted Bin','Qty','UOM'],moves.sort((a,b)=>a.fromBin.localeCompare(b.fromBin)).map(m=>[m.product,m.fromBin,m.toBin,m.qty,m.uom]))}</div><div class="card"><div class="card-title">Products With No Reserve Bins</div>${table(['Product Code','Shorted Bin','Qty Shorted','UOM'],noRes.map(r=>[r.productCode,r.shortedBin,r.qtyShorted,r.uom]))}</div>`}function printReplenReport(){buildReplenishmentReport();doPrint('<h1>Replenishment Report</h1>'+$('restockBody').innerHTML);}
 function renderPickers(){
   if(!canManage())return;
   $('pickerList').innerHTML=pickerNames.length
@@ -2163,14 +2170,7 @@ async function printOverPullReport(){
     </div>
   </div>`;
 
-  $('printArea').innerHTML=html;
-  // Force browser to render the printArea before opening dialog
-  void $('printArea').offsetHeight;
-  window.addEventListener('afterprint',function onAP(){
-    $('printArea').innerHTML='';
-    window.removeEventListener('afterprint',onAP);
-  });
-  setTimeout(()=>window.print(),80);
+  doPrint(html);
 }
 
 function populateStationSelects(){
