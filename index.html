@@ -828,7 +828,9 @@ async function toggleSecond(id){
   }
 }
 async function toggleReplenished(id){const r=shortages.find(x=>x.id===id&&!x._archived);if(r)await updateRecord(id,{replenishedAfterPick:!r.replenishedAfterPick})}
-function openEdit(id,archived){const r=shortages.find(x=>x.id===id&&x._archived===archived);if(!r)return;editingId=id;editingArchive=archived;$('editBody').innerHTML=`<div class="form-row two"><div class="field"><label>Date</label><input id="eDate" type="date" value="${esc(normalizeDate(r.date)||'')}"></div><div class="field"><label>Division</label><input id="eDiv" value="${esc(r.division||'')}"></div><div class="field"><label>Product Code</label><input id="eProduct" autocapitalize="characters" spellcheck="false" style="text-transform:uppercase" value="${esc(r.productCode||'')}"></div><div class="field"><label>Shorted Bin</label><div class="bin-input-wrap"><input id="eBin" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" value="${esc(r.shortedBin||'')}" oninput="liveBinValidate(this)" onblur="strictBinValidate(this)"><span class="bin-valid-icon"></span></div><div class="bin-format-hint">##-##-## &nbsp;·&nbsp; ##-##-# &nbsp;·&nbsp; P##### &nbsp;·&nbsp; BULK &nbsp;·&nbsp; ROOM &nbsp;·&nbsp; KEY ACCOUNT</div><div class="bin-format-err"></div></div><div class="field"><label>Qty Shorted</label><input id="eQty" type="number" value="${val(r.qtyShorted)}"></div><div class="field"><label>UOM</label><input id="eUom" value="${esc(r.uom||'')}"></div><div class="field"><label>Demand / Order</label><input id="eDemand" value="${esc(r.pickDemand||'')}"></div><div class="field"><label>Picker</label><input id="ePicker" value="${esc(r.picker||'')}"></div><div class="field"><label>IC Qty Found</label><input id="eIcQty" type="number" value="${val(r.icQtyFound)}"></div><div class="field"><label>IC UOM</label><input id="eIcUom" value="${esc(r.icUom||r.uom||'EA')}"></div></div><div class="form-row one"><div class="field"><label>Notes</label><textarea id="eNotes">${esc(r.notes||'')}</textarea></div><div class="field"><label>IC Notes</label><textarea id="eIcNotes">${esc(r.icNotes||'')}</textarea></div></div><label class="toggle"><input id="eErr" type="checkbox" ${r.foundInShortedBin?'checked':''}> Mark as erroneous bin short</label><br><label class="toggle"><input id="eSecond" type="checkbox" ${r.secondLocationFilled?'checked':''}> Product was filled from second location</label><div class="notice" style="margin-top:8px"><b>Second-location bins:</b> ${esc(secondarySummary(r)||'None saved. Use the Second Location Filled button on the row to add one or more bins with qty.')}</div><br><label class="toggle"><input id="eRep" type="checkbox" ${r.replenishedAfterPick?'checked':''}> Bin was replenished after pick</label><div class="actions" style="margin-top:14px"><button class="btn primary" onclick="saveEdit()">Save Changes</button><button class="btn" onclick="closeEdit()">Cancel</button></div>`;$('editOverlay').classList.add('open')}
+function openEdit(id,archived){
+  if(!shortages.length){loadShortages(true).then(()=>openEdit(id,archived));return;}
+  const r=shortages.find(x=>x.id===id&&x._archived===archived);if(!r){alert('Record not found. Try refreshing the list.');return;}editingId=id;editingArchive=archived;$('editBody').innerHTML=`<div class="form-row two"><div class="field"><label>Date</label><input id="eDate" type="date" value="${esc(normalizeDate(r.date)||'')}"></div><div class="field"><label>Division</label><input id="eDiv" value="${esc(r.division||'')}"></div><div class="field"><label>Product Code</label><input id="eProduct" autocapitalize="characters" spellcheck="false" style="text-transform:uppercase" value="${esc(r.productCode||'')}"></div><div class="field"><label>Shorted Bin</label><div class="bin-input-wrap"><input id="eBin" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" value="${esc(r.shortedBin||'')}" oninput="liveBinValidate(this)" onblur="strictBinValidate(this)"><span class="bin-valid-icon"></span></div><div class="bin-format-hint">##-##-## &nbsp;·&nbsp; ##-##-# &nbsp;·&nbsp; P##### &nbsp;·&nbsp; BULK &nbsp;·&nbsp; ROOM &nbsp;·&nbsp; KEY ACCOUNT</div><div class="bin-format-err"></div></div><div class="field"><label>Qty Shorted</label><input id="eQty" type="number" value="${val(r.qtyShorted)}"></div><div class="field"><label>UOM</label><input id="eUom" value="${esc(r.uom||'')}"></div><div class="field"><label>Demand / Order</label><input id="eDemand" value="${esc(r.pickDemand||'')}"></div><div class="field"><label>Picker</label><input id="ePicker" value="${esc(r.picker||'')}"></div><div class="field"><label>IC Qty Found</label><input id="eIcQty" type="number" value="${val(r.icQtyFound)}"></div><div class="field"><label>IC UOM</label><input id="eIcUom" value="${esc(r.icUom||r.uom||'EA')}"></div></div><div class="form-row one"><div class="field"><label>Notes</label><textarea id="eNotes">${esc(r.notes||'')}</textarea></div><div class="field"><label>IC Notes</label><textarea id="eIcNotes">${esc(r.icNotes||'')}</textarea></div></div><label class="toggle"><input id="eErr" type="checkbox" ${r.foundInShortedBin?'checked':''}> Mark as erroneous bin short</label><br><label class="toggle"><input id="eSecond" type="checkbox" ${r.secondLocationFilled?'checked':''}> Product was filled from second location</label><div class="notice" style="margin-top:8px"><b>Second-location bins:</b> ${esc(secondarySummary(r)||'None saved. Use the Second Location Filled button on the row to add one or more bins with qty.')}</div><br><label class="toggle"><input id="eRep" type="checkbox" ${r.replenishedAfterPick?'checked':''}> Bin was replenished after pick</label><div class="actions" style="margin-top:14px"><button class="btn primary" onclick="saveEdit()">Save Changes</button><button class="btn" onclick="closeEdit()">Cancel</button></div>`;$('editOverlay').classList.add('open')}
 function closeEdit(){$('editOverlay').classList.remove('open');editingId=null}
 async function saveEdit(){const binRaw=$('eBin').value.trim();if(binRaw&&!validateBinFormat(binRaw).ok){alert('Invalid bin format.\n\nValid: ##-##-##, ##-##-#, P#####, BULK, ROOM, KEY ACCOUNT');return}const data={date:$('eDate').value,division:$('eDiv').value.trim().toUpperCase(),productCode:$('eProduct').value.trim().toUpperCase(),shortedBin:binRaw.toUpperCase(),qtyShorted:num($('eQty').value),uom:$('eUom').value.trim().toUpperCase(),pickDemand:$('eDemand').value.trim(),picker:$('ePicker').value.trim(),notes:$('eNotes').value.trim(),icQtyFound:num($('eIcQty').value),icUom:$('eIcUom').value.trim().toUpperCase(),icNotes:$('eIcNotes').value.trim(),foundInShortedBin:$('eErr').checked,secondLocationFilled:$('eSecond').checked,replenishedAfterPick:$('eRep').checked,status:$('eErr').checked?'located':'open'};if(!data.foundInShortedBin){data.icQtyFound=0;data.icUom='';data.icNotes=data.icNotes}await updateRecord(editingId,data,editingArchive);closeEdit()}
 function selectVisible(on){document.querySelectorAll('.sr-check:not(:disabled)').forEach(c=>c.checked=on)}function selectedIds(){return [...document.querySelectorAll('.sr-check:checked')].map(c=>c.dataset.id)}async function archiveSelected(){const ids=selectedIds();if(!ids.length){alert('Select shortages first.');return}await archiveIds(ids)}async function archiveFiltered(){const ids=visibleShortages.filter(r=>!r._archived).map(r=>r.id);if(!ids.length){alert('No active filtered shortages to archive.');return}if(!confirm(`Archive ${ids.length} active filtered shortages?`))return;await archiveIds(ids)}
@@ -1017,10 +1019,10 @@ function renderReports(){
 
 function renderCheckPreview(){}
 
-function printSummaryReport(){
+async function printSummaryReport(){
   if(!shortages.length){
-    runReportPull().then(()=>setTimeout(printSummaryReport,600));
-    return;
+    await runReportPull();
+    if(!shortages.length){alert('No shortage data found. Make sure shortages are loaded.');return;}
   }
   const fromStr=$('reportStart')?.value;
   const toStr=$('reportEnd')?.value;
@@ -1204,10 +1206,10 @@ function printSummaryReport(){
 }
 
 
-function printCheckReport(){
+async function printCheckReport(){
   if(!shortages.length){
-    runReportPull().then(()=>setTimeout(printCheckReport,600));
-    return;
+    await runReportPull();
+    if(!shortages.length){alert('No shortage data found.');return;}
   }
   const fromStr=$('reportStart')?.value;
   const toStr=$('reportEnd')?.value;
@@ -1832,11 +1834,10 @@ async function opUnarchiveSelected(){
   }catch(e){hideLoading();alert('Unarchive failed: '+e.message);}
 }
 
-function printOverPullReport(){
+async function printOverPullReport(){
   if(!opRecords.length){
-    // Records not loaded yet — load them first then print
-    opLoadRecords(true).then(()=>setTimeout(printOverPullReport,500));
-    return;
+    await opLoadRecords(true);
+    if(!opRecords.length){alert('No over pull records found.');return;}
   }
   const rows=opFilteredRows();
   if(!rows.length){alert('No over pull records in selected range.');return;}
@@ -2215,13 +2216,13 @@ function renderIcConfirmSheet(){
   const total=shortages.filter(r=>!r._archived&&r.type!=='duplicate_pick').length;
   const done=shortages.filter(r=>!r._archived&&(r.icConfirmed||r.foundInShortedBin||r.secondLocationFilled)).length;
   const pct=total?Math.round(done/total*100):0;
-  const prog=$('icProgress');
-  if(prog)prog.innerHTML=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-    <div style="flex:1;background:var(--border);border-radius:4px;height:8px">
-      <div style="width:${pct}%;background:var(--green);height:8px;border-radius:4px;transition:width .3s"></div>
-    </div>
-    <span style="font-size:12px;color:var(--muted);white-space:nowrap">${done}/${total} verified (${pct}%)</span>
-  </div>`;
+  // Update progress bar and stats
+  const fill=$('icProgFill');
+  if(fill)fill.style.width=pct+'%';
+  const stats=$('icConfirmStats');
+  if(stats)stats.textContent=done+'/'+total+' verified ('+pct+'%)';
+  const subhead=$('icConfirmSubhead');
+  if(subhead)subhead.textContent=rows.length+' shortages in this filter';
 
   if(!rows.length){
     $('icConfirmSheet').innerHTML='<div class="empty" style="padding:32px;text-align:center">No shortages in this filter.</div>';
@@ -2319,6 +2320,41 @@ function icRemoveCount(id,ci){
   icConfirmEdits[id].icCounts.splice(ci,1);
   renderIcConfirmSheet();
 }
+
+function icMarkAllVisible(result){
+  const rows=icConfirmFilteredRows();
+  rows.forEach(r=>{
+    if(!icConfirmEdits[r.id])icConfirmEdits[r.id]={};
+    icConfirmEdits[r.id].result=result;
+  });
+  renderIcConfirmSheet();
+}
+
+async function icMassConfirmNonErroneous(){
+  const active=shortages.filter(r=>!r._archived&&!r.foundInShortedBin&&!r.icConfirmed&&r.type!=='duplicate_pick');
+  if(!active.length){alert('No pending non-erroneous shortages found.');return;}
+  if(!confirm(`Mark all ${active.length} pending (non-erroneous) shortages as Confirmed Short Bin?
+
+This cannot be undone.`))return;
+  showLoading('Bulk confirming '+active.length+' shortages...');
+  try{
+    const s=getSettings();
+    const now=new Date().toISOString();
+    let batch=db.batch();let count=0;
+    for(const r of active){
+      const ref=db.collection(r._archived?s.archiveCollection:s.activeCollection).doc(r.id);
+      batch.set(ref,{icConfirmed:'confirmed_short',icConfirmedAt:now,icConfirmedBy:role||'icteam',status:'confirmed_short'},{merge:true});
+      count++;
+      if(count%499===0){await batch.commit();batch=db.batch();count=0;}
+    }
+    if(count>0)await batch.commit();
+    clearCaches();await loadShortages(true);
+    hideLoading();
+    renderIcConfirmSheet();
+    alert('Bulk confirmed '+active.length+' shortages.');
+  }catch(e){hideLoading();alert('Failed: '+e.message);}
+}
+
 
 async function icConfirmSubmitAll(){
   const entries=Object.entries(icConfirmEdits).filter(([,e])=>e.result&&e.result!=='skip');
