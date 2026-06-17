@@ -175,7 +175,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 <section id="reportScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Reports</div><h1>Shortage Reports</h1><p>IC Team and IC Manager only.</p></div><div class="actions"><button class="btn primary" onclick="printSummaryReport()">Print Summary</button><button class="btn" onclick="printCheckReport()">Print IC Check Sheet</button></div></div><div class="card"><div class="form-row four"><div class="field"><label>Report Mode</label><select id="reportMode"><option value="active">Active Only</option><option value="archive">Archived History</option><option value="both">Active + Archived (Default)</option></select></div><div class="field"><label>Start Date</label><input id="reportStart" type="date"></div><div class="field"><label>End Date</label><input id="reportEnd" type="date"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="runReportPull()">Run Report</button></div></div><div class="notice" style="margin-top:8px;margin-bottom:0"><strong>Tip:</strong> When a date range is selected, both active and archived records for those dates are always included — archived shortages from older periods will appear in the report regardless of mode.</div></div><div id="reportBody"></div></div></section>
 <section id="restockScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Replenishment</div><h1>Replenishment Report</h1><p>IC Manager only.</p></div><button class="btn primary" onclick="printReplenReport()">Print</button></div><div class="card"><div class="card-title">Inventory Bin Report Import</div><p class="notice">Paste report columns: Bin Name, Product Code, Qty on Hand, Qty Allocated, Unit of Measure.</p><textarea id="binImport" style="width:100%;min-height:160px" placeholder="82-26-01&#9;DI1210&#9;12&#9;0&#9;EA"></textarea><div class="actions" style="margin-top:10px"><button class="btn primary" onclick="saveInventoryBinReport()">Import Bin Report</button></div></div><div id="restockBody"></div></div></section>
 <section id="pickerScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Personnel</div><h1>Manage Pickers &amp; Packers</h1><p>IC Manager only. Names stored as FirstInitialLastName (e.g. JDoe).</p></div></div><div class="card"><div class="card-title">Pickers</div><div class="form-row two"><div class="field"><label>Picker Name (FirstInitialLastName)</label><input id="pickerName" placeholder="JDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPickerManual()">Add Picker</button></div></div><div id="pickerList"></div></div><div class="card"><div class="card-title">Packers</div><div class="form-row two"><div class="field"><label>Packer Name (FirstInitialLastName)</label><input id="packerName" placeholder="MDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackerManual()">Add Packer</button></div></div><div id="packerList"></div></div><div class="card"><div class="card-title">Pack Stations</div><div class="form-row two"><div class="field"><label>Pack Station Name</label><input id="packStationName" placeholder="PS-01"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackStationManual()">Add Station</button></div></div><div id="packStationList"></div></div></div></section>
-<section id="migrationScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Migration</div><h1>Old Firebase Migration</h1><p>Copies old shortage records into the new shortage database. Does not delete the old database.</p></div></div><div class="card"><div class="notice">Source: <b>inventory-control-portal</b> collection <b>shortages</b>. Destination: current active collection.</div><div class="form-row three"><div class="field"><label>Old Collection</label><input id="oldCollection" value="shortages"></div><div class="field"><label>Limit</label><input id="migLimit" type="number" value="5000"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="runMigration()">Run Migration</button></div></div><div id="migrationResult"></div></div></div></section>
+<section id="batchScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow" style="color:var(--purple);background:var(--purple-l);border-color:rgba(167,139,250,.25)">Batch Pick</div><h1>Batch Pick Sheet</h1><p>One product picked for multiple orders simultaneously.</p></div></div><div class="card"><div class="card-title">Batch Pick Details</div><div class="form-row three"><div class="field"><label>Date &amp; Time</label><input id="bpDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="bpDiv"><option value="">Select</option><option value="NH">NH</option><option value="GT">GT</option><option value="FS">FS</option><option value="EE">EE</option><option value="BC">BC</option><option value="CF">CF</option><option value="VP">VP &ndash; VIP</option><option value="TP">TP &ndash; Transpac</option></select></div><div class="field"><label>Picker <em>*</em></label><select id="bpPickerSelect" onchange="onPickerSelectChange('bpPickerSelect','bpPickerNew','bpPicker')"><option value="">-- Select Picker --</option></select><div id="bpPickerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="bpPickerNew" placeholder="e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('bpPickerNew','picker');syncNewPersonToHidden('bpPickerNew','bpPicker')" onblur="validatePersonField('bpPickerNew','picker');syncNewPersonToHidden('bpPickerNew','bpPicker')" onkeydown="handleSuggestKey(event,'bpPickerNewSuggest')"><div class="suggest-box" id="bpPickerNewSuggest" style="display:none"></div></div></div><input id="bpPicker" type="hidden"></div></div><div class="form-row two"><div class="field"><label>Product Code <em>*</em></label><input id="bpProduct" placeholder="e.g. DI1210" autocomplete="off" style="font-family:var(--mono);font-weight:700;font-size:15px;letter-spacing:.06em"></div><div class="field"><label>Bin Location <em>*</em></label><div class="bin-input-wrap"><input id="bpBin" placeholder="82-26-01 / P12345 / BULK" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" oninput="liveBinValidate(this)" onblur="strictBinValidate(this)"><span class="bin-valid-icon"></span></div><div class="bin-format-hint">##-##-## &nbsp;&middot;&nbsp; ##-##-# &nbsp;&middot;&nbsp; P##### &nbsp;&middot;&nbsp; BULK &nbsp;&middot;&nbsp; ROOM &nbsp;&middot;&nbsp; KEY ACCOUNT</div><div class="bin-format-err"></div></div></div><div class="form-row two"><div class="field"><label>UOM</label><select id="bpUom"><option value="EA">EA</option><option value="CS">CS</option><option value="IN">IN</option><option value="PK">PK</option><option value="PR">PR</option><option value="BX">BX</option><option value="DZ">DZ</option></select></div><div class="field"><label>Shift</label><select id="bpShift"><option value="auto">Auto (use current time)</option><option value="1st">1st Shift (6am&ndash;3:30pm)</option><option value="2nd">2nd Shift (3:30pm&ndash;12am)</option><option value="weekend_ot">Weekend OT (6am&ndash;12am)</option></select></div></div><div class="card-title" style="margin-top:4px">Orders in this Batch Pick</div><p class="notice" style="margin-bottom:12px">Enter each order number and the quantity shorted for that order. All orders were picking the same product from the same bin.</p><div id="bpOrderLines"></div><div class="actions" style="margin-bottom:14px"><button class="btn" onclick="bpAddOrderLine()">+ Add Order</button></div><div class="field"><label>Notes</label><textarea id="bpNotes" placeholder="Additional context..."></textarea></div><div class="actions"><button class="btn" onclick="bpClearForm()">Clear Form</button><button class="btn primary" style="flex:1" onclick="saveBatchPick()">+ Log Batch Pick Shortage</button></div></div><div id="bpRecentList" class="shortage-list" style="margin-top:14px"></div></div></section><section id="migrationScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Migration</div><h1>Old Firebase Migration</h1><p>Copies old shortage records into the new shortage database. Does not delete the old database.</p></div></div><div class="card"><div class="notice">Source: <b>inventory-control-portal</b> collection <b>shortages</b>. Destination: current active collection.</div><div class="form-row three"><div class="field"><label>Old Collection</label><input id="oldCollection" value="shortages"></div><div class="field"><label>Limit</label><input id="migLimit" type="number" value="5000"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="runMigration()">Run Migration</button></div></div><div id="migrationResult"></div></div></div></section>
 <section id="settingsScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Settings</div><h1>Firebase Settings</h1><p>IC Manager only.</p></div></div><div class="card"><div class="form-row two"><div class="field"><label>API Key</label><input id="cfgApiKey"></div><div class="field"><label>Auth Domain</label><input id="cfgAuthDomain"></div><div class="field"><label>Project ID</label><input id="cfgProjectId"></div><div class="field"><label>Storage Bucket</label><input id="cfgStorageBucket"></div><div class="field"><label>Messaging Sender ID</label><input id="cfgSenderId"></div><div class="field"><label>App ID</label><input id="cfgAppId"></div><div class="field"><label>Active Collection</label><input id="cfgActiveCollection"></div><div class="field"><label>Archive Collection</label><input id="cfgArchiveCollection"></div></div><label class="toggle"><input id="themeToggle" type="checkbox" onchange="saveTheme(this.checked)"> Light mode</label><div class="actions" style="margin-top:14px"><button class="btn primary" onclick="saveSettings()">Save Settings</button><button class="btn red" onclick="forceReloadAllClients()" style="margin-left:auto">&#128257; Force Reload All Open Instances</button></div></div></div></section>
 <section id="overpullScreen" class="screen"><div class="wrap">
 
@@ -282,6 +282,7 @@ const IC_PORTAL_URL='https://phocas88.github.io/Chapman_Inventory_Control_Portal
 const DEFAULT_NEW_CONFIG={apiKey:'AIzaSyB1CEylhHj4JoWH2VejdLoOt1nteztaqH8',authDomain:'shortage-control-portal.firebaseapp.com',projectId:'shortage-control-portal',storageBucket:'shortage-control-portal.firebasestorage.app',messagingSenderId:'791183009826',appId:'1:791183009826:web:76f397201bd0228e61ee38'};
 const OLD_CONFIG={apiKey:'AIzaSyA1m5P6MFUojFsEBqLXaSLumNiChgAH1Lw',authDomain:'inventory-control-portal.firebaseapp.com',projectId:'inventory-control-portal',storageBucket:'inventory-control-portal.firebasestorage.app',messagingSenderId:'925547075268',appId:'1:925547075268:web:e6ebce91417aa6885a1b91'};
 const DEFAULT_SETTINGS={firebaseConfig:DEFAULT_NEW_CONFIG,activeCollection:'shortages_active',archiveCollection:'shortages_archive',overpullCollection:'overpull_active'};
+const UNKNOWN_PICKER='Unknown Picker';
 const PRESET_PICKERS=['ABrooks','ABurford','ACarter','ACherry','AJbari','ANazari','APayton','BChristian','BClaiborne','BZeyfuh','CArtis','CDavis','DAlston','DCooper','DLagatuz','DLee','DMartin','EBaysa','EKelly','EMoore','GMunford','HAkridge','JBoothe','JCary','JDelacruz','JLinwood','JRobles','KGreenhow','KHill','KRoberts','KWatford','MButler','MGracia','MHunt','MSimon','MWalker','NLewis','OZiyallah','QSills','RAlston','RCoy','RJoyner','SFnu','TMorgan','TPerry','TRobertson','WCooke','WCruz','WSellers'];
 let role='',pinTarget='',pinBuf='',db=null,oldDb=null,shortages=[],visibleShortages=[],pickerNames=[],packerNames=[],packStations=[],inventoryBins=[],editingId=null,editingArchive=false,lastLoadMode='active';
 function esc(v){return String(v??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]))}
@@ -291,7 +292,7 @@ function getSettings(){try{return {...DEFAULT_SETTINGS,...JSON.parse(localStorag
 function initFirebase(){const s=getSettings();try{if(!firebase.apps.length)firebase.initializeApp(s.firebaseConfig);db=firebase.firestore();firebase.firestore().settings({ignoreUndefinedProperties:true});}catch(e){console.error(e);alert('Firebase connection failed. Check Settings. '+e.message)}}
 function showLoading(t){$('loadingText').textContent=t||'Loading...';$('loading').classList.add('show')}function hideLoading(){$('loading').classList.remove('show')}
 function applyTheme(){const light=localStorage.getItem('scp_theme')==='light';document.body.classList.toggle('light-mode',light);if($('themeToggle'))$('themeToggle').checked=light}function saveTheme(light){localStorage.setItem('scp_theme',light?'light':'dark');applyTheme()}
-function showScreen(name){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const el=$(name+'Screen');if(el)el.classList.add('active');$('topbar').classList.toggle('show',name!=='login'&&name!=='pin');document.querySelectorAll('.nav-btn[data-screen]').forEach(b=>b.classList.toggle('active',b.dataset.screen===name));if(name==='shortage'){loadShortages(false);populateStationSelects();}if(name==='report')renderReports();if(name==='picker')renderPickers();if(name==='restock')buildReplenishmentReport();if(name==='settings')loadSettingsForm();if(name==='overpull'){if(role==='icteam'){alert('Over Pull access is not available for IC Team.');showScreen('shortage');return;}populatePickerSelects();populateStationSelects();opInitForm();opSwitchTab('entry');}}
+function showScreen(name){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const el=$(name+'Screen');if(el)el.classList.add('active');$('topbar').classList.toggle('show',name!=='login'&&name!=='pin');document.querySelectorAll('.nav-btn[data-screen]').forEach(b=>b.classList.toggle('active',b.dataset.screen===name));if(name==='shortage'){loadShortages(false);populateStationSelects();}if(name==='report')renderReports();if(name==='picker')renderPickers();if(name==='batch'){bpInitForm();bpPopulatePickers();}if(name==='restock')buildReplenishmentReport();if(name==='settings')loadSettingsForm();if(name==='overpull'){if(role==='icteam'){alert('Over Pull access is not available for IC Team.');showScreen('shortage');return;}populatePickerSelects();populateStationSelects();opInitForm();opSwitchTab('entry');}}
 function goPin(target){pinTarget=target;pinBuf='';$('pinBadge').textContent=ROLE_LABELS[target];updateDots();$('pinError').textContent='';showScreen('pin')}
 function pinKey(k){if(pinBuf.length>=4)return;pinBuf+=k;updateDots();document.querySelectorAll('.pin-key').forEach(btn=>{if(btn.dataset.key===k){btn.classList.add('active-press');setTimeout(()=>btn.classList.remove('active-press'),140)}});if(pinBuf.length===4)setTimeout(checkPin,120)}
 function pinBack(){pinBuf=pinBuf.slice(0,-1);updateDots()}function pinClear(){pinBuf='';updateDots();$('pinError').textContent=''}function updateDots(){document.querySelectorAll('#pinDots .pin-dot').forEach((d,i)=>d.classList.toggle('filled',i<pinBuf.length))}
@@ -299,16 +300,54 @@ function checkPin(){if(pinBuf!==PINS[pinTarget]){document.querySelectorAll('#pin
 function backToLogin(){role='';pinTarget='';pinBuf='';showScreen('login')}
 document.addEventListener('keydown',e=>{if(!$('pinScreen').classList.contains('active'))return;if(e.key>='0'&&e.key<='9')pinKey(e.key);else if(e.key==='Backspace')pinBack();else if(e.key==='Escape')pinClear();else if(e.key==='Enter'&&pinBuf.length===4)checkPin()});
 function canRunReports(){return role==='icteam'||role==='manager'}function canSettings(){return role==='manager'}function canManage(){return role==='manager'}
-function buildNav(){let nav=[['shortage','Shortages']];if(canRunReports())nav.push(['report','Reports']);if(role==='manager')nav.push(['restock','Replenishment'],['picker','Manage Pickers'],['migration','Migration'],['settings','Settings']);if(role!=='icteam')nav.push(['overpull','Over Pull']);if(role==='icteam'||role==='manager')nav.push(['link','IC Portal']);nav.push(['theme','Light/Dark'],['logout','Logout']);$('nav').innerHTML=nav.map(n=>n[0]==='link'?`<a class="nav-btn" href="${IC_PORTAL_URL}" target="_blank">${n[1]}</a>`:n[0]==='logout'?`<button class="nav-btn lock" onclick="logout()">${n[1]}</button>`:n[0]==='theme'?`<button class="nav-btn" onclick="saveTheme(!document.body.classList.contains('light-mode'))">${n[1]}</button>`:n[0]==='overpull'?`<button class="nav-btn" data-screen="overpull" onclick="showScreen('overpull')" style="color:var(--orange)">${n[1]}</button>`:`<button class="nav-btn" data-screen="${n[0]}" onclick="showScreen('${n[0]}')">${n[1]}</button>`).join('')}
+function buildNav(){let nav=[['shortage','Shortages']];if(canRunReports())nav.push(['report','Reports']);if(role==='manager')nav.push(['restock','Replenishment'],['picker','Manage Pickers'],['migration','Migration'],['settings','Settings']);nav.push(['batch','Batch Pick']);if(role!=='icteam')nav.push(['overpull','Over Pull']);if(role==='icteam'||role==='manager')nav.push(['link','IC Portal']);nav.push(['theme','Light/Dark'],['logout','Logout']);$('nav').innerHTML=nav.map(n=>n[0]==='link'?`<a class="nav-btn" href="${IC_PORTAL_URL}" target="_blank">${n[1]}</a>`:n[0]==='logout'?`<button class="nav-btn lock" onclick="logout()">${n[1]}</button>`:n[0]==='theme'?`<button class="nav-btn" onclick="saveTheme(!document.body.classList.contains('light-mode'))">${n[1]}</button>`:n[0]==='overpull'?`<button class="nav-btn" data-screen="overpull" onclick="showScreen('overpull')" style="color:var(--orange)">${n[1]}</button>`:`<button class="nav-btn" data-screen="${n[0]}" onclick="showScreen('${n[0]}')">${n[1]}</button>`).join('')}
 function login(r){role=r;$('roleChip').textContent=ROLE_LABELS[r];$('roleChip').className='role-chip '+(r==='manager'?'manager':r==='icteam'?'icteam':'clerk');buildNav();$('entryCard').classList.toggle('hide',r!=='clerk');$('shortageTopActions').innerHTML='';$('archiveActions').innerHTML=(canRunReports()?`<button class="btn green" onclick="openIcConfirm()" style="margin-right:auto">&#128203; IC Verify Sheet</button>`:'')+(canManage()?` <button class="btn" onclick="selectVisible(true)">Select Visible</button><button class="btn" onclick="selectVisible(false)">Clear Selection</button><button class="btn orange" onclick="archiveSelected()">Archive Selected</button><button class="btn red" onclick="archiveFiltered()">Archive Filtered Active</button>`:'');showScreen('shortage')}
 function logout(){role='';shortages=[];visibleShortages=[];showScreen('login')}
 const PRESET_STATIONS=[...Array(20)].map((_,i)=>`PS-${String(i+1).padStart(2,'0')}`);
 function loadAllPersonnel(){
+  // Merge local preset + localStorage
   const saved=JSON.parse(localStorage.getItem('scp_pickers')||'null');
-  pickerNames=[...new Set([...PRESET_PICKERS,...(saved||[])])].sort();
-  packerNames=JSON.parse(localStorage.getItem('scp_packers')||'[]');
+  pickerNames=[...new Set([UNKNOWN_PICKER,...PRESET_PICKERS,...(saved||[])])].sort();
+  packerNames=[...new Set([UNKNOWN_PICKER,...JSON.parse(localStorage.getItem('scp_packers')||'[]')])].sort();
   const savedStations=JSON.parse(localStorage.getItem('scp_packstations')||'[]');
   packStations=[...new Set([...PRESET_STATIONS,...savedStations])].sort();
+  // Sync from Firestore in background
+  syncPersonnelFromFirestore();
+}
+
+async function syncPersonnelFromFirestore(){
+  if(!db)return;
+  try{
+    const doc=await db.collection('_system').doc('personnel').get();
+    if(doc.exists){
+      const d=doc.data();
+      const fsPickers=Array.isArray(d.pickers)?d.pickers:[];
+      const fsPackers=Array.isArray(d.packers)?d.packers:[];
+      const fsStations=Array.isArray(d.packStations)?d.packStations:[];
+      pickerNames=[...new Set([UNKNOWN_PICKER,...PRESET_PICKERS,...fsPickers,...JSON.parse(localStorage.getItem('scp_pickers')||'[]')])].sort();
+      packerNames=[...new Set([UNKNOWN_PICKER,...fsPackers,...JSON.parse(localStorage.getItem('scp_packers')||'[]')])].sort();
+      packStations=[...new Set([...PRESET_STATIONS,...fsStations,...JSON.parse(localStorage.getItem('scp_packstations')||'[]')])].sort();
+      populatePickerSelects();
+      populateStationSelects();
+    }
+  }catch(e){console.warn('Personnel sync failed:',e);}
+}
+
+async function savePersonToFirestore(name, type){
+  if(!db)return;
+  try{
+    const ref=db.collection('_system').doc('personnel');
+    const doc=await ref.get();
+    const data=doc.exists?doc.data():{pickers:[],packers:[],packStations:[]};
+    if(type==='picker'){
+      data.pickers=[...new Set([...(data.pickers||[]),name])].sort();
+    } else if(type==='packer'){
+      data.packers=[...new Set([...(data.packers||[]),name])].sort();
+    } else if(type==='station'){
+      data.packStations=[...new Set([...(data.packStations||[]),name])].sort();
+    }
+    await ref.set(data);
+  }catch(e){console.warn('Personnel Firestore save failed:',e);}
 }
 async function loadPickerNames(){loadAllPersonnel();}
 
@@ -359,6 +398,9 @@ function savePerson(raw, type){
     packerNames=[...new Set([...packerNames,n])].sort();
     localStorage.setItem('scp_packers',JSON.stringify(packerNames));
   }
+  // Also persist to Firestore so all machines see the new name
+  savePersonToFirestore(n,type);
+  populatePickerSelects();
 }
 
 function savePackStation(skipBlur){
@@ -565,7 +607,7 @@ function filteredRows(forReport=false){
 }
 function renderShortages(){visibleShortages=filteredRows(false);$('shortageList').innerHTML=visibleShortages.length?visibleShortages.map(rowHtml).join(''):`<div class="empty">${t('list.no_shortages')}</div>`;renderCheckPreview();}
 function isBackorderRisk(r){return !!r.foundInShortedBin&&!r.secondLocationFilled}
-function statusBadges(r){let b=[];if(r._archived)b.push(`<span class="badge purple">${t('badge.archived')}</span>`);if(r.icConfirmed==='confirmed_short')b.push(`<span class="badge green">&#10003; ${t('badge.confirmed')}</span>`);if(r.icConfirmed==='erroneous')b.push(`<span class="badge yellow">&#9888; ${t('badge.erroneous')}</span>`);else if(r.foundInShortedBin)b.push(`<span class="badge yellow">${t('badge.erroneous')}</span>`);if(isBackorderRisk(r))b.push(`<span class="badge red">${t('badge.backorder')}</span>`);if(r.secondLocationFilled)b.push(`<span class="badge blue">${t('badge.second_loc')}</span>`);if(r.replenishedAfterPick)b.push(`<span class="badge green">${t('badge.replenished')}</span>`);return b.join(' ')}
+function statusBadges(r){let b=[];if(r.batchPick)b.push('<span class="badge purple">Batch Pick</span>');if(r._archived)b.push(`<span class="badge purple">${t('badge.archived')}</span>`);if(r.icConfirmed==='confirmed_short')b.push(`<span class="badge green">&#10003; ${t('badge.confirmed')}</span>`);if(r.icConfirmed==='erroneous')b.push(`<span class="badge yellow">&#9888; ${t('badge.erroneous')}</span>`);else if(r.foundInShortedBin)b.push(`<span class="badge yellow">${t('badge.erroneous')}</span>`);if(isBackorderRisk(r))b.push(`<span class="badge red">${t('badge.backorder')}</span>`);if(r.secondLocationFilled)b.push(`<span class="badge blue">${t('badge.second_loc')}</span>`);if(r.replenishedAfterPick)b.push(`<span class="badge green">${t('badge.replenished')}</span>`);return b.join(' ')}
 function secondarySummary(r){const locs=Array.isArray(r.secondaryLocations)?r.secondaryLocations:[];return locs.map(x=>`${x.bin||'NO BIN'}: ${x.qty||0} ${x.uom||r.uom||'EA'}${x.icQtyOnHand?` (OH ${x.icQtyOnHand})`:''}${x.notes?` - ${x.notes}`:''}`).join(' | ')}
 function rowHtml(r){
   if(r.type==='duplicate_pick'){
@@ -797,6 +839,7 @@ function renderReports(){
       <div class="card-title">Daily Summary</div>
       <div style="overflow:auto"><table class="table"><thead><tr><th>Date</th><th>Total</th><th>1st Shift</th><th>2nd Shift</th><th>Wknd OT</th><th>2nd Location</th><th>⚠ Erroneous</th></tr></thead><tbody>${dayTableRows}</tbody></table></div>
     </div>
+    ${(()=>{const uk=rows.filter(r=>!r.picker||r.picker===UNKNOWN_PICKER);return uk.length?`<div class="card no-break" style="border-color:rgba(251,146,60,.4)"><div class="card-title" style="color:var(--orange)">&#9888; Unknown Picker Orders (${uk.length}) &mdash; Requires Investigation</div><div class="notice" style="background:var(--orange-l);border-color:rgba(251,146,60,.35);margin-bottom:12px">These shortages were logged with no identified picker. Edit each record to assign the correct picker.</div>${table(['Product','Bin','Qty','Demand','Division','Date','Shift'],uk.map(r=>[r.productCode,r.shortedBin,r.qtyShorted,r.pickDemand,r.division,normalizeDate(r.date),shiftLabel(r)]))}</div>`:''})()}
     ${duplicate.length?`<div class="card no-break"><div class="card-title">⚠ Duplicate Bin / Product Alerts</div>${table(['Product Code','Bin Location','Occurrences','Pickers'],duplicate.map(d=>[d.product,d.bin,d.count,[...d.pickers].join(', ')]))}</div>`:''}
     <div class="card no-break">
       <div class="card-title">⚠ Erroneous Shorts — All Statuses</div>
@@ -1364,23 +1407,29 @@ function opGetLines(){
 }
 
 function opValidateHeader(){
-  const orderRaw=$('opOrder').value.trim();
+  const orderRaw=($('opOrder').value||'').trim();
   if(!orderRaw){alert('Order Number is required.');return false;}
+  // Normalize silently — don't block for format, just fix it
   const orderResult=normalizeOrderNumber(orderRaw);
-  if(!orderResult.ok){alert('Invalid order number format.\n\nRequired: Division + number, no leading zeros.\nExample: NH.45433\n\nGot: '+orderRaw);return false;}
-  $('opOrder').value=orderResult.val;
-  $('opDiv').value=orderResult.div;
-  // Packer: check hidden field (set by dropdown), the new-name input, or the select itself
+  if(orderResult.ok){
+    $('opOrder').value=orderResult.val;
+    $('opDiv').value=orderResult.div||orderRaw.slice(0,2).toUpperCase();
+  } else {
+    // Couldn't fully parse but still let it through with best guess
+    const div=orderRaw.replace(/[^A-Za-z]/g,'').slice(0,2).toUpperCase();
+    $('opDiv').value=div||orderRaw.slice(0,2).toUpperCase();
+  }
+  // Packer: check hidden field, new-name text input, or select value directly
+  const sel=$('opPackerSelect');
+  const selVal=sel&&sel.value&&sel.value!=='__new__'?sel.value:'';
   const packerVal=(
     ($('opPacker').value||'').trim() ||
-    ($('opPackerNew').value||'').trim() ||
-    (()=>{const s=$('opPackerSelect');return s&&s.value&&s.value!=='__new__'?s.value:'';})()
+    ($('opPackerNew')&&$('opPackerNew').style.display!=='none'?($('opPackerNew').value||'').trim():'') ||
+    selVal
   );
   if(!packerVal){alert('Packer Name is required.');return false;}
-  // Sync hidden field so opSaveEntry reads it correctly
-  if(packerVal&&!($('opPacker').value||'').trim()){
-    const h=$('opPacker');if(h)h.value=normalizeName(packerVal);
-  }
+  // Sync to hidden field
+  const h=$('opPacker');if(h&&!h.value.trim())h.value=normalizeName(packerVal)||packerVal;
   return true;
 }
 
@@ -1412,7 +1461,7 @@ async function opSaveEntry(){
   // validate + save new packer/picker names before submitting
   const rawPacker=normalizeName(($('opPacker').value||$('opPackerNew').value||'').trim());
   const rawPicker=normalizeName(($('opPicker').value||$('opPickerNew').value||'').trim());
-  const rawStation=($('opPackStation').value.trim()).toUpperCase();
+  const rawStation=(($('opPackStation')?.value)||'').toUpperCase();
   if(rawPacker&&!fuzzyMatchPerson(rawPacker,'packer')){if(confirm(`"${rawPacker}" is not saved. Save as new packer?`))savePerson(rawPacker,'packer');}
   if(rawPicker&&!fuzzyMatchPerson(rawPicker,'picker')){if(confirm(`"${rawPicker}" is not saved. Save as new picker?`))savePerson(rawPicker,'picker');}
   if(rawStation&&!packStations.includes(rawStation)){packStations=[...new Set([...packStations,rawStation])].sort();localStorage.setItem('scp_packstations',JSON.stringify(packStations));}
@@ -1826,11 +1875,13 @@ function populateStationSelects(){
 function populatePickerSelects(){
   // Build option lists for all person selects
   const pickerOpts=['<option value="">-- Select Picker --</option>',
-    ...pickerNames.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`),
+    `<option value="${UNKNOWN_PICKER}" style="color:var(--orange)">⚠ Unknown Picker</option>`,
+    ...pickerNames.filter(n=>n!==UNKNOWN_PICKER).map(n=>`<option value="${esc(n)}">${esc(n)}</option>`),
     '<option value="__new__">+ Add New Picker...</option>'
   ].join('');
   const packerOpts=['<option value="">-- Select Packer --</option>',
-    ...packerNames.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`),
+    `<option value="${UNKNOWN_PICKER}" style="color:var(--orange)">⚠ Unknown Packer</option>`,
+    ...packerNames.filter(n=>n!==UNKNOWN_PICKER).map(n=>`<option value="${esc(n)}">${esc(n)}</option>`),
     '<option value="__new__">+ Add New Packer...</option>'
   ].join('');
 
@@ -2840,6 +2891,115 @@ async function forceReloadAllClients(){
     alert('Reload signal sent. All open instances will refresh within a few seconds.');
   }catch(e){hideLoading();alert('Failed: '+e.message);}
 }
+
+
+/* ── BATCH PICK SHEET ───────────────────────────────── */
+function bpInitForm(){
+  const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());
+  const dateEl=$('bpDate');if(dateEl)dateEl.value=d.toISOString().slice(0,16);
+  ['bpProduct','bpBin','bpNotes','bpPicker'].forEach(id=>{const el=$(id);if(el)el.value='';});
+  ['bpDiv','bpUom','bpShift'].forEach(id=>{const el=$(id);if(el)el.value=id==='bpUom'?'EA':id==='bpShift'?'auto':'';}); 
+  const sel=$('bpPickerSelect');if(sel)sel.value='';
+  const wrap=$('bpPickerNewWrap');if(wrap)wrap.style.display='none';
+  const lines=$('bpOrderLines');if(lines){lines.innerHTML='';bpAddOrderLine();bpAddOrderLine();bpAddOrderLine();}
+  const recent=$('bpRecentList');if(recent)recent.innerHTML='';
+}
+function bpPopulatePickers(){
+  const sel=$('bpPickerSelect');if(!sel)return;
+  const opts=['<option value="">-- Select Picker --</option>',
+    `<option value="${UNKNOWN_PICKER}" style="color:var(--orange)">&#9888; Unknown Picker</option>`,
+    ...pickerNames.filter(n=>n!==UNKNOWN_PICKER).map(n=>`<option value="${esc(n)}">${esc(n)}</option>`),
+    '<option value="__new__">+ Add New Picker...</option>'].join('');
+  const cur=sel.value;sel.innerHTML=opts;if(cur)sel.value=cur;
+}
+function bpAddOrderLine(data={}){
+  const wrap=$('bpOrderLines');if(!wrap)return;
+  const row=document.createElement('div');row.className='product-line-card bp-order-line';
+  const ov=esc(data.orderNumber||'');const qv=esc(String(data.qty||''));
+  row.innerHTML='<div style="display:grid;grid-template-columns:2fr 1fr auto;gap:10px;align-items:end">'
+    +'<div class="field" style="margin-bottom:0"><label>Order # <em>*</em></label>'
+    +'<input class="bp-order" placeholder="e.g. NH.45433" autocomplete="off"'
+    +' style="font-family:var(--mono);font-weight:700;letter-spacing:.04em"'
+    +' value="'+ov+'" onblur="bpNormalizeOrder(this)">'
+    +'<div style="font-size:10px;color:var(--muted);margin-top:2px;font-family:var(--mono)" class="bp-div-hint"></div></div>'
+    +'<div class="field" style="margin-bottom:0"><label>Qty Shorted <em>*</em></label>'
+    +'<input class="bp-qty" type="number" min="1" step="1" value="'+qv+'"></div>'
+    +'<button class="btn remove-line-btn" style="margin-bottom:0" onclick="bpRemoveOrderLine(this)">&times;</button></div>';
+  wrap.appendChild(row);
+}
+function bpRemoveOrderLine(btn){
+  const rows=$('bpOrderLines').querySelectorAll('.bp-order-line');
+  if(rows.length<=1){alert('At least one order is required.');return;}
+  btn.closest('.bp-order-line').remove();
+}
+function bpNormalizeOrder(input){
+  const raw=(input.value||'').trim();if(!raw)return;
+  const result=normalizeOrderNumber(raw);
+  if(result.ok){input.value=result.val;input.style.borderColor='rgba(16,185,129,.6)';}
+  else input.style.borderColor='';
+  const div=raw.replace(/[^A-Za-z]/g,'').slice(0,2).toUpperCase();
+  const hint=input.closest('.bp-order-line')?.querySelector('.bp-div-hint');
+  if(hint&&div.length>=2)hint.textContent='Div: '+div;
+}
+function bpGetOrderLines(){
+  return [...$('bpOrderLines').querySelectorAll('.bp-order-line')].map(row=>({
+    orderNumber:(row.querySelector('.bp-order').value||'').trim().toUpperCase(),
+    qty:num(row.querySelector('.bp-qty').value)
+  })).filter(x=>x.orderNumber&&x.qty>0);
+}
+async function saveBatchPick(){
+  const product=($('bpProduct').value||'').trim().toUpperCase();
+  const bin=($('bpBin').value||'').trim().toUpperCase();
+  const div=($('bpDiv').value||'').trim();
+  const bpSel=$('bpPickerSelect');
+  const pickerVal=($('bpPicker').value||'').trim()||
+    ($('bpPickerNewWrap')?.style.display!=='none'?($('bpPickerNew')?.value||'').trim():'')||
+    (bpSel&&bpSel.value&&bpSel.value!=='__new__'?bpSel.value:'')||UNKNOWN_PICKER;
+  const uom=$('bpUom')?.value||'EA';
+  const shOv=$('bpShift')?.value||'auto';
+  const shift=shOv==='auto'?shiftValue():shOv;
+  const notes=($('bpNotes')?.value||'').trim();
+  const orders=bpGetOrderLines();
+  if(!product){alert('Product Code is required.');return;}
+  if(!bin){alert('Bin Location is required.');return;}
+  if(!validateBinFormat(bin).ok){alert('Invalid bin format.\nValid: ##-##-##, ##-##-#, P#####, BULK, ROOM, KEY ACCOUNT');return;}
+  if(!div){alert('Division is required.');return;}
+  if(!orders.length){alert('Add at least one order with a valid order number and qty.');return;}
+  const normalPicker=normalizeName(pickerVal)||UNKNOWN_PICKER;
+  if(normalPicker!==UNKNOWN_PICKER&&!fuzzyMatchPerson(normalPicker,'picker')){
+    if(confirm('Save "'+normalPicker+'" as new picker?'))savePerson(normalPicker,'picker');
+  }
+  showLoading('Logging '+orders.length+' batch pick shortages...');
+  try{
+    const s=getSettings();
+    const batch=db.batch();
+    const col=db.collection(s.activeCollection);
+    const now=new Date().toISOString();
+    orders.forEach(o=>{
+      batch.set(col.doc(),{
+        date:$('bpDate')?.value||nowLocalInput(),
+        division:div,pickDemand:o.orderNumber,
+        picker:normalPicker,shift,uom,notes,
+        productCode:product,shortedBin:bin,
+        qtyShorted:o.qty,batchPick:true,
+        foundInShortedBin:false,secondLocationFilled:false,
+        replenishedAfterPick:false,status:'open',
+        createdAt:now,createdBy:role||'batch',source:'batch_pick'
+      });
+    });
+    await batch.commit();
+    clearCaches();
+    const recent=$('bpRecentList');
+    if(recent)recent.innerHTML='<div class="card" style="border-color:rgba(167,139,250,.4);background:var(--purple-l)">'
+      +'<div style="font-size:13px;font-weight:700;color:var(--purple)">&#10003; Batch Pick Logged</div>'
+      +'<div class="sr-meta" style="margin-top:6px">Product: <strong>'+esc(product)+'</strong> &bull; Bin: <strong>'+esc(bin)+'</strong> &bull; '+orders.length+' order(s)</div>'
+      +'</div>';
+    setTimeout(()=>{if($('bpRecentList'))$('bpRecentList').innerHTML='';},8000);
+    alert('Logged '+orders.length+' shortage(s) for '+product+' at '+bin+'.');
+    bpClearForm();
+  }catch(e){alert('Save failed: '+e.message);}finally{hideLoading();}
+}
+function bpClearForm(){bpInitForm();}
 
 function startup(){applyTheme();initFirebase();$('sDate').value=nowLocalInput();loadAllPersonnel();populatePickerSelects();populateStationSelects();if($('productLines'))addProductLine();const sl=localStorage.getItem('scp_lang')||'en';setLang(sl);startResetListener();}
 startup();
