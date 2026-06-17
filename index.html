@@ -296,9 +296,15 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
       <input id="opFilterText" class="search" placeholder="Search by packer, picker, order, product, division..." oninput="opRenderList()">
       <input id="opFilterStart" type="date" onchange="opRenderList()">
       <input id="opFilterEnd" type="date" onchange="opRenderList()">
+      <select id="opViewMode" onchange="opLoadRecords(true)" style="background:var(--panel2);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;padding:6px 10px">
+        <option value="active">Active Records</option>
+        <option value="archive">Archived Records</option>
+        <option value="both">Active + Archived</option>
+      </select>
       <button class="btn" onclick="opLoadRecords(true)">Refresh</button>
       <button class="btn orange" onclick="printOverPullReport()">&#128438; Print KPI Report</button>
     </div>
+    <div id="opArchiveActions" style="margin-bottom:8px;display:flex;gap:8px"></div>
     <div id="opKpiBar" class="stat-grid" style="margin-bottom:14px"></div>
     <div id="opList" class="shortage-list"></div>
   </div>
@@ -349,7 +355,7 @@ const ROLE_LABELS={clerk:'Outbound Clerk',icteam:'IC Team',manager:'IC Manager'}
 const IC_PORTAL_URL='https://phocas88.github.io/Chapman_Inventory_Control_Portal/';
 const DEFAULT_NEW_CONFIG={apiKey:'AIzaSyB1CEylhHj4JoWH2VejdLoOt1nteztaqH8',authDomain:'shortage-control-portal.firebaseapp.com',projectId:'shortage-control-portal',storageBucket:'shortage-control-portal.firebasestorage.app',messagingSenderId:'791183009826',appId:'1:791183009826:web:76f397201bd0228e61ee38'};
 const OLD_CONFIG={apiKey:'AIzaSyA1m5P6MFUojFsEBqLXaSLumNiChgAH1Lw',authDomain:'inventory-control-portal.firebaseapp.com',projectId:'inventory-control-portal',storageBucket:'inventory-control-portal.firebasestorage.app',messagingSenderId:'925547075268',appId:'1:925547075268:web:e6ebce91417aa6885a1b91'};
-const DEFAULT_SETTINGS={firebaseConfig:DEFAULT_NEW_CONFIG,activeCollection:'shortages_active',archiveCollection:'shortages_archive',overpullCollection:'overpull_active'};
+const DEFAULT_SETTINGS={firebaseConfig:DEFAULT_NEW_CONFIG,activeCollection:'shortages_active',archiveCollection:'shortages_archive',overpullCollection:'overpull_active',overpullArchiveCollection:'overpull_archive'};
 const UNKNOWN_PICKER='Unknown Picker';
 const PRESET_PICKERS=['ABrooks','ABurford','ACarter','ACherry','AJbari','ANazari','APayton','BChristian','BClaiborne','BZeyfuh','CArtis','CDavis','DAlston','DCooper','DLagatuz','DLee','DMartin','EBaysa','EKelly','EMoore','GMunford','HAkridge','JBoothe','JCary','JDelacruz','JLinwood','JRobles','KGreenhow','KHill','KRoberts','KWatford','MButler','MGracia','MHunt','MSimon','MWalker','NLewis','OZiyallah','QSills','RAlston','RCoy','RJoyner','SFnu','TMorgan','TPerry','TRobertson','WCooke','WCruz','WSellers'];
 let role='',pinTarget='',pinBuf='',db=null,oldDb=null,shortages=[],visibleShortages=[],pickerNames=[],packerNames=[],packStations=[],inventoryBins=[],editingId=null,editingArchive=false,lastLoadMode='active';
@@ -360,13 +366,15 @@ function getSettings(){try{return {...DEFAULT_SETTINGS,...JSON.parse(localStorag
 function initFirebase(){
   const s=getSettings();
   try{
-    // Always delete any existing app to ensure we init with current config
+    // Use existing app or create new one
+    let app;
     if(firebase.apps.length){
-      firebase.apps.forEach(app=>{try{app.delete();}catch(x){}});
+      app=firebase.apps[0];
+    } else {
+      app=firebase.initializeApp(s.firebaseConfig);
     }
-    firebase.initializeApp(s.firebaseConfig);
-    db=firebase.firestore();
-    db.settings({ignoreUndefinedProperties:true});
+    db=app?app.firestore():firebase.firestore();
+    try{db.settings({ignoreUndefinedProperties:true});}catch(x){/* already set */}
     console.log('[Firebase] Connected to project:',s.firebaseConfig.projectId);
     updateDbStatus(true);
   }catch(e){
@@ -753,7 +761,13 @@ function rowHtml(r){
       </div>
     </div>
   </div>`}
-async function saveShortage(){if(!ensureDb())return;autoDivisionFromDemand();validatePickerInput();const base={date:$('sDate').value||nowLocalInput(),division:$('sDiv').value,pickDemand:$('sDemand').value.trim().toUpperCase(),picker:normalizeName(($('sPicker').value||$('sPickerNew').value||'').trim()),packStation:($('sPackStation').value.trim().toUpperCase()),shift:shiftValue(),uom:'EA',notes:$('sNotes').value.trim(),createdAt:new Date().toISOString(),createdBy:role,foundInShortedBin:false,secondLocationFilled:false,replenishedAfterPick:false,status:'open'};const lines=getProductLines();if(!base.pickDemand){alert('Pick Demand # is required.');return}if(!base.division){alert('Division is required. Enter or scan the Pick Demand # first.');return}if(!base.picker){alert('Picker is required.');return}if(base.picker&&!fuzzyMatchPerson(base.picker,'picker')){if(!confirm(`"${base.picker}" is not saved. Save as new picker?`)){$('sPicker').focus();return}savePerson(base.picker,'picker');}if(!lines.length||lines.some(l=>!l.productCode||!l.shortedBin)){alert('Each product line needs Product Code and Bin Shorted.');return}
+async function saveShortage(){if(!ensureDb())return;autoDivisionFromDemand();validatePickerInput();// Read picker from hidden field OR from select directly
+  const _pickerVal=($('sPicker').value||'').trim()||
+    ($('sPickerNewWrap')?.style.display!=='none'?($('sPickerNew')?.value||'').trim():'')||
+    (()=>{const s=$('sPickerSelect');return s&&s.value&&s.value!=='__new__'?s.value:'';})();
+  const _station=($('sPackStation')?.value||'');
+  const base={date:$('sDate').value||nowLocalInput(),division:$('sDiv').value,pickDemand:$('sDemand').value.trim().toUpperCase(),picker:normalizeName(_pickerVal),packStation:_station,shift:shiftValue(),uom:'EA',notes:($('sNotes')?.value||'').trim(),createdAt:new Date().toISOString(),createdBy:role,foundInShortedBin:false,secondLocationFilled:false,replenishedAfterPick:false,status:'open'};const lines=getProductLines();if(!base.pickDemand){alert('Pick Demand # is required.');return}if(!base.division){alert('Division is required. Enter or scan the Pick Demand # first.');return}if(!base.picker){alert('Picker is required. Select a picker from the dropdown.');return;}
+  if(base.picker&&base.picker!==UNKNOWN_PICKER&&!fuzzyMatchPerson(base.picker,'picker')){if(confirm('Save "'+base.picker+'" as new picker?'))savePerson(base.picker,'picker');}if(!lines.length||lines.some(l=>!l.productCode||!l.shortedBin)){alert('Each product line needs Product Code and Bin Shorted.');return}
   const invalidBins=lines.filter(l=>l.shortedBin&&!validateBinFormat(l.shortedBin).ok);
   if(invalidBins.length){alert('Invalid bin format on one or more lines.\n\nValid formats:\n  ##-##-##  (e.g. 82-26-01)\n  ##-##-#   (e.g. 82-26-1)\n  P#####    (e.g. P12345)\n  BULK\n  ROOM\n  KEY ACCOUNT');return}showLoading('Saving shortages...');try{const batch=db.batch();const col=db.collection(getSettings().activeCollection);lines.forEach(line=>{batch.set(col.doc(),{...base,...line,uom:'EA'});});await batch.commit();clearCaches();clearEntry();await loadShortages(true)}catch(e){alert(e.message)}finally{hideLoading()}}
 function clearEntry(){['sDemand','sPicker','sNotes'].forEach(id=>{if($(id))$(id).value='';});['sPickerSelect','sPackStation'].forEach(id=>{const el=$(id);if(el)el.value='';});['sPickerNewWrap'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});$('sDiv').value='';$('sShift').value='auto';$('sDate').value=nowLocalInput();$('productLines').innerHTML='';addProductLine();['sPickerNewSuggest','sPackStationSuggest'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});}
@@ -1471,30 +1485,24 @@ function opGetLines(){
 function opValidateHeader(){
   const orderRaw=($('opOrder').value||'').trim();
   if(!orderRaw){alert('Order Number is required.');return false;}
-  // Normalize silently — don't block for format, just fix it
   const orderResult=normalizeOrderNumber(orderRaw);
   if(orderResult.ok){
     $('opOrder').value=orderResult.val;
     $('opDiv').value=orderResult.div||orderRaw.slice(0,2).toUpperCase();
   } else {
-    // Couldn't fully parse but still let it through with best guess
     const div=orderRaw.replace(/[^A-Za-z]/g,'').slice(0,2).toUpperCase();
     $('opDiv').value=div||orderRaw.slice(0,2).toUpperCase();
   }
-  // Packer: check hidden field, new-name text input, or select value directly
-  const sel=$('opPackerSelect');
-  const selVal=sel&&sel.value&&sel.value!=='__new__'?sel.value:'';
+  const opkSel=$('opPackerSelect');
   const packerVal=(
-    ($('opPacker').value||'').trim() ||
-    ($('opPackerNew')&&$('opPackerNew').style.display!=='none'?($('opPackerNew').value||'').trim():'') ||
-    selVal
+    ($('opPacker')?.value||'').trim() ||
+    ($('opPackerNewWrap')?.style.display!=='none'?($('opPackerNew')?.value||'').trim():'') ||
+    (opkSel&&opkSel.value&&opkSel.value!=='__new__'?opkSel.value:'')
   );
-  if(!packerVal){alert('Packer Name is required.');return false;}
-  // Sync to hidden field
+  if(!packerVal){alert('Packer Name is required. Select a packer from the dropdown.');return false;}
   const h=$('opPacker');if(h&&!h.value.trim())h.value=normalizeName(packerVal)||packerVal;
   return true;
 }
-
 function opPromptMore(){
   if(!opValidateHeader())return;
   const lines=opGetLines();
@@ -1522,8 +1530,18 @@ async function opSaveEntry(){
   const s=getSettings();
   const col=s.overpullCollection||'overpull_active';
   // validate + save new packer/picker names before submitting
-  const rawPacker=normalizeName(($('opPacker').value||$('opPackerNew').value||'').trim());
-  const rawPicker=normalizeName(($('opPicker').value||$('opPickerNew').value||'').trim());
+  const _opPackerSel=$('opPackerSelect');
+  const rawPacker=normalizeName(
+    ($('opPacker').value||'').trim()||
+    ($('opPackerNewWrap')?.style.display!=='none'?($('opPackerNew')?.value||'').trim():'')||
+    (_opPackerSel&&_opPackerSel.value&&_opPackerSel.value!=='__new__'?_opPackerSel.value:'')
+  );
+  const _opPickerSel=$('opPickerSelect');
+  const rawPicker=normalizeName(
+    ($('opPicker').value||'').trim()||
+    ($('opPickerNewWrap')?.style.display!=='none'?($('opPickerNew')?.value||'').trim():'')||
+    (_opPickerSel&&_opPickerSel.value&&_opPickerSel.value!=='__new__'?_opPickerSel.value:'')
+  );
   const rawStation=(($('opPackStation')?.value)||'').toUpperCase();
   if(rawPacker&&!fuzzyMatchPerson(rawPacker,'packer')){if(confirm(`"${rawPacker}" is not saved. Save as new packer?`))savePerson(rawPacker,'packer');}
   if(rawPicker&&!fuzzyMatchPerson(rawPicker,'picker')){if(confirm(`"${rawPicker}" is not saved. Save as new picker?`))savePerson(rawPicker,'picker');}
@@ -1560,55 +1578,91 @@ async function opSaveEntry(){
 function opClearForm(){opInitForm();}
 
 async function opLoadRecords(force){
+  if(!ensureDb())return;
   const s=getSettings();
-  const col=s.overpullCollection||'overpull_active';
-  const cacheK='scp_opcache';
+  const activeCol=s.overpullCollection||'overpull_active';
+  const archiveCol=s.overpullArchiveCollection||'overpull_archive';
+  const mode=$('opViewMode')?.value||'active';
+  const cacheK='scp_opcache_'+mode;
   if(!force){
-    try{const c=JSON.parse(localStorage.getItem(cacheK)||'null');if(c&&Date.now()-c.t<3*60*1000){opRecords=c.rows;opRenderList();opRenderKpi();return;}}catch(e){}
+    try{const c=JSON.parse(localStorage.getItem(cacheK)||'null');if(c&&Date.now()-c.t<3*60*1000){opRecords=c.rows;opRenderList();opRenderKpi();opShowArchiveActions();return;}}catch(e){}
   }
+  showLoading('Loading over pull records...');
   try{
-    if(db){
-      const snap=await db.collection(col).limit(2000).get();
-      opRecords=snap.docs.map(d=>({...d.data(),id:d.id})).sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
-      localStorage.setItem(cacheK,JSON.stringify({t:Date.now(),rows:opRecords}));
-    } else {
-      opRecords=JSON.parse(localStorage.getItem('scp_overpull')||'[]');
+    let rows=[];
+    const mapDocs=(snap,archived)=>snap.docs.map(d=>({...d.data(),id:d.id,_archived:archived}));
+    if(mode==='active'||mode==='both'){
+      const snap=await db.collection(activeCol).limit(2000).get();
+      rows=rows.concat(mapDocs(snap,false));
     }
+    if(mode==='archive'||mode==='both'){
+      const snap=await db.collection(archiveCol).limit(2000).get();
+      rows=rows.concat(mapDocs(snap,true));
+    }
+    opRecords=rows.sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
+    localStorage.setItem(cacheK,JSON.stringify({t:Date.now(),rows:opRecords}));
   }catch(e){
+    alert('Load failed: '+e.message);
     opRecords=JSON.parse(localStorage.getItem('scp_overpull')||'[]');
-  }
+  }finally{hideLoading();}
   opRenderList();
   opRenderKpi();
+  opShowArchiveActions();
+}
+
+function opShowArchiveActions(){
+  const bar=$('opArchiveActions');
+  if(!bar||!canManage())return;
+  const mode=$('opViewMode')?.value||'active';
+  const activeRows=opRecords.filter(r=>!r._archived);
+  if(mode==='active'&&activeRows.length){
+    bar.innerHTML=`<button class="btn orange" onclick="opArchiveSelected()">&#128451; Archive Selected Over Pull Records</button>
+      <button class="btn red" onclick="opArchiveAll()">&#128451; Archive All Active Over Pull Records</button>`;
+  } else if(mode==='archive'){
+    bar.innerHTML=`<button class="btn" onclick="opUnarchiveSelected()">&#8634; Unarchive Selected</button>`;
+  } else {
+    bar.innerHTML='';
+  }
 }
 
 function opFilteredRows(){
   const text=($('opFilterText')?.value||'').toLowerCase().trim();
   const start=$('opFilterStart')?.value||'';
   const end=$('opFilterEnd')?.value||'';
+  const mode=$('opViewMode')?.value||'active';
   return opRecords.filter(r=>{
+    if(mode==='active'&&r._archived)return false;
+    if(mode==='archive'&&!r._archived)return false;
     const d=(r.date||r.createdAt||'').slice(0,10);
     if(start&&d<start)return false;
     if(end&&d>end)return false;
     if(!text)return true;
-    return [r.packer,r.picker,r.packStation,r.orderNumber,r.productCode,r.division].join(' ').toLowerCase().includes(text);
+    return [r.packer,r.picker,r.packStation,r.orderNumber,r.pickDemand,r.productCode,r.division,r.notes].join(' ').toLowerCase().includes(text);
   });
 }
 
 function opRenderKpi(){
   const rows=opFilteredRows();
+  const active=rows.filter(r=>!r._archived);
+  const archived=rows.filter(r=>r._archived);
   const totalLines=rows.length;
-  const totalQty=rows.reduce((s,r)=>s+num(r.qty),0);
-  const packers=new Set(rows.map(r=>r.packer||r.picker||'').filter(Boolean)).size;
+  const totalQty=rows.reduce((s,r)=>s+(num(r.qty)||num(r.qtyShorted)||0),0);
+  const packers=new Set(rows.map(r=>r.packer||'').filter(Boolean)).size;
   const pickers=new Set(rows.map(r=>r.picker||'').filter(Boolean)).size;
-  const orders=new Set(rows.map(r=>r.orderNumber)).size;
-  const divs=new Set(rows.map(r=>r.division)).size;
+  const orders=new Set(rows.map(r=>r.orderNumber||r.pickDemand||'').filter(Boolean)).size;
+  const divs=new Set(rows.map(r=>r.division||'').filter(Boolean)).size;
+  const batchCount=rows.filter(r=>r.batchPick||r.source==='batch_pick').length;
+  const dupCount=rows.filter(r=>r.type==='duplicate_pick').length;
   $('opKpiBar').innerHTML=`
-    <div class="stat-card"><div class="stat-num">${totalLines}</div><div class="stat-lbl">Over Pull Lines</div></div>
-    <div class="stat-card" style="border-color:rgba(251,146,60,.3)"><div class="stat-num" style="color:var(--orange)">${totalQty}</div><div class="stat-lbl">Total Units Over-Pulled</div></div>
-    <div class="stat-card"><div class="stat-num">${packers}</div><div class="stat-lbl">Packers Involved</div></div>
-    <div class="stat-card"><div class="stat-num">${pickers}</div><div class="stat-lbl">Pickers Involved</div></div>
+    <div class="stat-card"><div class="stat-num">${totalLines}</div><div class="stat-lbl">Total Lines</div></div>
+    <div class="stat-card" style="border-color:rgba(251,146,60,.3)"><div class="stat-num" style="color:var(--orange)">${totalQty}</div><div class="stat-lbl">Units Over-Pulled</div></div>
+    <div class="stat-card"><div class="stat-num">${packers}</div><div class="stat-lbl">Packers</div></div>
+    <div class="stat-card"><div class="stat-num">${pickers}</div><div class="stat-lbl">Pickers</div></div>
     <div class="stat-card"><div class="stat-num">${orders}</div><div class="stat-lbl">Orders Affected</div></div>
     <div class="stat-card"><div class="stat-num">${divs}</div><div class="stat-lbl">Divisions</div></div>
+    ${batchCount?`<div class="stat-card" style="border-color:rgba(167,139,250,.3)"><div class="stat-num" style="color:var(--purple)">${batchCount}</div><div class="stat-lbl">Batch Pick Lines</div></div>`:''}
+    ${dupCount?`<div class="stat-card" style="border-color:rgba(251,146,60,.4);background:rgba(251,146,60,.05)"><div class="stat-num" style="color:var(--orange)">${dupCount}</div><div class="stat-lbl">Duplicate Pick Reports</div></div>`:''}
+    ${archived.length?`<div class="stat-card" style="border-color:rgba(167,139,250,.3)"><div class="stat-num" style="color:var(--muted)">${archived.length}</div><div class="stat-lbl">Archived</div></div>`:''}
   `;
 }
 
@@ -1616,27 +1670,128 @@ function opRenderList(){
   opRenderKpi();
   const rows=opFilteredRows();
   if(!rows.length){$('opList').innerHTML='<div class="empty">No over pull records found.</div>';return;}
-  // Group by order+picker+date (same submission)
+  // Group by order+packer+date (same submission)
   const groups={};
   rows.forEach(r=>{
-    const key=(r.orderNumber||'')+'|'+(r.picker||'')+'|'+(r.date||r.createdAt||'').slice(0,16);
-    if(!groups[key])groups[key]={...r,_lines:[]};
+    const key=(r.orderNumber||r.pickDemand||'')+'|'+(r.packer||r.picker||'')+'|'+(r.date||r.createdAt||'').slice(0,16)+'|'+(r._archived?'1':'0');
+    if(!groups[key])groups[key]={...r,_lines:[],_ids:[]};
     groups[key]._lines.push(r);
+    if(r.id)groups[key]._ids.push(r.id);
   });
-  $('opList').innerHTML=Object.values(groups).map(g=>{
+  const isManager=canManage();
+  const mode=$('opViewMode')?.value||'active';
+  $('opList').innerHTML=Object.values(groups).map((g,gi)=>{
     const d=g.date||g.createdAt||'';
     const dateDisp=d?new Date(d).toLocaleString('en-US',{month:'2-digit',day:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
-    const lineHtml=g._lines.map(l=>`<span style="font-family:var(--mono);font-size:12px;background:var(--panel2);border:1px solid var(--border);border-radius:5px;padding:2px 8px;margin:2px;display:inline-block">${esc(l.productCode)} &times; ${l.qty} ${esc(l.uom)}</span>`).join('');
-    return `<div class="shortage-row" style="border-color:rgba(251,146,60,.3)">
+    const orderNum=g.orderNumber||g.pickDemand||'NO ORDER';
+    // Determine record type
+    const isBatch=g.batchPick||g.source==='batch_pick';
+    const isDup=g.type==='duplicate_pick';
+    const isArchived=!!g._archived;
+    // Build product lines display
+    const lineHtml=g._lines.map(l=>{
+      const code=l.productCode||l.productCode||'';
+      const qty=l.qty||l.qtyShorted||0;
+      const uom=l.uom||'EA';
+      return `<span style="font-family:var(--mono);font-size:12px;background:var(--panel2);border:1px solid var(--border);border-radius:5px;padding:2px 8px;margin:2px;display:inline-block">${esc(code)} &times; ${qty} ${esc(uom)}</span>`;
+    }).join('');
+    const badges=[
+      isBatch?'<span class="badge purple">Batch Pick</span>':'',
+      isDup?'<span class="badge orange">Duplicate Pick</span>':'',
+      isArchived?'<span class="badge purple">Archived</span>':'',
+    ].filter(Boolean).join(' ');
+    const idsJson=JSON.stringify(g._ids).replace(/"/g,'&quot;');
+    const chk=isManager&&!isArchived?`<input type="checkbox" class="sr-check op-row-check" data-ids="${idsJson}" style="margin-right:8px">`:
+              isManager&&isArchived?`<input type="checkbox" class="sr-check op-row-check" data-ids="${idsJson}" style="margin-right:8px">`:'' ;
+    const borderColor=isDup?'rgba(251,146,60,.5)':isBatch?'rgba(167,139,250,.4)':'rgba(251,146,60,.25)';
+    const bg=isArchived?'opacity:.65;':'';
+    return `<div class="shortage-row" style="border-color:${borderColor};${bg}">
       <div class="sr-head">
+        ${chk}
         <div style="flex:1">
-          <div class="sr-codes" style="color:var(--orange)">${esc(g.orderNumber||'NO ORDER')} <span style="color:var(--muted)">&bull;</span> <span style="font-size:11px">${esc(g.division||'')}</span></div>
-          <div class="sr-meta">${esc(dateDisp)}${g.packer?' &bull; Packer: <strong>'+esc(g.packer)+'</strong>':''}${g.picker?' &bull; Picker: <strong>'+esc(g.picker)+'</strong>':''}${g.packStation?' &bull; Station: <strong>'+esc(g.packStation)+'</strong>':''}</div>
-          <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:2px">${lineHtml}</div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:4px">
+            <div class="sr-codes" style="color:var(--orange)">${esc(orderNum)} <span style="color:var(--muted)">&bull;</span> <span style="font-size:11px">${esc(g.division||'')}</span></div>
+            ${badges?`<div>${badges}</div>`:''}
+          </div>
+          <div class="sr-meta">${esc(dateDisp)}${g.packer?' &bull; Packer: <strong>'+esc(g.packer)+'</strong>':''}${g.picker?' &bull; Picker: <strong>'+esc(g.picker)+'</strong>':''}${g.packStation?' &bull; Station: <strong>'+esc(g.packStation)+'</strong>':''}${g.shift?' &bull; '+esc(g.shift)+' Shift':''}</div>
+          ${lineHtml?`<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:2px">${lineHtml}</div>`:''}
+          ${g.notes?`<div class="sr-meta" style="margin-top:4px;font-style:italic">${esc(g.notes)}</div>`:''}
         </div>
       </div>
     </div>`;
   }).join('');
+}
+
+async function opArchiveSelected(){
+  if(!canManage()){alert('IC Manager access required.');return;}
+  const checked=[...document.querySelectorAll('.op-row-check:checked')];
+  if(!checked.length){alert('Select records to archive first.');return;}
+  const ids=checked.flatMap(el=>JSON.parse(el.dataset.ids.replace(/&quot;/g,'"')));
+  if(!ids.length)return;
+  if(!confirm(`Archive ${checked.length} over pull entry(s)?\nThis moves them to the archive collection.`))return;
+  await opArchiveIds(ids);
+}
+
+async function opArchiveAll(){
+  if(!canManage()){alert('IC Manager access required.');return;}
+  const activeRows=opRecords.filter(r=>!r._archived);
+  if(!activeRows.length){alert('No active over pull records to archive.');return;}
+  if(!confirm(`Archive ALL ${activeRows.length} active over pull records?`))return;
+  await opArchiveIds(activeRows.map(r=>r.id).filter(Boolean));
+}
+
+async function opArchiveIds(ids){
+  if(!ensureDb())return;
+  const s=getSettings();
+  const fromCol=db.collection(s.overpullCollection||'overpull_active');
+  const toCol=db.collection(s.overpullArchiveCollection||'overpull_archive');
+  showLoading('Archiving '+ids.length+' records...');
+  try{
+    const batch=db.batch();
+    for(const id of ids){
+      const doc=await fromCol.doc(id).get();
+      if(doc.exists){
+        batch.set(toCol.doc(id),{...doc.data(),_archived:true,archivedAt:new Date().toISOString(),archivedBy:role});
+        batch.delete(fromCol.doc(id));
+      }
+    }
+    await batch.commit();
+    localStorage.removeItem('scp_opcache_active');
+    localStorage.removeItem('scp_opcache_both');
+    await opLoadRecords(true);
+    hideLoading();
+    alert('Archived '+ids.length+' record(s).');
+  }catch(e){hideLoading();alert('Archive failed: '+e.message);}
+}
+
+async function opUnarchiveSelected(){
+  if(!canManage()){alert('IC Manager access required.');return;}
+  const checked=[...document.querySelectorAll('.op-row-check:checked')];
+  if(!checked.length){alert('Select records to unarchive first.');return;}
+  const ids=checked.flatMap(el=>JSON.parse(el.dataset.ids.replace(/&quot;/g,'"')));
+  if(!ids.length)return;
+  if(!ensureDb())return;
+  const s=getSettings();
+  const fromCol=db.collection(s.overpullArchiveCollection||'overpull_archive');
+  const toCol=db.collection(s.overpullCollection||'overpull_active');
+  showLoading('Unarchiving...');
+  try{
+    const batch=db.batch();
+    for(const id of ids){
+      const doc=await fromCol.doc(id).get();
+      if(doc.exists){
+        const data={...doc.data()};delete data._archived;delete data.archivedAt;delete data.archivedBy;
+        batch.set(toCol.doc(id),data);
+        batch.delete(fromCol.doc(id));
+      }
+    }
+    await batch.commit();
+    localStorage.removeItem('scp_opcache_archive');
+    localStorage.removeItem('scp_opcache_both');
+    await opLoadRecords(true);
+    hideLoading();
+    alert('Unarchived '+ids.length+' record(s).');
+  }catch(e){hideLoading();alert('Unarchive failed: '+e.message);}
 }
 
 function printOverPullReport(){
@@ -2328,7 +2483,7 @@ const LANGS={
     'login.shortage_portal':'Over Pull Portal','login.shortage_portal_sub':'Opens the standalone shortage app (new tab)',
     'login.enter_pin':'Enter PIN','login.back':'Back',
     'form.date_time':'Date & Time','form.division':'Division','form.picker':'Picker',
-    'form.pack_station':'Pack Station','form.pick_demand':'Pick Demand #',
+    'form.packer':'Packer','form.pack_station':'Pack Station','form.pick_demand':'Pick Demand #',
     'form.shift_override':'Shift Override','form.shift_auto':'Auto (use current time)','form.shift_1st':'1st Shift (6am–3:30pm)','form.shift_2nd':'2nd Shift (3:30pm–12am)','form.shift_wot':'Weekend OT (6am–12am)',
     'form.product_lines':'Product Lines','form.product_code':'Product Code',
     'form.qty_each':'Qty (Each)','form.bin_shorted':'Bin Shorted',
@@ -2379,7 +2534,7 @@ const LANGS={
     'login.shortage_portal':'Portal de Escasez y Exceso','login.shortage_portal_sub':'Abre la app de escasez (nueva pestaña)',
     'login.enter_pin':'Ingresar PIN','login.back':'Regresar',
     'form.date_time':'Fecha y Hora','form.division':'División','form.picker':'Recolector',
-    'form.pack_station':'Estación de Empaque','form.pick_demand':'Núm. de Demanda',
+    'form.packer':'Empacador','form.pack_station':'Estación de Empaque','form.pick_demand':'Núm. de Demanda',
     'form.shift_override':'Turno (manual)','form.shift_auto':'Auto (hora actual)',
     'form.shift_1st':'1er Turno (6am–3:30pm)','form.shift_2nd':'2do Turno (3:30pm–12am)','form.shift_wot':'Tiempo Extra Fin de Semana (6am–12am)',
     'form.product_lines':'Líneas de Producto','form.product_code':'Código de Producto',
@@ -2431,7 +2586,7 @@ const LANGS={
     'login.shortage_portal':'پورتل کمبود و مازاد','login.shortage_portal_sub':'برنامه کمبود را باز می‌کند (تب جدید)',
     'login.enter_pin':'پین را وارد کنید','login.back':'برگشت',
     'form.date_time':'تاریخ و ساعت','form.division':'بخش','form.picker':'جمع‌آورنده',
-    'form.pack_station':'ایستگاه بسته‌بندی','form.pick_demand':'شماره تقاضا',
+    'form.packer':'بسته‌بند','form.pack_station':'ایستگاه بسته‌بندی','form.pick_demand':'شماره تقاضا',
     'form.shift_override':'نوبت (دستی)','form.shift_auto':'خودکار (زمان فعلی)',
     'form.shift_1st':'نوبت اول (۶ صبح–۳:۳۰ عصر)','form.shift_2nd':'نوبت دوم (۳:۳۰–۱۲ شب)','form.shift_wot':'اضافه‌کاری آخر هفته',
     'form.product_lines':'خطوط محصول','form.product_code':'کد محصول',
@@ -2483,7 +2638,7 @@ const LANGS={
     'login.shortage_portal':'Portal ng Kakulangan at Sobra','login.shortage_portal_sub':'Binubuksan ang standalone app (bagong tab)',
     'login.enter_pin':'Ilagay ang PIN','login.back':'Bumalik',
     'form.date_time':'Petsa at Oras','form.division':'Dibisyon','form.picker':'Tagapulot',
-    'form.pack_station':'Estasyon ng Pagbabalot','form.pick_demand':'Pick Demand #',
+    'form.packer':'Tagabalot','form.pack_station':'Estasyon ng Pagbabalot','form.pick_demand':'Pick Demand #',
     'form.shift_override':'Shift (Manual)','form.shift_auto':'Auto (kasalukuyang oras)',
     'form.shift_1st':'1st Shift (6am–3:30pm)','form.shift_2nd':'2nd Shift (3:30pm–12am)','form.shift_wot':'Weekend OT (6am–12am)',
     'form.product_lines':'Mga Linya ng Produkto','form.product_code':'Kodigo ng Produkto',
@@ -2535,7 +2690,7 @@ const LANGS={
     'login.shortage_portal':'بوابة النقص والزيادة','login.shortage_portal_sub':'يفتح تطبيق النقص (تبويب جديد)',
     'login.enter_pin':'أدخل رمز PIN','login.back':'رجوع',
     'form.date_time':'التاريخ والوقت','form.division':'القسم','form.picker':'جامع البضائع',
-    'form.pack_station':'محطة التعبئة','form.pick_demand':'رقم طلب الانتقاء',
+    'form.packer':'المعبّئ','form.pack_station':'محطة التعبئة','form.pick_demand':'رقم طلب الانتقاء',
     'form.shift_override':'الوردية (يدوي)','form.shift_auto':'تلقائي (الوقت الحالي)',
     'form.shift_1st':'الوردية الأولى (6ص–3:30م)','form.shift_2nd':'الوردية الثانية (3:30م–12م)','form.shift_wot':'عمل إضافي نهاية الأسبوع (6ص–12م)',
     'form.product_lines':'خطوط المنتجات','form.product_code':'كود المنتج',
@@ -2840,7 +2995,7 @@ function applyLangToForms(){
   // Labels in batch pick form
   const bpLabelMap={
     'bpDate':t('form.date_time'),'bpDiv':t('form.division'),
-    'bpPickerSelect':t('form.picker'),'bpPackerSelect':t('form.packer'),
+    'bpPickerSelect':t('form.picker'),'bpPackerSelect':t('form.packer')||t('op.packer_name')||'Packer',
     'bpProduct':t('op.product_code'),'bpUom':t('op.uom'),'bpShift':t('form.shift_override'),
     'bpNotes':t('form.notes'),
   };
