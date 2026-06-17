@@ -737,7 +737,13 @@ function normalizeShortage(raw,id,arch){
   return r
 }
 function shortageSortValue(r){const d=r.date||r.createdAt||r.timestamp||'';if(d&&d.toDate)return d.toDate().getTime();const t=Date.parse(d);return isNaN(t)?0:t}
-async function loadShortages(force){if(!db){if(force){alert('Not connected to Firebase. Log in as IC Manager → Settings and save your Firebase config.');} return;}const mode=$('viewMode')?.value||lastLoadMode||'active';if(!force&&useCache(mode))return;showLoading('Loading shortages...');try{const s=getSettings();let rows=[];async function getCol(col,arch){const snap=await db.collection(col).limit(2500).get();const _rc=parseInt(localStorage.getItem('scp_reads_today')||'0')+snap.size;localStorage.setItem('scp_reads_today',_rc);return snap.docs.map(d=>normalizeShortage(d.data(),d.id,arch))}if(mode==='active'||mode==='both')rows=rows.concat(await getCol(s.activeCollection,false));
+async function loadShortages(force){if(!db){if(force){alert('Not connected to Firebase. Log in as IC Manager → Settings and save your Firebase config.');} return;}const mode=$('viewMode')?.value||lastLoadMode||'active';if(!force&&useCache(mode))return;showLoading('Loading shortages...');try{const s=getSettings();let rows=[];async function getCol(col,arch){
+      console.log('[loadShortages] reading collection:',col);
+      const snap=await db.collection(col).limit(2500).get();
+      console.log('[loadShortages]',col,'returned',snap.size,'docs');
+      const _rc=parseInt(localStorage.getItem('scp_reads_today')||'0')+snap.size;localStorage.setItem('scp_reads_today',_rc);
+      return snap.docs.map(d=>normalizeShortage(d.data(),d.id,arch));
+    }if(mode==='active'||mode==='both')rows=rows.concat(await getCol(s.activeCollection,false));
     if(mode==='archive'||mode==='both'){
       try{rows=rows.concat(await getCol(s.archiveCollection,true));}
       catch(archErr){console.warn('Archive collection not accessible (check Firestore rules):',archErr.message);}
@@ -745,11 +751,22 @@ async function loadShortages(force){if(!db){if(force){alert('Not connected to Fi
 async function runReportPull(){
   const mode=$('reportMode').value||'active';
   const hasDateRange=!!($('reportStart').value||$('reportEnd').value);
+  // Default to active only — avoids hitting archive if rules don't cover it
   const loadMode=hasDateRange?'both':mode;
+  console.log('[runReportPull] mode=',loadMode,'shortages before=',shortages.length);
   $('viewMode').value=loadMode;
-  // Clear cache so we get fresh data
   clearCaches();
   await loadShortages(true);
+  console.log('[runReportPull] shortages after load=',shortages.length);
+  if(!shortages.length){
+    $('reportBody').innerHTML='<div class="notice" style="background:var(--red-l);border-color:rgba(248,113,113,.4)">'
+      +'<strong>No shortages loaded.</strong> This usually means:<br>'
+      +'1. No shortages exist yet, or<br>'
+      +'2. Your Firestore rules are blocking reads — make sure <code>shortages_active</code> (and optionally <code>shortages_archive</code>) have <code>allow read, write: if true</code><br>'
+      +'3. Try: IC Manager → Settings → Test Connection</div>';
+    hideLoading();
+    return;
+  }
   renderReports();
 }
 function normalizeDate(v){if(!v)return '';try{if(v.toDate)return v.toDate().toISOString().slice(0,10);const str=String(v);if(/^\d{4}-\d{2}-\d{2}/.test(str))return str.slice(0,10);const t=Date.parse(str);return isNaN(t)?str.slice(0,10):new Date(t).toISOString().slice(0,10)}catch(e){return ''}}
@@ -2193,57 +2210,6 @@ function onPickerSelectChange(selectId, newInputId, hiddenId){
 }
 
 // Override savePerson to also refresh dropdowns after saving
-const _origSavePerson=savePerson;
-function savePerson(raw,type){
-  _origSavePerson(raw,type);
-  // After saving, add to the select and switch back from new-input mode
-  const normalized=normalizeName(raw);
-  if(type==='picker'){
-    // Update sPicker selects
-    ['sPickerSelect','opPickerSelect'].forEach(sid=>{
-      const sel=$(sid);if(!sel)return;
-      // check if option already exists
-      if(![...sel.options].some(o=>o.value===normalized)){
-        const opt=document.createElement('option');opt.value=normalized;opt.textContent=normalized;
-        sel.insertBefore(opt,sel.querySelector('option[value="__new__"]'));
-      }
-      sel.value=normalized;
-      onPickerSelectChange(sid,sid.replace('Select','New'),sid.replace('Select','').toLowerCase()+'picker');
-    });
-    // Set hidden fields
-    const sh=$('sPicker');if(sh)sh.value=normalized;
-    const oph=$('opPicker');if(oph)oph.value=normalized;
-    const wsp=$('sPickerNewWrap');if(wsp)wsp.style.display='none';
-    const wop=$('opPickerNewWrap');if(wop)wop.style.display='none';
-  } else {
-    ['sPackerSelect','opPackerSelect'].forEach(sid=>{
-      const sel=$(sid);if(!sel)return;
-      if(![...sel.options].some(o=>o.value===normalized)){
-        const opt=document.createElement('option');opt.value=normalized;opt.textContent=normalized;
-        sel.insertBefore(opt,sel.querySelector('option[value="__new__"]'));
-      }
-      sel.value=normalized;
-    });
-    const sh=$('sPackerVal');if(sh)sh.value=normalized;
-    const oph=$('opPacker');if(oph)oph.value=normalized;
-    const wsp=$('sPackerNewWrap');if(wsp)wsp.style.display='none';
-    const wop=$('opPackerNewWrap');if(wop)wop.style.display='none';
-  }
-}
-
-
-/* ═══════════════════════════════════════════════════════
-   IC VERIFICATION SHEET MODULE
-   ═══════════════════════════════════════════════════════ */
-
-// icConfirmEdits[id] = {
-//   result: 'confirmed_short'|'erroneous'|'second_location'|'not_found'|'skip',
-//   icCounts: [{qty, uom, notes}],   // multiple count lines per shortage
-//   icNotes: string,
-//   secondBin: string
-// }
-let icConfirmEdits={};
-const IC_UOMS=['EA','CS','IN','PK','PR','BX','DZ'];
 
 function openIcConfirm(){
   if(!canRunReports()){alert('IC Team or Manager access required.');return;}
@@ -2310,10 +2276,10 @@ function renderIcConfirmSheet(){
     const countLines=counts.map((c,ci)=>`
       <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">
         <input class="ic-qty-input" type="number" min="0" placeholder="Qty" style="width:70px;font-size:15px;padding:8px"
-          data-id="${esc(r.id)}" data-ci="${ci}" data-field="qty" value="${esc(String(c.qty))}" onchange="icCountChange(this)">
+          name="ic_qty_${esc(r.id)}_${ci}" data-id="${esc(r.id)}" data-ci="${ci}" data-field="qty" value="${esc(String(c.qty))}" onchange="icCountChange(this)">
         ${uomSelect(`uom_${esc(r.id)}_${ci}`,c.uom)}
         <input class="ic-notes-input" placeholder="Notes..." style="flex:1;font-size:13px;padding:8px"
-          data-id="${esc(r.id)}" data-ci="${ci}" data-field="notes" value="${esc(c.notes||'')}" onchange="icCountChange(this)">
+          name="ic_notes_${esc(r.id)}_${ci}" data-id="${esc(r.id)}" data-ci="${ci}" data-field="notes" value="${esc(c.notes||'')}" onchange="icCountChange(this)">
         ${ci>0?`<button class="btn" style="padding:4px 10px;font-size:13px" onclick="icRemoveCount('${esc(r.id)}',${ci})">&times;</button>`:''}
       </div>`).join('');
 
@@ -2336,7 +2302,7 @@ function renderIcConfirmSheet(){
       </div>
       <!-- IC Result — big tap target -->
       <div style="margin-bottom:10px">
-        <select class="ic-result-select ${selectClass}" data-id="${esc(r.id)}" onchange="icResultChange(this)"
+        <select class="ic-result-select ${selectClass}" name="ic_result_${esc(r.id)}" data-id="${esc(r.id)}" onchange="icResultChange(this)"
           style="width:100%;font-size:15px;padding:10px 12px;font-weight:700;border-radius:8px">
           <option value="">— Pending —</option>
           <option value="confirmed_short" ${curResult==='confirmed_short'?'selected':''}>✓ Confirmed Short Bin</option>
@@ -2350,7 +2316,7 @@ function renderIcConfirmSheet(){
         <button class="btn" style="font-size:12px;padding:6px 12px" onclick="icAddCount('${esc(r.id)}',${esc(JSON.stringify(r.uom||'EA'))})">+ Add Count Line</button>
       </div>
       <!-- IC Notes -->
-      <input class="ic-notes-input" placeholder="IC notes..." data-id="${esc(r.id)}" data-field="icNotes"
+      <input class="ic-notes-input" placeholder="IC notes..." name="ic_rownotes_${esc(r.id)}" data-id="${esc(r.id)}" data-field="icNotes"
         value="${esc(curNotes)}" onchange="icNoteChange(this)" style="width:100%;font-size:13px;padding:8px">
     </div>`;
   }).join('');
@@ -2362,10 +2328,17 @@ function icResultChange(sel){
   const id=sel.dataset.id;
   if(!icConfirmEdits[id])icConfirmEdits[id]={icCounts:[{qty:'',uom:'EA',notes:''}]};
   icConfirmEdits[id].result=sel.value;
+  // Update select color without re-rendering the whole sheet
   sel.className='ic-result-select'+(sel.value==='confirmed_short'?' res-confirmed':sel.value==='erroneous'?' res-erroneous':sel.value==='second_location'?' res-second':'');
-  // Only re-render this one row's right column to show/hide 2nd bin field
-  // Re-render whole sheet to keep it simple and accurate
-  renderIcConfirmSheet();
+  // Update parent card color
+  const card=sel.closest('.ic-sheet-row');
+  if(card){
+    card.className='ic-sheet-row'+
+      (sel.value==='confirmed_short'?' confirmed-row':
+       sel.value==='erroneous'?' erroneous-row':
+       sel.value==='second_location'?' second-row':'');
+  }
+  // Update stats without full re-render
   icUpdateStats();
 }
 
@@ -2982,9 +2955,9 @@ function applyLangToForms(){
   if(opTitle)opTitle.textContent=t('op.title');
   const opDesc=document.querySelector('#overpullScreen .page-head p');
   if(opDesc)opDesc.textContent=t('op.subtitle');
-  const et=$('opTab-entry');if(et)et.innerHTML=t('op.tab_entry')||'&#128221; Log Entry';
-  const bt=$('opTab-batch');if(bt)bt.innerHTML='&#128203; '+(t('op.tab_batch')||'Batch Pick Sheet');
-  const rt=$('opTab-records');if(rt)rt.innerHTML=t('op.tab_records')||'&#128202; Records &amp; Stats';
+  const et=$('opTab-entry');if(et)et.textContent=t('op.tab_entry')||'📝 Log Entry';
+  const bt=$('opTab-batch');if(bt)bt.textContent=t('op.tab_batch')||'📋 Batch Pick Sheet';
+  const rt=$('opTab-records');if(rt)rt.textContent=t('op.tab_records')||'📊 Records & Stats';
   lbl('opOrder','op.order_num');
   lbl('opPackerSelect','op.packer_name');
   lbl('opPickerSelect','op.picker_name');
