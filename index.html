@@ -402,6 +402,21 @@ function updateDbStatus(ok,msg){
   }
 }
 
+function updateReadCounter(){
+  if(!canManage())return;
+  let el=$('readCounter');
+  if(!el){
+    el=document.createElement('span');el.id='readCounter';
+    el.style.cssText='font-size:10px;padding:2px 8px;border-radius:10px;font-family:var(--mono);margin-left:4px;cursor:default;';
+    const dbEl=$('dbStatus');if(dbEl)dbEl.after(el);
+  }
+  const reads=parseInt(localStorage.getItem('scp_reads_today')||'0');
+  const color=reads>40000?'var(--red)':reads>25000?'var(--orange)':'var(--muted)';
+  el.textContent='\ud83d\udcd6 '+reads.toLocaleString()+'/50k';
+  el.style.color=color;
+  el.title='Firestore reads today: '+reads.toLocaleString()+' of 50,000\nResets at midnight. Caching reduces reads significantly.';
+}
+
 function ensureDb(){
   if(db)return true;
   // Try to reconnect
@@ -436,6 +451,18 @@ function loadAllPersonnel(){
 
 async function syncPersonnelFromFirestore(){
   if(!db)return;
+  const personnelCacheKey='scp_personnel_cache';
+  try{
+    const cached=JSON.parse(localStorage.getItem(personnelCacheKey)||'null');
+    if(cached&&Date.now()-cached.t<60*60*1000){
+      const d=cached.data;
+      pickerNames=[...new Set([UNKNOWN_PICKER,...PRESET_PICKERS,...(d.pickers||[]),...JSON.parse(localStorage.getItem('scp_pickers')||'[]')])].sort();
+      packerNames=[...new Set([UNKNOWN_PICKER,...(d.packers||[]),...JSON.parse(localStorage.getItem('scp_packers')||'[]')])].sort();
+      packStations=[...new Set([...PRESET_STATIONS,...(d.packStations||[]),...JSON.parse(localStorage.getItem('scp_packstations')||'[]')])].sort();
+      populatePickerSelects();populateStationSelects();
+      return;
+    }
+  }catch(e){}
   try{
     const doc=await db.collection('_system').doc('personnel').get();
     if(doc.exists){
@@ -446,6 +473,7 @@ async function syncPersonnelFromFirestore(){
       pickerNames=[...new Set([UNKNOWN_PICKER,...PRESET_PICKERS,...fsPickers,...JSON.parse(localStorage.getItem('scp_pickers')||'[]')])].sort();
       packerNames=[...new Set([UNKNOWN_PICKER,...fsPackers,...JSON.parse(localStorage.getItem('scp_packers')||'[]')])].sort();
       packStations=[...new Set([...PRESET_STATIONS,...fsStations,...JSON.parse(localStorage.getItem('scp_packstations')||'[]')])].sort();
+      localStorage.setItem(personnelCacheKey,JSON.stringify({t:Date.now(),data:{pickers:fsPickers,packers:fsPackers,packStations:fsStations}}));
       populatePickerSelects();
       populateStationSelects();
     }
@@ -519,6 +547,7 @@ function savePerson(raw, type){
   }
   // Also persist to Firestore so all machines see the new name
   savePersonToFirestore(n,type);
+  populatePickerSelects();
 }
 
 function savePackStation(skipBlur){
@@ -664,7 +693,7 @@ function shiftValue(){
   return '2nd'; // overnight (12am-6am) counts as tail end of 2nd
 }
 function validatePickerInput(){const raw=($('sPicker').value||'').trim();if(!raw)return;const exists=pickerNames.some(p=>p.toLowerCase()===raw.toLowerCase());if(exists){const found=pickerNames.find(p=>p.toLowerCase()===raw.toLowerCase());$('sPicker').value=found;return}const ok=confirm(`Picker "${raw}" is not saved. Create this picker?`);if(!ok){$('sPicker').value='';return}const full=prompt('Confirm picker name to save:',raw);if(!full){$('sPicker').value='';return}pickerNames=[...new Set([...pickerNames,full.trim()])].sort();localStorage.setItem('scp_pickers',JSON.stringify(pickerNames));loadPickerNames();$('sPicker').value=full.trim()}
-function cacheKey(mode){return 'scp_cache_'+mode}function useCache(mode){try{const c=JSON.parse(localStorage.getItem(cacheKey(mode))||'null');if(c&&Date.now()-c.t<5*60*1000){shortages=c.rows;lastLoadMode=mode;renderShortages();return true}}catch(e){}return false}
+function cacheKey(mode){return 'scp_cache_'+mode}function useCache(mode){try{const c=JSON.parse(localStorage.getItem(cacheKey(mode))||'null');if(c&&Date.now()-c.t<20*60*1000){shortages=c.rows;lastLoadMode=mode;renderShortages();return true}}catch(e){}return false}
 function normalizeShortage(raw,id,arch){
   const icCounts=Array.isArray(raw.icErroneousCounts)?raw.icErroneousCounts:[];
   let secondaryLocations=Array.isArray(raw.secondaryLocations)?raw.secondaryLocations:[];
@@ -708,7 +737,7 @@ function normalizeShortage(raw,id,arch){
   return r
 }
 function shortageSortValue(r){const d=r.date||r.createdAt||r.timestamp||'';if(d&&d.toDate)return d.toDate().getTime();const t=Date.parse(d);return isNaN(t)?0:t}
-async function loadShortages(force){if(!db){if(force){alert('Not connected to Firebase. Log in as IC Manager → Settings and save your Firebase config.');} return;}const mode=$('viewMode')?.value||lastLoadMode||'active';if(!force&&useCache(mode))return;showLoading('Loading shortages...');try{const s=getSettings();let rows=[];async function getCol(col,arch){const snap=await db.collection(col).limit(2500).get();return snap.docs.map(d=>normalizeShortage(d.data(),d.id,arch))}if(mode==='active'||mode==='both')rows=rows.concat(await getCol(s.activeCollection,false));if(mode==='archive'||mode==='both')rows=rows.concat(await getCol(s.archiveCollection,true));rows.sort((a,b)=>shortageSortValue(b)-shortageSortValue(a));shortages=rows;lastLoadMode=mode;localStorage.setItem(cacheKey(mode),JSON.stringify({t:Date.now(),rows}));renderShortages();if($('reportScreen').classList.contains('active'))renderReports()}catch(e){alert('Load failed: '+e.message)}finally{hideLoading()}}
+async function loadShortages(force){if(!db){if(force){alert('Not connected to Firebase. Log in as IC Manager → Settings and save your Firebase config.');} return;}const mode=$('viewMode')?.value||lastLoadMode||'active';if(!force&&useCache(mode))return;showLoading('Loading shortages...');try{const s=getSettings();let rows=[];async function getCol(col,arch){const snap=await db.collection(col).limit(2500).get();const _rc=parseInt(localStorage.getItem('scp_reads_today')||'0')+snap.size;localStorage.setItem('scp_reads_today',_rc);return snap.docs.map(d=>normalizeShortage(d.data(),d.id,arch))}if(mode==='active'||mode==='both')rows=rows.concat(await getCol(s.activeCollection,false));if(mode==='archive'||mode==='both')rows=rows.concat(await getCol(s.archiveCollection,true));rows.sort((a,b)=>shortageSortValue(b)-shortageSortValue(a));shortages=rows;lastLoadMode=mode;localStorage.setItem(cacheKey(mode),JSON.stringify({t:Date.now(),rows}));renderShortages();if($('reportScreen').classList.contains('active'))renderReports()}catch(e){alert('Load failed: '+e.message)}finally{hideLoading()}}
 async function runReportPull(){
   const mode=$('reportMode').value;
   const hasDateRange=!!($('reportStart').value||$('reportEnd').value);
@@ -828,9 +857,7 @@ async function toggleSecond(id){
   }
 }
 async function toggleReplenished(id){const r=shortages.find(x=>x.id===id&&!x._archived);if(r)await updateRecord(id,{replenishedAfterPick:!r.replenishedAfterPick})}
-function openEdit(id,archived){
-  if(!shortages.length){loadShortages(true).then(()=>openEdit(id,archived));return;}
-  const r=shortages.find(x=>x.id===id&&x._archived===archived);if(!r){alert('Record not found. Try refreshing the list.');return;}editingId=id;editingArchive=archived;$('editBody').innerHTML=`<div class="form-row two"><div class="field"><label>Date</label><input id="eDate" type="date" value="${esc(normalizeDate(r.date)||'')}"></div><div class="field"><label>Division</label><input id="eDiv" value="${esc(r.division||'')}"></div><div class="field"><label>Product Code</label><input id="eProduct" autocapitalize="characters" spellcheck="false" style="text-transform:uppercase" value="${esc(r.productCode||'')}"></div><div class="field"><label>Shorted Bin</label><div class="bin-input-wrap"><input id="eBin" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" value="${esc(r.shortedBin||'')}" oninput="liveBinValidate(this)" onblur="strictBinValidate(this)"><span class="bin-valid-icon"></span></div><div class="bin-format-hint">##-##-## &nbsp;·&nbsp; ##-##-# &nbsp;·&nbsp; P##### &nbsp;·&nbsp; BULK &nbsp;·&nbsp; ROOM &nbsp;·&nbsp; KEY ACCOUNT</div><div class="bin-format-err"></div></div><div class="field"><label>Qty Shorted</label><input id="eQty" type="number" value="${val(r.qtyShorted)}"></div><div class="field"><label>UOM</label><input id="eUom" value="${esc(r.uom||'')}"></div><div class="field"><label>Demand / Order</label><input id="eDemand" value="${esc(r.pickDemand||'')}"></div><div class="field"><label>Picker</label><input id="ePicker" value="${esc(r.picker||'')}"></div><div class="field"><label>IC Qty Found</label><input id="eIcQty" type="number" value="${val(r.icQtyFound)}"></div><div class="field"><label>IC UOM</label><input id="eIcUom" value="${esc(r.icUom||r.uom||'EA')}"></div></div><div class="form-row one"><div class="field"><label>Notes</label><textarea id="eNotes">${esc(r.notes||'')}</textarea></div><div class="field"><label>IC Notes</label><textarea id="eIcNotes">${esc(r.icNotes||'')}</textarea></div></div><label class="toggle"><input id="eErr" type="checkbox" ${r.foundInShortedBin?'checked':''}> Mark as erroneous bin short</label><br><label class="toggle"><input id="eSecond" type="checkbox" ${r.secondLocationFilled?'checked':''}> Product was filled from second location</label><div class="notice" style="margin-top:8px"><b>Second-location bins:</b> ${esc(secondarySummary(r)||'None saved. Use the Second Location Filled button on the row to add one or more bins with qty.')}</div><br><label class="toggle"><input id="eRep" type="checkbox" ${r.replenishedAfterPick?'checked':''}> Bin was replenished after pick</label><div class="actions" style="margin-top:14px"><button class="btn primary" onclick="saveEdit()">Save Changes</button><button class="btn" onclick="closeEdit()">Cancel</button></div>`;$('editOverlay').classList.add('open')}
+function openEdit(id,archived){const r=shortages.find(x=>x.id===id&&x._archived===archived);if(!r)return;editingId=id;editingArchive=archived;$('editBody').innerHTML=`<div class="form-row two"><div class="field"><label>Date</label><input id="eDate" type="date" value="${esc(normalizeDate(r.date)||'')}"></div><div class="field"><label>Division</label><input id="eDiv" value="${esc(r.division||'')}"></div><div class="field"><label>Product Code</label><input id="eProduct" autocapitalize="characters" spellcheck="false" style="text-transform:uppercase" value="${esc(r.productCode||'')}"></div><div class="field"><label>Shorted Bin</label><div class="bin-input-wrap"><input id="eBin" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" value="${esc(r.shortedBin||'')}" oninput="liveBinValidate(this)" onblur="strictBinValidate(this)"><span class="bin-valid-icon"></span></div><div class="bin-format-hint">##-##-## &nbsp;·&nbsp; ##-##-# &nbsp;·&nbsp; P##### &nbsp;·&nbsp; BULK &nbsp;·&nbsp; ROOM &nbsp;·&nbsp; KEY ACCOUNT</div><div class="bin-format-err"></div></div><div class="field"><label>Qty Shorted</label><input id="eQty" type="number" value="${val(r.qtyShorted)}"></div><div class="field"><label>UOM</label><input id="eUom" value="${esc(r.uom||'')}"></div><div class="field"><label>Demand / Order</label><input id="eDemand" value="${esc(r.pickDemand||'')}"></div><div class="field"><label>Picker</label><input id="ePicker" value="${esc(r.picker||'')}"></div><div class="field"><label>IC Qty Found</label><input id="eIcQty" type="number" value="${val(r.icQtyFound)}"></div><div class="field"><label>IC UOM</label><input id="eIcUom" value="${esc(r.icUom||r.uom||'EA')}"></div></div><div class="form-row one"><div class="field"><label>Notes</label><textarea id="eNotes">${esc(r.notes||'')}</textarea></div><div class="field"><label>IC Notes</label><textarea id="eIcNotes">${esc(r.icNotes||'')}</textarea></div></div><label class="toggle"><input id="eErr" type="checkbox" ${r.foundInShortedBin?'checked':''}> Mark as erroneous bin short</label><br><label class="toggle"><input id="eSecond" type="checkbox" ${r.secondLocationFilled?'checked':''}> Product was filled from second location</label><div class="notice" style="margin-top:8px"><b>Second-location bins:</b> ${esc(secondarySummary(r)||'None saved. Use the Second Location Filled button on the row to add one or more bins with qty.')}</div><br><label class="toggle"><input id="eRep" type="checkbox" ${r.replenishedAfterPick?'checked':''}> Bin was replenished after pick</label><div class="actions" style="margin-top:14px"><button class="btn primary" onclick="saveEdit()">Save Changes</button><button class="btn" onclick="closeEdit()">Cancel</button></div>`;$('editOverlay').classList.add('open')}
 function closeEdit(){$('editOverlay').classList.remove('open');editingId=null}
 async function saveEdit(){const binRaw=$('eBin').value.trim();if(binRaw&&!validateBinFormat(binRaw).ok){alert('Invalid bin format.\n\nValid: ##-##-##, ##-##-#, P#####, BULK, ROOM, KEY ACCOUNT');return}const data={date:$('eDate').value,division:$('eDiv').value.trim().toUpperCase(),productCode:$('eProduct').value.trim().toUpperCase(),shortedBin:binRaw.toUpperCase(),qtyShorted:num($('eQty').value),uom:$('eUom').value.trim().toUpperCase(),pickDemand:$('eDemand').value.trim(),picker:$('ePicker').value.trim(),notes:$('eNotes').value.trim(),icQtyFound:num($('eIcQty').value),icUom:$('eIcUom').value.trim().toUpperCase(),icNotes:$('eIcNotes').value.trim(),foundInShortedBin:$('eErr').checked,secondLocationFilled:$('eSecond').checked,replenishedAfterPick:$('eRep').checked,status:$('eErr').checked?'located':'open'};if(!data.foundInShortedBin){data.icQtyFound=0;data.icUom='';data.icNotes=data.icNotes}await updateRecord(editingId,data,editingArchive);closeEdit()}
 function selectVisible(on){document.querySelectorAll('.sr-check:not(:disabled)').forEach(c=>c.checked=on)}function selectedIds(){return [...document.querySelectorAll('.sr-check:checked')].map(c=>c.dataset.id)}async function archiveSelected(){const ids=selectedIds();if(!ids.length){alert('Select shortages first.');return}await archiveIds(ids)}async function archiveFiltered(){const ids=visibleShortages.filter(r=>!r._archived).map(r=>r.id);if(!ids.length){alert('No active filtered shortages to archive.');return}if(!confirm(`Archive ${ids.length} active filtered shortages?`))return;await archiveIds(ids)}
@@ -1020,10 +1047,7 @@ function renderReports(){
 function renderCheckPreview(){}
 
 async function printSummaryReport(){
-  if(!shortages.length){
-    await runReportPull();
-    if(!shortages.length){alert('No shortage data found. Make sure shortages are loaded.');return;}
-  }
+  if(!shortages.length){await runReportPull();if(!shortages.length){alert('No shortage data found. Click Run Report first.');return;}}
   const fromStr=$('reportStart')?.value;
   const toStr=$('reportEnd')?.value;
   const mode=$('reportMode')?.value||lastLoadMode;
@@ -1197,20 +1221,15 @@ async function printSummaryReport(){
     </div>
   </div>`;
   $('printArea').innerHTML=html;
-  // Use afterprint event to clear — avoids clearing before dialog opens
-  window.addEventListener('afterprint',function onAfterPrint(){
+  window.addEventListener('afterprint',function onAP(){
     $('printArea').innerHTML='';
-    window.removeEventListener('afterprint',onAfterPrint);
+    window.removeEventListener('afterprint',onAP);
   });
   window.print();
 }
 
-
 async function printCheckReport(){
-  if(!shortages.length){
-    await runReportPull();
-    if(!shortages.length){alert('No shortage data found.');return;}
-  }
+  if(!shortages.length){await runReportPull();if(!shortages.length){alert('No shortage data found. Click Run Report first.');return;}}
   const fromStr=$('reportStart')?.value;
   const toStr=$('reportEnd')?.value;
   const today=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
@@ -1293,14 +1312,12 @@ async function printCheckReport(){
     </div>
   </div>`;
   $('printArea').innerHTML=html;
-  // Use afterprint event to clear — avoids clearing before dialog opens
-  window.addEventListener('afterprint',function onAfterPrint(){
+  window.addEventListener('afterprint',function onAP(){
     $('printArea').innerHTML='';
-    window.removeEventListener('afterprint',onAfterPrint);
+    window.removeEventListener('afterprint',onAP);
   });
   window.print();
 }
-
 function saveInventoryBinReport(){inventoryBins=parseBinImport($('binImport').value);localStorage.setItem('scp_inventory_bins',JSON.stringify(inventoryBins));alert(`Saved ${inventoryBins.length} inventory bin rows.`);buildReplenishmentReport()}function parseBinImport(text){return text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean).map(l=>{const p=l.split(/\t|,/);return{bin:(p[0]||'').trim().toUpperCase(),product:(p[1]||'').trim().toUpperCase(),onHand:num(p[2]),allocated:num(p[3]),uom:(p[4]||'').trim().toUpperCase()}}).filter(r=>r.bin&&r.product)}
 function buildReplenishmentReport(){if(!canManage())return;inventoryBins=JSON.parse(localStorage.getItem('scp_inventory_bins')||'[]');if($('binImport')&&!$('binImport').value&&inventoryBins.length)$('binImport').value=inventoryBins.map(r=>[r.bin,r.product,r.onHand,r.allocated,r.uom].join('\t')).join('\n');const active=shortages.filter(r=>!r._archived);const moves=[],noRes=[];active.forEach(s=>{const reserves=inventoryBins.filter(b=>b.product===(s.productCode||'').toUpperCase()&&b.bin!==(s.shortedBin||'').toUpperCase()&&b.onHand>0&&b.allocated<=0).sort((a,b)=>a.bin.localeCompare(b.bin));if(reserves.length)moves.push({product:s.productCode,toBin:s.shortedBin,fromBin:reserves[0].bin,qty:Math.min(num(s.qtyShorted)||1,reserves[0].onHand),uom:reserves[0].uom||s.uom});else noRes.push(s)});$('restockBody').innerHTML=`<div class="card"><div class="card-title">Replenishment Moves</div>${table(['Product Code','From Reserve Bin','To Shorted Bin','Qty','UOM'],moves.sort((a,b)=>a.fromBin.localeCompare(b.fromBin)).map(m=>[m.product,m.fromBin,m.toBin,m.qty,m.uom]))}</div><div class="card"><div class="card-title">Products With No Reserve Bins</div>${table(['Product Code','Shorted Bin','Qty Shorted','UOM'],noRes.map(r=>[r.productCode,r.shortedBin,r.qtyShorted,r.uom]))}</div>`}function printReplenReport(){buildReplenishmentReport();$('printArea').innerHTML=`<h1>Replenishment Report</h1>${$('restockBody').innerHTML}`;window.print()}
 function renderPickers(){
@@ -1483,7 +1500,7 @@ function opInitForm(){
   ['opOrder','opDiv','opPacker','opPicker','opPackStation'].forEach(id=>{if($(id))$(id).value='';}); ['opPackerSelect','opPickerSelect'].forEach(id=>{const el=$(id);if(el){el.value='';el.disabled=false;el.style.opacity='';}}); ['opPackerNewWrap','opPickerNewWrap'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});
   ['opPackerUnknown','opPickerUnknown'].forEach(id=>{const el=$(id);if(el)el.checked=false;});
   $('opLines').innerHTML='';
-  const omw=$('opMoreWrap');if(omw)omw.style.display='none';
+  $('opMoreWrap').style.display='none';
   ['opPackerSuggest','opPickerSuggest','opPackStationSuggest'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});
   opAddLine();
 }
@@ -1623,7 +1640,7 @@ async function opLoadRecords(force){
   const mode=$('opViewMode')?.value||'active';
   const cacheK='scp_opcache_'+mode;
   if(!force){
-    try{const c=JSON.parse(localStorage.getItem(cacheK)||'null');if(c&&Date.now()-c.t<3*60*1000){opRecords=c.rows;opRenderList();opRenderKpi();opShowArchiveActions();return;}}catch(e){}
+    try{const c=JSON.parse(localStorage.getItem(cacheK)||'null');if(c&&Date.now()-c.t<15*60*1000){opRecords=c.rows;opRenderList();opRenderKpi();opShowArchiveActions();return;}}catch(e){}
   }
   showLoading('Loading over pull records...');
   try{
@@ -1835,10 +1852,7 @@ async function opUnarchiveSelected(){
 }
 
 async function printOverPullReport(){
-  if(!opRecords.length){
-    await opLoadRecords(true);
-    if(!opRecords.length){alert('No over pull records found.');return;}
-  }
+  if(!opRecords.length){await opLoadRecords(true);if(!opRecords.length){alert('No over pull records found.');return;}}
   const rows=opFilteredRows();
   if(!rows.length){alert('No over pull records in selected range.');return;}
   const today=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
@@ -2120,14 +2134,12 @@ async function printOverPullReport(){
   </div>`;
 
   $('printArea').innerHTML=html;
-  // Use afterprint event to clear — avoids clearing before dialog opens
-  window.addEventListener('afterprint',function onAfterPrint(){
+  window.addEventListener('afterprint',function onAP(){
     $('printArea').innerHTML='';
-    window.removeEventListener('afterprint',onAfterPrint);
+    window.removeEventListener('afterprint',onAP);
   });
   window.print();
 }
-
 
 function populateStationSelects(){
   const stationOpts='<option value="">-- Select Station --</option>'+
@@ -2175,25 +2187,58 @@ function onPickerSelectChange(selectId, newInputId, hiddenId){
   }
 }
 
+// Override savePerson to also refresh dropdowns after saving
+const _origSavePerson=savePerson;
+function savePerson(raw,type){
+  _origSavePerson(raw,type);
+  // After saving, add to the select and switch back from new-input mode
+  const normalized=normalizeName(raw);
+  if(type==='picker'){
+    // Update sPicker selects
+    ['sPickerSelect','opPickerSelect'].forEach(sid=>{
+      const sel=$(sid);if(!sel)return;
+      // check if option already exists
+      if(![...sel.options].some(o=>o.value===normalized)){
+        const opt=document.createElement('option');opt.value=normalized;opt.textContent=normalized;
+        sel.insertBefore(opt,sel.querySelector('option[value="__new__"]'));
+      }
+      sel.value=normalized;
+      onPickerSelectChange(sid,sid.replace('Select','New'),sid.replace('Select','').toLowerCase()+'picker');
+    });
+    // Set hidden fields
+    const sh=$('sPicker');if(sh)sh.value=normalized;
+    const oph=$('opPicker');if(oph)oph.value=normalized;
+    const wsp=$('sPickerNewWrap');if(wsp)wsp.style.display='none';
+    const wop=$('opPickerNewWrap');if(wop)wop.style.display='none';
+  } else {
+    ['sPackerSelect','opPackerSelect'].forEach(sid=>{
+      const sel=$(sid);if(!sel)return;
+      if(![...sel.options].some(o=>o.value===normalized)){
+        const opt=document.createElement('option');opt.value=normalized;opt.textContent=normalized;
+        sel.insertBefore(opt,sel.querySelector('option[value="__new__"]'));
+      }
+      sel.value=normalized;
+    });
+    const sh=$('sPackerVal');if(sh)sh.value=normalized;
+    const oph=$('opPacker');if(oph)oph.value=normalized;
+    const wsp=$('sPackerNewWrap');if(wsp)wsp.style.display='none';
+    const wop=$('opPackerNewWrap');if(wop)wop.style.display='none';
+  }
+}
 
-/* ── IC VERIFY SHEET ────────────────────────────────── */
+
+/* ═══════════════════════════════════════════════════════
+   IC VERIFICATION SHEET MODULE
+   ═══════════════════════════════════════════════════════ */
+
+// icConfirmEdits[id] = {
+//   result: 'confirmed_short'|'erroneous'|'second_location'|'not_found'|'skip',
+//   icCounts: [{qty, uom, notes}],   // multiple count lines per shortage
+//   icNotes: string,
+//   secondBin: string
+// }
 let icConfirmEdits={};
-
-function icConfirmFilteredRows(){
-  const f=$('icConfirmFilter')?.value||'pending';
-  const active=shortages.filter(r=>!r._archived&&r.type!=='duplicate_pick');
-  if(f==='pending') return active.filter(r=>!r.icConfirmed&&!r.foundInShortedBin&&!r.secondLocationFilled);
-  if(f==='confirmed') return active.filter(r=>r.icConfirmed==='confirmed_short');
-  if(f==='erroneous') return active.filter(r=>r.foundInShortedBin||r.icConfirmed==='erroneous');
-  return active;
-}
-
-function uomSelect(id,cur){
-  const uoms=['EA','CS','IN','PK','PR','BX','DZ'];
-  return `<select id="${id}" class="ic-qty-input" style="width:60px" onchange="icCountChange(this)" data-id="${id.split('_')[1]||''}" data-field="uom">
-    ${uoms.map(u=>`<option value="${u}"${u===(cur||'EA')?' selected':''}>${u}</option>`).join('')}
-  </select>`;
-}
+const IC_UOMS=['EA','CS','IN','PK','PR','BX','DZ'];
 
 function openIcConfirm(){
   if(!canRunReports()){alert('IC Team or Manager access required.');return;}
@@ -2202,8 +2247,8 @@ function openIcConfirm(){
     loadShortages(true).then(()=>{renderIcConfirmSheet();$('icConfirmOverlay').classList.add('open');});
     return;
   }
-  renderIcConfirmSheet();
   $('icConfirmOverlay').classList.add('open');
+  renderIcConfirmSheet();
 }
 
 function closeIcConfirm(){
@@ -2211,21 +2256,41 @@ function closeIcConfirm(){
   icConfirmEdits={};
 }
 
+function icConfirmFilteredRows(){
+  const f=$('icConfirmFilter')?.value||'pending';
+  const active=shortages.filter(r=>!r._archived&&r.type!=='duplicate_pick');
+  if(f==='pending') return active.filter(r=>!r.icConfirmed&&!r.foundInShortedBin&&!r.secondLocationFilled);
+  if(f==='confirmed') return active.filter(r=>r.icConfirmed==='confirmed_short');
+  if(f==='erroneous') return active.filter(r=>r.foundInShortedBin||r.icConfirmed==='erroneous');
+  return active; // all
+}
+
+function icUpdateStats(){
+  const all=shortages.filter(r=>!r._archived);
+  const done=all.filter(r=>r.icConfirmed||r.foundInShortedBin||r.secondLocationFilled).length;
+  const pctDone=all.length?Math.round(done/all.length*100):0;
+  const shown=icConfirmFilteredRows().length;
+  $('icConfirmSubhead').textContent=`${shown} shortages shown · ${done}/${all.length} verified (${pctDone}%)`;
+  $('icProgFill').style.width=pctDone+'%';
+  $('icConfirmStats').innerHTML=`
+    <span style="color:var(--green);font-weight:700">${all.filter(r=>r.icConfirmed==='confirmed_short').length} confirmed</span> ·
+    <span style="color:var(--yellow);font-weight:700">${all.filter(r=>r.foundInShortedBin||r.icConfirmed==='erroneous').length} erroneous</span> ·
+    <span style="color:var(--accent);font-weight:700">${all.filter(r=>r.secondLocationFilled||r.icConfirmed==='second_location').length} 2nd loc</span> ·
+    <span style="color:var(--red);font-weight:700">${all.filter(r=>!r.icConfirmed&&!r.foundInShortedBin&&!r.secondLocationFilled).length} pending</span>`;
+}
+
+function uomSelect(name,val){
+  return `<select class="ic-qty-input" style="width:70px;padding:4px 4px" name="${name}" onchange="icSyncEdits()">
+    ${IC_UOMS.map(u=>`<option value="${u}" ${u===(val||'EA')?'selected':''}>${u}</option>`).join('')}
+  </select>`;
+}
+
 function renderIcConfirmSheet(){
-  const rows=icConfirmFilteredRows();
-  const total=shortages.filter(r=>!r._archived&&r.type!=='duplicate_pick').length;
-  const done=shortages.filter(r=>!r._archived&&(r.icConfirmed||r.foundInShortedBin||r.secondLocationFilled)).length;
-  const pct=total?Math.round(done/total*100):0;
-  // Update progress bar and stats
-  const fill=$('icProgFill');
-  if(fill)fill.style.width=pct+'%';
-  const stats=$('icConfirmStats');
-  if(stats)stats.textContent=done+'/'+total+' verified ('+pct+'%)';
-  const subhead=$('icConfirmSubhead');
-  if(subhead)subhead.textContent=rows.length+' shortages in this filter';
+  const rows=icConfirmFilteredRows().sort((a,b)=>(a.shortedBin||'').localeCompare(b.shortedBin||'')||(a.productCode||'').localeCompare(b.productCode||''));
+  icUpdateStats();
 
   if(!rows.length){
-    $('icConfirmSheet').innerHTML='<div class="empty" style="padding:32px;text-align:center">No shortages in this filter.</div>';
+    $('icConfirmSheet').innerHTML='<div class="empty" style="padding:40px">No shortages match this filter.</div>';
     return;
   }
 
@@ -2246,7 +2311,9 @@ function renderIcConfirmSheet(){
           data-id="${esc(r.id)}" data-ci="${ci}" data-field="notes" value="${esc(c.notes||'')}" onchange="icCountChange(this)">
         ${ci>0?`<button class="btn" style="padding:4px 10px;font-size:13px" onclick="icRemoveCount('${esc(r.id)}',${ci})">&times;</button>`:''}
       </div>`).join('');
+
     return `<div class="ic-sheet-row ${rowClass}" data-id="${esc(r.id)}">
+      <!-- Row header: bin + product + qty -->
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
         <div>
           <div style="font-family:var(--mono);font-size:15px;font-weight:800;color:var(--accent)">${esc(r.shortedBin||'—')}</div>
@@ -2257,310 +2324,483 @@ function renderIcConfirmSheet(){
           <div style="font-size:10px;color:var(--muted);margin-top:2px">#${i+1} of ${rows.length}</div>
         </div>
       </div>
+      <!-- Meta: demand / picker -->
       <div style="font-size:11px;color:var(--muted);margin-bottom:10px;border-bottom:1px solid var(--border);padding-bottom:8px">
-        <span style="font-family:var(--mono)">${esc(r.pickDemand||'—')}</span> &bull; ${esc(r.division||'')} &bull; ${esc(r.picker||'—')}
-        ${alreadyDone&&!edit.result?`<span style="margin-left:8px;color:var(--green);font-weight:600">&#10003; Previously: ${curResult||'verified'}</span>`:''}
+        <span style="font-family:var(--mono)">${esc(r.pickDemand||'—')}</span> &bull; ${esc(r.division||'')} &bull; ${esc(r.picker||'—')}${r.packer?' / '+esc(r.packer):''}
+        ${alreadyDone&&!edit.result?`<span style="margin-left:8px;color:var(--green);font-weight:600">✓ Previously: ${curResult||'verified'}</span>`:''}
       </div>
+      <!-- IC Result — big tap target -->
       <div style="margin-bottom:10px">
         <select class="ic-result-select ${selectClass}" data-id="${esc(r.id)}" onchange="icResultChange(this)"
           style="width:100%;font-size:15px;padding:10px 12px;font-weight:700;border-radius:8px">
           <option value="">— Pending —</option>
-          <option value="confirmed_short" ${curResult==='confirmed_short'?'selected':''}>&#10003; Confirmed Short Bin</option>
-          <option value="erroneous" ${curResult==='erroneous'?'selected':''}>&#9888; Erroneous Short</option>
-          <option value="skip" ${curResult==='skip'?'selected':''}>&#8634; Skip (Review Next Pass)</option>
+          <option value="confirmed_short" ${curResult==='confirmed_short'?'selected':''}>✓ Confirmed Short Bin</option>
+          <option value="erroneous" ${curResult==='erroneous'?'selected':''}>⚠ Erroneous Short</option>
+          <option value="skip" ${curResult==='skip'?'selected':''}>↺ Skip (Review Next Pass)</option>
         </select>
       </div>
-      <div style="margin-bottom:6px">${countLines}
+      <!-- IC Counts -->
+      <div style="margin-bottom:6px">
+        ${countLines}
         <button class="btn" style="font-size:12px;padding:6px 12px" onclick="icAddCount('${esc(r.id)}',${esc(JSON.stringify(r.uom||'EA'))})">+ Add Count Line</button>
       </div>
+      <!-- IC Notes -->
       <input class="ic-notes-input" placeholder="IC notes..." data-id="${esc(r.id)}" data-field="icNotes"
         value="${esc(curNotes)}" onchange="icNoteChange(this)" style="width:100%;font-size:13px;padding:8px">
     </div>`;
   }).join('');
+
   $('icConfirmSheet').innerHTML=dataRows;
 }
 
 function icResultChange(sel){
   const id=sel.dataset.id;
-  if(!icConfirmEdits[id])icConfirmEdits[id]={};
+  if(!icConfirmEdits[id])icConfirmEdits[id]={icCounts:[{qty:'',uom:'EA',notes:''}]};
   icConfirmEdits[id].result=sel.value;
-  // Re-color the select
-  sel.className='ic-result-select'+(sel.value==='confirmed_short'?' res-confirmed':sel.value==='erroneous'?' res-erroneous':'');
-  // Re-color the card
-  const card=sel.closest('.ic-sheet-row');
-  if(card){card.className='ic-sheet-row'+(sel.value==='confirmed_short'?' confirmed-row':sel.value==='erroneous'?' erroneous-row':'');}
+  sel.className='ic-result-select'+(sel.value==='confirmed_short'?' res-confirmed':sel.value==='erroneous'?' res-erroneous':sel.value==='second_location'?' res-second':'');
+  // Only re-render this one row's right column to show/hide 2nd bin field
+  // Re-render whole sheet to keep it simple and accurate
+  renderIcConfirmSheet();
+  icUpdateStats();
 }
 
-function icCountChange(inp){
-  const id=inp.dataset.id;const ci=parseInt(inp.dataset.ci||'0');const field=inp.dataset.field;
-  if(!icConfirmEdits[id])icConfirmEdits[id]={};
-  if(!icConfirmEdits[id].icCounts){
-    const r=shortages.find(x=>x.id===id);
-    icConfirmEdits[id].icCounts=[{qty:'',uom:r?.uom||'EA',notes:''}];
-  }
-  while(icConfirmEdits[id].icCounts.length<=ci)icConfirmEdits[id].icCounts.push({qty:'',uom:'EA',notes:''});
-  icConfirmEdits[id].icCounts[ci][field]=field==='qty'?inp.value:inp.value;
+function icCountChange(input){
+  const id=input.dataset.id;
+  const ci=parseInt(input.dataset.ci);
+  const field=input.dataset.field;
+  if(!icConfirmEdits[id])icConfirmEdits[id]={icCounts:[{qty:'',uom:'EA',notes:''}]};
+  const edit=icConfirmEdits[id];
+  if(!edit.icCounts)edit.icCounts=[{qty:'',uom:'EA',notes:''}];
+  while(edit.icCounts.length<=ci)edit.icCounts.push({qty:'',uom:'EA',notes:''});
+  edit.icCounts[ci][field]=field==='qty'?num(input.value):input.value;
+  // sync UOM selects (they have name= attributes, not data-field)
+  // UOM changes handled by icSyncEdits on the select onchange
 }
 
-function icNoteChange(inp){
-  const id=inp.dataset.id;const field=inp.dataset.field;
-  if(!icConfirmEdits[id])icConfirmEdits[id]={};
-  icConfirmEdits[id][field]=inp.value;
+function icSyncEdits(){
+  // Called by UOM selects — sync all UOM values from the DOM into icConfirmEdits
+  document.querySelectorAll('.ic-sheet-row:not(.ic-sheet-head)').forEach(row=>{
+    const id=row.dataset.id;
+    if(!id||!icConfirmEdits[id])return;
+    const selects=row.querySelectorAll('select[name^="uom_"]');
+    selects.forEach(sel=>{
+      const parts=sel.name.split('_'); // uom_ID_CI
+      const ci=parseInt(parts[parts.length-1]);
+      if(!icConfirmEdits[id].icCounts)icConfirmEdits[id].icCounts=[{qty:'',uom:'EA',notes:''}];
+      while(icConfirmEdits[id].icCounts.length<=ci)icConfirmEdits[id].icCounts.push({qty:'',uom:'EA',notes:''});
+      icConfirmEdits[id].icCounts[ci].uom=sel.value;
+    });
+  });
 }
 
-function icAddCount(id,uom){
-  if(!icConfirmEdits[id])icConfirmEdits[id]={};
-  if(!icConfirmEdits[id].icCounts)icConfirmEdits[id].icCounts=[{qty:'',uom:uom||'EA',notes:''}];
-  icConfirmEdits[id].icCounts.push({qty:'',uom:uom||'EA',notes:''});
+function icNoteChange(input){
+  const id=input.dataset.id;
+  const field=input.dataset.field;
+  if(!icConfirmEdits[id])icConfirmEdits[id]={icCounts:[{qty:'',uom:'EA',notes:''}]};
+  icConfirmEdits[id][field]=input.value;
+}
+
+function icAddCount(id,defaultUom){
+  if(!icConfirmEdits[id])icConfirmEdits[id]={icCounts:[{qty:'',uom:defaultUom||'EA',notes:''}]};
+  if(!icConfirmEdits[id].icCounts)icConfirmEdits[id].icCounts=[{qty:'',uom:defaultUom||'EA',notes:''}];
+  icSyncEdits(); // save current state before re-render
+  icConfirmEdits[id].icCounts.push({qty:'',uom:defaultUom||'EA',notes:''});
   renderIcConfirmSheet();
 }
 
 function icRemoveCount(id,ci){
   if(!icConfirmEdits[id]||!icConfirmEdits[id].icCounts)return;
+  icSyncEdits();
   icConfirmEdits[id].icCounts.splice(ci,1);
+  if(!icConfirmEdits[id].icCounts.length)icConfirmEdits[id].icCounts=[{qty:'',uom:'EA',notes:''}];
   renderIcConfirmSheet();
 }
 
 function icMarkAllVisible(result){
+  icSyncEdits();
   const rows=icConfirmFilteredRows();
   rows.forEach(r=>{
-    if(!icConfirmEdits[r.id])icConfirmEdits[r.id]={};
+    if(!icConfirmEdits[r.id])icConfirmEdits[r.id]={icCounts:[{qty:'',uom:r.uom||'EA',notes:''}]};
     icConfirmEdits[r.id].result=result;
   });
   renderIcConfirmSheet();
 }
 
+// ── One-time mass confirm: mark all active non-erroneous as confirmed_short ──
 async function icMassConfirmNonErroneous(){
-  const active=shortages.filter(r=>!r._archived&&!r.foundInShortedBin&&!r.icConfirmed&&r.type!=='duplicate_pick');
-  if(!active.length){alert('No pending non-erroneous shortages found.');return;}
-  if(!confirm(`Mark all ${active.length} pending (non-erroneous) shortages as Confirmed Short Bin?
-
-This cannot be undone.`))return;
-  showLoading('Bulk confirming '+active.length+' shortages...');
-  try{
-    const s=getSettings();
-    const now=new Date().toISOString();
-    let batch=db.batch();let count=0;
-    for(const r of active){
-      const ref=db.collection(r._archived?s.archiveCollection:s.activeCollection).doc(r.id);
-      batch.set(ref,{icConfirmed:'confirmed_short',icConfirmedAt:now,icConfirmedBy:role||'icteam',status:'confirmed_short'},{merge:true});
-      count++;
-      if(count%499===0){await batch.commit();batch=db.batch();count=0;}
-    }
-    if(count>0)await batch.commit();
-    clearCaches();await loadShortages(true);
-    hideLoading();
-    renderIcConfirmSheet();
-    alert('Bulk confirmed '+active.length+' shortages.');
-  }catch(e){hideLoading();alert('Failed: '+e.message);}
-}
-
-
-async function icConfirmSubmitAll(){
-  const entries=Object.entries(icConfirmEdits).filter(([,e])=>e.result&&e.result!=='skip');
-  const skip_ct=Object.entries(icConfirmEdits).filter(([,e])=>e.result==='skip').length;
-  if(!entries.length){alert('No results to save. Select a result for each bin first.');return;}
-  const confirm_ct=entries.filter(([,e])=>e.result==='confirmed_short').length;
-  const err_ct=entries.filter(([,e])=>e.result==='erroneous').length;
-  if(!confirm(`Save IC verification results?\n\n✓ Confirmed Short Bin: ${confirm_ct}\n⚠ Erroneous Short: ${err_ct}\n↺ Skip (next pass): ${skip_ct}\n\nThis will update ${entries.length} shortage record(s).`))return;
-  showLoading('Saving IC verification...');
+  const targets=shortages.filter(r=>!r._archived&&!r.foundInShortedBin&&!r.icConfirmed);
+  if(!targets.length){alert('No unconfirmed, non-erroneous shortages found.');return;}
+  if(!confirm(`This will mark ${targets.length} shortage(s) as "Confirmed Short".\n\nThese are all active shortages that are NOT already flagged as erroneous.\n\nProceed?`))return;
+  showLoading(`Confirming ${targets.length} shortages...`);
   try{
     const s=getSettings();
     const verifiedAt=new Date().toISOString();
-    const verifiedBy=role||'icteam';
-    const batch=db.batch();
+    const verifiedBy=role;
+    let batch=db.batch();let count=0;const batches=[];
+    for(const r of targets){
+      batch.set(db.collection(s.activeCollection).doc(r.id),{
+        icConfirmed:'confirmed_short',icConfirmedAt:verifiedAt,icConfirmedBy:verifiedBy,
+        status:'confirmed_short',updatedAt:verifiedAt,updatedBy:verifiedBy
+      },{merge:true});
+      count++;
+      if(count%499===0){batches.push(batch);batch=db.batch();count=0;}
+    }
+    if(count>0)batches.push(batch);
+    for(const b of batches)await b.commit();
+    clearCaches();
+    icConfirmEdits={};
+    await loadShortages(true);
+    renderIcConfirmSheet();
+    if($('reportScreen').classList.contains('active'))renderReports();
+    hideLoading();
+    alert(`Done! ${targets.length} shortages marked as Confirmed Short.`);
+  }catch(e){hideLoading();alert('Failed: '+e.message);}
+}
+
+async function icConfirmSubmitAll(){
+  icSyncEdits(); // capture any UOM changes before reading edits
+  const entries=Object.entries(icConfirmEdits).filter(([,e])=>e.result&&e.result!=='skip');
+  if(!entries.length){alert('No results to save. Set at least one IC result first.');return;}
+
+  const confirm_ct=entries.filter(([,e])=>e.result==='confirmed_short').length;
+  const err_ct=entries.filter(([,e])=>e.result==='erroneous').length;
+  const skip_ct=entries.filter(([,e])=>e.result==='skip').length;
+
+  if(!confirm(`Save IC verification results?\n\n✓ Confirmed Short Bin: ${confirm_ct}\n⚠ Erroneous Short: ${err_ct}\n↺ Skip (next pass): ${skip_ct}\n\nThis will update ${entries.length} shortage record(s).`))return;
+
+  showLoading('Saving IC verification results...');
+  try{
+    const s=getSettings();
+    let batch=db.batch();let count=0;const batches=[];
+    const verifiedAt=new Date().toISOString();
+    const verifiedBy=role;
+
     for(const [id,edit] of entries){
-      const r=shortages.find(x=>x.id===id);if(!r)continue;
-      const counts=edit.icCounts||[];
-      const validCounts=counts.filter(c=>num(c.qty)>0);
-      const totalIcQty=validCounts.reduce((s,x)=>s+num(x.qty),0);
-      const countSummary=validCounts.map(x=>`${x.qty} ${x.uom}${x.notes?' ('+x.notes+')':''}`).join(', ');
-      let update={icConfirmed:edit.result,icConfirmedAt:verifiedAt,icConfirmedBy:verifiedBy};
-      if(totalIcQty>0){update.icQtyFound=totalIcQty;update.icUom=validCounts[0]?.uom||r.uom||'EA';}
-      if(edit.icNotes)update.icNotes=edit.icNotes;
+      const r=shortages.find(x=>x.id===id&&!x._archived);
+      if(!r)continue;
+      const ref=db.collection(s.activeCollection).doc(id);
+
+      // Build icErroneousCounts array from multi-line count entries
+      const validCounts=(edit.icCounts||[]).filter(c=>c.qty!==''&&c.qty!==undefined&&num(c.qty)>0);
+      const totalIcQty=validCounts.reduce((s,c)=>s+num(c.qty),0);
+      // Summary string for icNotes
+      const countSummary=validCounts.map(c=>`${c.qty} ${c.uom}${c.notes?' ('+c.notes+')':''}`).join(', ');
+
+      const update={
+        icConfirmed:edit.result,
+        icConfirmedAt:verifiedAt,
+        icConfirmedBy:verifiedBy,
+        updatedAt:verifiedAt,
+        updatedBy:verifiedBy
+      };
+      if(validCounts.length){
+        update.icErroneousCounts=validCounts.map(c=>({qty:num(c.qty),uom:c.uom,notes:c.notes||'',enteredAt:verifiedAt}));
+        update.icQtyFound=totalIcQty;
+        update.icUom=validCounts[0].uom;
+      }
+      if(edit.icNotes||(countSummary&&!edit.icNotes)){
+        update.icNotes=[edit.icNotes,countSummary].filter(Boolean).join(' | ')||r.icNotes||'';
+      }
       if(edit.result==='erroneous'){
-        update.foundInShortedBin=true;update.status='located';
+        update.foundInShortedBin=true;
+        update.status='located';
       } else if(edit.result==='confirmed_short'){
         update.status='confirmed_short';
       }
-      const ref=db.collection(r._archived?s.archiveCollection:s.activeCollection).doc(id);
+      // skip = no status change, stays open for next pass
       batch.set(ref,update,{merge:true});
+      count++;
+      if(count%499===0){batches.push(batch);batch=db.batch();count=0;}
     }
-    await batch.commit();
+    if(count>0)batches.push(batch);
+    for(const b of batches)await b.commit();
+
     clearCaches();
-    await loadShortages(true);
-    hideLoading();
     icConfirmEdits={};
+    await loadShortages(true);
     renderIcConfirmSheet();
-    alert(`IC verification saved. ${confirm_ct} confirmed short, ${err_ct} erroneous.`);
-  }catch(e){hideLoading();alert('Save failed: '+e.message);}
+    if($('reportScreen').classList.contains('active'))renderReports();
+    hideLoading();
+    alert(`Saved! ${entries.length} shortage(s) verified.`);
+  }catch(e){
+    hideLoading();
+    alert('Save failed: '+e.message);
+  }
 }
 
+
+/* ═══════════════════════════════════════════════════════
+   INTERNATIONALIZATION (i18n) MODULE
+   Languages: English (en), Spanish (es), Dari (fa), Filipino (fil)
+   ═══════════════════════════════════════════════════════ */
 let currentLang='en';
+
 const LANGS={
-  en:{dir:'ltr','form.packer':'Packer','form.picker':'Picker','form.pack_station':'Pack Station',
-    'btn.edit':'Edit','btn.found_bin':'Found in Shorted Bin / Count','btn.second_loc':'Second Location Filled',
-    'btn.replenished':'Bin Replenished After Pick?','btn.unarchive':'Unarchive',
-    'badge.archived':'Archived','badge.erroneous':'Erroneous Bin','badge.backorder':'Backorder Risk',
-    'badge.second_loc':'Second Location Filled','badge.replenished':'Replenished After Pick',
-    'badge.confirmed':'IC Confirmed Short','row.ic_found':'IC Found',
-    'row.second_filled':'Second location filled:','row.qty':'Qty','row.demand':'Demand','row.picker':'Picker',
-    'list.no_shortages':'No shortages found for this filter.',
-    'form.shift_auto':'Auto (use current time)','form.shift_1st':'1st Shift (6am–3:30pm)',
-    'form.shift_2nd':'2nd Shift (3:30pm–12am)','form.shift_wot':'Weekend OT (6am–12am)',
-    'op.tab_entry':'📝 Log Entry','op.tab_batch':'📋 Batch Pick Sheet','op.tab_records':'📊 Records & Stats',
-    'op.packer_name':'Packer Name','op.picker_name':'Picker Name','op.pack_station':'Pack Station',
-    'dup.modal_title':'⚠ Report: Order Picked Twice / Duplicate Pick',
-    'dup.modal_btn':'⚠ Report Duplicate Pick — Entire Order Picked Twice',
-    'dup.what_does':'What this does:',
-    'dup.what_desc':'Flags an entire order as having been picked twice (over-pulled). No product lines needed — the whole order must be returned and investigated. This creates a Duplicate Pick record for IC and management review.',
-    'dup.picker_involved':'Picker Involved','dup.notes_label':'Notes / Details',
-    'dup.notes_ph':'Describe what happened — where was the duplicate pick found, who reported it, what action was taken...',
-    'dup.submit':'⚠ Submit Duplicate Pick Report','dup.cancel':'Cancel',
-    'dup.alert':'Duplicate pick report filed for order {0}.\nIC team and management have been flagged for investigation.',
-    'form.date_time':'Date & Time','form.division':'Division','form.pick_demand':'Pick Demand #',
-    'form.shift_override':'Shift Override','form.notes':'Notes',
-    'form.product_code':'Product Code','form.qty_each':'Qty (Each)','form.bin_shorted':'Bin Shorted',
+  en:{dir:'ltr',
+    'login.title':'Shortage Control Portal','login.subtitle':'Separate shortage reporting app',
+    'login.select_role':'Select role',
+    'login.clerk_title':'Outbound Clerk','login.clerk_sub':'Shortage Entry',
+    'login.ic_title':'IC Team','login.ic_sub':'Verify and Report',
+    'login.manager_title':'IC Manager','login.manager_sub':'Settings and Migration',
+    'login.no_login':'No Login Required','login.batch_btn':'Batch Pick Sheet','login.batch_sub':'One item, multiple orders','login.op_btn':'Over Pull Portal','login.op_sub':'Log over-pulled items',
+    'login.shortage_portal':'Over Pull Portal','login.shortage_portal_sub':'Opens the standalone shortage app (new tab)',
+    'login.enter_pin':'Enter PIN','login.back':'Back',
+    'form.date_time':'Date & Time','form.division':'Division','form.picker':'Picker',
+    'form.packer':'Packer','form.pack_station':'Pack Station','form.pick_demand':'Pick Demand #',
+    'form.shift_override':'Shift Override','form.shift_auto':'Auto (use current time)','form.shift_1st':'1st Shift (6am–3:30pm)','form.shift_2nd':'2nd Shift (3:30pm–12am)','form.shift_wot':'Weekend OT (6am–12am)',
+    'form.product_lines':'Product Lines','form.product_code':'Product Code',
+    'form.qty_each':'Qty (Each)','form.bin_shorted':'Bin Shorted',
+    'form.uom':'Unit of Measure','form.notes':'Notes',
     'form.add_line':'+ Add Line','form.clear_form':'Clear Form','form.log_shortages':'+ Log All Shortages',
+    'form.required':'Required',
     'list.search':'Search by product, order, picker, division...',
     'list.active':'Active','list.archive':'Archived History','list.both':'Active + Archived',
-    'btn.open_ic_portal':'Open IC Portal Tickets',
-    'login.no_login':'No Login Required','login.batch_btn':'Batch Pick Sheet',
-    'login.batch_sub':'One item, multiple orders','login.op_btn':'Over Pull Portal',
-    'login.op_sub':'Over Pull & Batch Pick — no PIN needed',
-    'op.batch_title':'Batch Pick Details','op.batch_orders_title':'Orders in this Batch Pick',
-    'op.batch_add_order':'+ Add Order','op.batch_submit':'+ Submit Batch Pick',
+    'list.refresh':'Refresh Data','list.no_shortages':'No shortages found for this filter.',
+    'list.select_visible':'Select Visible','list.clear_selection':'Clear Selection',
+    'list.archive_selected':'Archive Selected','list.archive_filtered':'Archive Filtered Active',
+    'list.ic_verify':'IC Verify Sheet',
+    'btn.edit':'Edit','btn.found_bin':'Found in Shorted Bin / Count',
+    'btn.second_loc':'Second Location Filled','btn.replenished':'Bin Replenished After Pick?',
+    'btn.unarchive':'Unarchive','btn.open_ic_portal':'Open IC Portal Tickets',
+    'badge.archived':'Archived','badge.erroneous':'Erroneous Bin','badge.backorder':'Backorder Risk',
+    'badge.second_loc':'Second Location Filled','badge.replenished':'Replenished After Pick',
+    'badge.confirmed':'IC Confirmed Short',
+    'row.ic_found':'IC Found','row.second_filled':'Second location filled:',
+    'row.qty':'Qty','row.demand':'Demand','row.picker':'Picker',
+    'pin.incorrect':'Incorrect PIN',
+    'op.title':'Over Pull Log','op.subtitle':'No login required — log items pulled in excess of the pick demand.',
+    'op.tab_entry':'📝 Log Entry','op.tab_batch':'📋 Batch Pick Sheet','op.batch_title':'Mga Detalye ng Batch Pick','op.batch_orders_title':'Mga Order sa Batch Pick na ito','op.batch_add_order':'+ Magdagdag ng Order','op.batch_submit':'+ I-log ang Batch Pick Shortage','op.batch_title':'Batch Pick Details','op.batch_orders_title':'Orders in this Batch Pick','op.batch_add_order':'+ Add Order','op.batch_submit':'+ Log Batch Pick Shortage','op.tab_records':'📊 Records & Stats',
+    'op.new_entry':'New Over Pull Entry','op.order_num':'Order Number',
+    'op.packer_name':'Packer Name','op.picker_name':'Picker Name','op.pack_station':'Pack Station',
+    'op.items_title':'Items Over-Pulled','op.add_item':'+ Add Item','op.clear':'Clear Form',
+    'op.submit':'Submit Over Pull','op.more_q':'Are there more items to add to this entry?',
+    'op.yes_more':'+ Yes — Add Another Item','op.no_submit':'✓ No — Submit This Entry',
+    'op.print':'🖨 Print KPI Report',
+    'op.search':'Search by packer, picker, order, product, division...',
+    'op.product_code':'Product Code','op.qty':'Qty','op.uom':'UOM',
+    'page.shortages_title':'Shortage Entry','page.shortages_desc':'Log shortage lines and review active records.',
+    'page.reports_title':'Shortage Reports','page.reports_desc':'IC Team and IC Manager only.',
+    'nav.shortages':'Shortages','nav.reports':'Reports','nav.replenishment':'Replenishment',
+    'nav.manage_pickers':'Manage Pickers','nav.migration':'Migration','nav.settings':'Settings',
+    'nav.ic_portal':'IC Portal','nav.light_dark':'Light/Dark','nav.logout':'Logout',
+    'nav.over_pull':'Over Pull',
+    'viewmode.active':'Active','viewmode.archive':'Archived History','viewmode.both':'Active + Archived',
+    'form.duplicate_order':'Report: Order Picked Twice','dup.modal_title':'⚠ Report: Order Picked Twice / Duplicate Pick','dup.modal_btn':'⚠ Report Duplicate Pick — Entire Order Picked Twice','dup.what_does':'What this does:','dup.what_desc':'Flags an entire order as having been picked twice (over-pulled). No product lines needed — the whole order must be returned and investigated. This creates a Duplicate Pick record for IC and management review.','dup.picker_involved':'Picker Involved','dup.notes_label':'Notes / Details','dup.notes_ph':'Describe what happened — where was the duplicate pick found, who reported it, what action was taken...','dup.submit':'⚠ Submit Duplicate Pick Report','dup.cancel':'Cancel','dup.alert':'Duplicate pick report filed for order {0}.\nIC team and management have been flagged for investigation.',
   },
-  es:{dir:'ltr','form.packer':'Empacador','form.picker':'Recolector','form.pack_station':'Estación de Empaque',
-    'btn.edit':'Editar','btn.found_bin':'Encontrado en Bin / Conteo','btn.second_loc':'Llenado en Segunda Ubicación',
-    'btn.replenished':'¿Bin Reabastecido?','btn.unarchive':'Desarchivar',
-    'badge.archived':'Archivado','badge.erroneous':'Bin Erróneo','badge.backorder':'Riesgo de Pedido Pendiente',
-    'badge.second_loc':'Segunda Ubicación Llenada','badge.replenished':'Reabastecido después de Recoger',
-    'badge.confirmed':'IC Confirmado Corto','row.ic_found':'IC Encontró',
-    'row.second_filled':'Segunda ubicación llenada:','row.qty':'Cant.','row.demand':'Demanda','row.picker':'Recolector',
-    'list.no_shortages':'No se encontraron escaseces.',
-    'form.shift_auto':'Auto (hora actual)','form.shift_1st':'1er Turno (6am–3:30pm)',
-    'form.shift_2nd':'2do Turno (3:30pm–12am)','form.shift_wot':'Tiempo Extra Fin de Semana (6am–12am)',
-    'op.tab_entry':'📝 Entrada','op.tab_batch':'📋 Hoja de Recogida por Lotes','op.tab_records':'📊 Registros y Estadísticas',
-    'op.packer_name':'Nombre del Empacador','op.picker_name':'Nombre del Recolector','op.pack_station':'Estación de Empaque',
-    'dup.modal_title':'⚠ Reporte: Orden Recogida Dos Veces',
-    'dup.modal_btn':'⚠ Reportar Recogida Duplicada — Orden Completa Recogida Dos Veces',
-    'dup.what_does':'¿Qué hace esto?',
-    'dup.what_desc':'Marca una orden completa como recogida dos veces (exceso). No se necesitan líneas de producto — toda la orden debe devolverse e investigarse.',
-    'dup.picker_involved':'Recolector Involucrado','dup.notes_label':'Notas / Detalles',
-    'dup.notes_ph':'Describa qué pasó...','dup.submit':'⚠ Enviar Reporte de Recogida Duplicada','dup.cancel':'Cancelar',
-    'dup.alert':'Reporte de recogida duplicada para orden {0}.',
-    'form.date_time':'Fecha y Hora','form.division':'División','form.pick_demand':'Núm. de Demanda',
-    'form.shift_override':'Turno (manual)','form.notes':'Notas',
-    'form.product_code':'Código de Producto','form.qty_each':'Cantidad (c/u)','form.bin_shorted':'Bin con Escasez',
+  es:{dir:'ltr',
+    'login.title':'Portal de Control de Escasez','login.subtitle':'Aplicación separada de informes de escasez',
+    'login.select_role':'Seleccionar rol',
+    'login.clerk_title':'Empleado de Salida','login.clerk_sub':'Entrada de Escasez',
+    'login.ic_title':'Equipo IC','login.ic_sub':'Verificar e Informar',
+    'login.manager_title':'Gerente IC','login.manager_sub':'Configuración y Migración',
+    'login.no_login':'Sin Inicio de Sesión','login.batch_btn':'Hoja de Recogida por Lotes','login.batch_sub':'Un artículo, múltiples órdenes','login.op_btn':'Portal de Exceso','login.op_sub':'Registrar artículos en exceso',
+    'login.shortage_portal':'Portal de Escasez y Exceso','login.shortage_portal_sub':'Abre la app de escasez (nueva pestaña)',
+    'login.enter_pin':'Ingresar PIN','login.back':'Regresar',
+    'form.date_time':'Fecha y Hora','form.division':'División','form.picker':'Recolector',
+    'form.packer':'Empacador','form.pack_station':'Estación de Empaque','form.pick_demand':'Núm. de Demanda',
+    'form.shift_override':'Turno (manual)','form.shift_auto':'Auto (hora actual)',
+    'form.shift_1st':'1er Turno (6am–3:30pm)','form.shift_2nd':'2do Turno (3:30pm–12am)','form.shift_wot':'Tiempo Extra Fin de Semana (6am–12am)',
+    'form.product_lines':'Líneas de Producto','form.product_code':'Código de Producto',
+    'form.qty_each':'Cantidad (c/u)','form.bin_shorted':'Bin con Escasez',
+    'form.uom':'Unidad de Medida','form.notes':'Notas',
     'form.add_line':'+ Agregar Línea','form.clear_form':'Limpiar','form.log_shortages':'+ Registrar Escasez',
+    'form.required':'Requerido',
     'list.search':'Buscar por producto, orden, recolector, división...',
     'list.active':'Activo','list.archive':'Historial Archivado','list.both':'Activo + Archivado',
-    'btn.open_ic_portal':'Abrir Portal IC',
-    'login.no_login':'Sin Inicio de Sesión','login.batch_btn':'Hoja de Recogida por Lotes',
-    'login.batch_sub':'Un artículo, múltiples órdenes','login.op_btn':'Portal de Exceso',
-    'login.op_sub':'Exceso y Lotes — sin PIN',
-    'op.batch_title':'Detalles de Recogida por Lotes','op.batch_orders_title':'Órdenes en esta Recogida por Lotes',
-    'op.batch_add_order':'+ Agregar Orden','op.batch_submit':'+ Enviar Recogida por Lotes',
+    'list.refresh':'Actualizar','list.no_shortages':'No se encontraron escaseces.',
+    'list.select_visible':'Seleccionar Visibles','list.clear_selection':'Limpiar Selección',
+    'list.archive_selected':'Archivar Seleccionados','list.archive_filtered':'Archivar Activos Filtrados',
+    'list.ic_verify':'Hoja IC Verificar',
+    'btn.edit':'Editar','btn.found_bin':'Encontrado en Bin / Conteo',
+    'btn.second_loc':'Llenado en Segunda Ubicación','btn.replenished':'¿Bin Reabastecido?',
+    'btn.unarchive':'Desarchivar','btn.open_ic_portal':'Abrir Portal IC',
+    'badge.archived':'Archivado','badge.erroneous':'Bin Erróneo','badge.backorder':'Riesgo de Pedido Pendiente',
+    'badge.second_loc':'Segunda Ubicación Llenada','badge.replenished':'Reabastecido después de Recoger',
+    'badge.confirmed':'IC Confirmado Corto',
+    'row.ic_found':'IC Encontró','row.second_filled':'Segunda ubicación llenada:',
+    'row.qty':'Cant.','row.demand':'Demanda','row.picker':'Recolector',
+    'pin.incorrect':'PIN Incorrecto',
+    'op.title':'Registro de Exceso','op.subtitle':'Sin inicio de sesión — registre artículos en exceso.',
+    'op.tab_entry':'📝 Entrada','op.tab_batch':'📋 Hoja de Recogida por Lotes','op.batch_title':'Detalles de Recogida por Lotes','op.batch_orders_title':'Órdenes en esta Recogida por Lotes','op.batch_add_order':'+ Agregar Orden','op.batch_submit':'+ Registrar Recogida por Lotes','op.tab_records':'📊 Registros y Estadísticas',
+    'op.new_entry':'Nueva Entrada de Exceso','op.order_num':'Número de Orden',
+    'op.packer_name':'Nombre del Empacador','op.picker_name':'Nombre del Recolector','op.pack_station':'Estación de Empaque',
+    'op.items_title':'Artículos en Exceso','op.add_item':'+ Agregar Artículo','op.clear':'Limpiar',
+    'op.submit':'Enviar Exceso','op.more_q':'¿Hay más artículos para agregar?',
+    'op.yes_more':'+ Sí — Agregar Otro','op.no_submit':'✓ No — Enviar Esta Entrada',
+    'op.print':'🖨 Imprimir Reporte KPI',
+    'op.search':'Buscar por empacador, recolector, orden, producto, división...',
+    'op.product_code':'Código de Producto','op.qty':'Cantidad','op.uom':'Unidad de Medida',
+    'page.shortages_title':'Entrada de Escasez','page.shortages_desc':'Registrar líneas de escasez y revisar registros activos.',
+    'page.reports_title':'Reportes de Escasez','page.reports_desc':'Solo para Equipo IC y Gerente IC.',
+    'nav.shortages':'Escaseces','nav.reports':'Reportes','nav.replenishment':'Reabastecimiento',
+    'nav.manage_pickers':'Gestionar Recolectores','nav.migration':'Migración','nav.settings':'Configuración',
+    'nav.ic_portal':'Portal IC','nav.light_dark':'Claro/Oscuro','nav.logout':'Cerrar Sesión',
+    'nav.over_pull':'Exceso de Retiro',
+    'viewmode.active':'Activo','viewmode.archive':'Historial Archivado','viewmode.both':'Activo + Archivado',
+    'form.duplicate_order':'Reporte: Orden Doble','dup.modal_title':'⚠ Reporte: Orden Recogida Dos Veces','dup.modal_btn':'⚠ Reportar Recogida Duplicada — Orden Completa Recogida Dos Veces','dup.what_does':'¿Qué hace esto?','dup.what_desc':'Marca una orden completa como recogida dos veces (exceso). No se necesitan líneas de producto — toda la orden debe devolverse e investigarse. Crea un registro de Recogida Duplicada para revisión.','dup.picker_involved':'Recolector Involucrado','dup.notes_label':'Notas / Detalles','dup.notes_ph':'Describa qué pasó — dónde se encontró, quién lo reportó, qué acción se tomó...','dup.submit':'⚠ Enviar Reporte de Recogida Duplicada','dup.cancel':'Cancelar','dup.alert':'Reporte de recogida duplicada para orden {0}.\nEl equipo IC y la gerencia han sido notificados para investigación.',
   },
-  fa:{dir:'rtl','form.packer':'بسته‌بند','form.picker':'جمع‌آورنده','form.pack_station':'ایستگاه بسته‌بندی',
-    'btn.edit':'ویرایش','btn.found_bin':'در بین کمبود یافت شد','btn.second_loc':'از مکان دوم پر شد',
-    'btn.replenished':'بین بعد از جمع‌آوری پر شد؟','btn.unarchive':'از آرشیو خارج شود',
-    'badge.archived':'آرشیو شده','badge.erroneous':'بین اشتباه','badge.backorder':'خطر سفارش معوق',
-    'badge.second_loc':'از مکان دوم پر شد','badge.replenished':'پر شده پس از جمع‌آوری',
-    'badge.confirmed':'IC تأیید شده کوتاه','row.ic_found':'IC یافت','row.second_filled':'مکان دوم پر شده:',
-    'row.qty':'تعداد','row.demand':'تقاضا','row.picker':'جمع‌آورنده',
-    'list.no_shortages':'کمبودی یافت نشد.',
-    'form.shift_auto':'خودکار (زمان فعلی)','form.shift_1st':'نوبت اول (۶ صبح–۳:۳۰ عصر)',
-    'form.shift_2nd':'نوبت دوم (۳:۳۰–۱۲ شب)','form.shift_wot':'اضافه‌کاری آخر هفته',
-    'op.tab_entry':'📝 ورود داده','op.tab_batch':'📋 برگه برداشت دسته‌ای','op.tab_records':'📊 سوابق و آمار',
-    'op.packer_name':'نام بسته‌بند','op.picker_name':'نام جمع‌آورنده','op.pack_station':'ایستگاه بسته‌بندی',
-    'dup.modal_title':'⚠ گزارش: سفارش دو بار جمع‌آوری شد',
-    'dup.modal_btn':'⚠ گزارش برداشت تکراری — کل سفارش دو بار برداشته شد',
-    'dup.what_does':'این چه می‌کند:','dup.what_desc':'یک سفارش کامل را به عنوان دو بار جمع‌آوری شده علامت می‌زند.',
-    'dup.picker_involved':'جمع‌آورنده مربوطه','dup.notes_label':'یادداشت‌ها / جزئیات',
-    'dup.notes_ph':'توضیح دهید چه اتفاقی افتاد...','dup.submit':'⚠ ارسال گزارش برداشت تکراری','dup.cancel':'لغو',
-    'dup.alert':'گزارش برداشت تکراری برای سفارش {0} ثبت شد.',
-    'form.date_time':'تاریخ و ساعت','form.division':'بخش','form.pick_demand':'شماره تقاضا',
-    'form.shift_override':'نوبت (دستی)','form.notes':'یادداشت‌ها',
-    'form.product_code':'کد محصول','form.qty_each':'تعداد (هر کدام)','form.bin_shorted':'بین کمبود',
+  fa:{dir:'rtl',
+    'login.title':'پورتل کنترل کمبود','login.subtitle':'برنامه جداگانه گزارش کمبود',
+    'login.select_role':'نقش را انتخاب کنید',
+    'login.clerk_title':'کارمند خروجی','login.clerk_sub':'ورود کمبود',
+    'login.ic_title':'تیم IC','login.ic_sub':'تأیید و گزارش',
+    'login.manager_title':'مدیر IC','login.manager_sub':'تنظیمات و انتقال',
+    'login.no_login':'بدون ورود','login.batch_btn':'برگه برداشت دسته‌ای','login.batch_sub':'یک محصول، چند سفارش','login.op_btn':'پورتل مازاد','login.op_sub':'ثبت اقلام مازاد',
+    'login.shortage_portal':'پورتل کمبود و مازاد','login.shortage_portal_sub':'برنامه کمبود را باز می‌کند (تب جدید)',
+    'login.enter_pin':'پین را وارد کنید','login.back':'برگشت',
+    'form.date_time':'تاریخ و ساعت','form.division':'بخش','form.picker':'جمع‌آورنده',
+    'form.packer':'بسته‌بند','form.pack_station':'ایستگاه بسته‌بندی','form.pick_demand':'شماره تقاضا',
+    'form.shift_override':'نوبت (دستی)','form.shift_auto':'خودکار (زمان فعلی)',
+    'form.shift_1st':'نوبت اول (۶ صبح–۳:۳۰ عصر)','form.shift_2nd':'نوبت دوم (۳:۳۰–۱۲ شب)','form.shift_wot':'اضافه‌کاری آخر هفته',
+    'form.product_lines':'خطوط محصول','form.product_code':'کد محصول',
+    'form.qty_each':'تعداد (هر کدام)','form.bin_shorted':'بین کمبود',
+    'form.uom':'واحد اندازه‌گیری','form.notes':'یادداشت‌ها',
     'form.add_line':'+ افزودن خط','form.clear_form':'پاک کردن','form.log_shortages':'+ ثبت کمبود',
+    'form.required':'الزامی',
     'list.search':'جستجو بر اساس محصول، سفارش، جمع‌آورنده، بخش...',
     'list.active':'فعال','list.archive':'تاریخچه آرشیو','list.both':'فعال + آرشیو',
-    'btn.open_ic_portal':'باز کردن پورتل IC',
-    'login.no_login':'بدون ورود','login.batch_btn':'برگه برداشت دسته‌ای',
-    'login.batch_sub':'یک محصول، چند سفارش','login.op_btn':'پورتل مازاد',
-    'login.op_sub':'ثبت مازاد — بدون ورود',
-    'op.batch_title':'جزئیات برداشت دسته‌ای','op.batch_orders_title':'سفارش‌ها در این برداشت دسته‌ای',
-    'op.batch_add_order':'+ افزودن سفارش','op.batch_submit':'+ ثبت برداشت دسته‌ای',
+    'list.refresh':'بروزرسانی','list.no_shortages':'کمبودی یافت نشد.',
+    'list.select_visible':'انتخاب موارد نمایش داده شده','list.clear_selection':'پاک کردن انتخاب',
+    'list.archive_selected':'آرشیو موارد انتخاب شده','list.archive_filtered':'آرشیو موارد فعال فیلتر شده',
+    'list.ic_verify':'برگه تأیید IC',
+    'btn.edit':'ویرایش','btn.found_bin':'در بین کمبود یافت شد / شمارش',
+    'btn.second_loc':'از مکان دوم پر شد','btn.replenished':'بین بعد از جمع‌آوری پر شد؟',
+    'btn.unarchive':'از آرشیو خارج شود','btn.open_ic_portal':'باز کردن پورتل IC',
+    'badge.archived':'آرشیو شده','badge.erroneous':'بین اشتباه','badge.backorder':'خطر سفارش معوق',
+    'badge.second_loc':'از مکان دوم پر شد','badge.replenished':'پر شده پس از جمع‌آوری',
+    'badge.confirmed':'IC تأیید شده کوتاه',
+    'row.ic_found':'IC یافت','row.second_filled':'مکان دوم پر شده:',
+    'row.qty':'تعداد','row.demand':'تقاضا','row.picker':'جمع‌آورنده',
+    'pin.incorrect':'پین نادرست است',
+    'op.title':'ثبت مازاد','op.subtitle':'بدون ورود — اقلام مازاد را ثبت کنید.',
+    'op.tab_entry':'📝 ورود داده','op.tab_batch':'📋 برگه برداشت دسته‌ای','op.batch_title':'جزئیات برداشت دسته‌ای','op.batch_orders_title':'سفارش‌ها در این برداشت دسته‌ای','op.batch_add_order':'+ افزودن سفارش','op.batch_submit':'+ ثبت کمبود برداشت دسته‌ای','op.tab_records':'📊 سوابق و آمار',
+    'op.new_entry':'ورود مازاد جدید','op.order_num':'شماره سفارش',
+    'op.packer_name':'نام بسته‌بند','op.picker_name':'نام جمع‌آورنده','op.pack_station':'ایستگاه بسته‌بندی',
+    'op.items_title':'اقلام مازاد','op.add_item':'+ افزودن قلم','op.clear':'پاک کردن',
+    'op.submit':'ثبت مازاد','op.more_q':'آیا قلم دیگری برای اضافه کردن وجود دارد؟',
+    'op.yes_more':'+ بله — افزودن قلم دیگر','op.no_submit':'✓ نه — ارسال این ورودی',
+    'op.print':'🖨 چاپ گزارش KPI',
+    'op.search':'جستجو بر اساس بسته‌بند، جمع‌آورنده، سفارش، محصول...',
+    'op.product_code':'کد محصول','op.qty':'تعداد','op.uom':'واحد اندازه‌گیری',
+    'page.shortages_title':'ورود کمبود','page.shortages_desc':'ثبت خطوط کمبود و بررسی سوابق فعال.',
+    'page.reports_title':'گزارش‌های کمبود','page.reports_desc':'فقط برای تیم IC و مدیر IC.',
+    'nav.shortages':'کمبودها','nav.reports':'گزارش‌ها','nav.replenishment':'تأمین مجدد',
+    'nav.manage_pickers':'مدیریت جمع‌آورندگان','nav.migration':'انتقال','nav.settings':'تنظیمات',
+    'nav.ic_portal':'پورتل IC','nav.light_dark':'روشن/تیره','nav.logout':'خروج',
+    'nav.over_pull':'ثبت مازاد',
+    'viewmode.active':'فعال','viewmode.archive':'تاریخچه آرشیو','viewmode.both':'فعال + آرشیو',
+    'form.duplicate_order':'گزارش: سفارش دو بار برداشته شد','dup.modal_title':'⚠ گزارش: سفارش دو بار جمع‌آوری شد','dup.modal_btn':'⚠ گزارش برداشت تکراری — کل سفارش دو بار برداشته شد','dup.what_does':'این چه می‌کند:','dup.what_desc':'یک سفارش کامل را به عنوان دو بار جمع‌آوری شده (مازاد) علامت می‌زند. نیازی به خطوط محصول نیست — کل سفارش باید بازگشت داده شود و بررسی شود. این یک رکورد برداشت تکراری برای بررسی IC ایجاد می‌کند.','dup.picker_involved':'جمع‌آورنده مربوطه','dup.notes_label':'یادداشت‌ها / جزئیات','dup.notes_ph':'توضیح دهید چه اتفاقی افتاد — کجا پیدا شد، چه کسی گزارش داد، چه اقدامی انجام شد...','dup.submit':'⚠ ارسال گزارش برداشت تکراری','dup.cancel':'لغو','dup.alert':'گزارش برداشت تکراری برای سفارش {0} ثبت شد.\nتیم IC و مدیریت برای بررسی مطلع شدند.',
   },
-  ar:{dir:'rtl','form.packer':'المعبّئ','form.picker':'جامع البضائع','form.pack_station':'محطة التعبئة',
-    'btn.edit':'تعديل','btn.found_bin':'وُجد في صندوق النقص','btn.second_loc':'تم ملء الموقع الثاني',
-    'btn.replenished':'هل تم تعبئة الصندوق بعد الانتقاء؟','btn.unarchive':'إلغاء الأرشفة',
-    'badge.archived':'مؤرشف','badge.erroneous':'صندوق خاطئ','badge.backorder':'خطر الطلب المعلق',
-    'badge.second_loc':'تم ملء الموقع الثاني','badge.replenished':'تمت التعبئة بعد الانتقاء',
-    'badge.confirmed':'تم تأكيد النقص من IC','row.ic_found':'وجد IC','row.second_filled':'تم ملء الموقع الثاني:',
-    'row.qty':'الكمية','row.demand':'الطلب','row.picker':'جامع البضائع',
-    'list.no_shortages':'لم يتم العثور على نقص.',
-    'form.shift_auto':'تلقائي (الوقت الحالي)','form.shift_1st':'الوردية الأولى (6ص–3:30م)',
-    'form.shift_2nd':'الوردية الثانية (3:30م–12م)','form.shift_wot':'عمل إضافي في عطلة نهاية الأسبوع',
-    'op.tab_entry':'📝 إدخال البيانات','op.tab_batch':'📋 ورقة الانتقاء الدُفعي','op.tab_records':'📊 السجلات والإحصاءات',
-    'op.packer_name':'اسم المعبّئ','op.picker_name':'اسم جامع البضائع','op.pack_station':'محطة التعبئة',
-    'dup.modal_title':'⚠ تقرير: تم انتقاء الطلب مرتين',
-    'dup.modal_btn':'⚠ الإبلاغ عن انتقاء مكرر — تم انتقاء الطلب بالكامل مرتين',
-    'dup.what_does':'ماذا يفعل هذا:','dup.what_desc':'يُعلّم طلباً كاملاً على أنه تم انتقاؤه مرتين.',
-    'dup.picker_involved':'جامع البضائع المعني','dup.notes_label':'ملاحظات / تفاصيل',
-    'dup.notes_ph':'صف ما حدث...','dup.submit':'⚠ إرسال تقرير الانتقاء المكرر','dup.cancel':'إلغاء',
-    'dup.alert':'تم تقديم تقرير الانتقاء المكرر للطلب {0}.',
-    'form.date_time':'التاريخ والوقت','form.division':'القسم','form.pick_demand':'رقم الطلب',
-    'form.shift_override':'الوردية (يدوي)','form.notes':'ملاحظات',
-    'form.product_code':'رمز المنتج','form.qty_each':'الكمية (لكل واحد)','form.bin_shorted':'صندوق النقص',
-    'form.add_line':'+ إضافة سطر','form.clear_form':'مسح','form.log_shortages':'+ تسجيل النقص',
-    'list.search':'البحث بالمنتج أو الطلب أو جامع البضائع أو القسم...',
-    'list.active':'نشط','list.archive':'السجل المحفوظ','list.both':'نشط + محفوظ',
-    'btn.open_ic_portal':'فتح بوابة IC',
-    'login.no_login':'بدون تسجيل دخول','login.batch_btn':'ورقة الانتقاء الدُفعي',
-    'login.batch_sub':'منتج واحد، طلبات متعددة','login.op_btn':'بوابة الزيادة',
-    'login.op_sub':'تسجيل الزيادة — بدون رمز',
-    'op.batch_title':'تفاصيل الانتقاء الدُفعي','op.batch_orders_title':'الطلبات في هذا الانتقاء الدُفعي',
-    'op.batch_add_order':'+ إضافة طلب','op.batch_submit':'+ إرسال الانتقاء الدُفعي',
-  },
-  fil:{dir:'ltr','form.packer':'Tagabalot','form.picker':'Tagapulot','form.pack_station':'Estasyon ng Pagbabalot',
-    'btn.edit':'I-edit','btn.found_bin':'Natagpuan sa Shorted Bin / Bilang','btn.second_loc':'Napuno mula sa Pangalawang Lokasyon',
-    'btn.replenished':'Na-replenish ang Bin?','btn.unarchive':'I-unarchive',
-    'badge.archived':'Na-archive','badge.erroneous':'Maling Bin','badge.backorder':'Panganib ng Backorder',
-    'badge.second_loc':'Napuno mula 2nd Lokasyon','badge.replenished':'Na-replenish pagkatapos Pulutin',
-    'badge.confirmed':'IC Nakumpirma na Maikli','row.ic_found':'Nahanap ng IC',
-    'row.second_filled':'Napuno mula 2nd lokasyon:','row.qty':'Dami','row.demand':'Demand','row.picker':'Tagapulot',
-    'list.no_shortages':'Walang kakulangan na natagpuan.',
-    'form.shift_auto':'Auto (kasalukuyang oras)','form.shift_1st':'1st Shift (6am–3:30pm)',
-    'form.shift_2nd':'2nd Shift (3:30pm–12am)','form.shift_wot':'Weekend OT (6am–12am)',
-    'op.tab_entry':'📝 Pagpasok','op.tab_batch':'📋 Batch Pick Sheet','op.tab_records':'📊 Mga Rekord at Stats',
-    'op.packer_name':'Pangalan ng Tagabalot','op.picker_name':'Pangalan ng Tagapulot','op.pack_station':'Estasyon ng Pagbabalot',
-    'dup.modal_title':'⚠ Report: Dalawang Beses na Na-pick ang Order',
-    'dup.modal_btn':'⚠ Mag-ulat ng Duplicate Pick — Buong Order na Na-pick ng Dalawang Beses',
-    'dup.what_does':'Ano ang gagawin nito:','dup.what_desc':'Magtatanda ng buong order bilang na-pick ng dalawang beses.',
-    'dup.picker_involved':'Tagapulot na Kasangkot','dup.notes_label':'Mga Tala / Detalye',
-    'dup.notes_ph':'Ilarawan kung ano ang nangyari...','dup.submit':'⚠ Isumite ang Duplicate Pick Report','dup.cancel':'Kanselahin',
-    'dup.alert':'Na-file ang duplicate pick report para sa order na {0}.',
-    'form.date_time':'Petsa at Oras','form.division':'Dibisyon','form.pick_demand':'Pick Demand #',
-    'form.shift_override':'Shift (Manual)','form.notes':'Mga Tala',
-    'form.product_code':'Kodigo ng Produkto','form.qty_each':'Dami (bawat isa)','form.bin_shorted':'Bin na may Kakulangan',
+  fil:{dir:'ltr',
+    'login.title':'Portal ng Kontrol sa Kakulangan','login.subtitle':'Hiwalay na app para sa pag-uulat ng kakulangan',
+    'login.select_role':'Pumili ng papel',
+    'login.clerk_title':'Outbound Clerk','login.clerk_sub':'Pagpasok ng Kakulangan',
+    'login.ic_title':'Koponan ng IC','login.ic_sub':'I-verify at Mag-ulat',
+    'login.manager_title':'IC Manager','login.manager_sub':'Mga Setting at Paglipat',
+    'login.no_login':'Walang Login','login.batch_btn':'Batch Pick Sheet','login.batch_sub':'Isang item, maraming orders','login.op_btn':'Over Pull Portal','login.op_sub':'I-log ang mga item na sobra',
+    'login.shortage_portal':'Portal ng Kakulangan at Sobra','login.shortage_portal_sub':'Binubuksan ang standalone app (bagong tab)',
+    'login.enter_pin':'Ilagay ang PIN','login.back':'Bumalik',
+    'form.date_time':'Petsa at Oras','form.division':'Dibisyon','form.picker':'Tagapulot',
+    'form.packer':'Tagabalot','form.pack_station':'Estasyon ng Pagbabalot','form.pick_demand':'Pick Demand #',
+    'form.shift_override':'Shift (Manual)','form.shift_auto':'Auto (kasalukuyang oras)',
+    'form.shift_1st':'1st Shift (6am–3:30pm)','form.shift_2nd':'2nd Shift (3:30pm–12am)','form.shift_wot':'Weekend OT (6am–12am)',
+    'form.product_lines':'Mga Linya ng Produkto','form.product_code':'Kodigo ng Produkto',
+    'form.qty_each':'Dami (bawat isa)','form.bin_shorted':'Bin na may Kakulangan',
+    'form.uom':'Yunit ng Sukat','form.notes':'Mga Tala',
     'form.add_line':'+ Magdagdag ng Linya','form.clear_form':'I-clear','form.log_shortages':'+ I-log ang Kakulangan',
+    'form.required':'Kinakailangan',
     'list.search':'Maghanap sa pamamagitan ng produkto, order, tagapulot, dibisyon...',
     'list.active':'Aktibo','list.archive':'Kasaysayan ng Archive','list.both':'Aktibo + Archive',
-    'btn.open_ic_portal':'Buksan ang IC Portal',
-    'login.no_login':'Walang Login','login.batch_btn':'Batch Pick Sheet',
-    'login.batch_sub':'Isang item, maraming orders','login.op_btn':'Over Pull Portal',
-    'login.op_sub':'Over Pull at Batch — walang PIN',
-    'op.batch_title':'Mga Detalye ng Batch Pick','op.batch_orders_title':'Mga Order sa Batch Pick na ito',
-    'op.batch_add_order':'+ Magdagdag ng Order','op.batch_submit':'+ Isumite ang Batch Pick',
+    'list.refresh':'I-refresh','list.no_shortages':'Walang kakulangan na natagpuan.',
+    'list.select_visible':'Piliin ang Nakikita','list.clear_selection':'I-clear ang Seleksyon',
+    'list.archive_selected':'I-archive ang Napili','list.archive_filtered':'I-archive ang Aktibong Na-filter',
+    'list.ic_verify':'IC Verify Sheet',
+    'btn.edit':'I-edit','btn.found_bin':'Natagpuan sa Shorted Bin / Bilang',
+    'btn.second_loc':'Napuno mula sa Pangalawang Lokasyon','btn.replenished':'Na-replenish ang Bin?',
+    'btn.unarchive':'I-unarchive','btn.open_ic_portal':'Buksan ang IC Portal',
+    'badge.archived':'Na-archive','badge.erroneous':'Maling Bin','badge.backorder':'Panganib ng Backorder',
+    'badge.second_loc':'Napuno mula 2nd Lokasyon','badge.replenished':'Na-replenish pagkatapos Pulutin',
+    'badge.confirmed':'IC Nakumpirma na Maikli',
+    'row.ic_found':'Nahanap ng IC','row.second_filled':'Napuno mula 2nd lokasyon:',
+    'row.qty':'Dami','row.demand':'Demand','row.picker':'Tagapulot',
+    'pin.incorrect':'Maling PIN',
+    'op.title':'Log ng Sobra','op.subtitle':'Hindi kailangan ng login — i-log ang mga item na sobra.',
+    'op.tab_entry':'📝 Pagpasok','op.tab_batch':'📋 Batch Pick Sheet','op.tab_records':'📊 Mga Rekord at Stats',
+    'op.new_entry':'Bagong Entry ng Sobra','op.order_num':'Numero ng Order',
+    'op.packer_name':'Pangalan ng Tagabalot','op.picker_name':'Pangalan ng Tagapulot','op.pack_station':'Estasyon ng Pagbabalot',
+    'op.items_title':'Mga Item na Sobra','op.add_item':'+ Magdagdag ng Item','op.clear':'I-clear',
+    'op.submit':'Isumite ang Sobra','op.more_q':'Mayroon pa bang mga item na idadagdag?',
+    'op.yes_more':'+ Oo — Magdagdag ng Isa pa','op.no_submit':'✓ Hindi — Isumite Itong Entry',
+    'op.print':'🖨 I-print ang KPI Report',
+    'op.search':'Maghanap sa pamamagitan ng tagabalot, tagapulot, order, produkto...',
+    'op.product_code':'Kodigo ng Produkto','op.qty':'Dami','op.uom':'Yunit ng Sukat',
+    'page.shortages_title':'Pagpasok ng Kakulangan','page.shortages_desc':'I-log ang mga linya ng kakulangan at suriin ang mga aktibong rekord.',
+    'page.reports_title':'Mga Ulat ng Kakulangan','page.reports_desc':'Para sa Koponan ng IC at IC Manager lamang.',
+    'nav.shortages':'Mga Kakulangan','nav.reports':'Mga Ulat','nav.replenishment':'Muling Paglalagay',
+    'nav.manage_pickers':'Pamahalaan ang mga Tagapulot','nav.migration':'Paglipat','nav.settings':'Mga Setting',
+    'nav.ic_portal':'IC Portal','nav.light_dark':'Maliwanag/Madilim','nav.logout':'Mag-logout',
+    'nav.over_pull':'Log ng Sobra',
+    'viewmode.active':'Aktibo','viewmode.archive':'Kasaysayan ng Archive','viewmode.both':'Aktibo + Archive',
+    'form.duplicate_order':'Report: Dalawang Beses na na-pick','dup.modal_title':'⚠ Report: Dalawang Beses na Na-pick ang Order','dup.modal_btn':'⚠ Mag-ulat ng Duplicate Pick — Buong Order na Na-pick ng Dalawang Beses','dup.what_does':'Ano ang gagawin nito:','dup.what_desc':'Magtatanda ng buong order bilang na-pick ng dalawang beses (sobrang kinuha). Hindi na kailangan ng mga linya ng produkto — ang buong order ay dapat ibalik at imbestigahan. Gumagawa ito ng Duplicate Pick record para sa IC at management review.','dup.picker_involved':'Tagapulot na Kasangkot','dup.notes_label':'Mga Tala / Detalye','dup.notes_ph':'Ilarawan kung ano ang nangyari — saan natagpuan ang duplicate pick, sino ang nag-ulat, anong aksyon ang ginawa...','dup.submit':'⚠ Isumite ang Duplicate Pick Report','dup.cancel':'Kanselahin','dup.alert':'Na-file ang duplicate pick report para sa order na {0}.\nNaabisuhan ang IC team at management para sa imbestigasyon.',
   },
+  ar:{dir:'rtl',
+    'login.title':'بوابة التحكم في النقص','login.subtitle':'تطبيق منفصل للإبلاغ عن النقص',
+    'login.select_role':'اختر الدور',
+    'login.clerk_title':'موظف الشحن','login.clerk_sub':'إدخال النقص',
+    'login.ic_title':'فريق IC','login.ic_sub':'التحقق والتقرير',
+    'login.manager_title':'مدير IC','login.manager_sub':'الإعدادات والترحيل',
+    'login.no_login':'بدون تسجيل دخول','login.batch_btn':'ورقة الانتقاء الدُفعي','login.batch_sub':'منتج واحد، طلبات متعددة','login.op_btn':'بوابة الزيادة','login.op_sub':'تسجيل العناصر الزائدة',
+    'login.shortage_portal':'بوابة النقص والزيادة','login.shortage_portal_sub':'يفتح تطبيق النقص (تبويب جديد)',
+    'login.enter_pin':'أدخل رمز PIN','login.back':'رجوع',
+    'form.date_time':'التاريخ والوقت','form.division':'القسم','form.picker':'جامع البضائع',
+    'form.packer':'المعبّئ','form.pack_station':'محطة التعبئة','form.pick_demand':'رقم طلب الانتقاء',
+    'form.shift_override':'الوردية (يدوي)','form.shift_auto':'تلقائي (الوقت الحالي)',
+    'form.shift_1st':'الوردية الأولى (6ص–3:30م)','form.shift_2nd':'الوردية الثانية (3:30م–12م)','form.shift_wot':'عمل إضافي نهاية الأسبوع (6ص–12م)',
+    'form.product_lines':'خطوط المنتجات','form.product_code':'كود المنتج',
+    'form.qty_each':'الكمية (لكل وحدة)','form.bin_shorted':'خانة النقص',
+    'form.uom':'وحدة القياس','form.notes':'ملاحظات',
+    'form.add_line':'+ إضافة سطر','form.clear_form':'مسح النموذج','form.log_shortages':'+ تسجيل جميع النقصات',
+    'form.required':'مطلوب',
+    'form.duplicate_order':'تكرار الطلب','dup.modal_title':'⚠ تقرير: تم انتقاء الطلب مرتين','dup.modal_btn':'⚠ الإبلاغ عن انتقاء مكرر — تم انتقاء الطلب بالكامل مرتين','dup.what_does':'ماذا يفعل هذا:','dup.what_desc':'يُعلّم طلباً كاملاً على أنه تم انتقاؤه مرتين (زيادة في السحب). لا حاجة لخطوط المنتجات — يجب إعادة الطلب بالكامل والتحقيق فيه. يُنشئ هذا سجل انتقاء مكرر لمراجعة فريق IC والإدارة.','dup.picker_involved':'جامع البضائع المعني','dup.notes_label':'ملاحظات / تفاصيل','dup.notes_ph':'صف ما حدث — أين وُجد الانتقاء المكرر، من أبلغ عنه، ما الإجراء المتخذ...','dup.submit':'⚠ إرسال تقرير الانتقاء المكرر','dup.cancel':'إلغاء','dup.alert':'تم تقديم تقرير الانتقاء المكرر للطلب {0}.\nتم إشعار فريق IC والإدارة للتحقيق.',
+    'list.search':'بحث حسب المنتج، الطلب، الجامع، القسم...',
+    'list.active':'نشط','list.archive':'الأرشيف','list.both':'نشط + أرشيف',
+    'list.refresh':'تحديث','list.no_shortages':'لا توجد نقصات لهذا الفلتر.',
+    'list.select_visible':'تحديد المرئي','list.clear_selection':'إلغاء التحديد',
+    'list.archive_selected':'أرشفة المحدد','list.archive_filtered':'أرشفة النشط المفلتر',
+    'list.ic_verify':'ورقة تحقق IC',
+    'btn.edit':'تعديل','btn.found_bin':'وجد في خانة النقص / العد',
+    'btn.second_loc':'تم تعبئته من موقع ثانٍ','btn.replenished':'هل تم إعادة تعبئة الخانة؟',
+    'btn.unarchive':'إلغاء الأرشفة','btn.open_ic_portal':'فتح بوابة IC',
+    'badge.archived':'مؤرشف','badge.erroneous':'خانة خاطئة','badge.backorder':'خطر تأخير الطلب',
+    'badge.second_loc':'تم التعبئة من موقع ثانٍ','badge.replenished':'تمت إعادة التعبئة بعد الانتقاء',
+    'badge.confirmed':'تم تأكيد النقص من IC',
+    'row.ic_found':'وجد IC','row.second_filled':'موقع ثانٍ مملوء:',
+    'row.qty':'الكمية','row.demand':'الطلب','row.picker':'جامع البضائع',
+    'pin.incorrect':'رمز PIN غير صحيح',
+    'op.title':'سجل الزيادة','op.subtitle':'بدون تسجيل دخول — سجّل العناصر التي تم سحبها بزيادة.',
+    'op.tab_entry':'📝 إدخال البيانات','op.tab_batch':'📋 ورقة الانتقاء الدُفعي','op.batch_title':'تفاصيل الانتقاء الدُفعي','op.batch_orders_title':'الطلبات في هذا الانتقاء الدُفعي','op.batch_add_order':'+ إضافة طلب','op.batch_submit':'+ تسجيل نقص الانتقاء الدُفعي','op.tab_records':'📊 السجلات والإحصاءات',
+    'op.new_entry':'إدخال زيادة جديد','op.order_num':'رقم الطلب',
+    'op.packer_name':'اسم المعبّئ','op.picker_name':'اسم الجامع','op.pack_station':'محطة التعبئة',
+    'op.items_title':'العناصر الزائدة','op.add_item':'+ إضافة عنصر','op.clear':'مسح النموذج',
+    'op.submit':'تسجيل الزيادة','op.more_q':'هل هناك عناصر أخرى لإضافتها؟',
+    'op.yes_more':'+ نعم — إضافة عنصر آخر','op.no_submit':'✓ لا — تسجيل هذا الإدخال',
+    'op.print':'🖨 طباعة تقرير KPI',
+    'op.search':'بحث حسب المعبّئ، الجامع، الطلب، المنتج، القسم...',
+    'op.product_code':'كود المنتج','op.qty':'الكمية','op.uom':'وحدة القياس',
+    'page.shortages_title':'إدخال النقص','page.shortages_desc':'تسجيل خطوط النقص ومراجعة السجلات النشطة.',
+    'page.reports_title':'تقارير النقص','page.reports_desc':'لفريق IC ومدير IC فقط.',
+    'nav.shortages':'النقصات','nav.reports':'التقارير','nav.replenishment':'إعادة التخزين',
+    'nav.manage_pickers':'إدارة جامعي البضائع','nav.migration':'الترحيل','nav.settings':'الإعدادات',
+    'nav.ic_portal':'بوابة IC','nav.light_dark':'فاتح/داكن','nav.logout':'تسجيل الخروج',
+    'nav.over_pull':'سجل الزيادة',
+    'viewmode.active':'نشط','viewmode.archive':'الأرشيف','viewmode.both':'نشط + أرشيف',
+    'dup.select':'اختر طلباً للتكرار...','dup.btn':'↩ تكرار طلب سابق',
+  }
+
 };
 
 function t(key){
-  const lang=LANGS[currentLang]||LANGS.en;
-  return lang[key]||LANGS.en[key]||key;
+  return (LANGS[currentLang]&&LANGS[currentLang][key])||LANGS['en'][key]||key;
 }
 
 function setLang(lang){
@@ -2570,61 +2810,297 @@ function setLang(lang){
   const dir=LANGS[lang].dir||'ltr';
   document.documentElement.dir=dir;
   document.documentElement.lang=lang==='fa'?'fa-AF':lang==='ar'?'ar':lang==='fil'?'fil':lang==='es'?'es':'en';
+  // Update all i18n-keyed elements
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key=el.dataset.i18n;
+    const attr=el.dataset.i18nAttr;
+    const val=t(key);
+    if(attr)el.setAttribute(attr,val);
+    else el.textContent=val;
+  });
+  // Update page title
+  const ti=$('i18n-title');if(ti)ti.textContent=t('login.title');
+  const su=$('i18n-subtitle');if(su)su.textContent=t('login.subtitle');
+  // Highlight active lang button
+  ['en','es','fa','ar','fil'].forEach(l=>{
+    const btn=$('lang'+l.charAt(0).toUpperCase()+l.slice(1));
+    if(btn)btn.style.borderColor=l===lang?'var(--accent)':'var(--border)';
+    if(btn)btn.style.color=l===lang?'var(--accent)':'var(--muted)';
+  });
+  // Dynamically update key labels and placeholders in the current active screen
   applyLangToForms();
 }
 
 function applyLangToForms(){
-  function lbl(id,key){const el=$(id);if(!el)return;const f=el.closest('.field');if(!f)return;const lab=f.querySelector('label');if(!lab)return;lab.childNodes[0].textContent=t(key)+' ';}
+  const d=LANGS[currentLang]?.dir||'ltr';
+  document.documentElement.dir=d;
+
+  // ── Helper: set label text (skips <em> required markers) ──
+  function lbl(fieldId, key){
+    const el=$(fieldId);if(!el)return;
+    const f=el.closest('.field');if(!f)return;
+    const lab=f.querySelector('label');if(!lab)return;
+    // Preserve <em>*</em> if present
+    const em=lab.querySelector('em');
+    lab.childNodes[0].textContent=t(key)+(em?' ':' ');
+  }
+  function btnText(id,key){const el=$(id);if(el)el.textContent=t(key);}
+  function ph(id,key){const el=$(id);if(el)el.placeholder=t(key);}
   function optText(sel,idx,key){if(sel&&sel.options[idx])sel.options[idx].textContent=t(key);}
+  function cardTitle(el,key){if(el){const first=el.childNodes[0];if(first&&first.nodeType===3)first.textContent=t(key)+' ';}}
 
-  // Shift selects
-  ['sShift','bpShift','ptShift'].forEach(id=>{const s=$(id);if(s){optText(s,0,'form.shift_auto');optText(s,1,'form.shift_1st');optText(s,2,'form.shift_2nd');optText(s,3,'form.shift_wot');}});
+  // ── Shortage form ──
+  lbl('sDate','form.date_time');
+  lbl('sDiv','form.division');
+  lbl('sPickerSelect','form.picker');
+  lbl('sPackStation','form.pack_station');
+  lbl('sDemand','form.pick_demand');
+  lbl('sShift','form.shift_override');
+  lbl('sNotes','form.notes');
+  ph('filterText','list.search');
 
-  // Over Pull tabs
-  const et=$('opTab-entry');if(et)et.innerHTML=t('op.tab_entry');
-  const ebt=$('opTab-batch');if(ebt)ebt.innerHTML=t('op.tab_batch');
-  const rt=$('opTab-records');if(rt)rt.innerHTML=t('op.tab_records');
+  // Product Lines card title
+  const plTitle=document.querySelector('#productLines')?.previousElementSibling;
+  if(plTitle&&plTitle.classList.contains('card-title'))plTitle.childNodes[0].textContent=t('form.product_lines');
 
-  // viewMode
-  const vm=$('viewMode');if(vm){optText(vm,0,'list.active');optText(vm,1,'list.archive');optText(vm,2,'list.both');}
+  // Shortage buttons
+  const addLineBtn=document.querySelector('button[onclick="addProductLine()"]');
+  if(addLineBtn)addLineBtn.textContent=t('form.add_line');
+  const clearBtn=document.querySelector('button[onclick="clearEntry()"]');
+  if(clearBtn)clearBtn.textContent=t('form.clear_form');
+  const logBtn=document.querySelector('button[onclick="saveShortage()"]');
+  if(logBtn)logBtn.textContent=t('form.log_shortages');
+  const refreshBtn=document.querySelector('button[onclick="loadShortages(true)"]');
+  if(refreshBtn)refreshBtn.textContent=t('list.refresh');
 
-  // Duplicate pick modal
-  const ptMT=$('ptModalTitle');if(ptMT)ptMT.innerHTML='&#9888; '+(t('dup.modal_title'));
-  const ptWD=$('ptWhatDoes');if(ptWD)ptWD.textContent=t('dup.what_does');
-  const ptWDesc=$('ptWhatDesc');if(ptWDesc)ptWDesc.textContent=t('dup.what_desc');
-  const ptPL=$('ptPickerLabel');if(ptPL&&ptPL.childNodes[0])ptPL.childNodes[0].textContent=t('dup.picker_involved')+' ';
-  const ptNL=$('ptNotesLabel');if(ptNL&&ptNL.childNodes[0])ptNL.childNodes[0].textContent=t('dup.notes_label')+' ';
-  const ptNotes=$('ptNotes');if(ptNotes)ptNotes.placeholder=t('dup.notes_ph');
-  const ptSub=$('ptSubmitBtn');if(ptSub)ptSub.innerHTML='&#9888; '+t('dup.submit');
-  const ptCan=$('ptCancelBtn');if(ptCan)ptCan.textContent=t('dup.cancel');
-  const ptOpenBtn=$('ptOpenBtnText');if(ptOpenBtn)ptOpenBtn.innerHTML='&#9888; '+t('dup.modal_btn');
-  const ptSh=$('ptShift');if(ptSh){optText(ptSh,0,'form.shift_auto');optText(ptSh,1,'form.shift_1st');optText(ptSh,2,'form.shift_2nd');optText(ptSh,3,'form.shift_wot');}
+  // Archive action buttons
+  const archAct=$('archiveActions');
+  if(archAct){
+    const btns=archAct.querySelectorAll('button');
+    const labels=['list.select_visible','list.clear_selection','list.archive_selected','list.archive_filtered','list.ic_verify'];
+    btns.forEach((b,i)=>{if(labels[i]&&!b.onclick?.toString().includes('openIcConfirm'))b.textContent=t(labels[i]);
+      else if(b.onclick?.toString().includes('openIcConfirm'))b.textContent='📋 '+t('list.ic_verify');});
+  }
 
-  // Batch pick labels
+  // Shortage top actions IC portal button
+  const topAct=$('shortageTopActions');
+  if(topAct){const a=topAct.querySelector('a');if(a)a.textContent=t('btn.open_ic_portal');}
+
+  // viewMode options
+  const vm=$('viewMode');
+  if(vm){optText(vm,0,'viewmode.active');optText(vm,1,'viewmode.archive');optText(vm,2,'viewmode.both');}
+
+  // Shift options
+  const sh=$('sShift');
+  if(sh){optText(sh,0,'form.shift_auto');optText(sh,1,'form.shift_1st');optText(sh,2,'form.shift_2nd');optText(sh,3,'form.shift_wot');}
+
+  // Picker select placeholder
+  const sp=$('sPickerSelect');
+  if(sp&&sp.options[0]&&sp.options[0].value==='')sp.options[0].textContent='— '+t('form.picker')+' —';
+
+  // Product lines inside the existing form (label inside dynamically created .product-line-card)
+  document.querySelectorAll('.product-line-card').forEach(card=>{
+    const labels=card.querySelectorAll('label');
+    if(labels[0])labels[0].childNodes[0].textContent=t('form.product_code')+' ';
+    if(labels[1])labels[1].childNodes[0].textContent=t('form.qty_each')+' ';
+    if(labels[2])labels[2].childNodes[0].textContent=t('form.bin_shorted')+' ';
+  });
+
+  // bin format hints
+  document.querySelectorAll('.bin-format-hint').forEach(el=>{
+    el.textContent='##-##-## · ##-##-# · P##### · BULK · ROOM · KEY ACCOUNT';
+  });
+
+  // ── Page headings ──
+  const spTitle=document.querySelector('#shortageScreen h1');
+  if(spTitle)spTitle.textContent=t('page.shortages_title');
+  const spDesc=document.querySelector('#shortageScreen .page-head p');
+  if(spDesc)spDesc.textContent=t('page.shortages_desc');
+  const rpTitle=document.querySelector('#reportScreen h1');
+  if(rpTitle)rpTitle.textContent=t('page.reports_title');
+  const rpDesc=document.querySelector('#reportScreen .page-head p');
+  if(rpDesc)rpDesc.textContent=t('page.reports_desc');
+
+  // ── Login screen ──
+  const ti=$('i18n-title');if(ti)ti.textContent=t('login.title');
+  const su=$('i18n-subtitle');if(su)su.textContent=t('login.subtitle');
+  const selectRoleLbl=document.querySelector('.login-group-label');
+  if(selectRoleLbl)selectRoleLbl.textContent=t('login.select_role');
+  const noLoginLbl=document.querySelectorAll('.login-group-label')[1];
+  if(noLoginLbl)noLoginLbl.textContent=t('login.no_login');
+  // Login role buttons
+  const icBtns=document.querySelectorAll('.ic-login-btn');
+  if(icBtns[0]){
+    const t1=icBtns[0].querySelector('.ib-title');const s1=icBtns[0].querySelector('.ib-sub');
+    if(t1)t1.textContent=t('login.clerk_title');if(s1)s1.textContent=t('login.clerk_sub');
+  }
+  if(icBtns[1]){
+    const t2=icBtns[1].querySelector('.ib-title');const s2=icBtns[1].querySelector('.ib-sub');
+    if(t2)t2.textContent=t('login.ic_title');if(s2)s2.textContent=t('login.ic_sub');
+  }
+  if(icBtns[2]){
+    const t3=icBtns[2].querySelector('.ib-title');const s3=icBtns[2].querySelector('.ib-sub');
+    if(t3)t3.textContent=t('login.manager_title');if(s3)s3.textContent=t('login.manager_sub');
+  }
+  if(icBtns[3]){
+    const t4=icBtns[3].querySelector('.ib-title');const s4=icBtns[3].querySelector('.ib-sub');
+    if(t4)t4.textContent=t('login.op_btn')||t('login.shortage_portal');if(s4)s4.textContent=t('login.op_sub')||t('login.shortage_portal_sub');
+  }
+  if(icBtns[4]){
+    const t5=icBtns[4].querySelector('.ib-title');const s5=icBtns[4].querySelector('.ib-sub');
+    if(t5)t5.textContent=t('login.batch_btn')||'Batch Pick Sheet';if(s5)s5.textContent=t('login.batch_sub')||'One item, multiple orders';
+  }
+
+  // PIN screen back button
+  const backBtn=$('pinScreen')?.querySelector('.pin-back-btn');
+  if(backBtn)backBtn.textContent=t('login.back');
+
+  // ── Nav buttons ──
+  const navEl=$('nav');
+  if(navEl){
+    navEl.querySelectorAll('.nav-btn[data-screen]').forEach(b=>{
+      const sc=b.dataset.screen;
+      const keyMap={shortage:'nav.shortages',report:'nav.reports',restock:'nav.replenishment',
+        picker:'nav.manage_pickers',migration:'nav.migration',settings:'nav.settings',overpull:'nav.over_pull'};
+      if(keyMap[sc])b.textContent=t(keyMap[sc]);
+    });
+    const logoutBtn=navEl.querySelector('.nav-btn.lock');
+    if(logoutBtn)logoutBtn.textContent=t('nav.logout');
+    const themeBtn=navEl.querySelector('.nav-btn[onclick*="saveTheme"]');
+    if(themeBtn)themeBtn.textContent=t('nav.light_dark');
+    const icLink=navEl.querySelector('a.nav-btn');
+    if(icLink)icLink.textContent=t('nav.ic_portal');
+  }
+
+  // ── Over Pull ──
+  const opTitle=document.querySelector('#overpullScreen h1');
+  if(opTitle)opTitle.textContent=t('op.title');
+  const opDesc=document.querySelector('#overpullScreen .page-head p');
+  if(opDesc)opDesc.textContent=t('op.subtitle');
+  const et=$('opTab-entry');if(et)et.innerHTML=t('op.tab_entry')||'&#128221; Log Entry';
+  const bt=$('opTab-batch');if(bt)bt.innerHTML='&#128203; '+(t('op.tab_batch')||'Batch Pick Sheet');
+  const rt=$('opTab-records');if(rt)rt.innerHTML=t('op.tab_records')||'&#128202; Records &amp; Stats';
+  lbl('opOrder','op.order_num');
+  lbl('opPackerSelect','op.packer_name');
+  lbl('opPickerSelect','op.picker_name');
+  lbl('opPackStation','op.pack_station');
+  ph('opFilterText','op.search');
+  // Over Pull card title
+  const opCardTitle=document.querySelector('#opPane-entry .card-title');
+  if(opCardTitle)opCardTitle.childNodes[0].textContent=t('op.new_entry');
+  const opItemsTitle=document.querySelectorAll('#opPane-entry .card-title')[1];
+  if(opItemsTitle)opItemsTitle.childNodes[0].textContent=t('op.items_title');
+  // Over Pull buttons
+  const opAddItem=document.querySelector('button[onclick="opAddLine()"]');
+  if(opAddItem)opAddItem.textContent=t('op.add_item');
+  const opClear=document.querySelector('button[onclick="opClearForm()"]');
+  if(opClear)opClear.textContent=t('op.clear');
+  const opSubmit=document.querySelector('button[onclick="opPromptMore()"]');
+  if(opSubmit)opSubmit.textContent=t('op.submit');
+  const opPrint=document.querySelector('button[onclick="printOverPullReport()"]');
+  if(opPrint)opPrint.textContent=t('op.print');
+  // More items prompt
+  const mw=$('opMoreWrap');
+  if(mw){
+    const q=mw.querySelector('div[style*="font-size:13px"]');if(q)q.textContent='❓ '+t('op.more_q');
+    const btns=mw.querySelectorAll('button');
+    if(btns[0])btns[0].textContent=t('op.yes_more');
+    if(btns[1])btns[1].textContent=t('op.no_submit');
+  }
+  // Op packer/picker select placeholders
+  ['opPackerSelect','opPickerSelect'].forEach((id,i)=>{
+    const sel=$(id);if(!sel||!sel.options.length)return;
+    if(sel.options[0]&&sel.options[0].value==='')
+      sel.options[0].textContent='— '+(i===0?t('op.packer_name'):t('op.picker_name'))+' —';
+  });
+  // Op dynamic item lines
+  document.querySelectorAll('.op-item-line').forEach(card=>{
+    const labels=card.querySelectorAll('label');
+    if(labels[0])labels[0].childNodes[0].textContent=t('op.product_code')+' ';
+    if(labels[1])labels[1].childNodes[0].textContent=t('op.qty')+' ';
+    if(labels[2])labels[2].childNodes[0].textContent=t('op.uom')+' ';
+  });
+  // Op records refresh
+  const opRefresh=document.querySelector('button[onclick="opLoadRecords(true)"]');
+  if(opRefresh)opRefresh.textContent=t('list.refresh');
+
+  // ── Picked Twice / Duplicate Pick modal ──
+  const ptOpenBtn=$('ptOpenBtnText');
+  if(ptOpenBtn)ptOpenBtn.innerHTML='&#9888; '+(t('dup.modal_btn')||'Report Duplicate Pick — Entire Order Picked Twice');
+  const ptMT=$('ptModalTitle');
+  if(ptMT)ptMT.innerHTML='&#9888; '+(t('dup.modal_title')||'Report: Order Picked Twice / Duplicate Pick');
+  const ptWD=$('ptWhatDoes');if(ptWD)ptWD.textContent=t('dup.what_does')||'What this does:';
+  const ptWDesc=$('ptWhatDesc');if(ptWDesc)ptWDesc.textContent=t('dup.what_desc')||'';
+  const ptPL=$('ptPickerLabel');
+  if(ptPL){ptPL.childNodes[0].textContent=(t('dup.picker_involved')||'Picker Involved')+' ';}
+  const ptNL=$('ptNotesLabel');
+  if(ptNL){ptNL.childNodes[0].textContent=(t('dup.notes_label')||'Notes / Details')+' ';}
+  const ptNotes=$('ptNotes');
+  if(ptNotes)ptNotes.placeholder=t('dup.notes_ph')||'Describe what happened...';
+  const ptSub=$('ptSubmitBtn');
+  if(ptSub)ptSub.innerHTML='&#9888; '+(t('dup.submit')||'Submit Duplicate Pick Report');
+  const ptCan=$('ptCancelBtn');
+  if(ptCan)ptCan.textContent=t('dup.cancel')||'Cancel';
+  // Also translate ptShift options (reuse form shift keys)
+  const ptSh=$('ptShift');
+  if(ptSh){
+    if(ptSh.options[0])ptSh.options[0].textContent=t('form.shift_auto');
+    if(ptSh.options[1])ptSh.options[1].textContent=t('form.shift_1st');
+    if(ptSh.options[2])ptSh.options[2].textContent=t('form.shift_2nd');
+    if(ptSh.options[3])ptSh.options[3].textContent=t('form.shift_wot');
+  }
+
+  // ── Batch Pick Sheet labels ──
   const bpCardTitle=document.querySelector('#opPane-batch .card-title');
-  if(bpCardTitle&&bpCardTitle.childNodes[0])bpCardTitle.childNodes[0].textContent=t('op.batch_title')+' ';
-  const bpSub=document.querySelector('#opPane-batch .notice');
+  if(bpCardTitle)bpCardTitle.childNodes[0].textContent=(t('op.batch_title')||'Batch Pick Details')+' ';
+  const bpOrdersTitle=document.querySelectorAll('#opPane-batch .card-title')[1];
+  if(bpOrdersTitle)bpOrdersTitle.childNodes[0].textContent=(t('op.batch_orders_title')||'Orders in this Batch Pick')+' ';
+  // Labels in batch pick form
+  const bpLabelMap={
+    'bpDate':t('form.date_time'),'bpDiv':t('form.division'),
+    'bpPickerSelect':t('form.picker'),'bpPackerSelect':t('form.packer')||t('op.packer_name')||'Packer',
+    'bpProduct':t('op.product_code'),'bpUom':t('op.uom'),'bpShift':t('form.shift_override'),
+    'bpNotes':t('form.notes'),
+  };
+  Object.entries(bpLabelMap).forEach(([id,lbl])=>{
+    const el=$(id);if(!el)return;
+    const field=el.closest('.field');if(!field)return;
+    const lab=field.querySelector('label');if(!lab)return;
+    lab.childNodes[0].textContent=lbl+' ';
+  });
   // Batch pick buttons
-  const bpAddBtn=document.querySelector('button[onclick="bpAddOrderLine()"]');if(bpAddBtn)bpAddBtn.textContent=t('op.batch_add_order');
-  const bpSubmitBtn=document.querySelector('button[onclick="saveBatchPick()"]');if(bpSubmitBtn)bpSubmitBtn.textContent=t('op.batch_submit');
-  const bpClearBtn=document.querySelector('button[onclick="bpClearForm()"]');if(bpClearBtn)bpClearBtn.textContent=t('form.clear_form');
-  // Batch pick select placeholders
-  const bpSh=$('bpShift');if(bpSh){optText(bpSh,0,'form.shift_auto');optText(bpSh,1,'form.shift_1st');optText(bpSh,2,'form.shift_2nd');optText(bpSh,3,'form.shift_wot');}
+  const bpAddBtn=document.querySelector('button[onclick="bpAddOrderLine()"]');
+  if(bpAddBtn)bpAddBtn.textContent=(t('op.batch_add_order')||'+ Add Order');
+  const bpClearBtn=document.querySelector('button[onclick="bpClearForm()"]');
+  if(bpClearBtn)bpClearBtn.textContent=t('form.clear_form')||'Clear Form';
+  const bpSubmitBtn=document.querySelector('button[onclick="saveBatchPick()"]');
+  if(bpSubmitBtn)bpSubmitBtn.textContent=(t('op.batch_submit')||'+ Log Batch Pick Shortage');
+  // Batch picker/packer select placeholders
+  ['bpPickerSelect','bpPackerSelect'].forEach((id,i)=>{
+    const sel=$(id);if(!sel||!sel.options.length)return;
+    if(sel.options[0]&&sel.options[0].value==='')sel.options[0].textContent=
+      '-- '+(i===0?t('form.picker'):t('form.packer'))+' --';
+  });
+  // Batch shift options
+  const bpSh=$('bpShift');
+  if(bpSh){optText(bpSh,0,'form.shift_auto');optText(bpSh,1,'form.shift_1st');optText(bpSh,2,'form.shift_2nd');optText(bpSh,3,'form.shift_wot');}
 
-  // Highlight active lang button
+  // ── Highlight active lang button ──
   ['en','es','fa','ar','fil'].forEach(l=>{
     const id='lang'+l.charAt(0).toUpperCase()+l.slice(1);
-    const btn=$(id);if(!btn)return;
-    btn.style.borderColor=l===currentLang?'var(--accent)':'';
-    btn.style.color=l===currentLang?'var(--accent)':'';
-    btn.style.fontWeight=l===currentLang?'700':'';
-    const lid='loginLang'+l.charAt(0).toUpperCase()+l.slice(1);
-    const lbtn=$(lid);if(!lbtn)return;
-    lbtn.style.borderColor=l===currentLang?'var(--accent)':'';
+    const btn=$(id);
+    if(!btn)return;
+    btn.style.borderColor=l===currentLang?'var(--accent)':'var(--border)';
+    btn.style.color=l===currentLang?'var(--accent)':'var(--muted)';
+    btn.style.fontWeight=l===currentLang?'700':'400';
   });
+
+  // Re-render shortage list to update translated button labels in rows
+  if(typeof renderShortages==='function'&&shortages.length)renderShortages();
 }
 
-/* ── DUPLICATE PICK MODAL ───────────────────────────── */
+
+/* ── PICKED TWICE / DUPLICATE PICK REPORT ─────────── */
 function openPickedTwiceModal(){
   const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());
   $('ptDate').value=d.toISOString().slice(0,16);
@@ -2635,14 +3111,24 @@ function openPickedTwiceModal(){
   const wrap=$('ptPickerNewWrap');if(wrap)wrap.style.display='none';
   const ptUnk=$('ptPickerUnknown');if(ptUnk)ptUnk.checked=false;
   const ptHint=$('ptOrderHint');if(ptHint){ptHint.style.display='none';}
-  // Pre-fill from Over Pull order field
+  // Pre-fill from Over Pull form fields if filled
   const d2=$('opOrder').value;
-  if(d2){$('ptDemand').value=d2;ptBlurOrder();}
-  // Populate picker select
+  if(d2){
+    $('ptDemand').value=d2;
+    ptBlurOrder(); // normalize + fill division
+  }
+  const pv=$('opPacker').value||$('opPackerNew').value||$('opPicker').value||$('opPickerNew').value;
+  // Populate picker dropdown
   const pickerOpts=['<option value="">-- Select Picker --</option>',
-    ...pickerNames.filter(n=>n!==UNKNOWN_PICKER).map(n=>`<option value="${esc(n)}">${esc(n)}</option>`),
-    '<option value="__new__">+ Add New Picker...</option>'].join('');
+    ...pickerNames.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`),
+    '<option value="__new__">+ Add New Picker...</option>'
+  ].join('');
   const ptSel=$('ptPickerSelect');if(ptSel)ptSel.innerHTML=pickerOpts;
+  // Pre-fill picker if we got a value from Over Pull form
+  if(pv&&ptSel){
+    const opt=[...ptSel.options].find(o=>o.value===normalizeName(pv));
+    if(opt){ptSel.value=opt.value;onPickerSelectChange('ptPickerSelect','ptPickerNew','ptPicker');}
+  }
   $('pickedTwiceOverlay').classList.add('open');
 }
 
@@ -2650,15 +3136,156 @@ function closePickedTwiceModal(){
   $('pickedTwiceOverlay').classList.remove('open');
 }
 
+function ptAutoDivision(){
+  const raw=($('ptDemand').value||'').trim();
+  const div=raw.replace(/[^A-Za-z]/g,'').slice(0,2).toUpperCase();
+  if(div.length===2)$('ptDiv').value=div;
+}
+
+function ptBlurOrder(){
+  const raw=($('ptDemand').value||'').trim();
+  if(!raw)return;
+  const result=normalizeOrderNumber(raw);
+  const hint=$('ptOrderHint');
+  if(result.ok){
+    $('ptDemand').value=result.val;
+    $('ptDiv').value=result.div;
+    $('ptDemand').style.borderColor='rgba(16,185,129,.6)';
+    if(hint){hint.textContent='';hint.style.display='none';}
+  } else {
+    $('ptDemand').style.borderColor='';
+    if(hint){hint.textContent='Format: NH.45433';hint.style.display='block';}
+    ptAutoDivision();
+  }
+}
+
+async function savePickedTwice(){
+  if(!ensureDb())return;
+  // Normalize order number first
+  ptBlurOrder();
+  const demand=($('ptDemand').value||'').trim().toUpperCase();
+  const div=($('ptDiv').value||'').trim().toUpperCase();
+  const notes=($('ptNotes').value||'').trim();
+  // Read picker from hidden, new input, or select
+  const ptSel=$('ptPickerSelect');
+  const pickerRaw=($('ptPicker').value||'').trim()||
+    ($('ptPickerNewWrap')?.style.display!=='none'?($('ptPickerNew')?.value||'').trim():'')||
+    (ptSel&&ptSel.value&&ptSel.value!=='__new__'?ptSel.value:'')||
+    ($('ptPickerUnknown')?.checked?UNKNOWN_PICKER:'');
+  const picker=normalizeName(pickerRaw)||pickerRaw;
+  if(!demand){alert('Order Number is required.');return;}
+  if(!div){alert('Division is required. Enter a valid order number like NH.45433.');return;}
+  if(!picker){alert('Please select a picker or check Unknown Picker.');return;}
+  if(!notes){alert('Notes are required — describe what happened.');return;}
+  const shiftV=(()=>{const ov=$('ptShift').value;if(ov&&ov!=='auto')return ov;return shiftValue();})();
+  showLoading('Saving duplicate pick report...');
+  try{
+    const s=getSettings();
+    const record={
+      type:'duplicate_pick',
+      source:'overpull_duplicate',
+      date:$('ptDate').value||nowLocalInput(),
+      orderNumber:demand,
+      pickDemand:demand,
+      division:div,
+      picker,
+      shift:shiftV,
+      notes,
+      createdAt:new Date().toISOString(),
+      createdBy:role||'overpull',
+      requiresInvestigation:true,
+    };
+    await db.collection(s.overpullCollection||'overpull_active').add(record);
+    hideLoading();
+    closePickedTwiceModal();
+    clearCaches();
+    alert('Duplicate pick report filed for order '+demand+'.');
+  }catch(e){hideLoading();console.error('[savePickedTwice] error:',e);alert('Save failed: '+e.message);}
+}
+
+/* ── GLOBAL RESET / FORCE RELOAD ALL CLIENTS ───────── */
+let _resetListener=null;
+
+function startResetListener(){
+  if(!db)return;
+  if(_resetListener){_resetListener();_resetListener=null;}
+  try{
+    _resetListener=db.collection('_system').doc('reset')
+      .onSnapshot(snap=>{
+        if(!snap.exists)return;
+        const ts=snap.data()?.resetAt;
+        if(!ts)return;
+        const key='scp_last_reset';
+        const last=localStorage.getItem(key);
+        if(last!==ts){
+          localStorage.setItem(key,ts);
+          // Don't reload on the very first load — only on subsequent signals
+          if(last){
+            setTimeout(()=>location.reload(),800);
+          }
+        }
+      });
+  }catch(e){console.warn('Reset listener failed:',e);}
+}
+
+async function testFirebaseConnection(){
+  showLoading('Testing Firebase connection...');
+  try{
+    // Re-init with current form values (not saved settings)
+    const cfg={
+      apiKey:$('cfgApiKey').value.trim(),
+      authDomain:$('cfgAuthDomain').value.trim(),
+      projectId:$('cfgProjectId').value.trim(),
+      storageBucket:$('cfgStorageBucket').value.trim(),
+      messagingSenderId:$('cfgSenderId').value.trim(),
+      appId:$('cfgAppId').value.trim(),
+    };
+    // Try connecting with these values
+    if(firebase.apps.length){firebase.apps.forEach(app=>{try{app.delete();}catch(x){}});}
+    firebase.initializeApp(cfg);
+    const testDb=firebase.firestore();
+    testDb.settings({ignoreUndefinedProperties:true});
+    // Try a read
+    const testSnap=await testDb.collection($('cfgActiveCollection').value.trim()||'shortages_active').limit(1).get();
+    db=testDb;
+    updateDbStatus(true);
+    hideLoading();
+    alert('✓ Connection successful!\n\nProject: '+cfg.projectId+'\nRead test: '+testSnap.size+' doc(s) returned.\n\nClick Save Settings to apply.');
+  }catch(e){
+    hideLoading();
+    db=null;
+    updateDbStatus(false,e.message);
+    alert('✗ Connection failed:\n\n'+e.message+'\n\nCheck your API key and Project ID.');
+  }
+}
+
+async function forceReloadAllClients(){
+  if(!canSettings()){alert('IC Manager access required.');return;}
+  if(!confirm('Force reload ALL open instances of this app on every computer?\n\nThis will refresh everyone\'s browser within ~2 seconds.'))return;
+  try{
+    showLoading('Sending reload signal...');
+    await db.collection('_system').doc('reset').set({
+      resetAt:new Date().toISOString(),
+      triggeredBy:role,
+      reason:'Manual force reload by IC Manager'
+    });
+    hideLoading();
+    alert('Reload signal sent. All open instances will refresh within a few seconds.');
+  }catch(e){hideLoading();alert('Failed: '+e.message);}
+}
+
+
 /* ── BATCH PICK SHEET ───────────────────────────────── */
 function bpInitForm(){
   const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());
   const dateEl=$('bpDate');if(dateEl)dateEl.value=d.toISOString().slice(0,16);
   ['bpProduct','bpNotes','bpPicker','bpPacker'].forEach(id=>{const el=$(id);if(el)el.value='';});
   ['bpDiv','bpUom','bpShift'].forEach(id=>{const el=$(id);if(el)el.value=id==='bpUom'?'EA':id==='bpShift'?'auto':'';});
-  ['bpPickerSelect','bpPackerSelect','bpPackStation'].forEach(id=>{const el=$(id);if(el){el.value='';el.disabled=false;el.style.opacity='';}});
-  ['bpPickerNewWrap','bpPackerNewWrap'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});
-  ['bpPickerUnknown','bpPackerUnknown'].forEach(id=>{const el=$(id);if(el)el.checked=false;});
+  ['bpPickerSelect','bpPackerSelect','bpPackStation'].forEach(id=>{const el=$(id);if(el){el.value='';el.disabled=false;el.style.opacity='';}})
+  ;['bpPickerNewWrap','bpPackerNewWrap'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});
+  ['bpPickerUnknown','bpPackerUnknown'].forEach(id=>{const el=$(id);if(el)el.checked=false;}); 
+  const sel=$('bpPickerSelect');if(sel)sel.value='';
+  const wrap=$('bpPickerNewWrap');if(wrap)wrap.style.display='none';
   const lines=$('bpOrderLines');if(lines){lines.innerHTML='';bpAddOrderLine();bpAddOrderLine();bpAddOrderLine();}
   const recent=$('bpRecentList');if(recent)recent.innerHTML='';
 }
@@ -2676,6 +3303,12 @@ function bpPopulatePickers(){
     const cur=psel.value;psel.innerHTML=popts;if(cur)psel.value=cur;
   }
 }
+function bpAutoDiv(input){
+  const raw=(input.value||'').replace('.','').slice(0,2).toUpperCase();
+  const divSel=$('bpDiv');
+  if(divSel&&!divSel.value&&raw.length===2&&/^[A-Z]{2}$/.test(raw))divSel.value=raw;
+}
+
 function bpAddOrderLine(data={}){
   const wrap=$('bpOrderLines');if(!wrap)return;
   const row=document.createElement('div');row.className='product-line-card bp-order-line';
@@ -2696,18 +3329,21 @@ function bpRemoveOrderLine(btn){
   if(rows.length<=1){alert('At least one order is required.');return;}
   btn.closest('.bp-order-line').remove();
 }
-function bpAutoDiv(input){
-  const raw=(input.value||'').replace('.','').slice(0,2).toUpperCase();
-  const divSel=$('bpDiv');
-  if(divSel&&!divSel.value&&raw.length===2&&/^[A-Z]{2}$/.test(raw))divSel.value=raw;
-}
 function bpNormalizeOrder(input){
   const raw=(input.value||'').trim();if(!raw)return;
   const result=normalizeOrderNumber(raw);
   if(result.ok){
-    input.value=result.val;input.style.borderColor='rgba(16,185,129,.6)';
-    const divSel=$('bpDiv');if(divSel&&!divSel.value&&result.div)divSel.value=result.div;
-  } else input.style.borderColor='';
+    input.value=result.val;
+    input.style.borderColor='rgba(16,185,129,.6)';
+    // Auto-fill division from first order line entered
+    const divSel=$('bpDiv');
+    if(divSel&&!divSel.value&&result.div)divSel.value=result.div;
+  } else {
+    input.style.borderColor='';
+    const div=raw.replace(/[^A-Za-z]/g,'').slice(0,2).toUpperCase();
+    const divSel=$('bpDiv');
+    if(divSel&&!divSel.value&&div)divSel.value=div;
+  }
   const div2=(result.ok?result.div:(raw.replace(/[^A-Za-z]/g,'').slice(0,2).toUpperCase()));
   const hint=input.closest('.bp-order-line')?.querySelector('.bp-div-hint');
   if(hint&&div2)hint.textContent='Div: '+div2;
@@ -2724,18 +3360,16 @@ async function saveBatchPick(){
   const bpSel=$('bpPickerSelect');
   const pickerVal=($('bpPicker').value||'').trim()||
     ($('bpPickerNewWrap')?.style.display!=='none'?($('bpPickerNew')?.value||'').trim():'')||
-    (bpSel&&bpSel.value&&bpSel.value!=='__new__'?bpSel.value:'')||
-    ($('bpPickerUnknown')?.checked?UNKNOWN_PICKER:'')||UNKNOWN_PICKER;
+    (bpSel&&bpSel.value&&bpSel.value!=='__new__'?bpSel.value:'')||UNKNOWN_PICKER;
   const bpkSel=$('bpPackerSelect');
   const packerVal=($('bpPacker').value||'').trim()||
     ($('bpPackerNewWrap')?.style.display!=='none'?($('bpPackerNew')?.value||'').trim():'')||
-    (bpkSel&&bpkSel.value&&bpkSel.value!=='__new__'?bpkSel.value:'')||
-    ($('bpPackerUnknown')?.checked?UNKNOWN_PICKER:'')||'';
-  const uom=($('bpUom')?.value||'EA');
-  const bpStation=($('bpPackStation')?.value||'');
-  const shOv=($('bpShift')?.value||'auto');
+    (bpkSel&&bpkSel.value&&bpkSel.value!=='__new__'?bpkSel.value:'')||'';
+  const uom=$('bpUom')?.value||'EA';
+  const shOv=$('bpShift')?.value||'auto';
   const shift=shOv==='auto'?shiftValue():shOv;
   const notes=($('bpNotes')?.value||'').trim();
+  const bpStation=($('bpPackStation')?.value||'');
   const orders=bpGetOrderLines();
   if(!product){alert('Product Code is required.');return;}
   if(!div){alert('Division is required.');return;}
@@ -2747,7 +3381,7 @@ async function saveBatchPick(){
   console.log('[saveBatchPick] called, db=',!!db);
   if(!ensureDb())return;
   console.log('[saveBatchPick] db ok, saving',orders.length,'orders');
-  showLoading('Logging '+orders.length+' batch pick over pulls...');
+  showLoading('Logging '+orders.length+' batch pick shortages...');
   try{
     const s=getSettings();
     const batch=db.batch();
@@ -2772,111 +3406,18 @@ async function saveBatchPick(){
     });
     await batch.commit();
     hideLoading();
-    const recentEl=$('bpRecentList');
-    if(recentEl)recentEl.innerHTML='<div class="card" style="border-color:rgba(167,139,250,.4);background:var(--purple-l)">'
-      +'<div style="font-size:13px;font-weight:700;color:var(--purple)">&#10003; Batch Pick Over Pull Logged</div>'
+    clearCaches();
+    const recent=$('bpRecentList');
+    if(recent)recent.innerHTML='<div class="card" style="border-color:rgba(167,139,250,.4);background:var(--purple-l)">'
+      +'<div style="font-size:13px;font-weight:700;color:var(--purple)">&#10003; Batch Pick Logged</div>'
       +'<div class="sr-meta" style="margin-top:6px">Product: <strong>'+esc(product)+'</strong> &bull; '+orders.length+' order(s)</div>'
       +'</div>';
-    setTimeout(()=>{if($('bpRecentList'))$('bpRecentList').innerHTML='';},6000);
-    alert('Logged '+orders.length+' over pull(s) for '+product+'.');
+    setTimeout(()=>{if($('bpRecentList'))$('bpRecentList').innerHTML='';},8000);
+    alert('Logged '+orders.length+' shortage(s) for '+product+'.');
     bpClearForm();
-  }catch(e){hideLoading();console.error('[saveBatchPick] error:',e);alert('Save failed: '+e.message);}
+    }catch(e){hideLoading();console.error('[saveBatchPick] error:',e);alert('Save failed: '+e.message);}
 }
 function bpClearForm(){bpInitForm();}
-
-/* ── DUPLICATE PICK / PICKED TWICE ─────────────────── */
-function ptAutoDivision(){
-  const raw=($('ptDemand').value||'').trim();
-  const div=raw.replace(/[^A-Za-z]/g,'').slice(0,2).toUpperCase();
-  if(div.length===2)$('ptDiv').value=div;
-}
-function ptBlurOrder(){
-  const raw=($('ptDemand').value||'').trim();if(!raw)return;
-  const result=normalizeOrderNumber(raw);
-  const hint=$('ptOrderHint');
-  if(result.ok){
-    $('ptDemand').value=result.val;$('ptDiv').value=result.div;
-    $('ptDemand').style.borderColor='rgba(16,185,129,.6)';
-    if(hint){hint.textContent='';hint.style.display='none';}
-  } else {
-    $('ptDemand').style.borderColor='';
-    if(hint){hint.textContent='Format: NH.45433';hint.style.display='block';}
-    ptAutoDivision();
-  }
-}
-async function savePickedTwice(){
-  if(!ensureDb())return;
-  ptBlurOrder();
-  const demand=($('ptDemand').value||'').trim().toUpperCase();
-  const div=($('ptDiv').value||'').trim().toUpperCase();
-  const notes=($('ptNotes').value||'').trim();
-  const ptSel=$('ptPickerSelect');
-  const pickerRaw=($('ptPicker').value||'').trim()||
-    ($('ptPickerNewWrap')?.style.display!=='none'?($('ptPickerNew')?.value||'').trim():'')||
-    (ptSel&&ptSel.value&&ptSel.value!=='__new__'?ptSel.value:'')||
-    ($('ptPickerUnknown')?.checked?UNKNOWN_PICKER:'');
-  const picker=normalizeName(pickerRaw)||pickerRaw;
-  if(!demand){alert('Order Number is required.');return;}
-  if(!div){alert('Division is required. Enter a valid order number like NH.45433.');return;}
-  if(!picker){alert('Please select a picker or check Unknown Picker.');return;}
-  if(!notes){alert('Notes are required — describe what happened.');return;}
-  const shiftV=(()=>{const ov=$('ptShift').value;if(ov&&ov!=='auto')return ov;return shiftValue();})();
-  showLoading('Saving duplicate pick report...');
-  try{
-    const s=getSettings();
-    const record={
-      type:'duplicate_pick',source:'overpull_duplicate',
-      date:$('ptDate').value||nowLocalInput(),
-      orderNumber:demand,pickDemand:demand,division:div,
-      picker,shift:shiftV,notes,
-      createdAt:new Date().toISOString(),createdBy:role||'overpull',requiresInvestigation:true,
-    };
-    await db.collection(s.overpullCollection||'overpull_active').add(record);
-    hideLoading();
-    closePickedTwiceModal();
-    clearCaches();
-    alert('Duplicate pick report filed for order '+demand+'.');
-  }catch(e){hideLoading();console.error('[savePickedTwice] error:',e);alert('Save failed: '+e.message);}
-}
-
-/* ── GLOBAL RESET / FORCE RELOAD ALL CLIENTS ───────── */
-let _resetListener=null;
-function startResetListener(){
-  if(!db)return;
-  if(_resetListener){_resetListener();_resetListener=null;}
-  try{
-    _resetListener=db.collection('_system').doc('reset')
-      .onSnapshot(snap=>{
-        if(!snap.exists)return;
-        const ts=snap.data()?.resetAt;if(!ts)return;
-        const key='scp_last_reset';const last=localStorage.getItem(key);
-        if(last!==ts){localStorage.setItem(key,ts);if(last){setTimeout(()=>location.reload(),800);}}
-      });
-  }catch(e){console.warn('Reset listener failed:',e);}
-}
-async function testFirebaseConnection(){
-  showLoading('Testing Firebase connection...');
-  try{
-    const cfg={apiKey:$('cfgApiKey').value.trim(),authDomain:$('cfgAuthDomain').value.trim(),
-      projectId:$('cfgProjectId').value.trim(),storageBucket:$('cfgStorageBucket').value.trim(),
-      messagingSenderId:$('cfgSenderId').value.trim(),appId:$('cfgAppId').value.trim()};
-    if(firebase.apps.length){firebase.apps[0].delete().catch(()=>{});}
-    firebase.initializeApp(cfg);
-    const testDb=firebase.firestore();testDb.settings({ignoreUndefinedProperties:true});
-    const testSnap=await testDb.collection($('cfgActiveCollection').value.trim()||'shortages_active').limit(1).get();
-    db=testDb;updateDbStatus(true);hideLoading();
-    alert('✓ Connection successful!\n\nProject: '+cfg.projectId+'\nRead test: '+testSnap.size+' doc(s) returned.\n\nClick Save Settings to apply.');
-  }catch(e){hideLoading();db=null;updateDbStatus(false,e.message);alert('✗ Connection failed:\n\n'+e.message);}
-}
-async function forceReloadAllClients(){
-  if(!canSettings()){alert('IC Manager access required.');return;}
-  if(!confirm('Force reload ALL open instances of this app on every computer?'))return;
-  try{
-    showLoading('Sending reload signal...');
-    await db.collection('_system').doc('reset').set({resetAt:new Date().toISOString(),triggeredBy:role});
-    hideLoading();alert('Reload signal sent. All open instances will refresh within a few seconds.');
-  }catch(e){hideLoading();alert('Failed: '+e.message);}
-}
 
 // Auto-uppercase product codes and order numbers typed into any matching input
 document.addEventListener('input',function(e){
@@ -2884,11 +3425,18 @@ document.addEventListener('input',function(e){
   if(!el||el.tagName!=='INPUT')return;
   const cls=el.className||'';
   if(cls.includes('bp-order')||cls.includes('op-product')||cls.includes('line-product')||cls.includes('line-bin')||el.id==='opOrder'||el.id==='bpProduct'||el.id==='sDemand'||el.id==='ptDemand'){
-    const pos=el.selectionStart;el.value=el.value.toUpperCase();try{el.setSelectionRange(pos,pos);}catch(x){}
+    const pos=el.selectionStart;
+    el.value=el.value.toUpperCase();
+    try{el.setSelectionRange(pos,pos);}catch(x){}
   }
 });
 
-function startup(){applyTheme();initFirebase();$('sDate').value=nowLocalInput();loadAllPersonnel();populatePickerSelects();populateStationSelects();if($('productLines'))addProductLine();const sl=localStorage.getItem('scp_lang')||'en';setLang(sl);startResetListener();}
+function startup(){
+  if(!localStorage.getItem('scp_read_date')||localStorage.getItem('scp_read_date')!==new Date().toDateString()){
+    localStorage.setItem('scp_reads_today','0');
+    localStorage.setItem('scp_read_date',new Date().toDateString());
+  }
+  applyTheme();initFirebase();$('sDate').value=nowLocalInput();loadAllPersonnel();populatePickerSelects();populateStationSelects();if($('productLines'))addProductLine();const sl=localStorage.getItem('scp_lang')||'en';setLang(sl);startResetListener();}
 startup();
 </script>
 </body>
