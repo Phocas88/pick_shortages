@@ -171,7 +171,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 <button class="btn" style="font-size:11px;padding:5px 10px;background:#fff;border-color:#d4d9e8;color:#1a2038" onclick="setLang('fil')" id="loginLangFil"><span style="font-weight:700">FIL</span> Filipino</button>
 </div></div></div><div class="login-group-label">Select role</div><div class="ic-btns"><button class="ic-login-btn" onclick="goPin('clerk')"><span class="ib-icon">&#128203;</span><span class="ib-title">Outbound Clerk</span><span class="ib-sub">Shortage Entry</span></button><button class="ic-login-btn" onclick="goPin('icteam')"><span class="ib-icon">&#128270;</span><span class="ib-title">IC Team</span><span class="ib-sub">Verify and Report</span></button><button class="ic-login-btn" onclick="goPin('manager')"><span class="ib-icon">&#9881;&#65039;</span><span class="ib-title">IC Manager</span><span class="ib-sub">Settings and Migration</span></button></div><div class="login-group-label" style="margin-top:16px">No Login Required</div><div style="display:grid;grid-template-columns:1fr;gap:10px"><button class="ic-login-btn" onclick="enterOverPull()" style="border-color:rgba(251,146,60,.4);background:var(--orange-l)"><span class="ib-icon">&#128202;</span><span class="ib-title" style="color:var(--orange)">Over Pull Log</span><span class="ib-sub">Operations — no PIN needed</span></button></div></div></section>
 <section id="pinScreen" class="screen"><div class="pin-card"><div id="pinBadge" class="pin-div-badge">Role</div><p style="color:var(--muted);font-size:12px">Enter PIN</p><div id="pinDots" class="pin-dots"><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span></div><div class="pin-keypad"><button class="pin-key" data-key="1" onclick="pinKey('1')">1</button><button class="pin-key" data-key="2" onclick="pinKey('2')">2</button><button class="pin-key" data-key="3" onclick="pinKey('3')">3</button><button class="pin-key" data-key="4" onclick="pinKey('4')">4</button><button class="pin-key" data-key="5" onclick="pinKey('5')">5</button><button class="pin-key" data-key="6" onclick="pinKey('6')">6</button><button class="pin-key" data-key="7" onclick="pinKey('7')">7</button><button class="pin-key" data-key="8" onclick="pinKey('8')">8</button><button class="pin-key" data-key="9" onclick="pinKey('9')">9</button><button class="pin-key clr" onclick="pinClear()">CLR</button><button class="pin-key" data-key="0" onclick="pinKey('0')">0</button><button class="pin-key clr" onclick="pinBack()">&#9003;</button></div><div id="pinError" class="pin-error"></div><button class="pin-back-btn" onclick="backToLogin()">Back</button></div></section>
-<section id="shortageScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Outbound</div><h1>Shortage Entry</h1><p>Log shortage lines and review active records.</p></div><div id="shortageTopActions" class="actions"></div></div><div class="card" id="entryCard"><div class="form-row four"><div class="field"><label>Date &amp; Time</label><input id="sDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="sDiv"><option value="">Select</option><option value="NH">NH</option><option value="GT">GT</option><option value="FS">FS</option><option value="EE">EE</option><option value="BC">BC</option><option value="CF">CF</option><option value="VP">VP – VIP</option><option value="TP">TP – Transpac</option></select></div><div class="field"><label>Picker <em>*</em></label><select id="sPickerSelect" onchange="onPickerSelectChange('sPickerSelect','sPickerNew','sPicker')"><option value="">-- Select Picker --</option></select><div id="sPickerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="sPickerNew" placeholder="FirstInitialLastName e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('sPickerNew','picker');syncNewPersonToHidden('sPickerNew','sPicker')" onblur="validatePersonField('sPickerNew','picker');syncNewPersonToHidden('sPickerNew','sPicker')" onkeydown="handleSuggestKey(event,'sPickerNewSuggest')"><div class="suggest-box" id="sPickerNewSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name</div></div><input id="sPicker" type="hidden"></div><div class="field"><label>Pack Station</label><select id="sPackStation"><option value="">-- Select Station --</option></select></div><div class="field"><label>Pick Demand # <em>*</em></label><input id="sDemand" placeholder="e.g. NH00012345" oninput="autoDivisionFromDemand()"></div><div class="field"><label>Shift Override</label><select id="sShift"><option value="auto">Auto (use current time)</option><option value="1st">1st</option><option value="2nd">2nd</option><option value="3rd">3rd</option></select></div></div><div class="card-title">Product Lines</div><div id="productLines"></div><div class="actions"><button class="btn" onclick="addProductLine()">+ Add Line</button><button class="btn" onclick="clearEntry()">Clear Form</button><button class="btn primary" style="flex:1" onclick="saveShortage()">+ Log All Shortages</button></div><div class="field" style="margin-top:12px"><label>Notes</label><textarea id="sNotes"></textarea></div></div><div class="filters"><input id="filterText" class="search" placeholder="Search by product, order, picker, division..." oninput="renderShortages()"><select id="viewMode" onchange="loadShortages(true)"><option value="active">Active</option><option value="archive">Archived History</option><option value="both">Active + Archived</option></select><input id="filterStart" type="date" onchange="renderShortages()"><input id="filterEnd" type="date" onchange="renderShortages()"><button class="btn" onclick="loadShortages(true)">Refresh Data</button></div><div id="archiveActions" class="actions" style="margin-bottom:10px"></div><div id="shortageList" class="shortage-list"></div></div></section>
+<section id="shortageScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Outbound</div><h1>Shortage Entry</h1><p>Log shortage lines and review active records.</p></div><div id="shortageTopActions" class="actions"></div></div><div class="card" id="entryCard"><div class="form-row four"><div class="field"><label>Date &amp; Time</label><input id="sDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="sDiv"><option value="">Select</option><option value="NH">NH</option><option value="GT">GT</option><option value="FS">FS</option><option value="EE">EE</option><option value="BC">BC</option><option value="CF">CF</option><option value="VP">VP – VIP</option><option value="TP">TP – Transpac</option></select></div><div class="field"><label>Picker <em>*</em></label><select id="sPickerSelect" onchange="onPickerSelectChange('sPickerSelect','sPickerNew','sPicker')"><option value="">-- Select Picker --</option></select><div id="sPickerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="sPickerNew" placeholder="FirstInitialLastName e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('sPickerNew','picker');syncNewPersonToHidden('sPickerNew','sPicker')" onblur="validatePersonField('sPickerNew','picker');syncNewPersonToHidden('sPickerNew','sPicker')" onkeydown="handleSuggestKey(event,'sPickerNewSuggest')"><div class="suggest-box" id="sPickerNewSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name</div></div><input id="sPicker" type="hidden"></div><div class="field"><label>Pack Station</label><select id="sPackStation"><option value="">-- Select Station --</option></select></div><div class="field"><label>Pick Demand # <em>*</em></label><input id="sDemand" placeholder="e.g. NH00012345" oninput="autoDivisionFromDemand()"></div><div class="field"><label>Shift Override</label><select id="sShift"><option value="auto">Auto (use current time)</option><option value="1st">1st Shift (6am–3:30pm)</option><option value="2nd">2nd Shift (3:30pm–12am)</option><option value="weekend_ot">Weekend OT (6am–12am)</option></select></div></div><div class="card-title">Product Lines</div><div id="productLines"></div><div class="actions"><button class="btn" onclick="addProductLine()">+ Add Line</button><button class="btn" onclick="clearEntry()">Clear Form</button><button class="btn primary" style="flex:1" onclick="saveShortage()">+ Log All Shortages</button></div><div class="field" style="margin-top:12px"><label>Notes</label><textarea id="sNotes"></textarea></div></div><div class="filters"><input id="filterText" class="search" placeholder="Search by product, order, picker, division..." oninput="renderShortages()"><select id="viewMode" onchange="loadShortages(true)"><option value="active">Active</option><option value="archive">Archived History</option><option value="both">Active + Archived</option></select><input id="filterStart" type="date" onchange="renderShortages()"><input id="filterEnd" type="date" onchange="renderShortages()"><button class="btn" onclick="loadShortages(true)">Refresh Data</button></div><div id="archiveActions" class="actions" style="margin-bottom:10px"></div><div id="shortageList" class="shortage-list"></div></div></section>
 <section id="reportScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Reports</div><h1>Shortage Reports</h1><p>IC Team and IC Manager only.</p></div><div class="actions"><button class="btn primary" onclick="printSummaryReport()">Print Summary</button><button class="btn" onclick="printCheckReport()">Print IC Check Sheet</button></div></div><div class="card"><div class="form-row four"><div class="field"><label>Report Mode</label><select id="reportMode"><option value="active">Active Only</option><option value="archive">Archived History</option><option value="both">Active + Archived</option></select></div><div class="field"><label>Start Date</label><input id="reportStart" type="date"></div><div class="field"><label>End Date</label><input id="reportEnd" type="date"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="runReportPull()">Run Report</button></div></div></div><div id="reportBody"></div></div></section>
 <section id="restockScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Replenishment</div><h1>Replenishment Report</h1><p>IC Manager only.</p></div><button class="btn primary" onclick="printReplenReport()">Print</button></div><div class="card"><div class="card-title">Inventory Bin Report Import</div><p class="notice">Paste report columns: Bin Name, Product Code, Qty on Hand, Qty Allocated, Unit of Measure.</p><textarea id="binImport" style="width:100%;min-height:160px" placeholder="82-26-01&#9;DI1210&#9;12&#9;0&#9;EA"></textarea><div class="actions" style="margin-top:10px"><button class="btn primary" onclick="saveInventoryBinReport()">Import Bin Report</button></div></div><div id="restockBody"></div></div></section>
 <section id="pickerScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Personnel</div><h1>Manage Pickers &amp; Packers</h1><p>IC Manager only. Names stored as FirstInitialLastName (e.g. JDoe).</p></div></div><div class="card"><div class="card-title">Pickers</div><div class="form-row two"><div class="field"><label>Picker Name (FirstInitialLastName)</label><input id="pickerName" placeholder="JDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPickerManual()">Add Picker</button></div></div><div id="pickerList"></div></div><div class="card"><div class="card-title">Packers</div><div class="form-row two"><div class="field"><label>Packer Name (FirstInitialLastName)</label><input id="packerName" placeholder="MDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackerManual()">Add Packer</button></div></div><div id="packerList"></div></div><div class="card"><div class="card-title">Pack Stations</div><div class="form-row two"><div class="field"><label>Pack Station Name</label><input id="packStationName" placeholder="PS-01"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackStationManual()">Add Station</button></div></div><div id="packStationList"></div></div></div></section>
@@ -236,7 +236,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
   </div>
 
 </div></section>
-<div id="pickedTwiceOverlay" class="overlay"><div class="modal"><div class="modal-head"><h3 id="ptModalTitle">&#9888; Report: Order Picked Twice / Duplicate Pick</h3><button onclick="closePickedTwiceModal()">&#215;</button></div><div class="modal-body"><div class="notice" style="background:var(--orange-l);border-color:rgba(251,146,60,.35);margin-bottom:16px"><b id="ptWhatDoes">What this does:</b> <span id="ptWhatDesc">Flags an entire order as having been picked twice (over-pulled). No product lines needed — the whole order must be returned and investigated. This creates a Duplicate Pick record for IC and management review.</span></div><div class="form-row two"><div class="field"><label>Date &amp; Time <em>*</em></label><input id="ptDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="ptDiv"><option value="">Select</option><option value="NH">NH</option><option value="GT">GT</option><option value="FS">FS</option><option value="EE">EE</option><option value="BC">BC</option><option value="CF">CF</option><option value="VP">VP – VIP</option><option value="TP">TP – Transpac</option></select></div><div class="field"><label>Pick Demand # <em>*</em></label><input id="ptDemand" placeholder="e.g. NH00012345" oninput="ptAutoDivision()"></div><div class="field"><label id="ptPickerLabel">Picker Involved <em>*</em></label><select id="ptPickerSelect" onchange="onPickerSelectChange('ptPickerSelect','ptPickerNew','ptPicker')"><option value="">-- Select Picker --</option></select><div id="ptPickerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="ptPickerNew" placeholder="e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('ptPickerNew','picker');syncNewPersonToHidden('ptPickerNew','ptPicker')" onblur="validatePersonField('ptPickerNew','picker');syncNewPersonToHidden('ptPickerNew','ptPicker')" onkeydown="handleSuggestKey(event,'ptPickerNewSuggest')"><div class="suggest-box" id="ptPickerNewSuggest" style="display:none"></div></div></div><input id="ptPicker" type="hidden"></div></div><div class="field"><label>Shift</label><select id="ptShift"><option value="auto">Auto (use current time)</option><option value="1st">1st</option><option value="2nd">2nd</option><option value="3rd">3rd</option></select></div><div class="field"><label id="ptNotesLabel">Notes / Details <em>*</em></label><textarea id="ptNotes" placeholder="Describe what happened — where was the duplicate pick found, who reported it, what action was taken..."></textarea></div><div class="actions" style="margin-top:8px"><button class="btn primary" onclick="savePickedTwice()" id="ptSubmitBtn">&#9888; Submit Duplicate Pick Report</button><button class="btn" onclick="closePickedTwiceModal()" id="ptCancelBtn">Cancel</button></div></div></div></div>
+<div id="pickedTwiceOverlay" class="overlay"><div class="modal"><div class="modal-head"><h3 id="ptModalTitle">&#9888; Report: Order Picked Twice / Duplicate Pick</h3><button onclick="closePickedTwiceModal()">&#215;</button></div><div class="modal-body"><div class="notice" style="background:var(--orange-l);border-color:rgba(251,146,60,.35);margin-bottom:16px"><b id="ptWhatDoes">What this does:</b> <span id="ptWhatDesc">Flags an entire order as having been picked twice (over-pulled). No product lines needed — the whole order must be returned and investigated. This creates a Duplicate Pick record for IC and management review.</span></div><div class="form-row two"><div class="field"><label>Date &amp; Time <em>*</em></label><input id="ptDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="ptDiv"><option value="">Select</option><option value="NH">NH</option><option value="GT">GT</option><option value="FS">FS</option><option value="EE">EE</option><option value="BC">BC</option><option value="CF">CF</option><option value="VP">VP – VIP</option><option value="TP">TP – Transpac</option></select></div><div class="field"><label>Pick Demand # <em>*</em></label><input id="ptDemand" placeholder="e.g. NH00012345" oninput="ptAutoDivision()"></div><div class="field"><label id="ptPickerLabel">Picker Involved <em>*</em></label><select id="ptPickerSelect" onchange="onPickerSelectChange('ptPickerSelect','ptPickerNew','ptPicker')"><option value="">-- Select Picker --</option></select><div id="ptPickerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="ptPickerNew" placeholder="e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('ptPickerNew','picker');syncNewPersonToHidden('ptPickerNew','ptPicker')" onblur="validatePersonField('ptPickerNew','picker');syncNewPersonToHidden('ptPickerNew','ptPicker')" onkeydown="handleSuggestKey(event,'ptPickerNewSuggest')"><div class="suggest-box" id="ptPickerNewSuggest" style="display:none"></div></div></div><input id="ptPicker" type="hidden"></div></div><div class="field"><label>Shift</label><select id="ptShift"><option value="auto">Auto (use current time)</option><option value="1st">1st Shift (6am–3:30pm)</option><option value="2nd">2nd Shift (3:30pm–12am)</option><option value="weekend_ot">Weekend OT (6am–12am)</option></select></div><div class="field"><label id="ptNotesLabel">Notes / Details <em>*</em></label><textarea id="ptNotes" placeholder="Describe what happened — where was the duplicate pick found, who reported it, what action was taken..."></textarea></div><div class="actions" style="margin-top:8px"><button class="btn primary" onclick="savePickedTwice()" id="ptSubmitBtn">&#9888; Submit Duplicate Pick Report</button><button class="btn" onclick="closePickedTwiceModal()" id="ptCancelBtn">Cancel</button></div></div></div></div>
 <div id="editOverlay" class="overlay"><div class="modal"><div class="modal-head"><h3>Edit Shortage</h3><button onclick="closeEdit()">&#215;</button></div><div id="editBody" class="modal-body"></div></div></div>
 <div id="icConfirmOverlay" class="ic-confirm-overlay">
   <div class="ic-confirm-modal">
@@ -475,7 +475,20 @@ function autoDivisionFromDemand(){const div=demandDivision($('sDemand').value);i
 function addProductLine(data={}){const wrap=$('productLines');const row=document.createElement('div');row.className='product-line-card';row.innerHTML=`<div class="product-line-grid"><div class="field"><label>Product Code <em>*</em></label><input class="line-product" placeholder="E.G. DI1210" value="${esc(data.productCode||'')}"></div><div class="field"><label>Qty (Each) <em>*</em></label><input class="line-qty" type="number" min="0" step="1" value="${esc(data.qtyShorted??0)}"></div><div class="field"><label>Bin Shorted <em>*</em></label><div class="bin-input-wrap"><input class="line-bin" placeholder="82-26-01 / P12345 / BULK" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" value="${esc(data.shortedBin||'')}" oninput="liveBinValidate(this)" onblur="strictBinValidate(this)"><span class="bin-valid-icon"></span></div><div class="bin-format-hint">##-##-## &nbsp;·&nbsp; ##-##-# &nbsp;·&nbsp; P##### &nbsp;·&nbsp; BULK &nbsp;·&nbsp; ROOM &nbsp;·&nbsp; KEY ACCOUNT</div><div class="bin-format-err"></div></div><button class="btn remove-line-btn" onclick="removeProductLine(this)">&times;</button></div>`;wrap.appendChild(row);if(data.shortedBin){const binEl=row.querySelector('.line-bin');liveBinValidate(binEl);};}
 function removeProductLine(btn){const rows=$('productLines').querySelectorAll('.product-line-card');if(rows.length<=1){alert('At least one product line is required.');return}btn.closest('.product-line-card').remove()}
 function getProductLines(){return [...$('productLines').querySelectorAll('.product-line-card')].map(row=>({productCode:row.querySelector('.line-product').value.trim().toUpperCase(),qtyShorted:num(row.querySelector('.line-qty').value),shortedBin:row.querySelector('.line-bin').value.trim().toUpperCase()})).filter(x=>x.productCode||x.shortedBin||x.qtyShorted)}
-function shiftValue(){const ov=$('sShift').value;if(ov&&ov!=='auto')return ov;const h=new Date().getHours();if(h>=6&&h<14)return '1st';if(h>=14&&h<22)return '2nd';return '3rd'}
+function shiftValue(){
+  const ov=$('sShift').value;
+  if(ov&&ov!=='auto')return ov;
+  const now=new Date();
+  const h=now.getHours(),m=now.getMinutes();
+  const day=now.getDay(); // 0=Sun, 6=Sat
+  const isWeekend=(day===0||day===6);
+  const minsSinceMidnight=h*60+m;
+  const start6am=6*60, end330pm=15*60+30, end12am=24*60;
+  if(isWeekend&&minsSinceMidnight>=start6am&&minsSinceMidnight<end12am)return 'weekend_ot';
+  if(minsSinceMidnight>=start6am&&minsSinceMidnight<end330pm)return '1st';
+  if(minsSinceMidnight>=end330pm)return '2nd';
+  return '2nd'; // overnight (12am-6am) counts as tail end of 2nd
+}
 function validatePickerInput(){const raw=($('sPicker').value||'').trim();if(!raw)return;const exists=pickerNames.some(p=>p.toLowerCase()===raw.toLowerCase());if(exists){const found=pickerNames.find(p=>p.toLowerCase()===raw.toLowerCase());$('sPicker').value=found;return}const ok=confirm(`Picker "${raw}" is not saved. Create this picker?`);if(!ok){$('sPicker').value='';return}const full=prompt('Confirm picker name to save:',raw);if(!full){$('sPicker').value='';return}pickerNames=[...new Set([...pickerNames,full.trim()])].sort();localStorage.setItem('scp_pickers',JSON.stringify(pickerNames));loadPickerNames();$('sPicker').value=full.trim()}
 function cacheKey(mode){return 'scp_cache_'+mode}function useCache(mode){try{const c=JSON.parse(localStorage.getItem(cacheKey(mode))||'null');if(c&&Date.now()-c.t<5*60*1000){shortages=c.rows;lastLoadMode=mode;renderShortages();return true}}catch(e){}return false}
 function normalizeShortage(raw,id,arch){
@@ -616,20 +629,29 @@ async function unarchiveOne(id){if(!canManage()){alert('IC Manager access requir
 function reportStats(rows){return {total:rows.length,confirmed:rows.filter(r=>r.icConfirmed==='confirmed_short').length,err:rows.filter(r=>r.foundInShortedBin||r.icConfirmed==='erroneous').length,backorder:rows.filter(isBackorderRisk).length,second:rows.filter(r=>r.secondLocationFilled||r.icConfirmed==='second_location').length,replen:rows.filter(r=>r.replenishedAfterPick).length,archived:rows.filter(r=>r._archived).length,pending:rows.filter(r=>!r.icConfirmed&&!r.foundInShortedBin&&!r.secondLocationFilled).length}}
 function table(headers,rows){if(!rows.length)return '<div class="empty">No records found.</div>';return `<div style="overflow:auto"><table class="table"><thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`}
 
-// Shift helper: 1=1st (6am-3:30pm), 2=2nd (3:30pm-midnight/overnight)
+// Shift helper: 1=1st (6am-3:30pm), 2=2nd (3:30pm-midnight), 3=Weekend OT (6am-12am)
 function getShiftNum(dateStr){
   const d=new Date(dateStr);
   if(isNaN(d))return 0;
   const h=d.getHours(),m=d.getMinutes();
-  if(h>=6&&(h<15||(h===15&&m<30)))return 1;
-  return 2;
+  const day=d.getDay();
+  const isWeekend=(day===0||day===6);
+  const mins=h*60+m;
+  if(isWeekend&&mins>=360)return 3; // Weekend OT
+  if(mins>=360&&mins<930)return 1;  // 6am-3:30pm
+  if(mins>=930)return 2;            // 3:30pm-midnight
+  return 2; // overnight
 }
 function getShiftFromRecord(r){
   const sv=r.shift||'';
   if(sv==='1st'||sv===1||sv==='1')return 1;
   if(sv==='2nd'||sv===2||sv==='2')return 2;
-  if(sv==='3rd'||sv===3||sv==='3')return 2; // treat 3rd as 2nd for reporting
+  if(sv==='weekend_ot'||sv==='3rd'||sv===3||sv==='3')return 3;
   return getShiftNum(r.date||r.createdAt||'');
+}
+function shiftLabel(r){
+  const s=getShiftFromRecord(r);
+  return s===1?'1st Shift':s===3?'Weekend OT':'2nd Shift';
 }
 function hasSecondLocationEvidence(r){
   const locs=Array.isArray(r.secondaryLocations)?r.secondaryLocations:[];
@@ -650,7 +672,7 @@ function renderReports(){
   // by division
   const divs=[...new Set(rows.map(r=>r.division))].filter(Boolean).sort();
   const byDiv={};
-  divs.forEach(d=>{byDiv[d]={total:0,s1:0,s2:0,located:0,erroneous:0,notLoc:0};});
+  divs.forEach(d=>{byDiv[d]={total:0,s1:0,s2:0,swot:0,located:0,erroneous:0,notLoc:0};});
   rows.forEach(r=>{
     const d=r.division||'??';
     if(!byDiv[d])byDiv[d]={total:0,s1:0,s2:0,located:0,erroneous:0,notLoc:0};
@@ -681,7 +703,7 @@ function renderReports(){
     byDay[ds].total++;
     if(r.foundInShortedBin)byDay[ds].erroneous++;
     else if(r.secondLocationFilled)byDay[ds].located++;
-    if(getShiftFromRecord(r)===1)byDay[ds].s1++;else byDay[ds].s2++;
+    const _dsh=getShiftFromRecord(r);if(_dsh===1)byDay[ds].s1++;else if(_dsh===3)byDay[ds].swot=((byDay[ds].swot||0)+1);else byDay[ds].s2++;
   });
 
   function pct(a,b){return b?Math.round(a/b*100)+'%':'—';}
@@ -698,7 +720,7 @@ function renderReports(){
 
   const dayTableRows=Object.keys(byDay).sort().map((d,i)=>{
     const row=byDay[d];const bg=i%2===0?'':' style="background:rgba(255,255,255,.03)"';
-    return `<tr${bg}><td>${esc(d)}</td><td>${row.total}</td><td>${row.s1}</td><td>${row.s2}</td><td style="color:var(--green);font-weight:600">${row.located}</td><td style="color:var(--yellow);font-weight:600">${row.erroneous}</td></tr>`;
+    return `<tr${bg}><td>${esc(d)}</td><td>${row.total}</td><td>${row.s1}</td><td>${row.s2}</td><td style="color:var(--purple);font-weight:600">${row.swot||0}</td><td style="color:var(--green);font-weight:600">${row.located}</td><td style="color:var(--yellow);font-weight:600">${row.erroneous}</td></tr>`;
   }).join('');
 
   $('reportBody').innerHTML=`
@@ -709,8 +731,9 @@ function renderReports(){
       <div class="stat-card" style="border-color:rgba(16,185,129,.3)"><div class="stat-num" style="color:var(--green)">${st.second}</div><div class="stat-lbl">2nd Location Found</div></div>
       <div class="stat-card" style="border-color:rgba(245,158,11,.3)"><div class="stat-num" style="color:var(--yellow)">${st.err} <span style="font-size:12px">(${pct(st.err,st.total)})</span></div><div class="stat-lbl">&#9888; Erroneous Shorts</div></div>
       <div class="stat-card" style="border-color:rgba(220,38,38,.4);background:rgba(220,38,38,.07)"><div class="stat-num" style="color:var(--red)">${st.backorder}</div><div class="stat-lbl">Erroneous Backorders</div></div>
-      <div class="stat-card"><div class="stat-num">${rows.filter(r=>getShiftFromRecord(r)===1).length}</div><div class="stat-lbl">1st Shift</div></div>
-      <div class="stat-card"><div class="stat-num">${rows.filter(r=>getShiftFromRecord(r)===2).length}</div><div class="stat-lbl">2nd Shift</div></div>
+      <div class="stat-card"><div class="stat-num">${rows.filter(r=>getShiftFromRecord(r)===1).length}</div><div class="stat-lbl">1st Shift (6am–3:30pm)</div></div>
+      <div class="stat-card"><div class="stat-num">${rows.filter(r=>getShiftFromRecord(r)===2).length}</div><div class="stat-lbl">2nd Shift (3:30pm–12am)</div></div>
+      <div class="stat-card"><div class="stat-num">${rows.filter(r=>getShiftFromRecord(r)===3).length}</div><div class="stat-lbl">Weekend OT</div></div>
     </div>
     <div class="card no-break">
       <div class="card-title">Division &amp; Shift Breakdown</div>
@@ -749,6 +772,7 @@ function printSummaryReport(){
   const notLoc=rows.filter(r=>!r.secondLocationFilled&&!r.foundInShortedBin).length;
   const shift1c=rows.filter(r=>getShiftFromRecord(r)===1).length;
   const shift2c=rows.filter(r=>getShiftFromRecord(r)===2).length;
+  const shiftWotc=rows.filter(r=>getShiftFromRecord(r)===3).length;
   const locPct=total?Math.round(located2nd/total*100):0;
   const errPct=total?Math.round(erroneous/total*100):0;
   function pct(a,b){return b?Math.round(a/b*100)+'%':'—';}
@@ -758,7 +782,7 @@ function printSummaryReport(){
   divs.forEach(d=>{byDiv[d]={total:0,s1:0,s2:0,located:0,erroneous:0,notLoc:0};});
   rows.forEach(r=>{
     const d=r.division||'??';if(!byDiv[d])byDiv[d]={total:0,s1:0,s2:0,located:0,erroneous:0,notLoc:0};
-    byDiv[d].total++;if(getShiftFromRecord(r)===1)byDiv[d].s1++;else byDiv[d].s2++;
+    byDiv[d].total++;const _sh=getShiftFromRecord(r);if(_sh===1)byDiv[d].s1++;else if(_sh===3)byDiv[d].swot=((byDiv[d].swot||0)+1);else byDiv[d].s2++;
     if(r.foundInShortedBin)byDiv[d].erroneous++;else if(r.secondLocationFilled)byDiv[d].located++;else byDiv[d].notLoc++;
   });
   const byPicker={};
@@ -794,16 +818,16 @@ function printSummaryReport(){
     </div>
     <div style="font-size:8pt;font-weight:700;color:#374151;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #e5e7eb;padding-bottom:4pt;margin-bottom:10pt">Executive Summary</div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8pt;margin-bottom:18pt">
-      ${[['Total Shortages',total,'#1a2038'],['2nd Location Found',located2nd+'  ('+locPct+'%)','#047857'],['⚠ Erroneous Shorts',erroneous+'  ('+errPct+'%)','#92400e'],['Erroneous Backorders',errFullyShorted,'#b91c1c'],['Not Located',notLoc,'#b91c1c'],['1st Shift',shift1c,'#1d4ed8'],['2nd Shift',shift2c,'#1d4ed8'],['Replenished After Pick',rows.filter(r=>r.replenishedAfterPick).length,'#047857']].map(([lbl,val,color])=>`
+      ${[['Total Shortages',total,'#1a2038'],['2nd Location Found',located2nd+'  ('+locPct+'%)','#047857'],['⚠ Erroneous Shorts',erroneous+'  ('+errPct+'%)','#92400e'],['Erroneous Backorders',errFullyShorted,'#b91c1c'],['Not Located',notLoc,'#b91c1c'],['1st Shift (6am–3:30pm)',shift1c,'#1d4ed8'],['2nd Shift (3:30pm–12am)',shift2c,'#1d4ed8'],['Weekend OT (6am–12am)',shiftWotc,'#7c3aed'],['Replenished After Pick',rows.filter(r=>r.replenishedAfterPick).length,'#047857']].map(([lbl,val,color])=>`
         <div style="border:1pt solid #d1d5db;border-radius:4pt;padding:10pt;background:#f9fafb;text-align:center;break-inside:avoid">
           <div style="font-size:20pt;font-weight:700;color:${color};line-height:1.1">${val}</div>
           <div style="font-size:7pt;color:#6b7280;margin-top:3pt;text-transform:uppercase;letter-spacing:.06em">${lbl}</div>
         </div>`).join('')}
     </div>
     <div style="font-size:8pt;font-weight:700;color:#374151;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #e5e7eb;padding-bottom:4pt;margin:14pt 0 8pt">Division &amp; Shift Breakdown</div>
-    <table style="width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:16pt"><thead><tr>${['Division','Total','1st Shift','2nd Shift','2nd Location','⚠ Erroneous','Not Located','Error Rate'].map(th).join('')}</tr></thead><tbody>
-      ${Object.keys(byDiv).map((d,i)=>{const row=byDiv[d];const ep=pct(row.erroneous,row.total);const bg=i%2===0?'#fff':'#f3f4f6';const epC=row.total&&row.erroneous/row.total>0.2?'#b91c1c':row.total&&row.erroneous/row.total>0.1?'#92400e':'#111';return`<tr style="background:${bg}"><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-weight:700">${esc(d)}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${row.total}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${row.s1}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${row.s2}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;color:#047857;font-weight:600">${row.located}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;color:#92400e;font-weight:600">${row.erroneous}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;color:#b91c1c;font-weight:600">${row.notLoc}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;color:${epC};font-weight:600">${ep}</td></tr>`;}).join('')}
-      <tr style="background:#1a2038;color:#fff"><td style="padding:5pt 8pt;font-weight:700">TOTAL</td><td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700">${total}</td><td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700">${shift1c}</td><td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700">${shift2c}</td><td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700;color:#6ee7b7">${located2nd}</td><td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700;color:#fcd34d">${erroneous}</td><td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700;color:#fca5a5">${notLoc}</td><td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700;color:#fcd34d">${pct(erroneous,total)}</td></tr>
+    <table style="width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:16pt"><thead><tr>${['Division','Total','1st Shift','2nd Shift','Wknd OT','2nd Location','⚠ Erroneous','Not Located','Error Rate'].map(th).join('')}</tr></thead><tbody>
+      ${Object.keys(byDiv).map((d,i)=>{const row=byDiv[d];const ep=pct(row.erroneous,row.total);const bg=i%2===0?'#fff':'#f3f4f6';const epC=row.total&&row.erroneous/row.total>0.2?'#b91c1c':row.total&&row.erroneous/row.total>0.1?'#92400e':'#111';return`<tr style="background:${bg}"><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-weight:700">${esc(d)}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${row.total}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${row.s1}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${row.s2}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;color:#7c3aed">${row.swot||0}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;color:#047857;font-weight:600">${row.located}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;color:#92400e;font-weight:600">${row.erroneous}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;color:#b91c1c;font-weight:600">${row.notLoc}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;color:${epC};font-weight:600">${ep}</td></tr>`;}).join('')}
+      <tr style="background:#1a2038;color:#fff"><td style="padding:5pt 8pt;font-weight:700">TOTAL</td><td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700">${total}</td><td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700">${shift1c}</td><td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700">${shift2c}</td><td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700;color:#c4b5fd">${rows.filter(r=>getShiftFromRecord(r)===3).length}</td><td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700;color:#6ee7b7">${located2nd}</td><td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700;color:#fcd34d">${erroneous}</td><td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700;color:#fca5a5">${notLoc}</td><td style="padding:5pt 8pt;font-family:'Courier New',monospace;font-weight:700;color:#fcd34d">${pct(erroneous,total)}</td></tr>
     </tbody></table>
     <div style="page-break-inside:avoid">
     <div style="font-size:8pt;font-weight:700;color:#374151;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #e5e7eb;padding-bottom:4pt;margin:14pt 0 8pt">Picker Performance</div>
@@ -815,7 +839,7 @@ function printSummaryReport(){
     ${rows.filter(isErrBackorder).length?`<div style="page-break-before:always;page-break-inside:avoid"><div style="font-size:8pt;font-weight:700;color:#7f1d1d;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #fecaca;padding-bottom:4pt;margin:14pt 0 8pt">Erroneous Shortages That Likely Became Backorders</div><div style="font-size:8.5pt;color:#6b7280;margin-bottom:8pt">Found by IC in the original shorted bin, no secondary location fill recorded. Customer line likely stayed short.</div><table style="width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:16pt"><thead><tr>${['Product Code','Division','Shorted Bin','Qty Shorted','IC Qty Found','UOM','Pick Demand','Picker','Date'].map(h=>`<th style="background:#7f1d1d;color:#fff;padding:5pt 8pt;text-align:left;font-size:8pt;font-weight:600;letter-spacing:.04em">${h}</th>`).join('')}</tr></thead><tbody>${rows.filter(isErrBackorder).sort((a,b)=>(a.shortedBin||'').localeCompare(b.shortedBin||'')).map((r,i)=>{const bg=i%2===0?'#fff5f5':'#fee2e2';return`<tr style="background:${bg}"><td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-family:'Courier New',monospace;font-weight:700;color:#1a2038">${esc(r.productCode)}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-family:'Courier New',monospace">${esc(r.division)}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-family:'Courier New',monospace;font-weight:700;color:#7f1d1d">${esc(r.shortedBin||'—')}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-family:'Courier New',monospace">${r.qtyShorted||0}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-family:'Courier New',monospace;font-weight:700;color:#7f1d1d">${r.icQtyFound||'—'}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-family:'Courier New',monospace">${esc(r.icUom||r.uom||'EA')}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-family:'Courier New',monospace">${esc(r.pickDemand||'—')}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-size:8.5pt">${esc(r.picker||'—')}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #fecaca;font-size:8pt;color:#6b7280">${esc(normalizeDate(r.date||r.createdAt||''))}</td></tr>`;}).join('')}</tbody></table></div>`:''}
     <div style="page-break-before:always;page-break-inside:avoid">
     <div style="font-size:8pt;font-weight:700;color:#374151;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #e5e7eb;padding-bottom:4pt;margin:14pt 0 8pt">Daily Summary</div>
-    <table style="width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:16pt"><thead><tr>${['Date','Total','1st Shift','2nd Shift','2nd Location','⚠ Erroneous'].map(th).join('')}</tr></thead><tbody>
+    <table style="width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:16pt"><thead><tr>${['Date','Total','1st Shift','2nd Shift','Wknd OT','2nd Location','⚠ Erroneous'].map(th).join('')}</tr></thead><tbody>
       ${Object.keys(byDay).sort().map((d,i)=>{const bg=i%2===0?'#fff':'#f3f4f6';return`<tr style="background:${bg}"><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${d}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${byDay[d].total}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${byDay[d].s1}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${byDay[d].s2}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;color:#047857;font-weight:600">${byDay[d].located}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;color:#92400e;font-weight:600">${byDay[d].erroneous}</td></tr>`;}).join('')}
     </tbody></table></div>
     <div style="margin-top:20pt;padding-top:8pt;border-top:1pt solid #e5e7eb;font-size:7.5pt;color:#9ca3af;display:flex;justify-content:space-between">
@@ -847,7 +871,7 @@ function printCheckReport(){
     const bg=i%2===0?'#fff':'#f9fafb';
     const dateVal=r.date||r.createdAt||'';
     const dateDisplay=dateVal?fmtD(dateVal)+' '+fmtT(dateVal):'—';
-    const shiftLbl='Shift '+(getShiftFromRecord(r)===1?'1':'2');
+    const shiftLbl=shiftLabel(r);
     return `<tr style="background:${bg}${isDup?';border-left:3pt solid #f87171':''}">
       <td style="padding:4pt 5pt;border-bottom:.5pt solid #e5e7eb;text-align:center;font-size:7pt;color:#9ca3af">${i+1}</td>
       <td style="padding:4pt 5pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;font-weight:700;font-size:8.5pt${isDup?';color:#b91c1c':''}">${esc(r.shortedBin||'—')}${isDup?' ⚠':''}</td>
@@ -2033,8 +2057,7 @@ const LANGS={
     'login.enter_pin':'Enter PIN','login.back':'Back',
     'form.date_time':'Date & Time','form.division':'Division','form.picker':'Picker',
     'form.pack_station':'Pack Station','form.pick_demand':'Pick Demand #',
-    'form.shift_override':'Shift Override','form.shift_auto':'Auto (use current time)',
-    'form.shift_1st':'1st','form.shift_2nd':'2nd','form.shift_3rd':'3rd',
+    'form.shift_override':'Shift Override','form.shift_auto':'Auto (use current time)','form.shift_1st':'1st Shift (6am–3:30pm)','form.shift_2nd':'2nd Shift (3:30pm–12am)','form.shift_wot':'Weekend OT (6am–12am)',
     'form.product_lines':'Product Lines','form.product_code':'Product Code',
     'form.qty_each':'Qty (Each)','form.bin_shorted':'Bin Shorted',
     'form.uom':'Unit of Measure','form.notes':'Notes',
@@ -2086,7 +2109,7 @@ const LANGS={
     'form.date_time':'Fecha y Hora','form.division':'División','form.picker':'Recolector',
     'form.pack_station':'Estación de Empaque','form.pick_demand':'Núm. de Demanda',
     'form.shift_override':'Turno (manual)','form.shift_auto':'Auto (hora actual)',
-    'form.shift_1st':'1er Turno','form.shift_2nd':'2do Turno','form.shift_3rd':'3er Turno',
+    'form.shift_1st':'1er Turno (6am–3:30pm)','form.shift_2nd':'2do Turno (3:30pm–12am)','form.shift_wot':'Tiempo Extra Fin de Semana (6am–12am)',
     'form.product_lines':'Líneas de Producto','form.product_code':'Código de Producto',
     'form.qty_each':'Cantidad (c/u)','form.bin_shorted':'Bin con Escasez',
     'form.uom':'Unidad de Medida','form.notes':'Notas',
@@ -2138,7 +2161,7 @@ const LANGS={
     'form.date_time':'تاریخ و ساعت','form.division':'بخش','form.picker':'جمع‌آورنده',
     'form.pack_station':'ایستگاه بسته‌بندی','form.pick_demand':'شماره تقاضا',
     'form.shift_override':'نوبت (دستی)','form.shift_auto':'خودکار (زمان فعلی)',
-    'form.shift_1st':'نوبت اول','form.shift_2nd':'نوبت دوم','form.shift_3rd':'نوبت سوم',
+    'form.shift_1st':'نوبت اول (۶ صبح–۳:۳۰ عصر)','form.shift_2nd':'نوبت دوم (۳:۳۰–۱۲ شب)','form.shift_wot':'اضافه‌کاری آخر هفته',
     'form.product_lines':'خطوط محصول','form.product_code':'کد محصول',
     'form.qty_each':'تعداد (هر کدام)','form.bin_shorted':'بین کمبود',
     'form.uom':'واحد اندازه‌گیری','form.notes':'یادداشت‌ها',
@@ -2190,7 +2213,7 @@ const LANGS={
     'form.date_time':'Petsa at Oras','form.division':'Dibisyon','form.picker':'Tagapulot',
     'form.pack_station':'Estasyon ng Pagbabalot','form.pick_demand':'Pick Demand #',
     'form.shift_override':'Shift (Manual)','form.shift_auto':'Auto (kasalukuyang oras)',
-    'form.shift_1st':'1st Shift','form.shift_2nd':'2nd Shift','form.shift_3rd':'3rd Shift',
+    'form.shift_1st':'1st Shift (6am–3:30pm)','form.shift_2nd':'2nd Shift (3:30pm–12am)','form.shift_wot':'Weekend OT (6am–12am)',
     'form.product_lines':'Mga Linya ng Produkto','form.product_code':'Kodigo ng Produkto',
     'form.qty_each':'Dami (bawat isa)','form.bin_shorted':'Bin na may Kakulangan',
     'form.uom':'Yunit ng Sukat','form.notes':'Mga Tala',
@@ -2242,7 +2265,7 @@ const LANGS={
     'form.date_time':'التاريخ والوقت','form.division':'القسم','form.picker':'جامع البضائع',
     'form.pack_station':'محطة التعبئة','form.pick_demand':'رقم طلب الانتقاء',
     'form.shift_override':'الوردية (يدوي)','form.shift_auto':'تلقائي (الوقت الحالي)',
-    'form.shift_1st':'الوردية الأولى','form.shift_2nd':'الوردية الثانية','form.shift_3rd':'الوردية الثالثة',
+    'form.shift_1st':'الوردية الأولى (6ص–3:30م)','form.shift_2nd':'الوردية الثانية (3:30م–12م)','form.shift_wot':'عمل إضافي نهاية الأسبوع (6ص–12م)',
     'form.product_lines':'خطوط المنتجات','form.product_code':'كود المنتج',
     'form.qty_each':'الكمية (لكل وحدة)','form.bin_shorted':'خانة النقص',
     'form.uom':'وحدة القياس','form.notes':'ملاحظات',
@@ -2379,7 +2402,7 @@ function applyLangToForms(){
 
   // Shift options
   const sh=$('sShift');
-  if(sh){optText(sh,0,'form.shift_auto');optText(sh,1,'form.shift_1st');optText(sh,2,'form.shift_2nd');optText(sh,3,'form.shift_3rd');}
+  if(sh){optText(sh,0,'form.shift_auto');optText(sh,1,'form.shift_1st');optText(sh,2,'form.shift_2nd');optText(sh,3,'form.shift_wot');}
 
   // Picker select placeholder
   const sp=$('sPickerSelect');
@@ -2529,7 +2552,7 @@ function applyLangToForms(){
     if(ptSh.options[0])ptSh.options[0].textContent=t('form.shift_auto');
     if(ptSh.options[1])ptSh.options[1].textContent=t('form.shift_1st');
     if(ptSh.options[2])ptSh.options[2].textContent=t('form.shift_2nd');
-    if(ptSh.options[3])ptSh.options[3].textContent=t('form.shift_3rd');
+    if(ptSh.options[3])ptSh.options[3].textContent=t('form.shift_wot');
   }
 
   // ── Highlight active lang button ──
@@ -2590,7 +2613,7 @@ async function savePickedTwice(){
   if(!div){alert('Division is required.');return;}
   if(!picker){alert('Picker is required.');return;}
   if(!notes){alert('Notes are required — describe what happened.');return;}
-  const shiftV=(()=>{const ov=$('ptShift').value;if(ov&&ov!=='auto')return ov;const h=new Date().getHours();if(h>=6&&h<14)return'1st';if(h>=14&&h<22)return'2nd';return'3rd';})();
+  const shiftV=(()=>{const ov=$('ptShift').value;if(ov&&ov!=='auto')return ov;return shiftValue();})();
   showLoading('Saving duplicate pick report...');
   try{
     const s=getSettings();
