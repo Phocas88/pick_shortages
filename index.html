@@ -1815,6 +1815,11 @@ async function opUnarchiveSelected(){
 }
 
 function printOverPullReport(){
+  if(!opRecords.length){
+    // Records not loaded yet — load them first then print
+    opLoadRecords(true).then(()=>setTimeout(printOverPullReport,500));
+    return;
+  }
   const rows=opFilteredRows();
   if(!rows.length){alert('No over pull records in selected range.');return;}
   const today=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
@@ -2146,6 +2151,260 @@ function onPickerSelectChange(selectId, newInputId, hiddenId){
   }
 }
 
+
+let currentLang='en';
+const LANGS={
+  en:{dir:'ltr','form.packer':'Packer','form.picker':'Picker','form.pack_station':'Pack Station',
+    'btn.edit':'Edit','btn.found_bin':'Found in Shorted Bin / Count','btn.second_loc':'Second Location Filled',
+    'btn.replenished':'Bin Replenished After Pick?','btn.unarchive':'Unarchive',
+    'badge.archived':'Archived','badge.erroneous':'Erroneous Bin','badge.backorder':'Backorder Risk',
+    'badge.second_loc':'Second Location Filled','badge.replenished':'Replenished After Pick',
+    'badge.confirmed':'IC Confirmed Short','row.ic_found':'IC Found',
+    'row.second_filled':'Second location filled:','row.qty':'Qty','row.demand':'Demand','row.picker':'Picker',
+    'list.no_shortages':'No shortages found for this filter.',
+    'form.shift_auto':'Auto (use current time)','form.shift_1st':'1st Shift (6am–3:30pm)',
+    'form.shift_2nd':'2nd Shift (3:30pm–12am)','form.shift_wot':'Weekend OT (6am–12am)',
+    'op.tab_entry':'📝 Log Entry','op.tab_batch':'📋 Batch Pick Sheet','op.tab_records':'📊 Records & Stats',
+    'op.packer_name':'Packer Name','op.picker_name':'Picker Name','op.pack_station':'Pack Station',
+    'dup.modal_title':'⚠ Report: Order Picked Twice / Duplicate Pick',
+    'dup.modal_btn':'⚠ Report Duplicate Pick — Entire Order Picked Twice',
+    'dup.what_does':'What this does:',
+    'dup.what_desc':'Flags an entire order as having been picked twice (over-pulled). No product lines needed — the whole order must be returned and investigated. This creates a Duplicate Pick record for IC and management review.',
+    'dup.picker_involved':'Picker Involved','dup.notes_label':'Notes / Details',
+    'dup.notes_ph':'Describe what happened — where was the duplicate pick found, who reported it, what action was taken...',
+    'dup.submit':'⚠ Submit Duplicate Pick Report','dup.cancel':'Cancel',
+    'dup.alert':'Duplicate pick report filed for order {0}.\nIC team and management have been flagged for investigation.',
+    'form.date_time':'Date & Time','form.division':'Division','form.pick_demand':'Pick Demand #',
+    'form.shift_override':'Shift Override','form.notes':'Notes',
+    'form.product_code':'Product Code','form.qty_each':'Qty (Each)','form.bin_shorted':'Bin Shorted',
+    'form.add_line':'+ Add Line','form.clear_form':'Clear Form','form.log_shortages':'+ Log All Shortages',
+    'list.search':'Search by product, order, picker, division...',
+    'list.active':'Active','list.archive':'Archived History','list.both':'Active + Archived',
+    'btn.open_ic_portal':'Open IC Portal Tickets',
+    'login.no_login':'No Login Required','login.batch_btn':'Batch Pick Sheet',
+    'login.batch_sub':'One item, multiple orders','login.op_btn':'Over Pull Portal',
+    'login.op_sub':'Over Pull & Batch Pick — no PIN needed',
+    'op.batch_title':'Batch Pick Details','op.batch_orders_title':'Orders in this Batch Pick',
+    'op.batch_add_order':'+ Add Order','op.batch_submit':'+ Submit Batch Pick',
+  },
+  es:{dir:'ltr','form.packer':'Empacador','form.picker':'Recolector','form.pack_station':'Estación de Empaque',
+    'btn.edit':'Editar','btn.found_bin':'Encontrado en Bin / Conteo','btn.second_loc':'Llenado en Segunda Ubicación',
+    'btn.replenished':'¿Bin Reabastecido?','btn.unarchive':'Desarchivar',
+    'badge.archived':'Archivado','badge.erroneous':'Bin Erróneo','badge.backorder':'Riesgo de Pedido Pendiente',
+    'badge.second_loc':'Segunda Ubicación Llenada','badge.replenished':'Reabastecido después de Recoger',
+    'badge.confirmed':'IC Confirmado Corto','row.ic_found':'IC Encontró',
+    'row.second_filled':'Segunda ubicación llenada:','row.qty':'Cant.','row.demand':'Demanda','row.picker':'Recolector',
+    'list.no_shortages':'No se encontraron escaseces.',
+    'form.shift_auto':'Auto (hora actual)','form.shift_1st':'1er Turno (6am–3:30pm)',
+    'form.shift_2nd':'2do Turno (3:30pm–12am)','form.shift_wot':'Tiempo Extra Fin de Semana (6am–12am)',
+    'op.tab_entry':'📝 Entrada','op.tab_batch':'📋 Hoja de Recogida por Lotes','op.tab_records':'📊 Registros y Estadísticas',
+    'op.packer_name':'Nombre del Empacador','op.picker_name':'Nombre del Recolector','op.pack_station':'Estación de Empaque',
+    'dup.modal_title':'⚠ Reporte: Orden Recogida Dos Veces',
+    'dup.modal_btn':'⚠ Reportar Recogida Duplicada — Orden Completa Recogida Dos Veces',
+    'dup.what_does':'¿Qué hace esto?',
+    'dup.what_desc':'Marca una orden completa como recogida dos veces (exceso). No se necesitan líneas de producto — toda la orden debe devolverse e investigarse.',
+    'dup.picker_involved':'Recolector Involucrado','dup.notes_label':'Notas / Detalles',
+    'dup.notes_ph':'Describa qué pasó...','dup.submit':'⚠ Enviar Reporte de Recogida Duplicada','dup.cancel':'Cancelar',
+    'dup.alert':'Reporte de recogida duplicada para orden {0}.',
+    'form.date_time':'Fecha y Hora','form.division':'División','form.pick_demand':'Núm. de Demanda',
+    'form.shift_override':'Turno (manual)','form.notes':'Notas',
+    'form.product_code':'Código de Producto','form.qty_each':'Cantidad (c/u)','form.bin_shorted':'Bin con Escasez',
+    'form.add_line':'+ Agregar Línea','form.clear_form':'Limpiar','form.log_shortages':'+ Registrar Escasez',
+    'list.search':'Buscar por producto, orden, recolector, división...',
+    'list.active':'Activo','list.archive':'Historial Archivado','list.both':'Activo + Archivado',
+    'btn.open_ic_portal':'Abrir Portal IC',
+    'login.no_login':'Sin Inicio de Sesión','login.batch_btn':'Hoja de Recogida por Lotes',
+    'login.batch_sub':'Un artículo, múltiples órdenes','login.op_btn':'Portal de Exceso',
+    'login.op_sub':'Exceso y Lotes — sin PIN',
+    'op.batch_title':'Detalles de Recogida por Lotes','op.batch_orders_title':'Órdenes en esta Recogida por Lotes',
+    'op.batch_add_order':'+ Agregar Orden','op.batch_submit':'+ Enviar Recogida por Lotes',
+  },
+  fa:{dir:'rtl','form.packer':'بسته‌بند','form.picker':'جمع‌آورنده','form.pack_station':'ایستگاه بسته‌بندی',
+    'btn.edit':'ویرایش','btn.found_bin':'در بین کمبود یافت شد','btn.second_loc':'از مکان دوم پر شد',
+    'btn.replenished':'بین بعد از جمع‌آوری پر شد؟','btn.unarchive':'از آرشیو خارج شود',
+    'badge.archived':'آرشیو شده','badge.erroneous':'بین اشتباه','badge.backorder':'خطر سفارش معوق',
+    'badge.second_loc':'از مکان دوم پر شد','badge.replenished':'پر شده پس از جمع‌آوری',
+    'badge.confirmed':'IC تأیید شده کوتاه','row.ic_found':'IC یافت','row.second_filled':'مکان دوم پر شده:',
+    'row.qty':'تعداد','row.demand':'تقاضا','row.picker':'جمع‌آورنده',
+    'list.no_shortages':'کمبودی یافت نشد.',
+    'form.shift_auto':'خودکار (زمان فعلی)','form.shift_1st':'نوبت اول (۶ صبح–۳:۳۰ عصر)',
+    'form.shift_2nd':'نوبت دوم (۳:۳۰–۱۲ شب)','form.shift_wot':'اضافه‌کاری آخر هفته',
+    'op.tab_entry':'📝 ورود داده','op.tab_batch':'📋 برگه برداشت دسته‌ای','op.tab_records':'📊 سوابق و آمار',
+    'op.packer_name':'نام بسته‌بند','op.picker_name':'نام جمع‌آورنده','op.pack_station':'ایستگاه بسته‌بندی',
+    'dup.modal_title':'⚠ گزارش: سفارش دو بار جمع‌آوری شد',
+    'dup.modal_btn':'⚠ گزارش برداشت تکراری — کل سفارش دو بار برداشته شد',
+    'dup.what_does':'این چه می‌کند:','dup.what_desc':'یک سفارش کامل را به عنوان دو بار جمع‌آوری شده علامت می‌زند.',
+    'dup.picker_involved':'جمع‌آورنده مربوطه','dup.notes_label':'یادداشت‌ها / جزئیات',
+    'dup.notes_ph':'توضیح دهید چه اتفاقی افتاد...','dup.submit':'⚠ ارسال گزارش برداشت تکراری','dup.cancel':'لغو',
+    'dup.alert':'گزارش برداشت تکراری برای سفارش {0} ثبت شد.',
+    'form.date_time':'تاریخ و ساعت','form.division':'بخش','form.pick_demand':'شماره تقاضا',
+    'form.shift_override':'نوبت (دستی)','form.notes':'یادداشت‌ها',
+    'form.product_code':'کد محصول','form.qty_each':'تعداد (هر کدام)','form.bin_shorted':'بین کمبود',
+    'form.add_line':'+ افزودن خط','form.clear_form':'پاک کردن','form.log_shortages':'+ ثبت کمبود',
+    'list.search':'جستجو بر اساس محصول، سفارش، جمع‌آورنده، بخش...',
+    'list.active':'فعال','list.archive':'تاریخچه آرشیو','list.both':'فعال + آرشیو',
+    'btn.open_ic_portal':'باز کردن پورتل IC',
+    'login.no_login':'بدون ورود','login.batch_btn':'برگه برداشت دسته‌ای',
+    'login.batch_sub':'یک محصول، چند سفارش','login.op_btn':'پورتل مازاد',
+    'login.op_sub':'ثبت مازاد — بدون ورود',
+    'op.batch_title':'جزئیات برداشت دسته‌ای','op.batch_orders_title':'سفارش‌ها در این برداشت دسته‌ای',
+    'op.batch_add_order':'+ افزودن سفارش','op.batch_submit':'+ ثبت برداشت دسته‌ای',
+  },
+  ar:{dir:'rtl','form.packer':'المعبّئ','form.picker':'جامع البضائع','form.pack_station':'محطة التعبئة',
+    'btn.edit':'تعديل','btn.found_bin':'وُجد في صندوق النقص','btn.second_loc':'تم ملء الموقع الثاني',
+    'btn.replenished':'هل تم تعبئة الصندوق بعد الانتقاء؟','btn.unarchive':'إلغاء الأرشفة',
+    'badge.archived':'مؤرشف','badge.erroneous':'صندوق خاطئ','badge.backorder':'خطر الطلب المعلق',
+    'badge.second_loc':'تم ملء الموقع الثاني','badge.replenished':'تمت التعبئة بعد الانتقاء',
+    'badge.confirmed':'تم تأكيد النقص من IC','row.ic_found':'وجد IC','row.second_filled':'تم ملء الموقع الثاني:',
+    'row.qty':'الكمية','row.demand':'الطلب','row.picker':'جامع البضائع',
+    'list.no_shortages':'لم يتم العثور على نقص.',
+    'form.shift_auto':'تلقائي (الوقت الحالي)','form.shift_1st':'الوردية الأولى (6ص–3:30م)',
+    'form.shift_2nd':'الوردية الثانية (3:30م–12م)','form.shift_wot':'عمل إضافي في عطلة نهاية الأسبوع',
+    'op.tab_entry':'📝 إدخال البيانات','op.tab_batch':'📋 ورقة الانتقاء الدُفعي','op.tab_records':'📊 السجلات والإحصاءات',
+    'op.packer_name':'اسم المعبّئ','op.picker_name':'اسم جامع البضائع','op.pack_station':'محطة التعبئة',
+    'dup.modal_title':'⚠ تقرير: تم انتقاء الطلب مرتين',
+    'dup.modal_btn':'⚠ الإبلاغ عن انتقاء مكرر — تم انتقاء الطلب بالكامل مرتين',
+    'dup.what_does':'ماذا يفعل هذا:','dup.what_desc':'يُعلّم طلباً كاملاً على أنه تم انتقاؤه مرتين.',
+    'dup.picker_involved':'جامع البضائع المعني','dup.notes_label':'ملاحظات / تفاصيل',
+    'dup.notes_ph':'صف ما حدث...','dup.submit':'⚠ إرسال تقرير الانتقاء المكرر','dup.cancel':'إلغاء',
+    'dup.alert':'تم تقديم تقرير الانتقاء المكرر للطلب {0}.',
+    'form.date_time':'التاريخ والوقت','form.division':'القسم','form.pick_demand':'رقم الطلب',
+    'form.shift_override':'الوردية (يدوي)','form.notes':'ملاحظات',
+    'form.product_code':'رمز المنتج','form.qty_each':'الكمية (لكل واحد)','form.bin_shorted':'صندوق النقص',
+    'form.add_line':'+ إضافة سطر','form.clear_form':'مسح','form.log_shortages':'+ تسجيل النقص',
+    'list.search':'البحث بالمنتج أو الطلب أو جامع البضائع أو القسم...',
+    'list.active':'نشط','list.archive':'السجل المحفوظ','list.both':'نشط + محفوظ',
+    'btn.open_ic_portal':'فتح بوابة IC',
+    'login.no_login':'بدون تسجيل دخول','login.batch_btn':'ورقة الانتقاء الدُفعي',
+    'login.batch_sub':'منتج واحد، طلبات متعددة','login.op_btn':'بوابة الزيادة',
+    'login.op_sub':'تسجيل الزيادة — بدون رمز',
+    'op.batch_title':'تفاصيل الانتقاء الدُفعي','op.batch_orders_title':'الطلبات في هذا الانتقاء الدُفعي',
+    'op.batch_add_order':'+ إضافة طلب','op.batch_submit':'+ إرسال الانتقاء الدُفعي',
+  },
+  fil:{dir:'ltr','form.packer':'Tagabalot','form.picker':'Tagapulot','form.pack_station':'Estasyon ng Pagbabalot',
+    'btn.edit':'I-edit','btn.found_bin':'Natagpuan sa Shorted Bin / Bilang','btn.second_loc':'Napuno mula sa Pangalawang Lokasyon',
+    'btn.replenished':'Na-replenish ang Bin?','btn.unarchive':'I-unarchive',
+    'badge.archived':'Na-archive','badge.erroneous':'Maling Bin','badge.backorder':'Panganib ng Backorder',
+    'badge.second_loc':'Napuno mula 2nd Lokasyon','badge.replenished':'Na-replenish pagkatapos Pulutin',
+    'badge.confirmed':'IC Nakumpirma na Maikli','row.ic_found':'Nahanap ng IC',
+    'row.second_filled':'Napuno mula 2nd lokasyon:','row.qty':'Dami','row.demand':'Demand','row.picker':'Tagapulot',
+    'list.no_shortages':'Walang kakulangan na natagpuan.',
+    'form.shift_auto':'Auto (kasalukuyang oras)','form.shift_1st':'1st Shift (6am–3:30pm)',
+    'form.shift_2nd':'2nd Shift (3:30pm–12am)','form.shift_wot':'Weekend OT (6am–12am)',
+    'op.tab_entry':'📝 Pagpasok','op.tab_batch':'📋 Batch Pick Sheet','op.tab_records':'📊 Mga Rekord at Stats',
+    'op.packer_name':'Pangalan ng Tagabalot','op.picker_name':'Pangalan ng Tagapulot','op.pack_station':'Estasyon ng Pagbabalot',
+    'dup.modal_title':'⚠ Report: Dalawang Beses na Na-pick ang Order',
+    'dup.modal_btn':'⚠ Mag-ulat ng Duplicate Pick — Buong Order na Na-pick ng Dalawang Beses',
+    'dup.what_does':'Ano ang gagawin nito:','dup.what_desc':'Magtatanda ng buong order bilang na-pick ng dalawang beses.',
+    'dup.picker_involved':'Tagapulot na Kasangkot','dup.notes_label':'Mga Tala / Detalye',
+    'dup.notes_ph':'Ilarawan kung ano ang nangyari...','dup.submit':'⚠ Isumite ang Duplicate Pick Report','dup.cancel':'Kanselahin',
+    'dup.alert':'Na-file ang duplicate pick report para sa order na {0}.',
+    'form.date_time':'Petsa at Oras','form.division':'Dibisyon','form.pick_demand':'Pick Demand #',
+    'form.shift_override':'Shift (Manual)','form.notes':'Mga Tala',
+    'form.product_code':'Kodigo ng Produkto','form.qty_each':'Dami (bawat isa)','form.bin_shorted':'Bin na may Kakulangan',
+    'form.add_line':'+ Magdagdag ng Linya','form.clear_form':'I-clear','form.log_shortages':'+ I-log ang Kakulangan',
+    'list.search':'Maghanap sa pamamagitan ng produkto, order, tagapulot, dibisyon...',
+    'list.active':'Aktibo','list.archive':'Kasaysayan ng Archive','list.both':'Aktibo + Archive',
+    'btn.open_ic_portal':'Buksan ang IC Portal',
+    'login.no_login':'Walang Login','login.batch_btn':'Batch Pick Sheet',
+    'login.batch_sub':'Isang item, maraming orders','login.op_btn':'Over Pull Portal',
+    'login.op_sub':'Over Pull at Batch — walang PIN',
+    'op.batch_title':'Mga Detalye ng Batch Pick','op.batch_orders_title':'Mga Order sa Batch Pick na ito',
+    'op.batch_add_order':'+ Magdagdag ng Order','op.batch_submit':'+ Isumite ang Batch Pick',
+  },
+};
+
+function t(key){
+  const lang=LANGS[currentLang]||LANGS.en;
+  return lang[key]||LANGS.en[key]||key;
+}
+
+function setLang(lang){
+  if(!LANGS[lang])return;
+  currentLang=lang;
+  localStorage.setItem('scp_lang',lang);
+  const dir=LANGS[lang].dir||'ltr';
+  document.documentElement.dir=dir;
+  document.documentElement.lang=lang==='fa'?'fa-AF':lang==='ar'?'ar':lang==='fil'?'fil':lang==='es'?'es':'en';
+  applyLangToForms();
+}
+
+function applyLangToForms(){
+  function lbl(id,key){const el=$(id);if(!el)return;const f=el.closest('.field');if(!f)return;const lab=f.querySelector('label');if(!lab)return;lab.childNodes[0].textContent=t(key)+' ';}
+  function optText(sel,idx,key){if(sel&&sel.options[idx])sel.options[idx].textContent=t(key);}
+
+  // Shift selects
+  ['sShift','bpShift','ptShift'].forEach(id=>{const s=$(id);if(s){optText(s,0,'form.shift_auto');optText(s,1,'form.shift_1st');optText(s,2,'form.shift_2nd');optText(s,3,'form.shift_wot');}});
+
+  // Over Pull tabs
+  const et=$('opTab-entry');if(et)et.innerHTML=t('op.tab_entry');
+  const ebt=$('opTab-batch');if(ebt)ebt.innerHTML=t('op.tab_batch');
+  const rt=$('opTab-records');if(rt)rt.innerHTML=t('op.tab_records');
+
+  // viewMode
+  const vm=$('viewMode');if(vm){optText(vm,0,'list.active');optText(vm,1,'list.archive');optText(vm,2,'list.both');}
+
+  // Duplicate pick modal
+  const ptMT=$('ptModalTitle');if(ptMT)ptMT.innerHTML='&#9888; '+(t('dup.modal_title'));
+  const ptWD=$('ptWhatDoes');if(ptWD)ptWD.textContent=t('dup.what_does');
+  const ptWDesc=$('ptWhatDesc');if(ptWDesc)ptWDesc.textContent=t('dup.what_desc');
+  const ptPL=$('ptPickerLabel');if(ptPL&&ptPL.childNodes[0])ptPL.childNodes[0].textContent=t('dup.picker_involved')+' ';
+  const ptNL=$('ptNotesLabel');if(ptNL&&ptNL.childNodes[0])ptNL.childNodes[0].textContent=t('dup.notes_label')+' ';
+  const ptNotes=$('ptNotes');if(ptNotes)ptNotes.placeholder=t('dup.notes_ph');
+  const ptSub=$('ptSubmitBtn');if(ptSub)ptSub.innerHTML='&#9888; '+t('dup.submit');
+  const ptCan=$('ptCancelBtn');if(ptCan)ptCan.textContent=t('dup.cancel');
+  const ptOpenBtn=$('ptOpenBtnText');if(ptOpenBtn)ptOpenBtn.innerHTML='&#9888; '+t('dup.modal_btn');
+  const ptSh=$('ptShift');if(ptSh){optText(ptSh,0,'form.shift_auto');optText(ptSh,1,'form.shift_1st');optText(ptSh,2,'form.shift_2nd');optText(ptSh,3,'form.shift_wot');}
+
+  // Batch pick labels
+  const bpCardTitle=document.querySelector('#opPane-batch .card-title');
+  if(bpCardTitle&&bpCardTitle.childNodes[0])bpCardTitle.childNodes[0].textContent=t('op.batch_title')+' ';
+  const bpSub=document.querySelector('#opPane-batch .notice');
+  // Batch pick buttons
+  const bpAddBtn=document.querySelector('button[onclick="bpAddOrderLine()"]');if(bpAddBtn)bpAddBtn.textContent=t('op.batch_add_order');
+  const bpSubmitBtn=document.querySelector('button[onclick="saveBatchPick()"]');if(bpSubmitBtn)bpSubmitBtn.textContent=t('op.batch_submit');
+  const bpClearBtn=document.querySelector('button[onclick="bpClearForm()"]');if(bpClearBtn)bpClearBtn.textContent=t('form.clear_form');
+  // Batch pick select placeholders
+  const bpSh=$('bpShift');if(bpSh){optText(bpSh,0,'form.shift_auto');optText(bpSh,1,'form.shift_1st');optText(bpSh,2,'form.shift_2nd');optText(bpSh,3,'form.shift_wot');}
+
+  // Highlight active lang button
+  ['en','es','fa','ar','fil'].forEach(l=>{
+    const id='lang'+l.charAt(0).toUpperCase()+l.slice(1);
+    const btn=$(id);if(!btn)return;
+    btn.style.borderColor=l===currentLang?'var(--accent)':'';
+    btn.style.color=l===currentLang?'var(--accent)':'';
+    btn.style.fontWeight=l===currentLang?'700':'';
+    const lid='loginLang'+l.charAt(0).toUpperCase()+l.slice(1);
+    const lbtn=$(lid);if(!lbtn)return;
+    lbtn.style.borderColor=l===currentLang?'var(--accent)':'';
+  });
+}
+
+/* ── DUPLICATE PICK MODAL ───────────────────────────── */
+function openPickedTwiceModal(){
+  const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());
+  $('ptDate').value=d.toISOString().slice(0,16);
+  $('ptDemand').value='';$('ptDiv').value='';$('ptNotes').value='';$('ptShift').value='auto';
+  $('ptPicker').value='';
+  const sel=$('ptPickerSelect');
+  if(sel){sel.value='';sel.disabled=false;sel.style.opacity='';}
+  const wrap=$('ptPickerNewWrap');if(wrap)wrap.style.display='none';
+  const ptUnk=$('ptPickerUnknown');if(ptUnk)ptUnk.checked=false;
+  const ptHint=$('ptOrderHint');if(ptHint){ptHint.style.display='none';}
+  // Pre-fill from Over Pull order field
+  const d2=$('opOrder').value;
+  if(d2){$('ptDemand').value=d2;ptBlurOrder();}
+  // Populate picker select
+  const pickerOpts=['<option value="">-- Select Picker --</option>',
+    ...pickerNames.filter(n=>n!==UNKNOWN_PICKER).map(n=>`<option value="${esc(n)}">${esc(n)}</option>`),
+    '<option value="__new__">+ Add New Picker...</option>'].join('');
+  const ptSel=$('ptPickerSelect');if(ptSel)ptSel.innerHTML=pickerOpts;
+  $('pickedTwiceOverlay').classList.add('open');
+}
+
+function closePickedTwiceModal(){
+  $('pickedTwiceOverlay').classList.remove('open');
+}
 
 /* ── BATCH PICK SHEET ───────────────────────────────── */
 function bpInitForm(){
