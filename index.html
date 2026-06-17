@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shortage Control Portal</title>
+<title>Order Shortage &amp; Overage Portal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;700&family=DM+Sans:wght@300;400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700;800&family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -11,9 +11,9 @@
 body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;--border:#d4d9e8;--border2:#bcc4d8;--text:#1a2038;--muted:#5a6480;--subtle:#8892ac;--accent:#2563eb;--green:#059669;--yellow:#d97706;--red:#dc2626;--orange:#ea580c;--purple:#7c3aed;--shadow:0 1px 4px rgba(0,0,0,.1),0 4px 16px rgba(0,0,0,.08)}
 *{box-sizing:border-box;margin:0;padding:0}html,body{margin:0;min-height:100%}body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;line-height:1.55}button,input,select,textarea{font-family:var(--sans)}select option{background:var(--panel);color:var(--text)}
 .screen{display:none}.screen.active{display:block}.topbar{display:none;align-items:center;gap:14px;padding:0 20px;height:54px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(0,0,0,.2)}.topbar.show{display:flex}.brand{font-weight:700}.role-chip{font-family:var(--mono);font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.06em;text-transform:uppercase;background:var(--accent-l);color:var(--accent);border:1px solid rgba(79,131,245,.2)}.nav{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}.nav-btn{font-size:12px;font-weight:700;padding:6px 12px;border-radius:20px;border:1px solid transparent;cursor:pointer;background:none;color:var(--muted);text-decoration:none}.nav-btn:hover,.nav-btn.active{color:#fff;background:var(--accent)}.nav-btn.lock:hover{background:var(--red);color:#fff}
-#loginScreen,#pinScreen{min-height:100vh;display:none;align-items:center;justify-content:center;background:linear-gradient(135deg,#0d1020 0%,#0f1117 50%,#13101f 100%)}#loginScreen.active,#pinScreen.active{display:flex}.login-wrap{max-width:560px;width:100%;padding:22px}.login-header{text-align:center;margin-bottom:26px}.login-header h1{font-size:24px;margin-bottom:4px}.login-header p{color:var(--muted)}.login-group-label{font-size:10px;font-family:var(--mono);font-weight:700;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin:16px 0 8px}.ic-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}@media(max-width:620px){.ic-btns{grid-template-columns:1fr}}.ic-login-btn{display:flex;flex-direction:column;gap:5px;align-items:center;justify-content:center;padding:18px 12px;background:var(--panel);border:1.5px solid var(--border);border-radius:12px;cursor:pointer;color:var(--text)}.ic-login-btn:hover{border-color:var(--accent);background:var(--accent-l)}.ib-icon{font-size:24px}.ib-title{font-weight:700}.ib-sub{font-size:11px;color:var(--muted)}.pin-card{width:320px;text-align:center;background:var(--panel2);border:1px solid var(--border);border-radius:16px;padding:32px 28px;box-shadow:var(--shadow)}.pin-div-badge{display:inline-flex;padding:8px 16px;border-radius:10px;margin-bottom:14px;font-weight:700;background:var(--accent-l);color:var(--accent)}.pin-dots{display:flex;justify-content:center;gap:12px;margin:18px 0 22px}.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border2)}.pin-dot.filled{background:var(--accent);border-color:var(--accent)}.pin-dot.error{background:var(--red);border-color:var(--red)}.pin-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.pin-key{font-family:var(--mono);font-size:18px;font-weight:700;padding:13px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--text);cursor:pointer}.pin-key:hover,.pin-key.active-press{background:var(--border2)}.pin-error{color:var(--red);font-size:12px;margin-top:12px;min-height:16px}.pin-back-btn{background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;margin-top:12px;text-decoration:underline;width:100%}
+#loginScreen,#pinScreen{min-height:100vh;display:none;align-items:center;justify-content:center;background:linear-gradient(135deg,#e8edf5 0%,#f0f4fb 50%,#e4eaf4 100%)}#loginScreen.active,#pinScreen.active{display:flex}.login-wrap{max-width:560px;width:100%;padding:22px}.login-header{text-align:center;margin-bottom:26px}.login-header h1{font-size:24px;margin-bottom:4px;color:#1a2038}.login-header p{color:#5a6480}.login-header .credit{font-size:10px;color:#8892ac;margin-top:6px}.login-group-label{font-size:10px;font-family:var(--mono);font-weight:700;color:#5a6480;letter-spacing:.12em;text-transform:uppercase;margin:16px 0 8px}.ic-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}@media(max-width:620px){.ic-btns{grid-template-columns:1fr}}.ic-login-btn{display:flex;flex-direction:column;gap:5px;align-items:center;justify-content:center;padding:18px 12px;background:#ffffff;border:1.5px solid #d4d9e8;border-radius:12px;cursor:pointer;color:#1a2038;box-shadow:0 2px 8px rgba(0,0,0,.08)}.ic-login-btn:hover{border-color:#2563eb;background:#eff4ff;box-shadow:0 4px 16px rgba(37,99,235,.15)}.ib-icon{font-size:24px}.ib-title{font-weight:700;color:#1a2038}.ib-sub{font-size:11px;color:#5a6480}.pin-card{width:320px;text-align:center;background:var(--panel2);border:1px solid var(--border);border-radius:16px;padding:32px 28px;box-shadow:var(--shadow)}.pin-div-badge{display:inline-flex;padding:8px 16px;border-radius:10px;margin-bottom:14px;font-weight:700;background:var(--accent-l);color:var(--accent)}.pin-dots{display:flex;justify-content:center;gap:12px;margin:18px 0 22px}.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border2)}.pin-dot.filled{background:var(--accent);border-color:var(--accent)}.pin-dot.error{background:var(--red);border-color:var(--red)}.pin-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.pin-key{font-family:var(--mono);font-size:18px;font-weight:700;padding:13px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--text);cursor:pointer}.pin-key:hover,.pin-key.active-press{background:var(--border2)}.pin-error{color:var(--red);font-size:12px;margin-top:12px;min-height:16px}.pin-back-btn{background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;margin-top:12px;text-decoration:underline;width:100%}
 .wrap{max-width:1240px;margin:0 auto;padding:24px 20px 70px}.page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}.eyebrow{display:inline-flex;font-family:var(--mono);font-size:10px;font-weight:700;color:var(--green);background:var(--green-l);border:1px solid rgba(16,185,129,.2);border-radius:20px;padding:3px 10px;margin-bottom:8px;letter-spacing:.08em;text-transform:uppercase}h1{font-size:22px}.page-head p{font-size:13px;color:var(--muted)}.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px;box-shadow:var(--shadow)}.card-title{font-size:11px;font-weight:700;font-family:var(--mono);color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:10px}.card-title:after{content:'';flex:1;height:1px;background:var(--border)}.hide{display:none!important}
-.form-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.form-row.two{grid-template-columns:1fr 1fr}.form-row.three{grid-template-columns:1fr 1fr 1fr}.form-row.one{grid-template-columns:1fr}@media(max-width:820px){.form-row,.form-row.two,.form-row.three{grid-template-columns:1fr}}.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}.field label{font-size:12px;font-weight:600}.field label em{color:var(--red);font-style:normal}.field input,.field select,.field textarea{background:var(--panel2);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;padding:9px 12px;width:100%}.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,131,245,.15)}.field textarea{resize:vertical;min-height:90px}.product-line-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px}.product-line-grid{display:grid;grid-template-columns:2fr 1fr 2fr auto;gap:10px;align-items:end}@media(max-width:820px){.product-line-grid{grid-template-columns:1fr}}.remove-line-btn{height:38px;min-width:42px}
+.form-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.form-row.two{grid-template-columns:1fr 1fr}.form-row.three{grid-template-columns:1fr 1fr 1fr}.form-row.one{grid-template-columns:1fr}@media(max-width:820px){.form-row,.form-row.two,.form-row.three{grid-template-columns:1fr}}.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}.field label{font-size:12px;font-weight:600}.field label em{color:var(--red);font-style:normal}.field input,.field select,.field textarea{background:var(--panel2);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;padding:9px 12px;width:100%}.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,131,245,.15)}.field textarea{resize:vertical;min-height:90px}.product-line-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:8px}.product-line-grid{display:grid;grid-template-columns:minmax(120px,2fr) 90px minmax(140px,2fr) 42px;gap:10px;align-items:end}@media(max-width:820px){.product-line-grid{grid-template-columns:1fr 1fr;gap:8px}.product-line-grid .bin-col{grid-column:1/-1}}.remove-line-btn{height:38px;width:42px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 14px;border-radius:8px;border:1.5px solid var(--border);background:var(--panel2);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;text-decoration:none}.btn:hover{border-color:var(--accent)}.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}.btn.green{background:var(--green-l);border-color:rgba(16,185,129,.35);color:var(--green)}.btn.red{background:var(--red-l);border-color:rgba(248,113,113,.35);color:var(--red)}.btn.orange{background:var(--orange-l);border-color:rgba(251,146,60,.35);color:var(--orange)}.btn.purple{background:var(--purple-l);border-color:rgba(167,139,250,.35);color:var(--purple)}.actions,.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.filters{margin:12px 0}.filters input,.filters select{background:var(--panel2);border:1.5px solid var(--border);border-radius:8px;color:var(--text);padding:8px 10px;font-size:12px}.filters .search{flex:1;min-width:220px}
 .shortage-list{display:flex;flex-direction:column;gap:8px}.shortage-row{background:var(--panel);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px}.shortage-row.erroneous{border-color:rgba(245,158,11,.38);background:rgba(245,158,11,.06)}.shortage-row.archived{opacity:.72}.sr-head{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap}.sr-codes{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent)}.sr-meta{font-size:11px;color:var(--muted);margin-top:3px}.sr-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.sr-actions .btn{font-size:11px;padding:5px 9px}.sr-check{margin-top:3px;accent-color:var(--accent)}.badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;letter-spacing:.04em;border:1px solid var(--border);color:var(--muted)}.badge.green{color:var(--green);background:var(--green-l);border-color:rgba(16,185,129,.25)}.badge.red{color:var(--red);background:var(--red-l);border-color:rgba(248,113,113,.25)}.badge.yellow{color:var(--yellow);background:var(--yellow-l);border-color:rgba(245,158,11,.25)}.badge.blue{color:var(--accent);background:var(--accent-l);border-color:rgba(79,131,245,.25)}.badge.purple{color:var(--purple);background:var(--purple-l);border-color:rgba(167,139,250,.25)}.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:14px}.stat-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-align:center}.stat-num{font-family:var(--mono);font-size:24px;font-weight:700}.stat-lbl{font-size:10px;color:var(--muted);margin-top:3px}.table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}.table th{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;padding:10px;text-align:left;background:var(--panel);border-bottom:1px solid var(--border)}.table td{padding:10px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:top}.notice{background:var(--accent-l);border:1px solid rgba(79,131,245,.25);border-radius:10px;padding:10px 12px;font-size:12px;margin-bottom:12px}.empty{text-align:center;color:var(--muted);padding:30px 18px}
 .overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(15,20,40,.5);backdrop-filter:blur(6px);justify-content:center;align-items:flex-start;overflow-y:auto;padding:24px 16px}.overlay.open{display:flex}.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:100%;max-width:820px;box-shadow:var(--shadow)}.modal-head{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;border-bottom:1px solid var(--border)}.modal-head button{background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer}.modal-body{padding:20px}.loading{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.45);align-items:center;justify-content:center}.loading.show{display:flex}.loading-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 26px;box-shadow:var(--shadow)}.print-area{display:none}
@@ -39,12 +39,11 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 .ic-confirm-modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;max-width:1100px;margin:0 auto;box-shadow:0 8px 40px rgba(0,0,0,.5)}
 .ic-confirm-head{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:10;border-radius:16px 16px 0 0}
 .ic-confirm-head h3{font-size:16px;font-weight:700}
-.ic-sheet-row{display:grid;grid-template-columns:24px 80px 130px 80px 1fr 160px 100px 1fr;gap:8px;align-items:center;padding:8px 14px;border-bottom:1px solid var(--border);font-size:12px}
-.ic-sheet-row:nth-child(even){background:var(--panel)}
-.ic-sheet-row.confirmed-row{background:rgba(16,185,129,.07);border-left:3px solid var(--green)}
-.ic-sheet-row.erroneous-row{background:rgba(245,158,11,.07);border-left:3px solid var(--yellow)}
-.ic-sheet-row.already-done{opacity:.55}
-.ic-sheet-head{background:var(--panel2)!important;font-family:var(--mono);font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;position:sticky;top:57px;z-index:9}
+.ic-sheet-row{background:var(--panel);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;margin:8px 12px;font-size:13px}
+.ic-sheet-row.confirmed-row{background:rgba(16,185,129,.07);border-color:rgba(16,185,129,.4)}
+.ic-sheet-row.erroneous-row{background:rgba(245,158,11,.07);border-color:rgba(245,158,11,.4)}
+.ic-sheet-row.already-done{opacity:.6}
+.ic-sheet-head{display:none}
 .ic-result-select{background:var(--panel2);border:1.5px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;padding:5px 8px;width:100%}
 .ic-result-select.res-confirmed{border-color:rgba(16,185,129,.6);background:rgba(16,185,129,.08);color:var(--green);font-weight:700}
 .ic-result-select.res-erroneous{border-color:rgba(245,158,11,.6);background:rgba(245,158,11,.08);color:var(--yellow);font-weight:700}
@@ -157,10 +156,22 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 </style>
 </head>
 <body>
-<div id="topbar" class="topbar"><div class="brand">Shortage Control Portal</div><span id="roleChip" class="role-chip"></span><div id="nav" class="nav"></div><div class="actions" style="margin-left:8px"><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('en')" id="langEn">EN</button><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('es')" id="langEs">ES</button><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('fa')" id="langFa">داری</button><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('ar')" id="langAr">عربي</button><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('fil')" id="langFil">FIL</button></div></div>
-<section id="loginScreen" class="screen active"><div class="login-wrap"><div class="login-header"><h1 id="i18n-title">Shortage Control Portal</h1><p id="i18n-subtitle">Separate shortage reporting app</p><div style="display:flex;gap:8px;justify-content:center;margin-top:10px"><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('en')">EN</button><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('es')">ES</button><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('fa')">داری</button><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('ar')">عربي</button><button class="btn" style="font-size:11px;padding:4px 10px" onclick="setLang('fil')">FIL</button></div></div><div class="login-group-label">Select role</div><div class="ic-btns"><button class="ic-login-btn" onclick="goPin('clerk')"><span class="ib-icon">&#128203;</span><span class="ib-title">Outbound Clerk</span><span class="ib-sub">Shortage Entry</span></button><button class="ic-login-btn" onclick="goPin('icteam')"><span class="ib-icon">&#128270;</span><span class="ib-title">IC Team</span><span class="ib-sub">Verify and Report</span></button><button class="ic-login-btn" onclick="goPin('manager')"><span class="ib-icon">&#9881;&#65039;</span><span class="ib-title">IC Manager</span><span class="ib-sub">Settings and Migration</span></button></div><div class="login-group-label" style="margin-top:16px">No Login Required</div><div style="display:grid;grid-template-columns:1fr;gap:10px"><button class="ic-login-btn" onclick="enterOverPull()" style="border-color:rgba(251,146,60,.4);background:var(--orange-l)"><span class="ib-icon">&#128202;</span><span class="ib-title" style="color:var(--orange)">Over Pull Log</span><span class="ib-sub">Operations — no PIN needed</span></button></div></div></section>
+<div id="topbar" class="topbar"><div class="brand">Order Shortage &amp; Overage Portal</div><span id="roleChip" class="role-chip"></span><div id="nav" class="nav"></div><div class="actions" style="margin-left:8px;gap:4px" title="Select Language">
+<button class="btn" style="font-size:10px;padding:3px 8px" onclick="setLang('en')" id="langEn" title="English">EN</button>
+<button class="btn" style="font-size:10px;padding:3px 8px" onclick="setLang('es')" id="langEs" title="Español">ES</button>
+<button class="btn" style="font-size:10px;padding:3px 8px;font-family:'Noto Naskh Arabic',sans-serif" onclick="setLang('fa')" id="langFa" title="Dari">داری</button>
+<button class="btn" style="font-size:10px;padding:3px 8px;font-family:'Noto Naskh Arabic',sans-serif" onclick="setLang('ar')" id="langAr" title="Arabic / عربي">عر</button>
+<button class="btn" style="font-size:10px;padding:3px 8px" onclick="setLang('fil')" id="langFil" title="Filipino">FIL</button>
+</div></div>
+<section id="loginScreen" class="screen active"><div class="login-wrap"><div class="login-header"><h1 id="i18n-title" style="color:#1a2038;font-size:26px;font-weight:800">Order Shortage &amp; Overage Portal</h1><p id="i18n-subtitle" style="color:#5a6480">Shortage &amp; Over Pull reporting — 815 Chapman Warehouse</p><p class="credit">Built by Ruben Mendoza &mdash; IC Manager &amp; Analytic Developer</p><div style="margin-top:14px"><div style="font-size:10px;font-weight:700;color:#8892ac;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;text-align:center">Select Language &mdash; اختر اللغة &mdash; Seleccionar Idioma</div><div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap">
+<button class="btn" style="font-size:11px;padding:5px 10px;background:#fff;border-color:#d4d9e8;color:#1a2038" onclick="setLang('en')" id="loginLangEn"><span style="font-weight:700">EN</span> English</button>
+<button class="btn" style="font-size:11px;padding:5px 10px;background:#fff;border-color:#d4d9e8;color:#1a2038" onclick="setLang('es')" id="loginLangEs"><span style="font-weight:700">ES</span> Español</button>
+<button class="btn" style="font-size:11px;padding:5px 10px;background:#fff;border-color:#d4d9e8;color:#1a2038;font-family:'Noto Naskh Arabic',sans-serif" onclick="setLang('fa')" id="loginLangFa"><span style="font-weight:700">داری</span> Dari</button>
+<button class="btn" style="font-size:11px;padding:5px 10px;background:#fff;border-color:#d4d9e8;color:#1a2038;font-family:'Noto Naskh Arabic',sans-serif" onclick="setLang('ar')" id="loginLangAr"><span style="font-weight:700">عربي</span> Arabic</button>
+<button class="btn" style="font-size:11px;padding:5px 10px;background:#fff;border-color:#d4d9e8;color:#1a2038" onclick="setLang('fil')" id="loginLangFil"><span style="font-weight:700">FIL</span> Filipino</button>
+</div></div></div><div class="login-group-label">Select role</div><div class="ic-btns"><button class="ic-login-btn" onclick="goPin('clerk')"><span class="ib-icon">&#128203;</span><span class="ib-title">Outbound Clerk</span><span class="ib-sub">Shortage Entry</span></button><button class="ic-login-btn" onclick="goPin('icteam')"><span class="ib-icon">&#128270;</span><span class="ib-title">IC Team</span><span class="ib-sub">Verify and Report</span></button><button class="ic-login-btn" onclick="goPin('manager')"><span class="ib-icon">&#9881;&#65039;</span><span class="ib-title">IC Manager</span><span class="ib-sub">Settings and Migration</span></button></div><div class="login-group-label" style="margin-top:16px">No Login Required</div><div style="display:grid;grid-template-columns:1fr;gap:10px"><button class="ic-login-btn" onclick="enterOverPull()" style="border-color:rgba(251,146,60,.4);background:var(--orange-l)"><span class="ib-icon">&#128202;</span><span class="ib-title" style="color:var(--orange)">Over Pull Log</span><span class="ib-sub">Operations — no PIN needed</span></button></div></div></section>
 <section id="pinScreen" class="screen"><div class="pin-card"><div id="pinBadge" class="pin-div-badge">Role</div><p style="color:var(--muted);font-size:12px">Enter PIN</p><div id="pinDots" class="pin-dots"><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span></div><div class="pin-keypad"><button class="pin-key" data-key="1" onclick="pinKey('1')">1</button><button class="pin-key" data-key="2" onclick="pinKey('2')">2</button><button class="pin-key" data-key="3" onclick="pinKey('3')">3</button><button class="pin-key" data-key="4" onclick="pinKey('4')">4</button><button class="pin-key" data-key="5" onclick="pinKey('5')">5</button><button class="pin-key" data-key="6" onclick="pinKey('6')">6</button><button class="pin-key" data-key="7" onclick="pinKey('7')">7</button><button class="pin-key" data-key="8" onclick="pinKey('8')">8</button><button class="pin-key" data-key="9" onclick="pinKey('9')">9</button><button class="pin-key clr" onclick="pinClear()">CLR</button><button class="pin-key" data-key="0" onclick="pinKey('0')">0</button><button class="pin-key clr" onclick="pinBack()">&#9003;</button></div><div id="pinError" class="pin-error"></div><button class="pin-back-btn" onclick="backToLogin()">Back</button></div></section>
-<section id="shortageScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Outbound</div><h1>Shortage Entry</h1><p>Log shortage lines and review active records.</p></div><div id="shortageTopActions" class="actions"></div></div><div class="card" id="entryCard"><div class="form-row four"><div class="field"><label>Date &amp; Time</label><input id="sDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="sDiv"><option value="">Select</option><option value="NH">NH</option><option value="GT">GT</option><option value="FS">FS</option><option value="EE">EE</option><option value="BC">BC</option><option value="CF">CF</option><option value="VP">VP – VIP</option><option value="TP">TP – Transpac</option></select></div><div class="field"><label>Picker <em>*</em></label><select id="sPickerSelect" onchange="onPickerSelectChange('sPickerSelect','sPickerNew','sPicker')"><option value="">-- Select Picker --</option></select><div id="sPickerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="sPickerNew" placeholder="FirstInitialLastName e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('sPickerNew','picker');syncNewPersonToHidden('sPickerNew','sPicker')" onblur="validatePersonField('sPickerNew','picker');syncNewPersonToHidden('sPickerNew','sPicker')" onkeydown="handleSuggestKey(event,'sPickerNewSuggest')"><div class="suggest-box" id="sPickerNewSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name</div></div><input id="sPicker" type="hidden"></div><div class="field"><label>Pack Station</label><div class="field-wrap"><input id="sPackStation" placeholder="e.g. PS-01" autocomplete="off" oninput="liveStationSuggest()" onblur="savePackStation()" onkeydown="handleSuggestKey(event,'sPackStationSuggest')"><div class="suggest-box" id="sPackStationSuggest" style="display:none"></div></div></div><div class="field"><label>Pick Demand # <em>*</em></label><input id="sDemand" placeholder="e.g. NH00012345" oninput="autoDivisionFromDemand()"></div><div class="field"><label>Shift Override</label><select id="sShift"><option value="auto">Auto (use current time)</option><option value="1st">1st</option><option value="2nd">2nd</option><option value="3rd">3rd</option></select></div></div><div class="card-title">Product Lines</div><div id="productLines"></div><div class="actions"><button class="btn" onclick="addProductLine()">+ Add Line</button><button class="btn" onclick="clearEntry()">Clear Form</button><button class="btn primary" style="flex:1" onclick="saveShortage()">+ Log All Shortages</button></div><div class="field" style="margin-top:12px"><label>Notes</label><textarea id="sNotes"></textarea></div></div><div class="filters"><input id="filterText" class="search" placeholder="Search by product, order, picker, division..." oninput="renderShortages()"><select id="viewMode" onchange="loadShortages(true)"><option value="active">Active</option><option value="archive">Archived History</option><option value="both">Active + Archived</option></select><input id="filterStart" type="date" onchange="renderShortages()"><input id="filterEnd" type="date" onchange="renderShortages()"><button class="btn" onclick="loadShortages(true)">Refresh Data</button></div><div id="archiveActions" class="actions" style="margin-bottom:10px"></div><div id="shortageList" class="shortage-list"></div></div></section>
+<section id="shortageScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Outbound</div><h1>Shortage Entry</h1><p>Log shortage lines and review active records.</p></div><div id="shortageTopActions" class="actions"></div></div><div class="card" id="entryCard"><div class="form-row four"><div class="field"><label>Date &amp; Time</label><input id="sDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="sDiv"><option value="">Select</option><option value="NH">NH</option><option value="GT">GT</option><option value="FS">FS</option><option value="EE">EE</option><option value="BC">BC</option><option value="CF">CF</option><option value="VP">VP – VIP</option><option value="TP">TP – Transpac</option></select></div><div class="field"><label>Picker <em>*</em></label><select id="sPickerSelect" onchange="onPickerSelectChange('sPickerSelect','sPickerNew','sPicker')"><option value="">-- Select Picker --</option></select><div id="sPickerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="sPickerNew" placeholder="FirstInitialLastName e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('sPickerNew','picker');syncNewPersonToHidden('sPickerNew','sPicker')" onblur="validatePersonField('sPickerNew','picker');syncNewPersonToHidden('sPickerNew','sPicker')" onkeydown="handleSuggestKey(event,'sPickerNewSuggest')"><div class="suggest-box" id="sPickerNewSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name</div></div><input id="sPicker" type="hidden"></div><div class="field"><label>Pack Station</label><select id="sPackStation"><option value="">-- Select Station --</option></select></div><div class="field"><label>Pick Demand # <em>*</em></label><input id="sDemand" placeholder="e.g. NH00012345" oninput="autoDivisionFromDemand()"></div><div class="field"><label>Shift Override</label><select id="sShift"><option value="auto">Auto (use current time)</option><option value="1st">1st</option><option value="2nd">2nd</option><option value="3rd">3rd</option></select></div></div><div class="card-title">Product Lines</div><div id="productLines"></div><div class="actions"><button class="btn" onclick="addProductLine()">+ Add Line</button><button class="btn" onclick="clearEntry()">Clear Form</button><button class="btn primary" style="flex:1" onclick="saveShortage()">+ Log All Shortages</button></div><div class="field" style="margin-top:12px"><label>Notes</label><textarea id="sNotes"></textarea></div></div><div class="filters"><input id="filterText" class="search" placeholder="Search by product, order, picker, division..." oninput="renderShortages()"><select id="viewMode" onchange="loadShortages(true)"><option value="active">Active</option><option value="archive">Archived History</option><option value="both">Active + Archived</option></select><input id="filterStart" type="date" onchange="renderShortages()"><input id="filterEnd" type="date" onchange="renderShortages()"><button class="btn" onclick="loadShortages(true)">Refresh Data</button></div><div id="archiveActions" class="actions" style="margin-bottom:10px"></div><div id="shortageList" class="shortage-list"></div></div></section>
 <section id="reportScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Reports</div><h1>Shortage Reports</h1><p>IC Team and IC Manager only.</p></div><div class="actions"><button class="btn primary" onclick="printSummaryReport()">Print Summary</button><button class="btn" onclick="printCheckReport()">Print IC Check Sheet</button></div></div><div class="card"><div class="form-row four"><div class="field"><label>Report Mode</label><select id="reportMode"><option value="active">Active Only</option><option value="archive">Archived History</option><option value="both">Active + Archived</option></select></div><div class="field"><label>Start Date</label><input id="reportStart" type="date"></div><div class="field"><label>End Date</label><input id="reportEnd" type="date"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="runReportPull()">Run Report</button></div></div></div><div id="reportBody"></div></div></section>
 <section id="restockScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Replenishment</div><h1>Replenishment Report</h1><p>IC Manager only.</p></div><button class="btn primary" onclick="printReplenReport()">Print</button></div><div class="card"><div class="card-title">Inventory Bin Report Import</div><p class="notice">Paste report columns: Bin Name, Product Code, Qty on Hand, Qty Allocated, Unit of Measure.</p><textarea id="binImport" style="width:100%;min-height:160px" placeholder="82-26-01&#9;DI1210&#9;12&#9;0&#9;EA"></textarea><div class="actions" style="margin-top:10px"><button class="btn primary" onclick="saveInventoryBinReport()">Import Bin Report</button></div></div><div id="restockBody"></div></div></section>
 <section id="pickerScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Personnel</div><h1>Manage Pickers &amp; Packers</h1><p>IC Manager only. Names stored as FirstInitialLastName (e.g. JDoe).</p></div></div><div class="card"><div class="card-title">Pickers</div><div class="form-row two"><div class="field"><label>Picker Name (FirstInitialLastName)</label><input id="pickerName" placeholder="JDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPickerManual()">Add Picker</button></div></div><div id="pickerList"></div></div><div class="card"><div class="card-title">Packers</div><div class="form-row two"><div class="field"><label>Packer Name (FirstInitialLastName)</label><input id="packerName" placeholder="MDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackerManual()">Add Packer</button></div></div><div id="packerList"></div></div><div class="card"><div class="card-title">Pack Stations</div><div class="form-row two"><div class="field"><label>Pack Station Name</label><input id="packStationName" placeholder="PS-01"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackStationManual()">Add Station</button></div></div><div id="packStationList"></div></div></div></section>
@@ -194,7 +205,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
       <div class="form-row three">
         <div class="field"><label>Packer Name <em>*</em></label><select id="opPackerSelect" onchange="onPickerSelectChange('opPackerSelect','opPackerNew','opPacker')"><option value="">-- Select Packer --</option></select><div id="opPackerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="opPackerNew" placeholder="e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('opPackerNew','packer');syncNewPersonToHidden('opPackerNew','opPacker')" onblur="validatePersonField('opPackerNew','packer');syncNewPersonToHidden('opPackerNew','opPacker')" onkeydown="handleSuggestKey(event,'opPackerNewSuggest')"><div class="suggest-box" id="opPackerNewSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name</div></div><input id="opPacker" type="hidden"></div>
         <div class="field"><label>Picker Name</label><select id="opPickerSelect" onchange="onPickerSelectChange('opPickerSelect','opPickerNew','opPicker')"><option value="">-- Select Picker --</option></select><div id="opPickerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="opPickerNew" placeholder="e.g. MDoe" autocomplete="off" oninput="livePersonSuggest('opPickerNew','picker');syncNewPersonToHidden('opPickerNew','opPicker')" onblur="validatePersonField('opPickerNew','picker');syncNewPersonToHidden('opPickerNew','opPicker')" onkeydown="handleSuggestKey(event,'opPickerNewSuggest')"><div class="suggest-box" id="opPickerNewSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name</div></div><input id="opPicker" type="hidden"></div>
-        <div class="field"><label>Pack Station</label><div class="field-wrap"><input id="opPackStation" placeholder="e.g. PS-01" autocomplete="off" oninput="liveStationSuggest('opPackStation')" onblur="savePackStation()" onkeydown="handleSuggestKey(event,'opPackStationSuggest')"><div class="suggest-box" id="opPackStationSuggest" style="display:none"></div></div></div>
+        <div class="field"><label>Pack Station</label><select id="opPackStation"><option value="">-- Select Station --</option></select></div>
       </div>
       <div class="card-title" style="margin-top:4px">Items Over-Pulled</div>
       <div id="opLines"></div>
@@ -243,9 +254,10 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
     <div style="padding:10px 22px 6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
       <div style="font-size:11px;color:var(--muted)">Filter:</div>
       <select id="icConfirmFilter" onchange="renderIcConfirmSheet()" style="background:var(--panel2);border:1.5px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;padding:5px 10px">
-        <option value="pending">Pending / Not Confirmed</option>
+        <option value="pending">&#128203; Pending Verification</option>
         <option value="all">All Active Shortages</option>
-        <option value="confirmed">Already Confirmed</option>
+        <option value="confirmed">&#10003; Confirmed Short</option>
+        <option value="erroneous">&#9888; Erroneous Bin</option>
       </select>
       <button class="btn" style="font-size:11px;padding:5px 10px" onclick="icMarkAllVisible('confirmed_short')">&#10003; Mark All Visible → Confirmed Short</button>
       <button class="btn orange" style="font-size:11px;padding:5px 10px" onclick="icMassConfirmNonErroneous()">&#9889; One-Time: Confirm All Non-Erroneous</button>
@@ -279,7 +291,7 @@ function getSettings(){try{return {...DEFAULT_SETTINGS,...JSON.parse(localStorag
 function initFirebase(){const s=getSettings();try{if(!firebase.apps.length)firebase.initializeApp(s.firebaseConfig);db=firebase.firestore();firebase.firestore().settings({ignoreUndefinedProperties:true});}catch(e){console.error(e);alert('Firebase connection failed. Check Settings. '+e.message)}}
 function showLoading(t){$('loadingText').textContent=t||'Loading...';$('loading').classList.add('show')}function hideLoading(){$('loading').classList.remove('show')}
 function applyTheme(){const light=localStorage.getItem('scp_theme')==='light';document.body.classList.toggle('light-mode',light);if($('themeToggle'))$('themeToggle').checked=light}function saveTheme(light){localStorage.setItem('scp_theme',light?'light':'dark');applyTheme()}
-function showScreen(name){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const el=$(name+'Screen');if(el)el.classList.add('active');$('topbar').classList.toggle('show',name!=='login'&&name!=='pin');document.querySelectorAll('.nav-btn[data-screen]').forEach(b=>b.classList.toggle('active',b.dataset.screen===name));if(name==='shortage')loadShortages(false);if(name==='report')renderReports();if(name==='picker')renderPickers();if(name==='restock')buildReplenishmentReport();if(name==='settings')loadSettingsForm();if(name==='overpull'){populatePickerSelects();opInitForm();opSwitchTab('entry');}}
+function showScreen(name){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const el=$(name+'Screen');if(el)el.classList.add('active');$('topbar').classList.toggle('show',name!=='login'&&name!=='pin');document.querySelectorAll('.nav-btn[data-screen]').forEach(b=>b.classList.toggle('active',b.dataset.screen===name));if(name==='shortage'){loadShortages(false);populateStationSelects();}if(name==='report')renderReports();if(name==='picker')renderPickers();if(name==='restock')buildReplenishmentReport();if(name==='settings')loadSettingsForm();if(name==='overpull'){if(role==='icteam'){alert('Over Pull access is not available for IC Team.');showScreen('shortage');return;}populatePickerSelects();populateStationSelects();opInitForm();opSwitchTab('entry');}}
 function goPin(target){pinTarget=target;pinBuf='';$('pinBadge').textContent=ROLE_LABELS[target];updateDots();$('pinError').textContent='';showScreen('pin')}
 function pinKey(k){if(pinBuf.length>=4)return;pinBuf+=k;updateDots();document.querySelectorAll('.pin-key').forEach(btn=>{if(btn.dataset.key===k){btn.classList.add('active-press');setTimeout(()=>btn.classList.remove('active-press'),140)}});if(pinBuf.length===4)setTimeout(checkPin,120)}
 function pinBack(){pinBuf=pinBuf.slice(0,-1);updateDots()}function pinClear(){pinBuf='';updateDots();$('pinError').textContent=''}function updateDots(){document.querySelectorAll('#pinDots .pin-dot').forEach((d,i)=>d.classList.toggle('filled',i<pinBuf.length))}
@@ -287,15 +299,16 @@ function checkPin(){if(pinBuf!==PINS[pinTarget]){document.querySelectorAll('#pin
 function backToLogin(){role='';pinTarget='';pinBuf='';showScreen('login')}
 document.addEventListener('keydown',e=>{if(!$('pinScreen').classList.contains('active'))return;if(e.key>='0'&&e.key<='9')pinKey(e.key);else if(e.key==='Backspace')pinBack();else if(e.key==='Escape')pinClear();else if(e.key==='Enter'&&pinBuf.length===4)checkPin()});
 function canRunReports(){return role==='icteam'||role==='manager'}function canSettings(){return role==='manager'}function canManage(){return role==='manager'}
-function buildNav(){let nav=[['shortage','Shortages']];if(canRunReports())nav.push(['report','Reports']);if(role==='manager')nav.push(['restock','Replenishment'],['picker','Manage Pickers'],['migration','Migration'],['settings','Settings']);nav.push(['overpull','Over Pull']);if(role==='icteam'||role==='manager')nav.push(['link','IC Portal']);nav.push(['theme','Light/Dark'],['logout','Logout']);$('nav').innerHTML=nav.map(n=>n[0]==='link'?`<a class="nav-btn" href="${IC_PORTAL_URL}" target="_blank">${n[1]}</a>`:n[0]==='logout'?`<button class="nav-btn lock" onclick="logout()">${n[1]}</button>`:n[0]==='theme'?`<button class="nav-btn" onclick="saveTheme(!document.body.classList.contains('light-mode'))">${n[1]}</button>`:n[0]==='overpull'?`<button class="nav-btn" data-screen="overpull" onclick="showScreen('overpull')" style="color:var(--orange)">${n[1]}</button>`:`<button class="nav-btn" data-screen="${n[0]}" onclick="showScreen('${n[0]}')">${n[1]}</button>`).join('')}
-function login(r){role=r;$('roleChip').textContent=ROLE_LABELS[r];$('roleChip').className='role-chip '+(r==='manager'?'manager':r==='icteam'?'icteam':'clerk');buildNav();$('entryCard').classList.toggle('hide',r!=='clerk');$('shortageTopActions').innerHTML=canRunReports()?`<a class="btn" href="${IC_PORTAL_URL}" target="_blank">Open IC Portal Tickets</a>`:'';$('archiveActions').innerHTML=canRunReports()?`<button class="btn" onclick="selectVisible(true)">Select Visible</button><button class="btn" onclick="selectVisible(false)">Clear Selection</button><button class="btn orange" onclick="archiveSelected()">Archive Selected</button><button class="btn red" onclick="archiveFiltered()">Archive Filtered Active</button><button class="btn green" onclick="openIcConfirm()" style="margin-left:auto">&#128203; IC Verify Sheet</button>`:'';showScreen('shortage')}
+function buildNav(){let nav=[['shortage','Shortages']];if(canRunReports())nav.push(['report','Reports']);if(role==='manager')nav.push(['restock','Replenishment'],['picker','Manage Pickers'],['migration','Migration'],['settings','Settings']);if(role!=='icteam')nav.push(['overpull','Over Pull']);if(role==='icteam'||role==='manager')nav.push(['link','IC Portal']);nav.push(['theme','Light/Dark'],['logout','Logout']);$('nav').innerHTML=nav.map(n=>n[0]==='link'?`<a class="nav-btn" href="${IC_PORTAL_URL}" target="_blank">${n[1]}</a>`:n[0]==='logout'?`<button class="nav-btn lock" onclick="logout()">${n[1]}</button>`:n[0]==='theme'?`<button class="nav-btn" onclick="saveTheme(!document.body.classList.contains('light-mode'))">${n[1]}</button>`:n[0]==='overpull'?`<button class="nav-btn" data-screen="overpull" onclick="showScreen('overpull')" style="color:var(--orange)">${n[1]}</button>`:`<button class="nav-btn" data-screen="${n[0]}" onclick="showScreen('${n[0]}')">${n[1]}</button>`).join('')}
+function login(r){role=r;$('roleChip').textContent=ROLE_LABELS[r];$('roleChip').className='role-chip '+(r==='manager'?'manager':r==='icteam'?'icteam':'clerk');buildNav();$('entryCard').classList.toggle('hide',r!=='clerk');$('shortageTopActions').innerHTML='';$('archiveActions').innerHTML=(canRunReports()?`<button class="btn green" onclick="openIcConfirm()" style="margin-right:auto">&#128203; IC Verify Sheet</button>`:'')+(canManage()?` <button class="btn" onclick="selectVisible(true)">Select Visible</button><button class="btn" onclick="selectVisible(false)">Clear Selection</button><button class="btn orange" onclick="archiveSelected()">Archive Selected</button><button class="btn red" onclick="archiveFiltered()">Archive Filtered Active</button>`:'');showScreen('shortage')}
 function logout(){role='';shortages=[];visibleShortages=[];showScreen('login')}
+const PRESET_STATIONS=[...Array(20)].map((_,i)=>`PS-${String(i+1).padStart(2,'0')}`);
 function loadAllPersonnel(){
   const saved=JSON.parse(localStorage.getItem('scp_pickers')||'null');
-  // Merge preset list with any saved additions; preset always included
   pickerNames=[...new Set([...PRESET_PICKERS,...(saved||[])])].sort();
   packerNames=JSON.parse(localStorage.getItem('scp_packers')||'[]');
-  packStations=JSON.parse(localStorage.getItem('scp_packstations')||'[]');
+  const savedStations=JSON.parse(localStorage.getItem('scp_packstations')||'[]');
+  packStations=[...new Set([...PRESET_STATIONS,...savedStations])].sort();
 }
 async function loadPickerNames(){loadAllPersonnel();}
 
@@ -349,14 +362,7 @@ function savePerson(raw, type){
 }
 
 function savePackStation(skipBlur){
-  const el=$('sPackStation');
-  if(!el)return;
-  const raw=(el.value||'').trim().toUpperCase();
-  if(!raw)return;
-  if(!packStations.includes(raw)){
-    packStations=[...new Set([...packStations,raw])].sort();
-    localStorage.setItem('scp_packstations',JSON.stringify(packStations));
-  }
+  // Now handled by select dropdown — kept for legacy compatibility
 }
 
 // Live suggest as user types
@@ -525,24 +531,39 @@ function isBackorderRisk(r){return !!r.foundInShortedBin&&!r.secondLocationFille
 function statusBadges(r){let b=[];if(r._archived)b.push(`<span class="badge purple">${t('badge.archived')}</span>`);if(r.icConfirmed==='confirmed_short')b.push(`<span class="badge green">&#10003; ${t('badge.confirmed')}</span>`);if(r.icConfirmed==='erroneous')b.push(`<span class="badge yellow">&#9888; ${t('badge.erroneous')}</span>`);else if(r.foundInShortedBin)b.push(`<span class="badge yellow">${t('badge.erroneous')}</span>`);if(isBackorderRisk(r))b.push(`<span class="badge red">${t('badge.backorder')}</span>`);if(r.secondLocationFilled)b.push(`<span class="badge blue">${t('badge.second_loc')}</span>`);if(r.replenishedAfterPick)b.push(`<span class="badge green">${t('badge.replenished')}</span>`);return b.join(' ')}
 function secondarySummary(r){const locs=Array.isArray(r.secondaryLocations)?r.secondaryLocations:[];return locs.map(x=>`${x.bin||'NO BIN'}: ${x.qty||0} ${x.uom||r.uom||'EA'}${x.icQtyOnHand?` (OH ${x.icQtyOnHand})`:''}${x.notes?` - ${x.notes}`:''}`).join(' | ')}
 function rowHtml(r){
-  // Special rendering for duplicate pick reports
   if(r.type==='duplicate_pick'){
-    const edit=canRunReports()?`<button class="btn" onclick="openEdit('${esc(r.id)}',${r._archived})">Edit</button>`:'';
+    const edit=canManage()?`<button class="btn" onclick="openEdit('${esc(r.id)}',${r._archived})">${t('btn.edit')}</button>`:'';
     return `<div class="shortage-row" style="border-color:rgba(251,146,60,.5);background:rgba(251,146,60,.06)">
       <div class="sr-head"><div style="flex:1">
         <div class="sr-codes" style="color:var(--orange)">&#9888; DUPLICATE PICK &bull; ${esc(r.pickDemand||'NO ORDER')}</div>
         <div class="sr-meta">${esc(r.date||'No date')} &bull; ${esc(r.division||'')} &bull; Picker: <strong>${esc(r.picker||'')}</strong> &bull; ${esc(r.shift||'')} Shift</div>
         <div class="sr-meta" style="margin-top:4px;color:var(--text)">${esc(r.notes||'')}</div>
         <div style="margin-top:6px"><span class="badge orange" style="color:var(--orange);background:var(--orange-l);border-color:rgba(251,146,60,.35)">&#9888; Duplicate Pick — Investigation Required</span></div>
-        <div class="sr-actions">${edit}</div>
+        ${edit?`<div class="sr-actions" style="margin-top:8px">${edit}</div>`:''}
       </div></div>
     </div>`;
   }
-  const chk=canRunReports()&&!r._archived?`<input class="sr-check" type="checkbox" data-id="${esc(r.id)}">`:'';const edit=`<button class="btn" onclick="openEdit('${esc(r.id)}',${r._archived})">${t('btn.edit')}</button>`;const mark=!r._archived?`<button class="btn green" onclick="markErroneous('${esc(r.id)}')">${t('btn.found_bin')}</button><button class="btn" onclick="toggleSecond('${esc(r.id)}')">${t('btn.second_loc')}</button><button class="btn" onclick="toggleReplenished('${esc(r.id)}')">${t('btn.replenished')}</button>`:'';const unarch=r._archived&&canRunReports()?`<button class="btn orange" onclick="unarchiveOne('${esc(r.id)}')">${t('btn.unarchive')}</button>`:'';const sec=secondarySummary(r);return `<div class="shortage-row ${r._archived?'archived':''} ${r.foundInShortedBin?'erroneous':''}"><div class="sr-head">${chk}<div style="flex:1"><div class="sr-codes">${esc(r.productCode||'NO PRODUCT')} <span style="color:var(--muted)">&bull;</span> ${esc(r.shortedBin||'NO BIN')}</div><div class="sr-meta">${esc(r.date||'No date')} &bull; ${esc(r.division||'')} &bull; ${t('row.qty')} ${esc(r.qtyShorted||'')} ${esc(r.uom||'')} &bull; ${t('row.demand')} ${esc(r.pickDemand||'')} &bull; ${t('row.picker')} ${esc(r.picker||'')}${r.packStation?' &bull; Station '+esc(r.packStation):''}</div><div class="sr-meta">${t('row.ic_found')}: ${esc(r.icQtyFound||'')} ${esc(r.icUom||r.uom||'')} ${r.icNotes?'&bull; '+esc(r.icNotes):''}</div>${sec?`<div class="sr-meta"><b>${t('row.second_filled')}</b> ${esc(sec)}</div>`:''}<div style="margin-top:6px">${statusBadges(r)}</div><div class="sr-actions">${edit}${mark}${unarch}</div></div></div></div>`}
+  const chk=canManage()&&!r._archived?`<input class="sr-check" type="checkbox" data-id="${esc(r.id)}">`:'';const edit=canRunReports()?`<button class="btn" onclick="openEdit('${esc(r.id)}',${r._archived})">${t('btn.edit')}</button>`:'';const mark=!r._archived&&canRunReports()?`<button class="btn green" onclick="markErroneous('${esc(r.id)}')">${t('btn.found_bin')}</button><button class="btn" onclick="toggleSecond('${esc(r.id)}')">${t('btn.second_loc')}</button><button class="btn" onclick="toggleReplenished('${esc(r.id)}')">${t('btn.replenished')}</button>`:'';const unarch=r._archived&&canManage()?`<button class="btn orange" onclick="unarchiveOne('${esc(r.id)}')">${t('btn.unarchive')}</button>`:'';const sec=secondarySummary(r);
+  const icFoundLine=r.icQtyFound?`<div class="sr-meta" style="color:var(--green)">&#10003; ${t('row.ic_found')}: ${esc(r.icQtyFound)} ${esc(r.icUom||r.uom||'')}${r.icNotes?' &bull; '+esc(r.icNotes):''}</div>`:'';
+  const badges=statusBadges(r);
+  return `<div class="shortage-row ${r._archived?'archived':''} ${r.foundInShortedBin?'erroneous':''}">
+    <div class="sr-head">${chk}
+      <div style="flex:1">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:4px">
+          <div class="sr-codes">${esc(r.productCode||'NO PRODUCT')} <span style="color:var(--muted)">&bull;</span> ${esc(r.shortedBin||'NO BIN')}</div>
+          ${badges?`<div style="display:flex;flex-wrap:wrap;gap:4px">${badges}</div>`:''}
+        </div>
+        <div class="sr-meta" style="margin-top:4px">${esc(r.date||'No date')} &bull; <strong>${esc(r.division||'')}</strong> &bull; ${t('row.qty')} <strong>${esc(r.qtyShorted||'')} ${esc(r.uom||'')}</strong> &bull; ${t('row.demand')} ${esc(r.pickDemand||'')} &bull; ${t('row.picker')} ${esc(r.picker||'')}${r.packStation?' &bull; '+esc(r.packStation):''}</div>
+        ${icFoundLine}
+        ${sec?`<div class="sr-meta"><strong>${t('row.second_filled')}</strong> ${esc(sec)}</div>`:''}
+        <div class="sr-actions" style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">${edit}${mark}${unarch}</div>
+      </div>
+    </div>
+  </div>`
 async function saveShortage(){autoDivisionFromDemand();validatePickerInput();const base={date:$('sDate').value||nowLocalInput(),division:$('sDiv').value,pickDemand:$('sDemand').value.trim().toUpperCase(),picker:normalizeName(($('sPicker').value||$('sPickerNew').value||'').trim()),packStation:($('sPackStation').value.trim().toUpperCase()),shift:shiftValue(),uom:'EA',notes:$('sNotes').value.trim(),createdAt:new Date().toISOString(),createdBy:role,foundInShortedBin:false,secondLocationFilled:false,replenishedAfterPick:false,status:'open'};const lines=getProductLines();if(!base.pickDemand){alert('Pick Demand # is required.');return}if(!base.division){alert('Division is required. Enter or scan the Pick Demand # first.');return}if(!base.picker){alert('Picker is required.');return}if(base.picker&&!fuzzyMatchPerson(base.picker,'picker')){if(!confirm(`"${base.picker}" is not saved. Save as new picker?`)){$('sPicker').focus();return}savePerson(base.picker,'picker');}if(!lines.length||lines.some(l=>!l.productCode||!l.shortedBin)){alert('Each product line needs Product Code and Bin Shorted.');return}
   const invalidBins=lines.filter(l=>l.shortedBin&&!validateBinFormat(l.shortedBin).ok);
   if(invalidBins.length){alert('Invalid bin format on one or more lines.\n\nValid formats:\n  ##-##-##  (e.g. 82-26-01)\n  ##-##-#   (e.g. 82-26-1)\n  P#####    (e.g. P12345)\n  BULK\n  ROOM\n  KEY ACCOUNT');return}showLoading('Saving shortages...');try{const batch=db.batch();const col=db.collection(getSettings().activeCollection);lines.forEach(line=>{batch.set(col.doc(),{...base,...line,uom:'EA'});});await batch.commit();clearCaches();clearEntry();await loadShortages(true)}catch(e){alert(e.message)}finally{hideLoading()}}
-function clearEntry(){['sDemand','sPicker','sPackStation','sNotes'].forEach(id=>{if($(id))$(id).value='';});['sPickerSelect'].forEach(id=>{const el=$(id);if(el)el.value='';});['sPickerNewWrap'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});$('sDiv').value='';$('sShift').value='auto';$('sDate').value=nowLocalInput();$('productLines').innerHTML='';addProductLine();['sPickerNewSuggest','sPackStationSuggest'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});}
+function clearEntry(){['sDemand','sPicker','sNotes'].forEach(id=>{if($(id))$(id).value='';});['sPickerSelect','sPackStation'].forEach(id=>{const el=$(id);if(el)el.value='';});['sPickerNewWrap'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});$('sDiv').value='';$('sShift').value='auto';$('sDate').value=nowLocalInput();$('productLines').innerHTML='';addProductLine();['sPickerNewSuggest','sPackStationSuggest'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});}
 function clearCaches(){Object.keys(localStorage).filter(k=>k.startsWith('scp_cache_')).forEach(k=>localStorage.removeItem(k))}
 async function updateRecord(id,data,archived=false){showLoading('Saving...');try{const s=getSettings();await db.collection(archived?s.archiveCollection:s.activeCollection).doc(id).set({...data,updatedAt:new Date().toISOString(),updatedBy:role},{merge:true});clearCaches();await loadShortages(true)}catch(e){alert(e.message)}finally{hideLoading()}}
 async function markErroneous(id){const r=shortages.find(x=>x.id===id&&!x._archived);if(!r)return;const qty=prompt('Qty found in the shorted bin:',r.icQtyFound||r.qtyShorted||'');if(qty===null)return;const uom=prompt('UOM:',r.icUom||r.uom||'EA');if(uom===null)return;await updateRecord(id,{foundInShortedBin:true,icQtyFound:num(qty),icUom:(uom||'EA').toUpperCase(),status:'located'},false)}
@@ -590,8 +611,8 @@ function openEdit(id,archived){const r=shortages.find(x=>x.id===id&&x._archived=
 function closeEdit(){$('editOverlay').classList.remove('open');editingId=null}
 async function saveEdit(){const binRaw=$('eBin').value.trim();if(binRaw&&!validateBinFormat(binRaw).ok){alert('Invalid bin format.\n\nValid: ##-##-##, ##-##-#, P#####, BULK, ROOM, KEY ACCOUNT');return}const data={date:$('eDate').value,division:$('eDiv').value.trim().toUpperCase(),productCode:$('eProduct').value.trim().toUpperCase(),shortedBin:binRaw.toUpperCase(),qtyShorted:num($('eQty').value),uom:$('eUom').value.trim().toUpperCase(),pickDemand:$('eDemand').value.trim(),picker:$('ePicker').value.trim(),notes:$('eNotes').value.trim(),icQtyFound:num($('eIcQty').value),icUom:$('eIcUom').value.trim().toUpperCase(),icNotes:$('eIcNotes').value.trim(),foundInShortedBin:$('eErr').checked,secondLocationFilled:$('eSecond').checked,replenishedAfterPick:$('eRep').checked,status:$('eErr').checked?'located':'open'};if(!data.foundInShortedBin){data.icQtyFound=0;data.icUom='';data.icNotes=data.icNotes}await updateRecord(editingId,data,editingArchive);closeEdit()}
 function selectVisible(on){document.querySelectorAll('.sr-check:not(:disabled)').forEach(c=>c.checked=on)}function selectedIds(){return [...document.querySelectorAll('.sr-check:checked')].map(c=>c.dataset.id)}async function archiveSelected(){const ids=selectedIds();if(!ids.length){alert('Select shortages first.');return}await archiveIds(ids)}async function archiveFiltered(){const ids=visibleShortages.filter(r=>!r._archived).map(r=>r.id);if(!ids.length){alert('No active filtered shortages to archive.');return}if(!confirm(`Archive ${ids.length} active filtered shortages?`))return;await archiveIds(ids)}
-async function archiveIds(ids){showLoading('Archiving shortages...');try{const s=getSettings();const batch=db.batch();ids.forEach(id=>{const r=shortages.find(x=>x.id===id&&!x._archived);if(!r)return;const src=db.collection(s.activeCollection).doc(id);const dst=db.collection(s.archiveCollection).doc(id);const data={...r,archivedAt:new Date().toISOString(),archivedBy:role};delete data.id;delete data._archived;batch.set(dst,data,{merge:true});batch.delete(src)});await batch.commit();clearCaches();await loadShortages(true)}catch(e){alert(e.message)}finally{hideLoading()}}
-async function unarchiveOne(id){showLoading('Unarchiving...');try{const s=getSettings();const r=shortages.find(x=>x.id===id&&x._archived);const data={...r,unarchivedAt:new Date().toISOString()};delete data.id;delete data._archived;const batch=db.batch();batch.set(db.collection(s.activeCollection).doc(id),data,{merge:true});batch.delete(db.collection(s.archiveCollection).doc(id));await batch.commit();clearCaches();await loadShortages(true)}catch(e){alert(e.message)}finally{hideLoading()}}
+async function archiveIds(ids){if(!canManage()){alert('IC Manager access required to archive.');return;}showLoading('Archiving shortages...');try{const s=getSettings();const batch=db.batch();ids.forEach(id=>{const r=shortages.find(x=>x.id===id&&!x._archived);if(!r)return;const src=db.collection(s.activeCollection).doc(id);const dst=db.collection(s.archiveCollection).doc(id);const data={...r,archivedAt:new Date().toISOString(),archivedBy:role};delete data.id;delete data._archived;batch.set(dst,data,{merge:true});batch.delete(src)});await batch.commit();clearCaches();await loadShortages(true)}catch(e){alert(e.message)}finally{hideLoading()}}
+async function unarchiveOne(id){if(!canManage()){alert('IC Manager access required.');return;}showLoading('Unarchiving...');try{const s=getSettings();const r=shortages.find(x=>x.id===id&&x._archived);const data={...r,unarchivedAt:new Date().toISOString()};delete data.id;delete data._archived;const batch=db.batch();batch.set(db.collection(s.activeCollection).doc(id),data,{merge:true});batch.delete(db.collection(s.archiveCollection).doc(id));await batch.commit();clearCaches();await loadShortages(true)}catch(e){alert(e.message)}finally{hideLoading()}}
 function reportStats(rows){return {total:rows.length,confirmed:rows.filter(r=>r.icConfirmed==='confirmed_short').length,err:rows.filter(r=>r.foundInShortedBin||r.icConfirmed==='erroneous').length,backorder:rows.filter(isBackorderRisk).length,second:rows.filter(r=>r.secondLocationFilled||r.icConfirmed==='second_location').length,replen:rows.filter(r=>r.replenishedAfterPick).length,archived:rows.filter(r=>r._archived).length,pending:rows.filter(r=>!r.icConfirmed&&!r.foundInShortedBin&&!r.secondLocationFilled).length}}
 function table(headers,rows){if(!rows.length)return '<div class="empty">No records found.</div>';return `<div style="overflow:auto"><table class="table"><thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`}
 
@@ -1048,7 +1069,7 @@ function strictBinValidate(input){
    ═══════════════════════════════════════════════════════ */
 let opRecords=[];
 
-function enterOverPull(){
+function enterOverPull(){if(role==='icteam'){alert('Over Pull access is not available for IC Team.');return;}
   // No pin needed — go straight to overpull screen via showScreen logic but without role gating
   // Show topbar manually since we're not "logged in" via a role
   if(!role){ // not logged into any role — treat as ops visitor
@@ -1059,7 +1080,7 @@ function enterOverPull(){
   }
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   $('overpullScreen').classList.add('active');
-  populatePickerSelects();opInitForm();
+  populatePickerSelects();populateStationSelects();opInitForm();
   opSwitchTab('entry');
 }
 
@@ -1610,6 +1631,16 @@ function printOverPullReport(){
   setTimeout(()=>{$('printArea').innerHTML='';},500);
 }
 
+function populateStationSelects(){
+  const stationOpts='<option value="">-- Select Station --</option>'+
+    packStations.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join('');
+  ['sPackStation','opPackStation'].forEach(id=>{
+    const sel=$(id);if(!sel)return;
+    const cur=sel.value;
+    sel.innerHTML=stationOpts;
+    if(cur)sel.value=cur;
+  });
+}
 function populatePickerSelects(){
   // Build option lists for all person selects
   const pickerOpts=['<option value="">-- Select Picker --</option>',
@@ -1713,10 +1744,11 @@ function closeIcConfirm(){
 
 function icConfirmFilteredRows(){
   const f=$('icConfirmFilter')?.value||'pending';
-  const active=shortages.filter(r=>!r._archived);
+  const active=shortages.filter(r=>!r._archived&&r.type!=='duplicate_pick');
   if(f==='pending') return active.filter(r=>!r.icConfirmed&&!r.foundInShortedBin&&!r.secondLocationFilled);
-  if(f==='confirmed') return active.filter(r=>r.icConfirmed);
-  return active;
+  if(f==='confirmed') return active.filter(r=>r.icConfirmed==='confirmed_short');
+  if(f==='erroneous') return active.filter(r=>r.foundInShortedBin||r.icConfirmed==='erroneous');
+  return active; // all
 }
 
 function icUpdateStats(){
@@ -1748,65 +1780,63 @@ function renderIcConfirmSheet(){
     return;
   }
 
-  const headerRow=`<div class="ic-sheet-row ic-sheet-head" style="font-size:10px;grid-template-columns:28px 90px 120px 90px 1fr 170px 1fr">
-    <div>#</div><div>BIN</div><div>PRODUCT</div><div>SHORTED QTY</div><div>DEMAND · PICKER</div>
-    <div>IC RESULT</div><div>IC COUNTS &amp; NOTES</div>
-  </div>`;
-
   const dataRows=rows.map((r,i)=>{
     const edit=icConfirmEdits[r.id]||{};
     const alreadyDone=!!(r.icConfirmed||r.foundInShortedBin||r.secondLocationFilled);
     const curResult=edit.result||(r.icConfirmed||(r.foundInShortedBin?'erroneous':r.secondLocationFilled?'second_location':''));
-    // IC counts — multi-line
     const counts=edit.icCounts||[{qty:'',uom:r.uom||'EA',notes:''}];
     const curNotes=edit.icNotes!==undefined?edit.icNotes:(r.icNotes||'');
-    const curSecBin=edit.secondBin||'';
     const rowClass=curResult==='confirmed_short'?'confirmed-row':curResult==='erroneous'?'erroneous-row':alreadyDone?'already-done':'';
-    const selectClass=curResult==='confirmed_short'?'res-confirmed':curResult==='erroneous'?'res-erroneous':curResult==='second_location'?'res-second':'';
-
-    // Build count lines
+    const selectClass=curResult==='confirmed_short'?'res-confirmed':curResult==='erroneous'?'res-erroneous':'';
     const countLines=counts.map((c,ci)=>`
-      <div style="display:flex;gap:4px;align-items:center;margin-bottom:4px">
-        <input class="ic-qty-input" type="number" min="0" placeholder="qty" style="width:60px"
+      <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px">
+        <input class="ic-qty-input" type="number" min="0" placeholder="Qty" style="width:70px;font-size:15px;padding:8px"
           data-id="${esc(r.id)}" data-ci="${ci}" data-field="qty" value="${esc(String(c.qty))}" onchange="icCountChange(this)">
         ${uomSelect(`uom_${esc(r.id)}_${ci}`,c.uom)}
-        <input class="ic-notes-input" placeholder="notes (optional)" style="flex:1"
+        <input class="ic-notes-input" placeholder="Notes..." style="flex:1;font-size:13px;padding:8px"
           data-id="${esc(r.id)}" data-ci="${ci}" data-field="notes" value="${esc(c.notes||'')}" onchange="icCountChange(this)">
-        ${ci>0?`<button class="btn" style="padding:2px 7px;font-size:11px;min-width:unset" onclick="icRemoveCount('${esc(r.id)}',${ci})">×</button>`:''}
+        ${ci>0?`<button class="btn" style="padding:4px 10px;font-size:13px" onclick="icRemoveCount('${esc(r.id)}',${ci})">&times;</button>`:''}
       </div>`).join('');
 
-    return `<div class="ic-sheet-row ${rowClass}" data-id="${esc(r.id)}" style="grid-template-columns:28px 90px 120px 90px 1fr 170px 1fr;align-items:start">
-      <div style="font-size:10px;color:var(--muted);padding-top:6px">${i+1}</div>
-      <div style="font-family:var(--mono);font-weight:700;font-size:11px;padding-top:6px">${esc(r.shortedBin||'—')}</div>
-      <div style="font-family:var(--mono);font-weight:700;font-size:11px;color:var(--accent);padding-top:6px">${esc(r.productCode||'—')}</div>
-      <div style="font-family:var(--mono);font-size:11px;padding-top:6px;color:var(--yellow);font-weight:600">${r.qtyShorted||0} <span style="color:var(--muted)">${esc(r.uom||'EA')}</span></div>
-      <div style="font-size:11px;padding-top:6px"><span style="font-family:var(--mono)">${esc(r.pickDemand||'—')}</span><br><span style="color:var(--muted);font-size:10px">${esc(r.picker||'—')}${r.packer?' / '+esc(r.packer):''}</span></div>
-      <div style="padding-top:4px">
-        <select class="ic-result-select ${selectClass}" data-id="${esc(r.id)}" onchange="icResultChange(this)">
-          <option value="">— Pending —</option>
-          <option value="confirmed_short" ${curResult==='confirmed_short'?'selected':''}>✓ Confirmed Short</option>
-          <option value="erroneous" ${curResult==='erroneous'?'selected':''}>⚠ Erroneous Bin</option>
-          <option value="second_location" ${curResult==='second_location'?'selected':''}>↺ 2nd Location Fill</option>
-          <option value="not_found" ${curResult==='not_found'?'selected':''}>✗ Not Found</option>
-          <option value="skip" ${curResult==='skip'?'selected':''}>— Skip / Review Later</option>
-        </select>
-        ${alreadyDone&&!edit.result?`<div style="font-size:10px;color:var(--muted);margin-top:4px;font-style:italic">Previously: ${curResult||'verified'}</div>`:''}
-      </div>
-      <div>
-        ${countLines}
-        <button class="btn" style="font-size:11px;padding:3px 8px;margin-top:2px" onclick="icAddCount('${esc(r.id)}',${esc(JSON.stringify(r.uom||'EA'))})">+ Add Count Line</button>
-        <div style="margin-top:6px">
-          <input class="ic-notes-input" placeholder="General IC notes..." data-id="${esc(r.id)}" data-field="icNotes"
-            value="${esc(curNotes)}" onchange="icNoteChange(this)" style="width:100%">
+    return `<div class="ic-sheet-row ${rowClass}" data-id="${esc(r.id)}">
+      <!-- Row header: bin + product + qty -->
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div>
+          <div style="font-family:var(--mono);font-size:15px;font-weight:800;color:var(--accent)">${esc(r.shortedBin||'—')}</div>
+          <div style="font-family:var(--mono);font-size:13px;font-weight:700;margin-top:2px">${esc(r.productCode||'—')}</div>
         </div>
-        ${curResult==='second_location'?`<div style="margin-top:4px"><input class="ic-notes-input" placeholder="2nd location bin (e.g. 82-26-01)..."
-          data-id="${esc(r.id)}" data-field="secondBin" value="${esc(curSecBin)}" onchange="icNoteChange(this)"
-          style="width:100%;font-family:var(--mono)"></div>`:''}
+        <div style="text-align:right">
+          <div style="font-size:13px;font-weight:700;color:var(--yellow)">${r.qtyShorted||0} ${esc(r.uom||'EA')}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">#${i+1} of ${rows.length}</div>
+        </div>
       </div>
+      <!-- Meta: demand / picker -->
+      <div style="font-size:11px;color:var(--muted);margin-bottom:10px;border-bottom:1px solid var(--border);padding-bottom:8px">
+        <span style="font-family:var(--mono)">${esc(r.pickDemand||'—')}</span> &bull; ${esc(r.division||'')} &bull; ${esc(r.picker||'—')}${r.packer?' / '+esc(r.packer):''}
+        ${alreadyDone&&!edit.result?`<span style="margin-left:8px;color:var(--green);font-weight:600">✓ Previously: ${curResult||'verified'}</span>`:''}
+      </div>
+      <!-- IC Result — big tap target -->
+      <div style="margin-bottom:10px">
+        <select class="ic-result-select ${selectClass}" data-id="${esc(r.id)}" onchange="icResultChange(this)"
+          style="width:100%;font-size:15px;padding:10px 12px;font-weight:700;border-radius:8px">
+          <option value="">— Pending —</option>
+          <option value="confirmed_short" ${curResult==='confirmed_short'?'selected':''}>✓ Confirmed Short Bin</option>
+          <option value="erroneous" ${curResult==='erroneous'?'selected':''}>⚠ Erroneous Short</option>
+          <option value="skip" ${curResult==='skip'?'selected':''}>↺ Skip (Review Next Pass)</option>
+        </select>
+      </div>
+      <!-- IC Counts -->
+      <div style="margin-bottom:6px">
+        ${countLines}
+        <button class="btn" style="font-size:12px;padding:6px 12px" onclick="icAddCount('${esc(r.id)}',${esc(JSON.stringify(r.uom||'EA'))})">+ Add Count Line</button>
+      </div>
+      <!-- IC Notes -->
+      <input class="ic-notes-input" placeholder="IC notes..." data-id="${esc(r.id)}" data-field="icNotes"
+        value="${esc(curNotes)}" onchange="icNoteChange(this)" style="width:100%;font-size:13px;padding:8px">
     </div>`;
   }).join('');
 
-  $('icConfirmSheet').innerHTML=headerRow+dataRows;
+  $('icConfirmSheet').innerHTML=dataRows;
 }
 
 function icResultChange(sel){
@@ -1920,10 +1950,9 @@ async function icConfirmSubmitAll(){
 
   const confirm_ct=entries.filter(([,e])=>e.result==='confirmed_short').length;
   const err_ct=entries.filter(([,e])=>e.result==='erroneous').length;
-  const sec_ct=entries.filter(([,e])=>e.result==='second_location').length;
-  const not_ct=entries.filter(([,e])=>e.result==='not_found').length;
+  const skip_ct=entries.filter(([,e])=>e.result==='skip').length;
 
-  if(!confirm(`Save IC verification results?\n\n✓ Confirmed Short: ${confirm_ct}\n⚠ Erroneous Bin: ${err_ct}\n↺ 2nd Location: ${sec_ct}\n✗ Not Found: ${not_ct}\n\nThis will update ${entries.length} shortage record(s).`))return;
+  if(!confirm(`Save IC verification results?\n\n✓ Confirmed Short Bin: ${confirm_ct}\n⚠ Erroneous Short: ${err_ct}\n↺ Skip (next pass): ${skip_ct}\n\nThis will update ${entries.length} shortage record(s).`))return;
 
   showLoading('Saving IC verification results...');
   try{
@@ -1961,24 +1990,10 @@ async function icConfirmSubmitAll(){
       if(edit.result==='erroneous'){
         update.foundInShortedBin=true;
         update.status='located';
-      } else if(edit.result==='second_location'){
-        update.secondLocationFilled=true;
-        update.status='located';
-        if(edit.secondBin){
-          const existingLocs=Array.isArray(r.secondaryLocations)?r.secondaryLocations:[];
-          update.secondaryLocations=[...existingLocs,{
-            bin:edit.secondBin.trim().toUpperCase(),
-            qty:totalIcQty||0,
-            uom:validCounts[0]?.uom||r.uom||'EA',
-            notes:edit.icNotes||countSummary||'Added via IC Verify Sheet',
-            enteredAt:verifiedAt,enteredBy:verifiedBy
-          }];
-        }
       } else if(edit.result==='confirmed_short'){
         update.status='confirmed_short';
-      } else if(edit.result==='not_found'){
-        update.status='open';
       }
+      // skip = no status change, stays open for next pass
       batch.set(ref,update,{merge:true});
       count++;
       if(count%499===0){batches.push(batch);batch=db.batch();count=0;}
@@ -2645,7 +2660,7 @@ async function forceReloadAllClients(){
   }catch(e){hideLoading();alert('Failed: '+e.message);}
 }
 
-function startup(){applyTheme();initFirebase();$('sDate').value=nowLocalInput();loadAllPersonnel();populatePickerSelects();if($('productLines'))addProductLine();const sl=localStorage.getItem('scp_lang')||'en';setLang(sl);startResetListener();}
+function startup(){applyTheme();initFirebase();$('sDate').value=nowLocalInput();loadAllPersonnel();populatePickerSelects();populateStationSelects();if($('productLines'))addProductLine();const sl=localStorage.getItem('scp_lang')||'en';setLang(sl);startResetListener();}
 startup();
 </script>
 </body>
