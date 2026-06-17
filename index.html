@@ -169,13 +169,13 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 <button class="btn" style="font-size:11px;padding:5px 10px;background:#fff;border-color:#d4d9e8;color:#1a2038;font-family:'Noto Naskh Arabic',sans-serif" onclick="setLang('fa')" id="loginLangFa"><span style="font-weight:700">داری</span> Dari</button>
 <button class="btn" style="font-size:11px;padding:5px 10px;background:#fff;border-color:#d4d9e8;color:#1a2038;font-family:'Noto Naskh Arabic',sans-serif" onclick="setLang('ar')" id="loginLangAr"><span style="font-weight:700">عربي</span> Arabic</button>
 <button class="btn" style="font-size:11px;padding:5px 10px;background:#fff;border-color:#d4d9e8;color:#1a2038" onclick="setLang('fil')" id="loginLangFil"><span style="font-weight:700">FIL</span> Filipino</button>
-</div></div></div><div class="login-group-label">Select role</div><div class="ic-btns"><button class="ic-login-btn" onclick="goPin('clerk')"><span class="ib-icon">&#128203;</span><span class="ib-title">Outbound Clerk</span><span class="ib-sub">Shortage Entry</span></button><button class="ic-login-btn" onclick="goPin('icteam')"><span class="ib-icon">&#128270;</span><span class="ib-title">IC Team</span><span class="ib-sub">Verify and Report</span></button><button class="ic-login-btn" onclick="goPin('manager')"><span class="ib-icon">&#9881;&#65039;</span><span class="ib-title">IC Manager</span><span class="ib-sub">Settings and Migration</span></button></div><div class="login-group-label" style="margin-top:16px">No Login Required</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><button class="ic-login-btn" onclick="enterOverPull()" style="border-color:rgba(251,146,60,.4);background:var(--orange-l)"><span class="ib-icon">&#128202;</span><span class="ib-title" style="color:var(--orange)">Over Pull Portal</span><span class="ib-sub">Log over-pulled items</span></button><button class="ic-login-btn" onclick="enterBatchPick()" style="border-color:rgba(167,139,250,.4);background:var(--purple-l)"><span class="ib-icon">&#128203;</span><span class="ib-title" style="color:var(--purple)">Batch Pick Sheet</span><span class="ib-sub">One item, multiple orders</span></button></div></div></section>
+</div></div></div><div class="login-group-label">Select role</div><div class="ic-btns"><button class="ic-login-btn" onclick="goPin('clerk')"><span class="ib-icon">&#128203;</span><span class="ib-title">Outbound Clerk</span><span class="ib-sub">Shortage Entry</span></button><button class="ic-login-btn" onclick="goPin('icteam')"><span class="ib-icon">&#128270;</span><span class="ib-title">IC Team</span><span class="ib-sub">Verify and Report</span></button><button class="ic-login-btn" onclick="goPin('manager')"><span class="ib-icon">&#9881;&#65039;</span><span class="ib-title">IC Manager</span><span class="ib-sub">Settings and Migration</span></button></div><div class="login-group-label" style="margin-top:16px">No Login Required</div><div style="display:grid;grid-template-columns:1fr;gap:10px"><button class="ic-login-btn" onclick="enterOverPull()" style="border-color:rgba(251,146,60,.4);background:var(--orange-l);grid-column:1/-1"><span class="ib-icon">&#128202;</span><span class="ib-title" style="color:var(--orange)">Over Pull Portal</span><span class="ib-sub">Over Pull &amp; Batch Pick &mdash; no PIN needed</span></button></div></div></section>
 <section id="pinScreen" class="screen"><div class="pin-card"><div id="pinBadge" class="pin-div-badge">Role</div><p style="color:var(--muted);font-size:12px">Enter PIN</p><div id="pinDots" class="pin-dots"><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span></div><div class="pin-keypad"><button class="pin-key" data-key="1" onclick="pinKey('1')">1</button><button class="pin-key" data-key="2" onclick="pinKey('2')">2</button><button class="pin-key" data-key="3" onclick="pinKey('3')">3</button><button class="pin-key" data-key="4" onclick="pinKey('4')">4</button><button class="pin-key" data-key="5" onclick="pinKey('5')">5</button><button class="pin-key" data-key="6" onclick="pinKey('6')">6</button><button class="pin-key" data-key="7" onclick="pinKey('7')">7</button><button class="pin-key" data-key="8" onclick="pinKey('8')">8</button><button class="pin-key" data-key="9" onclick="pinKey('9')">9</button><button class="pin-key clr" onclick="pinClear()">CLR</button><button class="pin-key" data-key="0" onclick="pinKey('0')">0</button><button class="pin-key clr" onclick="pinBack()">&#9003;</button></div><div id="pinError" class="pin-error"></div><button class="pin-back-btn" onclick="backToLogin()">Back</button></div></section>
 <section id="shortageScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Outbound</div><h1>Shortage Entry</h1><p>Log shortage lines and review active records.</p></div><div id="shortageTopActions" class="actions"></div></div><div class="card" id="entryCard"><div class="form-row four"><div class="field"><label>Date &amp; Time</label><input id="sDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="sDiv"><option value="">Select</option><option value="NH">NH</option><option value="GT">GT</option><option value="FS">FS</option><option value="EE">EE</option><option value="BC">BC</option><option value="CF">CF</option><option value="VP">VP – VIP</option><option value="TP">TP – Transpac</option></select></div><div class="field"><label>Picker <em>*</em></label><select id="sPickerSelect" onchange="onPickerSelectChange('sPickerSelect','sPickerNew','sPicker')"><option value="">-- Select Picker --</option></select><div id="sPickerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="sPickerNew" placeholder="FirstInitialLastName e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('sPickerNew','picker');syncNewPersonToHidden('sPickerNew','sPicker')" onblur="validatePersonField('sPickerNew','picker');syncNewPersonToHidden('sPickerNew','sPicker')" onkeydown="handleSuggestKey(event,'sPickerNewSuggest')"><div class="suggest-box" id="sPickerNewSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name</div></div><input id="sPicker" type="hidden"></div><div class="field"><label>Pack Station</label><select id="sPackStation"><option value="">-- Select Station --</option></select></div><div class="field"><label>Pick Demand # <em>*</em></label><input id="sDemand" placeholder="e.g. NH00012345" oninput="autoDivisionFromDemand()"></div><div class="field"><label>Shift Override</label><select id="sShift"><option value="auto">Auto (use current time)</option><option value="1st">1st Shift (6am–3:30pm)</option><option value="2nd">2nd Shift (3:30pm–12am)</option><option value="weekend_ot">Weekend OT (6am–12am)</option></select></div></div><div class="card-title">Product Lines</div><div id="productLines"></div><div class="actions"><button class="btn" onclick="addProductLine()">+ Add Line</button><button class="btn" onclick="clearEntry()">Clear Form</button><button class="btn primary" style="flex:1" onclick="saveShortage()">+ Log All Shortages</button></div><div class="field" style="margin-top:12px"><label>Notes</label><textarea id="sNotes"></textarea></div></div><div class="filters"><input id="filterText" class="search" placeholder="Search by product, order, picker, division..." oninput="renderShortages()"><select id="viewMode" onchange="loadShortages(true)"><option value="active">Active</option><option value="archive">Archived History</option><option value="both">Active + Archived</option></select><input id="filterStart" type="date" onchange="renderShortages()"><input id="filterEnd" type="date" onchange="renderShortages()"><button class="btn" onclick="loadShortages(true)">Refresh Data</button></div><div id="archiveActions" class="actions" style="margin-bottom:10px"></div><div id="shortageList" class="shortage-list"></div></div></section>
 <section id="reportScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Reports</div><h1>Shortage Reports</h1><p>IC Team and IC Manager only.</p></div><div class="actions"><button class="btn primary" onclick="printSummaryReport()">Print Summary</button><button class="btn" onclick="printCheckReport()">Print IC Check Sheet</button></div></div><div class="card"><div class="form-row four"><div class="field"><label>Report Mode</label><select id="reportMode"><option value="active">Active Only</option><option value="archive">Archived History</option><option value="both">Active + Archived (Default)</option></select></div><div class="field"><label>Start Date</label><input id="reportStart" type="date"></div><div class="field"><label>End Date</label><input id="reportEnd" type="date"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="runReportPull()">Run Report</button></div></div><div class="notice" style="margin-top:8px;margin-bottom:0"><strong>Tip:</strong> When a date range is selected, both active and archived records for those dates are always included — archived shortages from older periods will appear in the report regardless of mode.</div></div><div id="reportBody"></div></div></section>
 <section id="restockScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Replenishment</div><h1>Replenishment Report</h1><p>IC Manager only.</p></div><button class="btn primary" onclick="printReplenReport()">Print</button></div><div class="card"><div class="card-title">Inventory Bin Report Import</div><p class="notice">Paste report columns: Bin Name, Product Code, Qty on Hand, Qty Allocated, Unit of Measure.</p><textarea id="binImport" style="width:100%;min-height:160px" placeholder="82-26-01&#9;DI1210&#9;12&#9;0&#9;EA"></textarea><div class="actions" style="margin-top:10px"><button class="btn primary" onclick="saveInventoryBinReport()">Import Bin Report</button></div></div><div id="restockBody"></div></div></section>
 <section id="pickerScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Personnel</div><h1>Manage Pickers &amp; Packers</h1><p>IC Manager only. Names stored as FirstInitialLastName (e.g. JDoe).</p></div></div><div class="card"><div class="card-title">Pickers</div><div class="form-row two"><div class="field"><label>Picker Name (FirstInitialLastName)</label><input id="pickerName" placeholder="JDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPickerManual()">Add Picker</button></div></div><div id="pickerList"></div></div><div class="card"><div class="card-title">Packers</div><div class="form-row two"><div class="field"><label>Packer Name (FirstInitialLastName)</label><input id="packerName" placeholder="MDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackerManual()">Add Packer</button></div></div><div id="packerList"></div></div><div class="card"><div class="card-title">Pack Stations</div><div class="form-row two"><div class="field"><label>Pack Station Name</label><input id="packStationName" placeholder="PS-01"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackStationManual()">Add Station</button></div></div><div id="packStationList"></div></div></div></section>
-<section id="batchScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow" style="color:var(--purple);background:var(--purple-l);border-color:rgba(167,139,250,.25)">Batch Pick</div><h1>Batch Pick Sheet</h1><p>One product picked for multiple orders simultaneously.</p></div></div><div class="card"><div class="card-title">Batch Pick Details</div><div class="form-row three"><div class="field"><label>Date &amp; Time</label><input id="bpDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="bpDiv"><option value="">Select</option><option value="NH">NH</option><option value="GT">GT</option><option value="FS">FS</option><option value="EE">EE</option><option value="BC">BC</option><option value="CF">CF</option><option value="VP">VP &ndash; VIP</option><option value="TP">TP &ndash; Transpac</option></select></div><div class="field"><label>Picker <em>*</em></label><select id="bpPickerSelect" onchange="onPickerSelectChange('bpPickerSelect','bpPickerNew','bpPicker')"><option value="">-- Select Picker --</option></select><div id="bpPickerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="bpPickerNew" placeholder="e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('bpPickerNew','picker');syncNewPersonToHidden('bpPickerNew','bpPicker')" onblur="validatePersonField('bpPickerNew','picker');syncNewPersonToHidden('bpPickerNew','bpPicker')" onkeydown="handleSuggestKey(event,'bpPickerNewSuggest')"><div class="suggest-box" id="bpPickerNewSuggest" style="display:none"></div></div></div><input id="bpPicker" type="hidden"></div></div><div class="form-row two"><div class="field"><label>Product Code <em>*</em></label><input id="bpProduct" placeholder="e.g. DI1210" autocomplete="off" style="font-family:var(--mono);font-weight:700;font-size:15px;letter-spacing:.06em"></div><div class="field"><label>Bin Location <em>*</em></label><div class="bin-input-wrap"><input id="bpBin" placeholder="82-26-01 / P12345 / BULK" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" oninput="liveBinValidate(this)" onblur="strictBinValidate(this)"><span class="bin-valid-icon"></span></div><div class="bin-format-hint">##-##-## &nbsp;&middot;&nbsp; ##-##-# &nbsp;&middot;&nbsp; P##### &nbsp;&middot;&nbsp; BULK &nbsp;&middot;&nbsp; ROOM &nbsp;&middot;&nbsp; KEY ACCOUNT</div><div class="bin-format-err"></div></div></div><div class="form-row two"><div class="field"><label>UOM</label><select id="bpUom"><option value="EA">EA</option><option value="CS">CS</option><option value="IN">IN</option><option value="PK">PK</option><option value="PR">PR</option><option value="BX">BX</option><option value="DZ">DZ</option></select></div><div class="field"><label>Shift</label><select id="bpShift"><option value="auto">Auto (use current time)</option><option value="1st">1st Shift (6am&ndash;3:30pm)</option><option value="2nd">2nd Shift (3:30pm&ndash;12am)</option><option value="weekend_ot">Weekend OT (6am&ndash;12am)</option></select></div></div><div class="card-title" style="margin-top:4px">Orders in this Batch Pick</div><p class="notice" style="margin-bottom:12px">Enter each order number and the quantity shorted for that order. All orders were picking the same product from the same bin.</p><div id="bpOrderLines"></div><div class="actions" style="margin-bottom:14px"><button class="btn" onclick="bpAddOrderLine()">+ Add Order</button></div><div class="field"><label>Notes</label><textarea id="bpNotes" placeholder="Additional context..."></textarea></div><div class="actions"><button class="btn" onclick="bpClearForm()">Clear Form</button><button class="btn primary" style="flex:1" onclick="saveBatchPick()">+ Log Batch Pick Shortage</button></div></div><div id="bpRecentList" class="shortage-list" style="margin-top:14px"></div></div></section><section id="migrationScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Migration</div><h1>Old Firebase Migration</h1><p>Copies old shortage records into the new shortage database. Does not delete the old database.</p></div></div><div class="card"><div class="notice">Source: <b>inventory-control-portal</b> collection <b>shortages</b>. Destination: current active collection.</div><div class="form-row three"><div class="field"><label>Old Collection</label><input id="oldCollection" value="shortages"></div><div class="field"><label>Limit</label><input id="migLimit" type="number" value="5000"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="runMigration()">Run Migration</button></div></div><div id="migrationResult"></div></div></div></section>
+<section id="migrationScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Migration</div><h1>Old Firebase Migration</h1><p>Copies old shortage records into the new shortage database. Does not delete the old database.</p></div></div><div class="card"><div class="notice">Source: <b>inventory-control-portal</b> collection <b>shortages</b>. Destination: current active collection.</div><div class="form-row three"><div class="field"><label>Old Collection</label><input id="oldCollection" value="shortages"></div><div class="field"><label>Limit</label><input id="migLimit" type="number" value="5000"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="runMigration()">Run Migration</button></div></div><div id="migrationResult"></div></div></div></section>
 <section id="settingsScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Settings</div><h1>Firebase Settings</h1><p>IC Manager only.</p></div></div><div class="card"><div class="form-row two"><div class="field"><label>API Key</label><input id="cfgApiKey"></div><div class="field"><label>Auth Domain</label><input id="cfgAuthDomain"></div><div class="field"><label>Project ID</label><input id="cfgProjectId"></div><div class="field"><label>Storage Bucket</label><input id="cfgStorageBucket"></div><div class="field"><label>Messaging Sender ID</label><input id="cfgSenderId"></div><div class="field"><label>App ID</label><input id="cfgAppId"></div><div class="field"><label>Active Collection</label><input id="cfgActiveCollection"></div><div class="field"><label>Archive Collection</label><input id="cfgArchiveCollection"></div></div><label class="toggle"><input id="themeToggle" type="checkbox" onchange="saveTheme(this.checked)"> Light mode</label><div class="actions" style="margin-top:14px"><button class="btn primary" onclick="saveSettings()">Save Settings</button><button class="btn red" onclick="forceReloadAllClients()" style="margin-left:auto">&#128257; Force Reload All Open Instances</button></div></div></div></section>
 <section id="overpullScreen" class="screen"><div class="wrap">
 
@@ -191,6 +191,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
   <!-- Tab Bar -->
   <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:18px">
     <button id="opTab-entry" onclick="opSwitchTab('entry')" style="padding:10px 22px;font-size:13px;font-weight:700;border:none;border-bottom:3px solid var(--orange);margin-bottom:-2px;background:none;color:var(--orange);cursor:pointer">&#128221; Log Entry</button>
+    <button id="opTab-batch" onclick="opSwitchTab('batch')" style="padding:10px 22px;font-size:13px;font-weight:700;border:none;border-bottom:3px solid transparent;margin-bottom:-2px;background:none;color:var(--muted);cursor:pointer">&#128203; Batch Pick Sheet</button>
     <button id="opTab-records" onclick="opSwitchTab('records')" style="padding:10px 22px;font-size:13px;font-weight:700;border:none;border-bottom:3px solid transparent;margin-bottom:-2px;background:none;color:var(--muted);cursor:pointer">&#128202; Records &amp; Stats</button>
   </div>
 
@@ -220,6 +221,73 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
       <div class="actions"><button class="btn" onclick="opClearForm()">Clear Form</button><button class="btn primary" style="flex:1" onclick="opPromptMore()">Submit Over Pull</button></div>
       <div class="actions" style="margin-top:8px"><button class="btn orange" style="width:100%" onclick="openPickedTwiceModal()" id="pickedTwiceBtn"><span id="ptOpenBtnText">&#9888; Report Duplicate Pick — Entire Order Picked Twice</span></button></div>
     </div>
+  </div>
+
+  <!-- TAB: BATCH PICK SHEET -->
+  <div id="opPane-batch" style="display:none">
+    <div class="card"><div class="card-title">Batch Pick Details</div>
+      <div class="form-row four">
+        <div class="field"><label>Date &amp; Time</label><input id="bpDate" type="datetime-local"></div>
+        <div class="field"><label>Division <em>*</em></label><select id="bpDiv">
+          <option value="">Select</option><option value="NH">NH</option><option value="GT">GT</option>
+          <option value="FS">FS</option><option value="EE">EE</option><option value="BC">BC</option>
+          <option value="CF">CF</option><option value="VP">VP &ndash; VIP</option><option value="TP">TP &ndash; Transpac</option>
+        </select></div>
+        <div class="field"><label>Picker <em>*</em></label>
+          <select id="bpPickerSelect" onchange="onPickerSelectChange('bpPickerSelect','bpPickerNew','bpPicker')">
+            <option value="">-- Select Picker --</option>
+          </select>
+          <div id="bpPickerNewWrap" style="display:none;margin-top:6px">
+            <div class="field-wrap"><input id="bpPickerNew" placeholder="e.g. JDoe" autocomplete="off"
+              oninput="livePersonSuggest('bpPickerNew','picker');syncNewPersonToHidden('bpPickerNew','bpPicker')"
+              onblur="validatePersonField('bpPickerNew','picker');syncNewPersonToHidden('bpPickerNew','bpPicker')"
+              onkeydown="handleSuggestKey(event,'bpPickerNewSuggest')">
+            <div class="suggest-box" id="bpPickerNewSuggest" style="display:none"></div></div>
+          </div>
+          <input id="bpPicker" type="hidden">
+        </div>
+        <div class="field"><label>Packer</label>
+          <select id="bpPackerSelect" onchange="onPickerSelectChange('bpPackerSelect','bpPackerNew','bpPacker')">
+            <option value="">-- Select Packer --</option>
+          </select>
+          <div id="bpPackerNewWrap" style="display:none;margin-top:6px">
+            <div class="field-wrap"><input id="bpPackerNew" placeholder="e.g. JDoe" autocomplete="off"
+              oninput="livePersonSuggest('bpPackerNew','packer');syncNewPersonToHidden('bpPackerNew','bpPacker')"
+              onblur="validatePersonField('bpPackerNew','packer');syncNewPersonToHidden('bpPackerNew','bpPacker')"
+              onkeydown="handleSuggestKey(event,'bpPackerNewSuggest')">
+            <div class="suggest-box" id="bpPackerNewSuggest" style="display:none"></div></div>
+          </div>
+          <input id="bpPacker" type="hidden">
+        </div>
+      </div>
+      <div class="form-row two">
+        <div class="field"><label>Product Code <em>*</em></label>
+          <input id="bpProduct" placeholder="e.g. DI1210" autocomplete="off"
+            style="font-family:var(--mono);font-weight:700;font-size:15px;letter-spacing:.06em"></div>
+        <div class="field"><label>Notes</label><textarea id="bpNotes" placeholder="Additional context about this batch pick..."></textarea></div>
+      </div>
+      <div class="form-row two">
+        <div class="field"><label>UOM</label><select id="bpUom">
+          <option value="EA">EA</option><option value="CS">CS</option><option value="IN">IN</option>
+          <option value="PK">PK</option><option value="PR">PR</option><option value="BX">BX</option><option value="DZ">DZ</option>
+        </select></div>
+        <div class="field"><label>Shift</label><select id="bpShift">
+          <option value="auto">Auto (use current time)</option>
+          <option value="1st">1st Shift (6am&ndash;3:30pm)</option>
+          <option value="2nd">2nd Shift (3:30pm&ndash;12am)</option>
+          <option value="weekend_ot">Weekend OT (6am&ndash;12am)</option>
+        </select></div>
+      </div>
+      <div class="card-title" style="margin-top:4px">Orders in this Batch Pick</div>
+      <p class="notice" style="margin-bottom:12px">Enter each order number and the quantity shorted for that order. All orders picked the same product — IC will investigate the bin location.</p>
+      <div id="bpOrderLines"></div>
+      <div class="actions" style="margin-bottom:14px"><button class="btn" onclick="bpAddOrderLine()">+ Add Order</button></div>
+      <div class="actions">
+        <button class="btn" onclick="bpClearForm()">Clear Form</button>
+        <button class="btn primary" style="flex:1" onclick="saveBatchPick()">+ Log Batch Pick Shortage</button>
+      </div>
+    </div>
+    <div id="bpRecentList" class="shortage-list" style="margin-top:14px"></div>
   </div>
 
   <!-- TAB: RECORDS & STATS -->
@@ -292,7 +360,7 @@ function getSettings(){try{return {...DEFAULT_SETTINGS,...JSON.parse(localStorag
 function initFirebase(){const s=getSettings();try{if(!firebase.apps.length)firebase.initializeApp(s.firebaseConfig);db=firebase.firestore();firebase.firestore().settings({ignoreUndefinedProperties:true});}catch(e){console.error(e);alert('Firebase connection failed. Check Settings. '+e.message)}}
 function showLoading(t){$('loadingText').textContent=t||'Loading...';$('loading').classList.add('show')}function hideLoading(){$('loading').classList.remove('show')}
 function applyTheme(){const light=localStorage.getItem('scp_theme')==='light';document.body.classList.toggle('light-mode',light);if($('themeToggle'))$('themeToggle').checked=light}function saveTheme(light){localStorage.setItem('scp_theme',light?'light':'dark');applyTheme()}
-function showScreen(name){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const el=$(name+'Screen');if(el)el.classList.add('active');$('topbar').classList.toggle('show',name!=='login'&&name!=='pin');document.querySelectorAll('.nav-btn[data-screen]').forEach(b=>b.classList.toggle('active',b.dataset.screen===name));if(name==='shortage'){loadShortages(false);populateStationSelects();}if(name==='report')renderReports();if(name==='picker')renderPickers();if(name==='batch'){populatePickerSelects();bpInitForm();bpPopulatePickers();}if(name==='restock')buildReplenishmentReport();if(name==='settings')loadSettingsForm();if(name==='overpull'){if(role==='icteam'){alert('Over Pull access is not available for IC Team.');showScreen('shortage');return;}populatePickerSelects();populateStationSelects();opInitForm();opSwitchTab('entry');}}
+function showScreen(name){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const el=$(name+'Screen');if(el)el.classList.add('active');$('topbar').classList.toggle('show',name!=='login'&&name!=='pin');document.querySelectorAll('.nav-btn[data-screen]').forEach(b=>b.classList.toggle('active',b.dataset.screen===name));if(name==='shortage'){loadShortages(false);populateStationSelects();}if(name==='report')renderReports();if(name==='picker')renderPickers();if(name==='restock')buildReplenishmentReport();if(name==='settings')loadSettingsForm();if(name==='overpull'){if(role==='icteam'){alert('Over Pull access is not available for IC Team.');showScreen('shortage');return;}populatePickerSelects();populateStationSelects();opInitForm();opSwitchTab('entry');}}
 function goPin(target){pinTarget=target;pinBuf='';$('pinBadge').textContent=ROLE_LABELS[target];updateDots();$('pinError').textContent='';showScreen('pin')}
 function pinKey(k){if(pinBuf.length>=4)return;pinBuf+=k;updateDots();document.querySelectorAll('.pin-key').forEach(btn=>{if(btn.dataset.key===k){btn.classList.add('active-press');setTimeout(()=>btn.classList.remove('active-press'),140)}});if(pinBuf.length===4)setTimeout(checkPin,120)}
 function pinBack(){pinBuf=pinBuf.slice(0,-1);updateDots()}function pinClear(){pinBuf='';updateDots();$('pinError').textContent=''}function updateDots(){document.querySelectorAll('#pinDots .pin-dot').forEach((d,i)=>d.classList.toggle('filled',i<pinBuf.length))}
@@ -300,7 +368,7 @@ function checkPin(){if(pinBuf!==PINS[pinTarget]){document.querySelectorAll('#pin
 function backToLogin(){role='';pinTarget='';pinBuf='';showScreen('login')}
 document.addEventListener('keydown',e=>{if(!$('pinScreen').classList.contains('active'))return;if(e.key>='0'&&e.key<='9')pinKey(e.key);else if(e.key==='Backspace')pinBack();else if(e.key==='Escape')pinClear();else if(e.key==='Enter'&&pinBuf.length===4)checkPin()});
 function canRunReports(){return role==='icteam'||role==='manager'}function canSettings(){return role==='manager'}function canManage(){return role==='manager'}
-function buildNav(){let nav=[['shortage','Shortages']];if(canRunReports())nav.push(['report','Reports']);if(role==='manager')nav.push(['restock','Replenishment'],['picker','Manage Pickers'],['migration','Migration'],['settings','Settings']);nav.push(['batch','Batch Pick']);if(role!=='icteam')nav.push(['overpull','Over Pull']);if(role==='icteam'||role==='manager')nav.push(['link','IC Portal']);nav.push(['theme','Light/Dark'],['logout','Logout']);$('nav').innerHTML=nav.map(n=>n[0]==='link'?`<a class="nav-btn" href="${IC_PORTAL_URL}" target="_blank">${n[1]}</a>`:n[0]==='logout'?`<button class="nav-btn lock" onclick="logout()">${n[1]}</button>`:n[0]==='theme'?`<button class="nav-btn" onclick="saveTheme(!document.body.classList.contains('light-mode'))">${n[1]}</button>`:n[0]==='overpull'?`<button class="nav-btn" data-screen="overpull" onclick="showScreen('overpull')" style="color:var(--orange)">${n[1]}</button>`:`<button class="nav-btn" data-screen="${n[0]}" onclick="showScreen('${n[0]}')">${n[1]}</button>`).join('')}
+function buildNav(){let nav=[['shortage','Shortages']];if(canRunReports())nav.push(['report','Reports']);if(role==='manager')nav.push(['restock','Replenishment'],['picker','Manage Pickers'],['migration','Migration'],['settings','Settings']);if(role!=='icteam')nav.push(['overpull','Over Pull']);if(role==='icteam'||role==='manager')nav.push(['link','IC Portal']);nav.push(['theme','Light/Dark'],['logout','Logout']);$('nav').innerHTML=nav.map(n=>n[0]==='link'?`<a class="nav-btn" href="${IC_PORTAL_URL}" target="_blank">${n[1]}</a>`:n[0]==='logout'?`<button class="nav-btn lock" onclick="logout()">${n[1]}</button>`:n[0]==='theme'?`<button class="nav-btn" onclick="saveTheme(!document.body.classList.contains('light-mode'))">${n[1]}</button>`:n[0]==='overpull'?`<button class="nav-btn" data-screen="overpull" onclick="showScreen('overpull')" style="color:var(--orange)">${n[1]}</button>`:`<button class="nav-btn" data-screen="${n[0]}" onclick="showScreen('${n[0]}')">${n[1]}</button>`).join('')}
 function login(r){role=r;$('roleChip').textContent=ROLE_LABELS[r];$('roleChip').className='role-chip '+(r==='manager'?'manager':r==='icteam'?'icteam':'clerk');buildNav();$('entryCard').classList.toggle('hide',r!=='clerk');$('shortageTopActions').innerHTML='';$('archiveActions').innerHTML=(canRunReports()?`<button class="btn green" onclick="openIcConfirm()" style="margin-right:auto">&#128203; IC Verify Sheet</button>`:'')+(canManage()?` <button class="btn" onclick="selectVisible(true)">Select Visible</button><button class="btn" onclick="selectVisible(false)">Clear Selection</button><button class="btn orange" onclick="archiveSelected()">Archive Selected</button><button class="btn red" onclick="archiveFiltered()">Archive Filtered Active</button>`:'');showScreen('shortage')}
 function logout(){role='';shortages=[];visibleShortages=[];showScreen('login')}
 const PRESET_STATIONS=[...Array(20)].map((_,i)=>`PS-${String(i+1).padStart(2,'0')}`);
@@ -1294,21 +1362,6 @@ function strictBinValidate(input){
    ═══════════════════════════════════════════════════════ */
 let opRecords=[];
 
-function enterBatchPick(){
-  if(!role){
-    $('topbar').classList.add('show');
-    $('roleChip').textContent='Operations';
-    $('roleChip').className='role-chip';
-    $('nav').innerHTML=`<button class="nav-btn" onclick="enterBatchPick()">Batch Pick</button>`
-      +`<button class="nav-btn" onclick="enterOverPull()">Over Pull</button>`
-      +`<button class="nav-btn lock" onclick="location.reload()">Exit</button>`;
-  }
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  $('batchScreen').classList.add('active');
-  populatePickerSelects();
-  bpInitForm();bpPopulatePickers();
-}
-
 function enterOverPull(){if(role==='icteam'){alert('Over Pull access is not available for IC Team.');return;}
   // No pin needed — go straight to overpull screen via showScreen logic but without role gating
   // Show topbar manually since we're not "logged in" via a role
@@ -1316,8 +1369,7 @@ function enterOverPull(){if(role==='icteam'){alert('Over Pull access is not avai
     $('topbar').classList.add('show');
     $('roleChip').textContent='Operations';
     $('roleChip').className='role-chip';
-    $('nav').innerHTML=`<button class="nav-btn" onclick="enterOverPull()">Over Pull</button>`
-      +`<button class="nav-btn" onclick="enterBatchPick()" style="color:var(--purple)">Batch Pick</button>`
+    $('nav').innerHTML=`<button class="nav-btn" onclick="enterOverPull()">Over Pull Portal</button>`
       +`<button class="nav-btn lock" onclick="location.reload()">Exit</button>`;
   }
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -1372,16 +1424,18 @@ function opBlurOrder(){
 }
 
 function opSwitchTab(tab){
-  ['entry','records'].forEach(t=>{
+  ['entry','batch','records'].forEach(t=>{
     const pane=$('opPane-'+t);
     const btn=$('opTab-'+t);
     if(pane) pane.style.display=t===tab?'':'none';
     if(btn){
-      btn.style.color=t===tab?'var(--orange)':'var(--muted)';
-      btn.style.borderBottomColor=t===tab?'var(--orange)':'transparent';
+      const activeColor=t==='batch'?'var(--purple)':'var(--orange)';
+      btn.style.color=t===tab?activeColor:'var(--muted)';
+      btn.style.borderBottomColor=t===tab?activeColor:'transparent';
     }
   });
   if(tab==='records'){opLoadRecords(false);opRenderList();}
+  if(tab==='batch'){populatePickerSelects();bpInitForm();bpPopulatePickers();}
 }
 
 function opInitForm(){
@@ -2305,7 +2359,7 @@ const LANGS={
     'row.qty':'Qty','row.demand':'Demand','row.picker':'Picker',
     'pin.incorrect':'Incorrect PIN',
     'op.title':'Over Pull Log','op.subtitle':'No login required — log items pulled in excess of the pick demand.',
-    'op.tab_entry':'📝 Log Entry','op.tab_records':'📊 Records & Stats',
+    'op.tab_entry':'📝 Log Entry','op.tab_batch':'📋 Batch Pick Sheet','op.tab_records':'📊 Records & Stats',
     'op.new_entry':'New Over Pull Entry','op.order_num':'Order Number',
     'op.packer_name':'Packer Name','op.picker_name':'Picker Name','op.pack_station':'Pack Station',
     'op.items_title':'Items Over-Pulled','op.add_item':'+ Add Item','op.clear':'Clear Form',
@@ -2357,7 +2411,7 @@ const LANGS={
     'row.qty':'Cant.','row.demand':'Demanda','row.picker':'Recolector',
     'pin.incorrect':'PIN Incorrecto',
     'op.title':'Registro de Exceso','op.subtitle':'Sin inicio de sesión — registre artículos en exceso.',
-    'op.tab_entry':'📝 Entrada','op.tab_records':'📊 Registros y Estadísticas',
+    'op.tab_entry':'📝 Entrada','op.tab_batch':'📋 Hoja de Recogida por Lotes','op.tab_records':'📊 Registros y Estadísticas',
     'op.new_entry':'Nueva Entrada de Exceso','op.order_num':'Número de Orden',
     'op.packer_name':'Nombre del Empacador','op.picker_name':'Nombre del Recolector','op.pack_station':'Estación de Empaque',
     'op.items_title':'Artículos en Exceso','op.add_item':'+ Agregar Artículo','op.clear':'Limpiar',
@@ -2409,7 +2463,7 @@ const LANGS={
     'row.qty':'تعداد','row.demand':'تقاضا','row.picker':'جمع‌آورنده',
     'pin.incorrect':'پین نادرست است',
     'op.title':'ثبت مازاد','op.subtitle':'بدون ورود — اقلام مازاد را ثبت کنید.',
-    'op.tab_entry':'📝 ورود داده','op.tab_records':'📊 سوابق و آمار',
+    'op.tab_entry':'📝 ورود داده','op.tab_batch':'📋 برگه برداشت دسته‌ای','op.tab_records':'📊 سوابق و آمار',
     'op.new_entry':'ورود مازاد جدید','op.order_num':'شماره سفارش',
     'op.packer_name':'نام بسته‌بند','op.picker_name':'نام جمع‌آورنده','op.pack_station':'ایستگاه بسته‌بندی',
     'op.items_title':'اقلام مازاد','op.add_item':'+ افزودن قلم','op.clear':'پاک کردن',
@@ -2461,7 +2515,7 @@ const LANGS={
     'row.qty':'Dami','row.demand':'Demand','row.picker':'Tagapulot',
     'pin.incorrect':'Maling PIN',
     'op.title':'Log ng Sobra','op.subtitle':'Hindi kailangan ng login — i-log ang mga item na sobra.',
-    'op.tab_entry':'📝 Pagpasok','op.tab_records':'📊 Mga Rekord at Stats',
+    'op.tab_entry':'📝 Pagpasok','op.tab_batch':'📋 Batch Pick Sheet','op.tab_records':'📊 Mga Rekord at Stats',
     'op.new_entry':'Bagong Entry ng Sobra','op.order_num':'Numero ng Order',
     'op.packer_name':'Pangalan ng Tagabalot','op.picker_name':'Pangalan ng Tagapulot','op.pack_station':'Estasyon ng Pagbabalot',
     'op.items_title':'Mga Item na Sobra','op.add_item':'+ Magdagdag ng Item','op.clear':'I-clear',
@@ -2514,7 +2568,7 @@ const LANGS={
     'row.qty':'الكمية','row.demand':'الطلب','row.picker':'جامع البضائع',
     'pin.incorrect':'رمز PIN غير صحيح',
     'op.title':'سجل الزيادة','op.subtitle':'بدون تسجيل دخول — سجّل العناصر التي تم سحبها بزيادة.',
-    'op.tab_entry':'📝 إدخال البيانات','op.tab_records':'📊 السجلات والإحصاءات',
+    'op.tab_entry':'📝 إدخال البيانات','op.tab_batch':'📋 ورقة الانتقاء الدُفعي','op.tab_records':'📊 السجلات والإحصاءات',
     'op.new_entry':'إدخال زيادة جديد','op.order_num':'رقم الطلب',
     'op.packer_name':'اسم المعبّئ','op.picker_name':'اسم الجامع','op.pack_station':'محطة التعبئة',
     'op.items_title':'العناصر الزائدة','op.add_item':'+ إضافة عنصر','op.clear':'مسح النموذج',
@@ -2714,6 +2768,7 @@ function applyLangToForms(){
   const opDesc=document.querySelector('#overpullScreen .page-head p');
   if(opDesc)opDesc.textContent=t('op.subtitle');
   const et=$('opTab-entry');if(et)et.textContent=t('op.tab_entry');
+  const bt=$('opTab-batch');if(bt)bt.textContent='&#128203; '+(t('op.tab_batch')||'Batch Pick Sheet');
   const rt=$('opTab-records');if(rt)rt.textContent=t('op.tab_records');
   lbl('opOrder','op.order_num');
   lbl('opPackerSelect','op.packer_name');
@@ -2918,20 +2973,30 @@ async function forceReloadAllClients(){
 function bpInitForm(){
   const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());
   const dateEl=$('bpDate');if(dateEl)dateEl.value=d.toISOString().slice(0,16);
-  ['bpProduct','bpBin','bpNotes','bpPicker'].forEach(id=>{const el=$(id);if(el)el.value='';});
-  ['bpDiv','bpUom','bpShift'].forEach(id=>{const el=$(id);if(el)el.value=id==='bpUom'?'EA':id==='bpShift'?'auto':'';}); 
+  ['bpProduct','bpNotes','bpPicker','bpPacker'].forEach(id=>{const el=$(id);if(el)el.value='';});
+  ['bpDiv','bpUom','bpShift'].forEach(id=>{const el=$(id);if(el)el.value=id==='bpUom'?'EA':id==='bpShift'?'auto':'';});
+  ['bpPickerSelect','bpPackerSelect'].forEach(id=>{const el=$(id);if(el)el.value='';})
+  ;['bpPickerNewWrap','bpPackerNewWrap'].forEach(id=>{const el=$(id);if(el)el.style.display='none';}); 
   const sel=$('bpPickerSelect');if(sel)sel.value='';
   const wrap=$('bpPickerNewWrap');if(wrap)wrap.style.display='none';
   const lines=$('bpOrderLines');if(lines){lines.innerHTML='';bpAddOrderLine();bpAddOrderLine();bpAddOrderLine();}
   const recent=$('bpRecentList');if(recent)recent.innerHTML='';
 }
 function bpPopulatePickers(){
-  const sel=$('bpPickerSelect');if(!sel)return;
-  const opts=['<option value="">-- Select Picker --</option>',
-    `<option value="${UNKNOWN_PICKER}" style="color:var(--orange)">&#9888; Unknown Picker</option>`,
-    ...pickerNames.filter(n=>n!==UNKNOWN_PICKER).map(n=>`<option value="${esc(n)}">${esc(n)}</option>`),
-    '<option value="__new__">+ Add New Picker...</option>'].join('');
-  const cur=sel.value;sel.innerHTML=opts;if(cur)sel.value=cur;
+  const sel=$('bpPickerSelect');if(sel){
+    const opts=['<option value="">-- Select Picker --</option>',
+      `<option value="${UNKNOWN_PICKER}" style="color:var(--orange)">&#9888; Unknown Picker</option>`,
+      ...pickerNames.filter(n=>n!==UNKNOWN_PICKER).map(n=>`<option value="${esc(n)}">${esc(n)}</option>`),
+      '<option value="__new__">+ Add New Picker...</option>'].join('');
+    const cur=sel.value;sel.innerHTML=opts;if(cur)sel.value=cur;
+  }
+  const psel=$('bpPackerSelect');if(psel){
+    const popts=['<option value="">-- Select Packer --</option>',
+      `<option value="${UNKNOWN_PICKER}" style="color:var(--orange)">&#9888; Unknown Packer</option>`,
+      ...packerNames.filter(n=>n!==UNKNOWN_PICKER).map(n=>`<option value="${esc(n)}">${esc(n)}</option>`),
+      '<option value="__new__">+ Add New Packer...</option>'].join('');
+    const cur=psel.value;psel.innerHTML=popts;if(cur)psel.value=cur;
+  }
 }
 function bpAddOrderLine(data={}){
   const wrap=$('bpOrderLines');if(!wrap)return;
@@ -2970,25 +3035,30 @@ function bpGetOrderLines(){
 }
 async function saveBatchPick(){
   const product=($('bpProduct').value||'').trim().toUpperCase();
-  const bin=($('bpBin').value||'').trim().toUpperCase();
   const div=($('bpDiv').value||'').trim();
   const bpSel=$('bpPickerSelect');
   const pickerVal=($('bpPicker').value||'').trim()||
     ($('bpPickerNewWrap')?.style.display!=='none'?($('bpPickerNew')?.value||'').trim():'')||
     (bpSel&&bpSel.value&&bpSel.value!=='__new__'?bpSel.value:'')||UNKNOWN_PICKER;
+  const bpkSel=$('bpPackerSelect');
+  const packerVal=($('bpPacker').value||'').trim()||
+    ($('bpPackerNewWrap')?.style.display!=='none'?($('bpPackerNew')?.value||'').trim():'')||
+    (bpkSel&&bpkSel.value&&bpkSel.value!=='__new__'?bpkSel.value:'')||'';
   const uom=$('bpUom')?.value||'EA';
   const shOv=$('bpShift')?.value||'auto';
   const shift=shOv==='auto'?shiftValue():shOv;
   const notes=($('bpNotes')?.value||'').trim();
   const orders=bpGetOrderLines();
   if(!product){alert('Product Code is required.');return;}
-  if(!bin){alert('Bin Location is required.');return;}
-  if(!validateBinFormat(bin).ok){alert('Invalid bin format.\nValid: ##-##-##, ##-##-#, P#####, BULK, ROOM, KEY ACCOUNT');return;}
   if(!div){alert('Division is required.');return;}
   if(!orders.length){alert('Add at least one order with a valid order number and qty.');return;}
   const normalPicker=normalizeName(pickerVal)||UNKNOWN_PICKER;
+  const normalPacker=normalizeName(packerVal)||'';
   if(normalPicker!==UNKNOWN_PICKER&&!fuzzyMatchPerson(normalPicker,'picker')){
     if(confirm('Save "'+normalPicker+'" as new picker?'))savePerson(normalPicker,'picker');
+  }
+  if(normalPacker&&!fuzzyMatchPerson(normalPacker,'packer')){
+    if(confirm('Save "'+normalPacker+'" as new packer?'))savePerson(normalPacker,'packer');
   }
   showLoading('Logging '+orders.length+' batch pick shortages...');
   try{
@@ -3000,8 +3070,9 @@ async function saveBatchPick(){
       batch.set(col.doc(),{
         date:$('bpDate')?.value||nowLocalInput(),
         division:div,pickDemand:o.orderNumber,
-        picker:normalPicker,shift,uom,notes,
-        productCode:product,shortedBin:bin,
+        picker:normalPicker,packer:normalPacker||undefined,
+        shift,uom,notes,
+        productCode:product,
         qtyShorted:o.qty,batchPick:true,
         foundInShortedBin:false,secondLocationFilled:false,
         replenishedAfterPick:false,status:'open',
@@ -3013,10 +3084,10 @@ async function saveBatchPick(){
     const recent=$('bpRecentList');
     if(recent)recent.innerHTML='<div class="card" style="border-color:rgba(167,139,250,.4);background:var(--purple-l)">'
       +'<div style="font-size:13px;font-weight:700;color:var(--purple)">&#10003; Batch Pick Logged</div>'
-      +'<div class="sr-meta" style="margin-top:6px">Product: <strong>'+esc(product)+'</strong> &bull; Bin: <strong>'+esc(bin)+'</strong> &bull; '+orders.length+' order(s)</div>'
+      +'<div class="sr-meta" style="margin-top:6px">Product: <strong>'+esc(product)+'</strong> &bull; '+orders.length+' order(s)</div>'
       +'</div>';
     setTimeout(()=>{if($('bpRecentList'))$('bpRecentList').innerHTML='';},8000);
-    alert('Logged '+orders.length+' shortage(s) for '+product+' at '+bin+'.');
+    alert('Logged '+orders.length+' shortage(s) for '+product+'.');
     bpClearForm();
   }catch(e){alert('Save failed: '+e.message);}finally{hideLoading();}
 }
