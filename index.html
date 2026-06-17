@@ -1071,6 +1071,9 @@ function renderCheckPreview(){}
 
 async function printSummaryReport(){
   if(!shortages.length){await runReportPull();if(!shortages.length){alert('No shortage data found. Click Run Report first.');return;}}
+  const allRows=filteredRows(true);
+  console.log('[printSummaryReport] shortages=',shortages.length,'filtered rows=',allRows.length);
+  if(!allRows.length){alert('No shortages match the current date filter.\n\nTip: Clear the Start/End date fields to see all shortages.');return;}
   const fromStr=$('reportStart')?.value;
   const toStr=$('reportEnd')?.value;
   const mode=$('reportMode')?.value||lastLoadMode;
@@ -1079,8 +1082,7 @@ async function printSummaryReport(){
   const to=toStr?new Date(toStr+'T23:59:59'):new Date();
   const dateRange=fromStr||toStr?fmtD(from)+' \u2014 '+fmtD(to):'All Dates';
   const today=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
-  const rows=filteredRows(true);
-  const total=rows.length;
+    const total=rows.length;
   const located2nd=rows.filter(r=>r.secondLocationFilled).length;
   const erroneous=rows.filter(r=>r.foundInShortedBin).length;
   const errFullyShorted=rows.filter(isErrBackorder).length;
@@ -1244,15 +1246,20 @@ async function printSummaryReport(){
     </div>
   </div>`;
   $('printArea').innerHTML=html;
+  // Force browser to render the printArea before opening dialog
+  void $('printArea').offsetHeight;
   window.addEventListener('afterprint',function onAP(){
     $('printArea').innerHTML='';
     window.removeEventListener('afterprint',onAP);
   });
-  window.print();
+  setTimeout(()=>window.print(),80);
 }
 
 async function printCheckReport(){
   if(!shortages.length){await runReportPull();if(!shortages.length){alert('No shortage data found. Click Run Report first.');return;}}
+  const allRows=filteredRows(true);
+  console.log('[printCheckReport] shortages=',shortages.length,'filtered rows=',allRows.length);
+  if(!allRows.length){alert('No shortages match the current date filter.\n\nTip: Clear the Start/End date fields to see all shortages.');return;}
   const fromStr=$('reportStart')?.value;
   const toStr=$('reportEnd')?.value;
   const today=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
@@ -1335,14 +1342,16 @@ async function printCheckReport(){
     </div>
   </div>`;
   $('printArea').innerHTML=html;
+  // Force browser to render the printArea before opening dialog
+  void $('printArea').offsetHeight;
   window.addEventListener('afterprint',function onAP(){
     $('printArea').innerHTML='';
     window.removeEventListener('afterprint',onAP);
   });
-  window.print();
+  setTimeout(()=>window.print(),80);
 }
 function saveInventoryBinReport(){inventoryBins=parseBinImport($('binImport').value);localStorage.setItem('scp_inventory_bins',JSON.stringify(inventoryBins));alert(`Saved ${inventoryBins.length} inventory bin rows.`);buildReplenishmentReport()}function parseBinImport(text){return text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean).map(l=>{const p=l.split(/\t|,/);return{bin:(p[0]||'').trim().toUpperCase(),product:(p[1]||'').trim().toUpperCase(),onHand:num(p[2]),allocated:num(p[3]),uom:(p[4]||'').trim().toUpperCase()}}).filter(r=>r.bin&&r.product)}
-function buildReplenishmentReport(){if(!canManage())return;inventoryBins=JSON.parse(localStorage.getItem('scp_inventory_bins')||'[]');if($('binImport')&&!$('binImport').value&&inventoryBins.length)$('binImport').value=inventoryBins.map(r=>[r.bin,r.product,r.onHand,r.allocated,r.uom].join('\t')).join('\n');const active=shortages.filter(r=>!r._archived);const moves=[],noRes=[];active.forEach(s=>{const reserves=inventoryBins.filter(b=>b.product===(s.productCode||'').toUpperCase()&&b.bin!==(s.shortedBin||'').toUpperCase()&&b.onHand>0&&b.allocated<=0).sort((a,b)=>a.bin.localeCompare(b.bin));if(reserves.length)moves.push({product:s.productCode,toBin:s.shortedBin,fromBin:reserves[0].bin,qty:Math.min(num(s.qtyShorted)||1,reserves[0].onHand),uom:reserves[0].uom||s.uom});else noRes.push(s)});$('restockBody').innerHTML=`<div class="card"><div class="card-title">Replenishment Moves</div>${table(['Product Code','From Reserve Bin','To Shorted Bin','Qty','UOM'],moves.sort((a,b)=>a.fromBin.localeCompare(b.fromBin)).map(m=>[m.product,m.fromBin,m.toBin,m.qty,m.uom]))}</div><div class="card"><div class="card-title">Products With No Reserve Bins</div>${table(['Product Code','Shorted Bin','Qty Shorted','UOM'],noRes.map(r=>[r.productCode,r.shortedBin,r.qtyShorted,r.uom]))}</div>`}function printReplenReport(){buildReplenishmentReport();$('printArea').innerHTML=`<h1>Replenishment Report</h1>${$('restockBody').innerHTML}`;window.print()}
+function buildReplenishmentReport(){if(!canManage())return;inventoryBins=JSON.parse(localStorage.getItem('scp_inventory_bins')||'[]');if($('binImport')&&!$('binImport').value&&inventoryBins.length)$('binImport').value=inventoryBins.map(r=>[r.bin,r.product,r.onHand,r.allocated,r.uom].join('\t')).join('\n');const active=shortages.filter(r=>!r._archived);const moves=[],noRes=[];active.forEach(s=>{const reserves=inventoryBins.filter(b=>b.product===(s.productCode||'').toUpperCase()&&b.bin!==(s.shortedBin||'').toUpperCase()&&b.onHand>0&&b.allocated<=0).sort((a,b)=>a.bin.localeCompare(b.bin));if(reserves.length)moves.push({product:s.productCode,toBin:s.shortedBin,fromBin:reserves[0].bin,qty:Math.min(num(s.qtyShorted)||1,reserves[0].onHand),uom:reserves[0].uom||s.uom});else noRes.push(s)});$('restockBody').innerHTML=`<div class="card"><div class="card-title">Replenishment Moves</div>${table(['Product Code','From Reserve Bin','To Shorted Bin','Qty','UOM'],moves.sort((a,b)=>a.fromBin.localeCompare(b.fromBin)).map(m=>[m.product,m.fromBin,m.toBin,m.qty,m.uom]))}</div><div class="card"><div class="card-title">Products With No Reserve Bins</div>${table(['Product Code','Shorted Bin','Qty Shorted','UOM'],noRes.map(r=>[r.productCode,r.shortedBin,r.qtyShorted,r.uom]))}</div>`}function printReplenReport(){buildReplenishmentReport();$('printArea').innerHTML=`<h1>Replenishment Report</h1>${$('restockBody').innerHTML}`;void $('printArea').offsetHeight;setTimeout(()=>window.print(),80);}
 function renderPickers(){
   if(!canManage())return;
   $('pickerList').innerHTML=pickerNames.length
@@ -1514,7 +1523,8 @@ function opSwitchTab(tab){
     }
   });
   if(tab==='records'){opLoadRecords(false);opRenderList();}
-  if(tab==='batch'){populatePickerSelects();bpInitForm();bpPopulatePickers();}
+  if(tab==='entry'){populateStationSelects();}
+  if(tab==='batch'){populatePickerSelects();populateStationSelects();bpInitForm();bpPopulatePickers();}
 }
 
 function opInitForm(){
@@ -2156,11 +2166,13 @@ async function printOverPullReport(){
   </div>`;
 
   $('printArea').innerHTML=html;
+  // Force browser to render the printArea before opening dialog
+  void $('printArea').offsetHeight;
   window.addEventListener('afterprint',function onAP(){
     $('printArea').innerHTML='';
     window.removeEventListener('afterprint',onAP);
   });
-  window.print();
+  setTimeout(()=>window.print(),80);
 }
 
 function populateStationSelects(){
@@ -2250,6 +2262,7 @@ function icUpdateStats(){
     <span style="color:var(--red);font-weight:700">${all.filter(r=>!r.icConfirmed&&!r.foundInShortedBin&&!r.secondLocationFilled).length} pending</span>`;
 }
 
+const IC_UOMS=['EA','CS','IN','PK','PR','BX','DZ'];
 function uomSelect(name,val){
   return `<select class="ic-qty-input" style="width:70px;padding:4px 4px" name="${name}" onchange="icSyncEdits()">
     ${IC_UOMS.map(u=>`<option value="${u}" ${u===(val||'EA')?'selected':''}>${u}</option>`).join('')}
