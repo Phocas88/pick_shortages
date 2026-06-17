@@ -325,8 +325,8 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
     <div style="padding:10px 22px 6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
       <div style="font-size:11px;color:var(--muted)">Filter:</div>
       <select id="icConfirmFilter" onchange="renderIcConfirmSheet()" style="background:var(--panel2);border:1.5px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;padding:5px 10px">
-        <option value="pending">&#128203; Pending Verification</option>
         <option value="all">All Active Shortages</option>
+        <option value="pending">&#128203; Pending Verification</option>
         <option value="confirmed">&#10003; Confirmed Short</option>
         <option value="erroneous">&#9888; Erroneous Bin</option>
       </select>
@@ -880,7 +880,17 @@ async function toggleSecond(id){
 async function toggleReplenished(id){const r=shortages.find(x=>x.id===id&&!x._archived);if(r)await updateRecord(id,{replenishedAfterPick:!r.replenishedAfterPick})}
 function openEdit(id,archived){
   if(!shortages.length){loadShortages(true).then(()=>openEdit(id,archived));return;}
-  const r=shortages.find(x=>x.id===id&&x._archived===archived);if(!r)return;editingId=id;editingArchive=archived;$('editBody').innerHTML=`<div class="form-row two"><div class="field"><label>Date</label><input id="eDate" type="date" value="${esc(normalizeDate(r.date)||'')}"></div><div class="field"><label>Division</label><input id="eDiv" value="${esc(r.division||'')}"></div><div class="field"><label>Product Code</label><input id="eProduct" autocapitalize="characters" spellcheck="false" style="text-transform:uppercase" value="${esc(r.productCode||'')}"></div><div class="field"><label>Shorted Bin</label><div class="bin-input-wrap"><input id="eBin" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" value="${esc(r.shortedBin||'')}" oninput="liveBinValidate(this)" onblur="strictBinValidate(this)"><span class="bin-valid-icon"></span></div><div class="bin-format-hint">##-##-## &nbsp;·&nbsp; ##-##-# &nbsp;·&nbsp; P##### &nbsp;·&nbsp; BULK &nbsp;·&nbsp; ROOM &nbsp;·&nbsp; KEY ACCOUNT</div><div class="bin-format-err"></div></div><div class="field"><label>Qty Shorted</label><input id="eQty" type="number" value="${val(r.qtyShorted)}"></div><div class="field"><label>UOM</label><input id="eUom" value="${esc(r.uom||'')}"></div><div class="field"><label>Demand / Order</label><input id="eDemand" value="${esc(r.pickDemand||'')}"></div><div class="field"><label>Picker</label><input id="ePicker" value="${esc(r.picker||'')}"></div><div class="field"><label>IC Qty Found</label><input id="eIcQty" type="number" value="${val(r.icQtyFound)}"></div><div class="field"><label>IC UOM</label><input id="eIcUom" value="${esc(r.icUom||r.uom||'EA')}"></div></div><div class="form-row one"><div class="field"><label>Notes</label><textarea id="eNotes">${esc(r.notes||'')}</textarea></div><div class="field"><label>IC Notes</label><textarea id="eIcNotes">${esc(r.icNotes||'')}</textarea></div></div><label class="toggle"><input id="eErr" type="checkbox" ${r.foundInShortedBin?'checked':''}> Mark as erroneous bin short</label><br><label class="toggle"><input id="eSecond" type="checkbox" ${r.secondLocationFilled?'checked':''}> Product was filled from second location</label><div class="notice" style="margin-top:8px"><b>Second-location bins:</b> ${esc(secondarySummary(r)||'None saved. Use the Second Location Filled button on the row to add one or more bins with qty.')}</div><br><label class="toggle"><input id="eRep" type="checkbox" ${r.replenishedAfterPick?'checked':''}> Bin was replenished after pick</label><div class="actions" style="margin-top:14px"><button class="btn primary" onclick="saveEdit()">Save Changes</button><button class="btn" onclick="closeEdit()">Cancel</button></div>`;$('editOverlay').classList.add('open')}
+  // Coerce archived to boolean — HTML onclick may pass string or undefined
+  const isArchived=archived===true||archived==='true';
+  console.log('[openEdit] id=',id,'archived=',archived,'isArchived=',isArchived,'shortages=',shortages.length);
+  const r=shortages.find(x=>x.id===id&&(x._archived===isArchived||(!x._archived&&!isArchived)));
+  if(!r){
+    console.warn('[openEdit] record not found. id=',id,'isArchived=',isArchived);
+    console.log('[openEdit] shortages sample:',shortages.slice(0,3).map(x=>({id:x.id,_archived:x._archived})));
+    alert('Record not found. The list may be stale — refreshing...');
+    loadShortages(true).then(()=>openEdit(id,isArchived));
+    return;
+  }editingId=id;editingArchive=archived;$('editBody').innerHTML=`<div class="form-row two"><div class="field"><label>Date</label><input id="eDate" type="date" value="${esc(normalizeDate(r.date)||'')}"></div><div class="field"><label>Division</label><input id="eDiv" value="${esc(r.division||'')}"></div><div class="field"><label>Product Code</label><input id="eProduct" autocapitalize="characters" spellcheck="false" style="text-transform:uppercase" value="${esc(r.productCode||'')}"></div><div class="field"><label>Shorted Bin</label><div class="bin-input-wrap"><input id="eBin" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" value="${esc(r.shortedBin||'')}" oninput="liveBinValidate(this)" onblur="strictBinValidate(this)"><span class="bin-valid-icon"></span></div><div class="bin-format-hint">##-##-## &nbsp;·&nbsp; ##-##-# &nbsp;·&nbsp; P##### &nbsp;·&nbsp; BULK &nbsp;·&nbsp; ROOM &nbsp;·&nbsp; KEY ACCOUNT</div><div class="bin-format-err"></div></div><div class="field"><label>Qty Shorted</label><input id="eQty" type="number" value="${val(r.qtyShorted)}"></div><div class="field"><label>UOM</label><input id="eUom" value="${esc(r.uom||'')}"></div><div class="field"><label>Demand / Order</label><input id="eDemand" value="${esc(r.pickDemand||'')}"></div><div class="field"><label>Picker</label><input id="ePicker" value="${esc(r.picker||'')}"></div><div class="field"><label>IC Qty Found</label><input id="eIcQty" type="number" value="${val(r.icQtyFound)}"></div><div class="field"><label>IC UOM</label><input id="eIcUom" value="${esc(r.icUom||r.uom||'EA')}"></div></div><div class="form-row one"><div class="field"><label>Notes</label><textarea id="eNotes">${esc(r.notes||'')}</textarea></div><div class="field"><label>IC Notes</label><textarea id="eIcNotes">${esc(r.icNotes||'')}</textarea></div></div><label class="toggle"><input id="eErr" type="checkbox" ${r.foundInShortedBin?'checked':''}> Mark as erroneous bin short</label><br><label class="toggle"><input id="eSecond" type="checkbox" ${r.secondLocationFilled?'checked':''}> Product was filled from second location</label><div class="notice" style="margin-top:8px"><b>Second-location bins:</b> ${esc(secondarySummary(r)||'None saved. Use the Second Location Filled button on the row to add one or more bins with qty.')}</div><br><label class="toggle"><input id="eRep" type="checkbox" ${r.replenishedAfterPick?'checked':''}> Bin was replenished after pick</label><div class="actions" style="margin-top:14px"><button class="btn primary" onclick="saveEdit()">Save Changes</button><button class="btn" onclick="closeEdit()">Cancel</button></div>`;$('editOverlay').classList.add('open')}
 function closeEdit(){$('editOverlay').classList.remove('open');editingId=null}
 async function saveEdit(){const binRaw=$('eBin').value.trim();if(binRaw&&!validateBinFormat(binRaw).ok){alert('Invalid bin format.\n\nValid: ##-##-##, ##-##-#, P#####, BULK, ROOM, KEY ACCOUNT');return}const data={date:$('eDate').value,division:$('eDiv').value.trim().toUpperCase(),productCode:$('eProduct').value.trim().toUpperCase(),shortedBin:binRaw.toUpperCase(),qtyShorted:num($('eQty').value),uom:$('eUom').value.trim().toUpperCase(),pickDemand:$('eDemand').value.trim(),picker:$('ePicker').value.trim(),notes:$('eNotes').value.trim(),icQtyFound:num($('eIcQty').value),icUom:$('eIcUom').value.trim().toUpperCase(),icNotes:$('eIcNotes').value.trim(),foundInShortedBin:$('eErr').checked,secondLocationFilled:$('eSecond').checked,replenishedAfterPick:$('eRep').checked,status:$('eErr').checked?'located':'open'};if(!data.foundInShortedBin){data.icQtyFound=0;data.icUom='';data.icNotes=data.icNotes}await updateRecord(editingId,data,editingArchive);closeEdit()}
 function selectVisible(on){document.querySelectorAll('.sr-check:not(:disabled)').forEach(c=>c.checked=on)}function selectedIds(){return [...document.querySelectorAll('.sr-check:checked')].map(c=>c.dataset.id)}async function archiveSelected(){const ids=selectedIds();if(!ids.length){alert('Select shortages first.');return}await archiveIds(ids)}async function archiveFiltered(){const ids=visibleShortages.filter(r=>!r._archived).map(r=>r.id);if(!ids.length){alert('No active filtered shortages to archive.');return}if(!confirm(`Archive ${ids.length} active filtered shortages?`))return;await archiveIds(ids)}
@@ -2224,12 +2234,19 @@ function onPickerSelectChange(selectId, newInputId, hiddenId){
 function openIcConfirm(){
   if(!canRunReports()){alert('IC Team or Manager access required.');return;}
   icConfirmEdits={};
-  if(!shortages.length){
-    loadShortages(true).then(()=>{renderIcConfirmSheet();$('icConfirmOverlay').classList.add('open');});
-    return;
-  }
-  $('icConfirmOverlay').classList.add('open');
-  renderIcConfirmSheet();
+  // Reset filter to 'all' so user sees everything immediately
+  const filt=$('icConfirmFilter');
+  if(filt)filt.value='all';
+  // Always reload to get latest data
+  showLoading('Loading IC sheet...');
+  loadShortages(true).then(()=>{
+    hideLoading();
+    $('icConfirmOverlay').classList.add('open');
+    renderIcConfirmSheet();
+  }).catch(e=>{
+    hideLoading();
+    alert('Failed to load shortages: '+e.message);
+  });
 }
 
 function closeIcConfirm(){
@@ -2238,7 +2255,7 @@ function closeIcConfirm(){
 }
 
 function icConfirmFilteredRows(){
-  const f=$('icConfirmFilter')?.value||'pending';
+  const f=$('icConfirmFilter')?.value||'all';
   const active=shortages.filter(r=>!r._archived&&r.type!=='duplicate_pick');
   if(f==='pending') return active.filter(r=>!r.icConfirmed&&!r.foundInShortedBin&&!r.secondLocationFilled);
   if(f==='confirmed') return active.filter(r=>r.icConfirmed==='confirmed_short');
