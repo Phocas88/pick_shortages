@@ -169,7 +169,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 <button class="btn" style="font-size:11px;padding:5px 10px;background:#fff;border-color:#d4d9e8;color:#1a2038;font-family:'Noto Naskh Arabic',sans-serif" onclick="setLang('fa')" id="loginLangFa"><span style="font-weight:700">داری</span> Dari</button>
 <button class="btn" style="font-size:11px;padding:5px 10px;background:#fff;border-color:#d4d9e8;color:#1a2038;font-family:'Noto Naskh Arabic',sans-serif" onclick="setLang('ar')" id="loginLangAr"><span style="font-weight:700">عربي</span> Arabic</button>
 <button class="btn" style="font-size:11px;padding:5px 10px;background:#fff;border-color:#d4d9e8;color:#1a2038" onclick="setLang('fil')" id="loginLangFil"><span style="font-weight:700">FIL</span> Filipino</button>
-</div></div></div><div class="login-group-label">Select role</div><div class="ic-btns"><button class="ic-login-btn" onclick="goPin('clerk')"><span class="ib-icon">&#128203;</span><span class="ib-title">Outbound Clerk</span><span class="ib-sub">Shortage Entry</span></button><button class="ic-login-btn" onclick="goPin('icteam')"><span class="ib-icon">&#128270;</span><span class="ib-title">IC Team</span><span class="ib-sub">Verify and Report</span></button><button class="ic-login-btn" onclick="goPin('manager')"><span class="ib-icon">&#9881;&#65039;</span><span class="ib-title">IC Manager</span><span class="ib-sub">Settings and Migration</span></button></div><div class="login-group-label" style="margin-top:16px">No Login Required</div><div style="display:grid;grid-template-columns:1fr;gap:10px"><button class="ic-login-btn" onclick="enterOverPull()" style="border-color:rgba(251,146,60,.4);background:var(--orange-l)"><span class="ib-icon">&#128202;</span><span class="ib-title" style="color:var(--orange)">Over Pull Log</span><span class="ib-sub">Operations — no PIN needed</span></button></div></div></section>
+</div></div></div><div class="login-group-label">Select role</div><div class="ic-btns"><button class="ic-login-btn" onclick="goPin('clerk')"><span class="ib-icon">&#128203;</span><span class="ib-title">Outbound Clerk</span><span class="ib-sub">Shortage Entry</span></button><button class="ic-login-btn" onclick="goPin('icteam')"><span class="ib-icon">&#128270;</span><span class="ib-title">IC Team</span><span class="ib-sub">Verify and Report</span></button><button class="ic-login-btn" onclick="goPin('manager')"><span class="ib-icon">&#9881;&#65039;</span><span class="ib-title">IC Manager</span><span class="ib-sub">Settings and Migration</span></button></div><div class="login-group-label" style="margin-top:16px">No Login Required</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><button class="ic-login-btn" onclick="enterOverPull()" style="border-color:rgba(251,146,60,.4);background:var(--orange-l)"><span class="ib-icon">&#128202;</span><span class="ib-title" style="color:var(--orange)">Over Pull Portal</span><span class="ib-sub">Log over-pulled items</span></button><button class="ic-login-btn" onclick="enterBatchPick()" style="border-color:rgba(167,139,250,.4);background:var(--purple-l)"><span class="ib-icon">&#128203;</span><span class="ib-title" style="color:var(--purple)">Batch Pick Sheet</span><span class="ib-sub">One item, multiple orders</span></button></div></div></section>
 <section id="pinScreen" class="screen"><div class="pin-card"><div id="pinBadge" class="pin-div-badge">Role</div><p style="color:var(--muted);font-size:12px">Enter PIN</p><div id="pinDots" class="pin-dots"><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span></div><div class="pin-keypad"><button class="pin-key" data-key="1" onclick="pinKey('1')">1</button><button class="pin-key" data-key="2" onclick="pinKey('2')">2</button><button class="pin-key" data-key="3" onclick="pinKey('3')">3</button><button class="pin-key" data-key="4" onclick="pinKey('4')">4</button><button class="pin-key" data-key="5" onclick="pinKey('5')">5</button><button class="pin-key" data-key="6" onclick="pinKey('6')">6</button><button class="pin-key" data-key="7" onclick="pinKey('7')">7</button><button class="pin-key" data-key="8" onclick="pinKey('8')">8</button><button class="pin-key" data-key="9" onclick="pinKey('9')">9</button><button class="pin-key clr" onclick="pinClear()">CLR</button><button class="pin-key" data-key="0" onclick="pinKey('0')">0</button><button class="pin-key clr" onclick="pinBack()">&#9003;</button></div><div id="pinError" class="pin-error"></div><button class="pin-back-btn" onclick="backToLogin()">Back</button></div></section>
 <section id="shortageScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Outbound</div><h1>Shortage Entry</h1><p>Log shortage lines and review active records.</p></div><div id="shortageTopActions" class="actions"></div></div><div class="card" id="entryCard"><div class="form-row four"><div class="field"><label>Date &amp; Time</label><input id="sDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="sDiv"><option value="">Select</option><option value="NH">NH</option><option value="GT">GT</option><option value="FS">FS</option><option value="EE">EE</option><option value="BC">BC</option><option value="CF">CF</option><option value="VP">VP – VIP</option><option value="TP">TP – Transpac</option></select></div><div class="field"><label>Picker <em>*</em></label><select id="sPickerSelect" onchange="onPickerSelectChange('sPickerSelect','sPickerNew','sPicker')"><option value="">-- Select Picker --</option></select><div id="sPickerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="sPickerNew" placeholder="FirstInitialLastName e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('sPickerNew','picker');syncNewPersonToHidden('sPickerNew','sPicker')" onblur="validatePersonField('sPickerNew','picker');syncNewPersonToHidden('sPickerNew','sPicker')" onkeydown="handleSuggestKey(event,'sPickerNewSuggest')"><div class="suggest-box" id="sPickerNewSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name</div></div><input id="sPicker" type="hidden"></div><div class="field"><label>Pack Station</label><select id="sPackStation"><option value="">-- Select Station --</option></select></div><div class="field"><label>Pick Demand # <em>*</em></label><input id="sDemand" placeholder="e.g. NH00012345" oninput="autoDivisionFromDemand()"></div><div class="field"><label>Shift Override</label><select id="sShift"><option value="auto">Auto (use current time)</option><option value="1st">1st Shift (6am–3:30pm)</option><option value="2nd">2nd Shift (3:30pm–12am)</option><option value="weekend_ot">Weekend OT (6am–12am)</option></select></div></div><div class="card-title">Product Lines</div><div id="productLines"></div><div class="actions"><button class="btn" onclick="addProductLine()">+ Add Line</button><button class="btn" onclick="clearEntry()">Clear Form</button><button class="btn primary" style="flex:1" onclick="saveShortage()">+ Log All Shortages</button></div><div class="field" style="margin-top:12px"><label>Notes</label><textarea id="sNotes"></textarea></div></div><div class="filters"><input id="filterText" class="search" placeholder="Search by product, order, picker, division..." oninput="renderShortages()"><select id="viewMode" onchange="loadShortages(true)"><option value="active">Active</option><option value="archive">Archived History</option><option value="both">Active + Archived</option></select><input id="filterStart" type="date" onchange="renderShortages()"><input id="filterEnd" type="date" onchange="renderShortages()"><button class="btn" onclick="loadShortages(true)">Refresh Data</button></div><div id="archiveActions" class="actions" style="margin-bottom:10px"></div><div id="shortageList" class="shortage-list"></div></div></section>
 <section id="reportScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Reports</div><h1>Shortage Reports</h1><p>IC Team and IC Manager only.</p></div><div class="actions"><button class="btn primary" onclick="printSummaryReport()">Print Summary</button><button class="btn" onclick="printCheckReport()">Print IC Check Sheet</button></div></div><div class="card"><div class="form-row four"><div class="field"><label>Report Mode</label><select id="reportMode"><option value="active">Active Only</option><option value="archive">Archived History</option><option value="both">Active + Archived (Default)</option></select></div><div class="field"><label>Start Date</label><input id="reportStart" type="date"></div><div class="field"><label>End Date</label><input id="reportEnd" type="date"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="runReportPull()">Run Report</button></div></div><div class="notice" style="margin-top:8px;margin-bottom:0"><strong>Tip:</strong> When a date range is selected, both active and archived records for those dates are always included — archived shortages from older periods will appear in the report regardless of mode.</div></div><div id="reportBody"></div></div></section>
@@ -292,7 +292,7 @@ function getSettings(){try{return {...DEFAULT_SETTINGS,...JSON.parse(localStorag
 function initFirebase(){const s=getSettings();try{if(!firebase.apps.length)firebase.initializeApp(s.firebaseConfig);db=firebase.firestore();firebase.firestore().settings({ignoreUndefinedProperties:true});}catch(e){console.error(e);alert('Firebase connection failed. Check Settings. '+e.message)}}
 function showLoading(t){$('loadingText').textContent=t||'Loading...';$('loading').classList.add('show')}function hideLoading(){$('loading').classList.remove('show')}
 function applyTheme(){const light=localStorage.getItem('scp_theme')==='light';document.body.classList.toggle('light-mode',light);if($('themeToggle'))$('themeToggle').checked=light}function saveTheme(light){localStorage.setItem('scp_theme',light?'light':'dark');applyTheme()}
-function showScreen(name){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const el=$(name+'Screen');if(el)el.classList.add('active');$('topbar').classList.toggle('show',name!=='login'&&name!=='pin');document.querySelectorAll('.nav-btn[data-screen]').forEach(b=>b.classList.toggle('active',b.dataset.screen===name));if(name==='shortage'){loadShortages(false);populateStationSelects();}if(name==='report')renderReports();if(name==='picker')renderPickers();if(name==='batch'){bpInitForm();bpPopulatePickers();}if(name==='restock')buildReplenishmentReport();if(name==='settings')loadSettingsForm();if(name==='overpull'){if(role==='icteam'){alert('Over Pull access is not available for IC Team.');showScreen('shortage');return;}populatePickerSelects();populateStationSelects();opInitForm();opSwitchTab('entry');}}
+function showScreen(name){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const el=$(name+'Screen');if(el)el.classList.add('active');$('topbar').classList.toggle('show',name!=='login'&&name!=='pin');document.querySelectorAll('.nav-btn[data-screen]').forEach(b=>b.classList.toggle('active',b.dataset.screen===name));if(name==='shortage'){loadShortages(false);populateStationSelects();}if(name==='report')renderReports();if(name==='picker')renderPickers();if(name==='batch'){populatePickerSelects();bpInitForm();bpPopulatePickers();}if(name==='restock')buildReplenishmentReport();if(name==='settings')loadSettingsForm();if(name==='overpull'){if(role==='icteam'){alert('Over Pull access is not available for IC Team.');showScreen('shortage');return;}populatePickerSelects();populateStationSelects();opInitForm();opSwitchTab('entry');}}
 function goPin(target){pinTarget=target;pinBuf='';$('pinBadge').textContent=ROLE_LABELS[target];updateDots();$('pinError').textContent='';showScreen('pin')}
 function pinKey(k){if(pinBuf.length>=4)return;pinBuf+=k;updateDots();document.querySelectorAll('.pin-key').forEach(btn=>{if(btn.dataset.key===k){btn.classList.add('active-press');setTimeout(()=>btn.classList.remove('active-press'),140)}});if(pinBuf.length===4)setTimeout(checkPin,120)}
 function pinBack(){pinBuf=pinBuf.slice(0,-1);updateDots()}function pinClear(){pinBuf='';updateDots();$('pinError').textContent=''}function updateDots(){document.querySelectorAll('#pinDots .pin-dot').forEach((d,i)=>d.classList.toggle('filled',i<pinBuf.length))}
@@ -1294,6 +1294,21 @@ function strictBinValidate(input){
    ═══════════════════════════════════════════════════════ */
 let opRecords=[];
 
+function enterBatchPick(){
+  if(!role){
+    $('topbar').classList.add('show');
+    $('roleChip').textContent='Operations';
+    $('roleChip').className='role-chip';
+    $('nav').innerHTML=`<button class="nav-btn" onclick="enterBatchPick()">Batch Pick</button>`
+      +`<button class="nav-btn" onclick="enterOverPull()">Over Pull</button>`
+      +`<button class="nav-btn lock" onclick="location.reload()">Exit</button>`;
+  }
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $('batchScreen').classList.add('active');
+  populatePickerSelects();
+  bpInitForm();bpPopulatePickers();
+}
+
 function enterOverPull(){if(role==='icteam'){alert('Over Pull access is not available for IC Team.');return;}
   // No pin needed — go straight to overpull screen via showScreen logic but without role gating
   // Show topbar manually since we're not "logged in" via a role
@@ -1301,7 +1316,9 @@ function enterOverPull(){if(role==='icteam'){alert('Over Pull access is not avai
     $('topbar').classList.add('show');
     $('roleChip').textContent='Operations';
     $('roleChip').className='role-chip';
-    $('nav').innerHTML=`<button class="nav-btn" onclick="enterOverPull()">Over Pull</button><button class="nav-btn lock" onclick="location.reload()">Exit</button>`;
+    $('nav').innerHTML=`<button class="nav-btn" onclick="enterOverPull()">Over Pull</button>`
+      +`<button class="nav-btn" onclick="enterBatchPick()" style="color:var(--purple)">Batch Pick</button>`
+      +`<button class="nav-btn lock" onclick="location.reload()">Exit</button>`;
   }
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   $('overpullScreen').classList.add('active');
@@ -2261,8 +2278,8 @@ const LANGS={
     'login.clerk_title':'Outbound Clerk','login.clerk_sub':'Shortage Entry',
     'login.ic_title':'IC Team','login.ic_sub':'Verify and Report',
     'login.manager_title':'IC Manager','login.manager_sub':'Settings and Migration',
-    'login.no_login':'No Login Required',
-    'login.shortage_portal':'Shortage & Over Pull Portal','login.shortage_portal_sub':'Opens the standalone shortage app (new tab)',
+    'login.no_login':'No Login Required','login.batch_btn':'Batch Pick Sheet','login.batch_sub':'One item, multiple orders','login.op_btn':'Over Pull Portal','login.op_sub':'Log over-pulled items',
+    'login.shortage_portal':'Over Pull Portal','login.shortage_portal_sub':'Opens the standalone shortage app (new tab)',
     'login.enter_pin':'Enter PIN','login.back':'Back',
     'form.date_time':'Date & Time','form.division':'Division','form.picker':'Picker',
     'form.pack_station':'Pack Station','form.pick_demand':'Pick Demand #',
@@ -2312,7 +2329,7 @@ const LANGS={
     'login.clerk_title':'Empleado de Salida','login.clerk_sub':'Entrada de Escasez',
     'login.ic_title':'Equipo IC','login.ic_sub':'Verificar e Informar',
     'login.manager_title':'Gerente IC','login.manager_sub':'Configuración y Migración',
-    'login.no_login':'Sin Inicio de Sesión',
+    'login.no_login':'Sin Inicio de Sesión','login.batch_btn':'Hoja de Recogida por Lotes','login.batch_sub':'Un artículo, múltiples órdenes','login.op_btn':'Portal de Exceso','login.op_sub':'Registrar artículos en exceso',
     'login.shortage_portal':'Portal de Escasez y Exceso','login.shortage_portal_sub':'Abre la app de escasez (nueva pestaña)',
     'login.enter_pin':'Ingresar PIN','login.back':'Regresar',
     'form.date_time':'Fecha y Hora','form.division':'División','form.picker':'Recolector',
@@ -2364,7 +2381,7 @@ const LANGS={
     'login.clerk_title':'کارمند خروجی','login.clerk_sub':'ورود کمبود',
     'login.ic_title':'تیم IC','login.ic_sub':'تأیید و گزارش',
     'login.manager_title':'مدیر IC','login.manager_sub':'تنظیمات و انتقال',
-    'login.no_login':'بدون ورود',
+    'login.no_login':'بدون ورود','login.batch_btn':'برگه برداشت دسته‌ای','login.batch_sub':'یک محصول، چند سفارش','login.op_btn':'پورتل مازاد','login.op_sub':'ثبت اقلام مازاد',
     'login.shortage_portal':'پورتل کمبود و مازاد','login.shortage_portal_sub':'برنامه کمبود را باز می‌کند (تب جدید)',
     'login.enter_pin':'پین را وارد کنید','login.back':'برگشت',
     'form.date_time':'تاریخ و ساعت','form.division':'بخش','form.picker':'جمع‌آورنده',
@@ -2416,7 +2433,7 @@ const LANGS={
     'login.clerk_title':'Outbound Clerk','login.clerk_sub':'Pagpasok ng Kakulangan',
     'login.ic_title':'Koponan ng IC','login.ic_sub':'I-verify at Mag-ulat',
     'login.manager_title':'IC Manager','login.manager_sub':'Mga Setting at Paglipat',
-    'login.no_login':'Walang Login',
+    'login.no_login':'Walang Login','login.batch_btn':'Batch Pick Sheet','login.batch_sub':'Isang item, maraming orders','login.op_btn':'Over Pull Portal','login.op_sub':'I-log ang mga item na sobra',
     'login.shortage_portal':'Portal ng Kakulangan at Sobra','login.shortage_portal_sub':'Binubuksan ang standalone app (bagong tab)',
     'login.enter_pin':'Ilagay ang PIN','login.back':'Bumalik',
     'form.date_time':'Petsa at Oras','form.division':'Dibisyon','form.picker':'Tagapulot',
@@ -2468,7 +2485,7 @@ const LANGS={
     'login.clerk_title':'موظف الشحن','login.clerk_sub':'إدخال النقص',
     'login.ic_title':'فريق IC','login.ic_sub':'التحقق والتقرير',
     'login.manager_title':'مدير IC','login.manager_sub':'الإعدادات والترحيل',
-    'login.no_login':'بدون تسجيل دخول',
+    'login.no_login':'بدون تسجيل دخول','login.batch_btn':'ورقة الانتقاء الدُفعي','login.batch_sub':'منتج واحد، طلبات متعددة','login.op_btn':'بوابة الزيادة','login.op_sub':'تسجيل العناصر الزائدة',
     'login.shortage_portal':'بوابة النقص والزيادة','login.shortage_portal_sub':'يفتح تطبيق النقص (تبويب جديد)',
     'login.enter_pin':'أدخل رمز PIN','login.back':'رجوع',
     'form.date_time':'التاريخ والوقت','form.division':'القسم','form.picker':'جامع البضائع',
@@ -2663,7 +2680,11 @@ function applyLangToForms(){
   }
   if(icBtns[3]){
     const t4=icBtns[3].querySelector('.ib-title');const s4=icBtns[3].querySelector('.ib-sub');
-    if(t4)t4.textContent=t('login.shortage_portal');if(s4)s4.textContent=t('login.shortage_portal_sub');
+    if(t4)t4.textContent=t('login.op_btn')||t('login.shortage_portal');if(s4)s4.textContent=t('login.op_sub')||t('login.shortage_portal_sub');
+  }
+  if(icBtns[4]){
+    const t5=icBtns[4].querySelector('.ib-title');const s5=icBtns[4].querySelector('.ib-sub');
+    if(t5)t5.textContent=t('login.batch_btn')||'Batch Pick Sheet';if(s5)s5.textContent=t('login.batch_sub')||'One item, multiple orders';
   }
 
   // PIN screen back button
