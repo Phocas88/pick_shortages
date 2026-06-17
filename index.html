@@ -172,7 +172,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 </div></div></div><div class="login-group-label">Select role</div><div class="ic-btns"><button class="ic-login-btn" onclick="goPin('clerk')"><span class="ib-icon">&#128203;</span><span class="ib-title">Outbound Clerk</span><span class="ib-sub">Shortage Entry</span></button><button class="ic-login-btn" onclick="goPin('icteam')"><span class="ib-icon">&#128270;</span><span class="ib-title">IC Team</span><span class="ib-sub">Verify and Report</span></button><button class="ic-login-btn" onclick="goPin('manager')"><span class="ib-icon">&#9881;&#65039;</span><span class="ib-title">IC Manager</span><span class="ib-sub">Settings and Migration</span></button></div><div class="login-group-label" style="margin-top:16px">No Login Required</div><div style="display:grid;grid-template-columns:1fr;gap:10px"><button class="ic-login-btn" onclick="enterOverPull()" style="border-color:rgba(251,146,60,.4);background:var(--orange-l)"><span class="ib-icon">&#128202;</span><span class="ib-title" style="color:var(--orange)">Over Pull Log</span><span class="ib-sub">Operations — no PIN needed</span></button></div></div></section>
 <section id="pinScreen" class="screen"><div class="pin-card"><div id="pinBadge" class="pin-div-badge">Role</div><p style="color:var(--muted);font-size:12px">Enter PIN</p><div id="pinDots" class="pin-dots"><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span></div><div class="pin-keypad"><button class="pin-key" data-key="1" onclick="pinKey('1')">1</button><button class="pin-key" data-key="2" onclick="pinKey('2')">2</button><button class="pin-key" data-key="3" onclick="pinKey('3')">3</button><button class="pin-key" data-key="4" onclick="pinKey('4')">4</button><button class="pin-key" data-key="5" onclick="pinKey('5')">5</button><button class="pin-key" data-key="6" onclick="pinKey('6')">6</button><button class="pin-key" data-key="7" onclick="pinKey('7')">7</button><button class="pin-key" data-key="8" onclick="pinKey('8')">8</button><button class="pin-key" data-key="9" onclick="pinKey('9')">9</button><button class="pin-key clr" onclick="pinClear()">CLR</button><button class="pin-key" data-key="0" onclick="pinKey('0')">0</button><button class="pin-key clr" onclick="pinBack()">&#9003;</button></div><div id="pinError" class="pin-error"></div><button class="pin-back-btn" onclick="backToLogin()">Back</button></div></section>
 <section id="shortageScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Outbound</div><h1>Shortage Entry</h1><p>Log shortage lines and review active records.</p></div><div id="shortageTopActions" class="actions"></div></div><div class="card" id="entryCard"><div class="form-row four"><div class="field"><label>Date &amp; Time</label><input id="sDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="sDiv"><option value="">Select</option><option value="NH">NH</option><option value="GT">GT</option><option value="FS">FS</option><option value="EE">EE</option><option value="BC">BC</option><option value="CF">CF</option><option value="VP">VP – VIP</option><option value="TP">TP – Transpac</option></select></div><div class="field"><label>Picker <em>*</em></label><select id="sPickerSelect" onchange="onPickerSelectChange('sPickerSelect','sPickerNew','sPicker')"><option value="">-- Select Picker --</option></select><div id="sPickerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="sPickerNew" placeholder="FirstInitialLastName e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('sPickerNew','picker');syncNewPersonToHidden('sPickerNew','sPicker')" onblur="validatePersonField('sPickerNew','picker');syncNewPersonToHidden('sPickerNew','sPicker')" onkeydown="handleSuggestKey(event,'sPickerNewSuggest')"><div class="suggest-box" id="sPickerNewSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name</div></div><input id="sPicker" type="hidden"></div><div class="field"><label>Pack Station</label><select id="sPackStation"><option value="">-- Select Station --</option></select></div><div class="field"><label>Pick Demand # <em>*</em></label><input id="sDemand" placeholder="e.g. NH00012345" oninput="autoDivisionFromDemand()"></div><div class="field"><label>Shift Override</label><select id="sShift"><option value="auto">Auto (use current time)</option><option value="1st">1st Shift (6am–3:30pm)</option><option value="2nd">2nd Shift (3:30pm–12am)</option><option value="weekend_ot">Weekend OT (6am–12am)</option></select></div></div><div class="card-title">Product Lines</div><div id="productLines"></div><div class="actions"><button class="btn" onclick="addProductLine()">+ Add Line</button><button class="btn" onclick="clearEntry()">Clear Form</button><button class="btn primary" style="flex:1" onclick="saveShortage()">+ Log All Shortages</button></div><div class="field" style="margin-top:12px"><label>Notes</label><textarea id="sNotes"></textarea></div></div><div class="filters"><input id="filterText" class="search" placeholder="Search by product, order, picker, division..." oninput="renderShortages()"><select id="viewMode" onchange="loadShortages(true)"><option value="active">Active</option><option value="archive">Archived History</option><option value="both">Active + Archived</option></select><input id="filterStart" type="date" onchange="renderShortages()"><input id="filterEnd" type="date" onchange="renderShortages()"><button class="btn" onclick="loadShortages(true)">Refresh Data</button></div><div id="archiveActions" class="actions" style="margin-bottom:10px"></div><div id="shortageList" class="shortage-list"></div></div></section>
-<section id="reportScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Reports</div><h1>Shortage Reports</h1><p>IC Team and IC Manager only.</p></div><div class="actions"><button class="btn primary" onclick="printSummaryReport()">Print Summary</button><button class="btn" onclick="printCheckReport()">Print IC Check Sheet</button></div></div><div class="card"><div class="form-row four"><div class="field"><label>Report Mode</label><select id="reportMode"><option value="active">Active Only</option><option value="archive">Archived History</option><option value="both">Active + Archived</option></select></div><div class="field"><label>Start Date</label><input id="reportStart" type="date"></div><div class="field"><label>End Date</label><input id="reportEnd" type="date"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="runReportPull()">Run Report</button></div></div></div><div id="reportBody"></div></div></section>
+<section id="reportScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Reports</div><h1>Shortage Reports</h1><p>IC Team and IC Manager only.</p></div><div class="actions"><button class="btn primary" onclick="printSummaryReport()">Print Summary</button><button class="btn" onclick="printCheckReport()">Print IC Check Sheet</button></div></div><div class="card"><div class="form-row four"><div class="field"><label>Report Mode</label><select id="reportMode"><option value="active">Active Only</option><option value="archive">Archived History</option><option value="both">Active + Archived (Default)</option></select></div><div class="field"><label>Start Date</label><input id="reportStart" type="date"></div><div class="field"><label>End Date</label><input id="reportEnd" type="date"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="runReportPull()">Run Report</button></div></div><div class="notice" style="margin-top:8px;margin-bottom:0"><strong>Tip:</strong> When a date range is selected, both active and archived records for those dates are always included — archived shortages from older periods will appear in the report regardless of mode.</div></div><div id="reportBody"></div></div></section>
 <section id="restockScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Replenishment</div><h1>Replenishment Report</h1><p>IC Manager only.</p></div><button class="btn primary" onclick="printReplenReport()">Print</button></div><div class="card"><div class="card-title">Inventory Bin Report Import</div><p class="notice">Paste report columns: Bin Name, Product Code, Qty on Hand, Qty Allocated, Unit of Measure.</p><textarea id="binImport" style="width:100%;min-height:160px" placeholder="82-26-01&#9;DI1210&#9;12&#9;0&#9;EA"></textarea><div class="actions" style="margin-top:10px"><button class="btn primary" onclick="saveInventoryBinReport()">Import Bin Report</button></div></div><div id="restockBody"></div></div></section>
 <section id="pickerScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Personnel</div><h1>Manage Pickers &amp; Packers</h1><p>IC Manager only. Names stored as FirstInitialLastName (e.g. JDoe).</p></div></div><div class="card"><div class="card-title">Pickers</div><div class="form-row two"><div class="field"><label>Picker Name (FirstInitialLastName)</label><input id="pickerName" placeholder="JDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPickerManual()">Add Picker</button></div></div><div id="pickerList"></div></div><div class="card"><div class="card-title">Packers</div><div class="form-row two"><div class="field"><label>Packer Name (FirstInitialLastName)</label><input id="packerName" placeholder="MDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackerManual()">Add Packer</button></div></div><div id="packerList"></div></div><div class="card"><div class="card-title">Pack Stations</div><div class="form-row two"><div class="field"><label>Pack Station Name</label><input id="packStationName" placeholder="PS-01"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackStationManual()">Add Station</button></div></div><div id="packStationList"></div></div></div></section>
 <section id="migrationScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Migration</div><h1>Old Firebase Migration</h1><p>Copies old shortage records into the new shortage database. Does not delete the old database.</p></div></div><div class="card"><div class="notice">Source: <b>inventory-control-portal</b> collection <b>shortages</b>. Destination: current active collection.</div><div class="form-row three"><div class="field"><label>Old Collection</label><input id="oldCollection" value="shortages"></div><div class="field"><label>Limit</label><input id="migLimit" type="number" value="5000"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="runMigration()">Run Migration</button></div></div><div id="migrationResult"></div></div></div></section>
@@ -535,10 +535,34 @@ function normalizeShortage(raw,id,arch){
 }
 function shortageSortValue(r){const d=r.date||r.createdAt||r.timestamp||'';if(d&&d.toDate)return d.toDate().getTime();const t=Date.parse(d);return isNaN(t)?0:t}
 async function loadShortages(force){if(!db)return;const mode=$('viewMode')?.value||lastLoadMode||'active';if(!force&&useCache(mode))return;showLoading('Loading shortages...');try{const s=getSettings();let rows=[];async function getCol(col,arch){const snap=await db.collection(col).limit(2500).get();return snap.docs.map(d=>normalizeShortage(d.data(),d.id,arch))}if(mode==='active'||mode==='both')rows=rows.concat(await getCol(s.activeCollection,false));if(mode==='archive'||mode==='both')rows=rows.concat(await getCol(s.archiveCollection,true));rows.sort((a,b)=>shortageSortValue(b)-shortageSortValue(a));shortages=rows;lastLoadMode=mode;localStorage.setItem(cacheKey(mode),JSON.stringify({t:Date.now(),rows}));renderShortages();if($('reportScreen').classList.contains('active'))renderReports()}catch(e){alert('Load failed: '+e.message)}finally{hideLoading()}}
-async function runReportPull(){const mode=$('reportMode').value;$('viewMode').value=mode;await loadShortages(true);renderReports()}
+async function runReportPull(){
+  const mode=$('reportMode').value;
+  const hasDateRange=!!($('reportStart').value||$('reportEnd').value);
+  // When a date range is specified, always pull both active + archive so
+  // archived records from older dates appear in the report
+  const loadMode=hasDateRange?'both':mode;
+  $('viewMode').value=loadMode;
+  await loadShortages(true);
+  renderReports();
+}
 function normalizeDate(v){if(!v)return '';try{if(v.toDate)return v.toDate().toISOString().slice(0,10);const str=String(v);if(/^\d{4}-\d{2}-\d{2}/.test(str))return str.slice(0,10);const t=Date.parse(str);return isNaN(t)?str.slice(0,10):new Date(t).toISOString().slice(0,10)}catch(e){return ''}}
 function matchesDate(r,start,end){const d=normalizeDate(r.date||r.createdAt||r.timestamp);if(start&&d<start)return false;if(end&&d>end)return false;return true}
-function filteredRows(forReport=false){const text=(forReport?'':$('filterText')?.value||'').toLowerCase().trim();const start=forReport?$('reportStart').value:$('filterStart')?.value;const end=forReport?$('reportEnd').value:$('filterEnd')?.value;return shortages.filter(r=>{if(!matchesDate(r,start,end))return false;if(!text)return true;return [r.productCode,r.shortedBin,r.picker,r.pickDemand,r.division,r.notes].join(' ').toLowerCase().includes(text)})}
+function filteredRows(forReport=false){
+  const text=(forReport?'':$('filterText')?.value||'').toLowerCase().trim();
+  const start=forReport?$('reportStart').value:$('filterStart')?.value;
+  const end=forReport?$('reportEnd').value:$('filterEnd')?.value;
+  const mode=forReport?($('reportMode')?.value||'both'):'both';
+  return shortages.filter(r=>{
+    if(!matchesDate(r,start,end))return false;
+    // When a date range is given for reports, include all matching records
+    // regardless of archive status — archived = historical data still belongs in report
+    if(forReport&&(start||end)){/* include all — already loaded 'both' */}
+    else if(forReport&&mode==='active'&&r._archived)return false;
+    else if(forReport&&mode==='archive'&&!r._archived)return false;
+    if(!text)return true;
+    return [r.productCode,r.shortedBin,r.picker,r.pickDemand,r.division,r.notes].join(' ').toLowerCase().includes(text);
+  });
+}
 function renderShortages(){visibleShortages=filteredRows(false);$('shortageList').innerHTML=visibleShortages.length?visibleShortages.map(rowHtml).join(''):`<div class="empty">${t('list.no_shortages')}</div>`;renderCheckPreview();}
 function isBackorderRisk(r){return !!r.foundInShortedBin&&!r.secondLocationFilled}
 function statusBadges(r){let b=[];if(r._archived)b.push(`<span class="badge purple">${t('badge.archived')}</span>`);if(r.icConfirmed==='confirmed_short')b.push(`<span class="badge green">&#10003; ${t('badge.confirmed')}</span>`);if(r.icConfirmed==='erroneous')b.push(`<span class="badge yellow">&#9888; ${t('badge.erroneous')}</span>`);else if(r.foundInShortedBin)b.push(`<span class="badge yellow">${t('badge.erroneous')}</span>`);if(isBackorderRisk(r))b.push(`<span class="badge red">${t('badge.backorder')}</span>`);if(r.secondLocationFilled)b.push(`<span class="badge blue">${t('badge.second_loc')}</span>`);if(r.replenishedAfterPick)b.push(`<span class="badge green">${t('badge.replenished')}</span>`);return b.join(' ')}
@@ -737,7 +761,33 @@ function renderReports(){
     </div>
     <div class="card no-break">
       <div class="card-title">Division &amp; Shift Breakdown</div>
-      <div style="overflow:auto"><table class="table"><thead><tr><th>Division</th><th>Total</th><th>1st Shift</th><th>2nd Shift</th><th>2nd Location</th><th>⚠ Erroneous</th><th>Not Located</th><th>Error Rate</th></tr></thead><tbody>${divTableRows}</tbody></table></div>
+      <div style="overflow:auto"><table class="table"><thead><tr><th>Division</th><th>Total</th><th>1st Shift</th><th>2nd Shift</th><th>Wknd OT</th><th>2nd Location</th><th>⚠ Erroneous</th><th>Not Located</th><th>Error Rate</th></tr></thead><tbody>${divTableRows}</tbody></table></div>
+    </div>
+    <div class="card no-break">
+      <div class="card-title">By Shift — Shortages, Erroneous &amp; Confirmed</div>
+      <div style="overflow:auto"><table class="table">
+        <thead><tr><th>Shift</th><th>Total Shortages</th><th>✓ Confirmed Short Bin</th><th>⚠ Erroneous Short</th><th>Erroneous Backorders</th><th>2nd Location Filled</th><th>Replenished</th><th>Archived</th></tr></thead>
+        <tbody>
+          ${[
+            {lbl:'1st Shift (6am–3:30pm)',filter:r=>getShiftFromRecord(r)===1},
+            {lbl:'2nd Shift (3:30pm–12am)',filter:r=>getShiftFromRecord(r)===2},
+            {lbl:'Weekend OT (6am–12am)',filter:r=>getShiftFromRecord(r)===3},
+          ].map(({lbl,filter})=>{
+            const sr=rows.filter(filter);
+            if(!sr.length)return'';
+            return `<tr>
+              <td style="font-weight:700">${lbl}</td>
+              <td>${sr.length}</td>
+              <td style="color:var(--green);font-weight:600">${sr.filter(r=>r.icConfirmed==='confirmed_short').length}</td>
+              <td style="color:var(--yellow);font-weight:600">${sr.filter(r=>r.foundInShortedBin||r.icConfirmed==='erroneous').length}</td>
+              <td style="color:var(--red);font-weight:600">${sr.filter(isErrBackorder).length}</td>
+              <td style="color:var(--accent);font-weight:600">${sr.filter(r=>r.secondLocationFilled).length}</td>
+              <td>${sr.filter(r=>r.replenishedAfterPick).length}</td>
+              <td style="color:var(--muted)">${sr.filter(r=>r._archived).length}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table></div>
     </div>
     <div class="card no-break">
       <div class="card-title">Picker Performance</div>
@@ -745,11 +795,38 @@ function renderReports(){
     </div>
     <div class="card no-break">
       <div class="card-title">Daily Summary</div>
-      <div style="overflow:auto"><table class="table"><thead><tr><th>Date</th><th>Total</th><th>1st Shift</th><th>2nd Shift</th><th>2nd Location</th><th>⚠ Erroneous</th></tr></thead><tbody>${dayTableRows}</tbody></table></div>
+      <div style="overflow:auto"><table class="table"><thead><tr><th>Date</th><th>Total</th><th>1st Shift</th><th>2nd Shift</th><th>Wknd OT</th><th>2nd Location</th><th>⚠ Erroneous</th></tr></thead><tbody>${dayTableRows}</tbody></table></div>
     </div>
     ${duplicate.length?`<div class="card no-break"><div class="card-title">⚠ Duplicate Bin / Product Alerts</div>${table(['Product Code','Bin Location','Occurrences','Pickers'],duplicate.map(d=>[d.product,d.bin,d.count,[...d.pickers].join(', ')]))}</div>`:''}
-    ${rows.filter(isErrBackorder).length?`<div class="card no-break"><div class="card-title" style="color:var(--red)">Erroneous Shortages That Likely Became Backorders</div>${table(['Product Code','Bin Location','Qty Shorted','IC Qty Found','UOM','Demand','Picker','Date'],rows.filter(isErrBackorder).map(r=>[r.productCode,r.shortedBin,r.qtyShorted,r.icQtyFound,r.icUom||r.uom,r.pickDemand,r.picker,normalizeDate(r.date)]))}</div>`:''}
-    ${rows.filter(r=>r.secondLocationFilled).length?`<div class="card no-break"><div class="card-title" style="color:var(--green)">2nd Location Finds — Inventory Adjustment Reference</div>${table(['Product Code','Div','Original Bin (Shorted)','2nd Location Bin(s)','Qty Filled','Demand','Picker','Date'],rows.filter(r=>r.secondLocationFilled).map(r=>[r.productCode,r.division,r.shortedBin,secondarySummary(r),Array.isArray(r.secondaryLocations)?r.secondaryLocations.reduce((sum,x)=>sum+num(x.qty),0):'',r.pickDemand,r.picker,normalizeDate(r.date)]))}</div>`:''}
+    <div class="card no-break">
+      <div class="card-title">⚠ Erroneous Shorts — All Statuses</div>
+      ${rows.filter(r=>r.foundInShortedBin||r.icConfirmed==='erroneous').length
+        ? table(
+            ['Product Code','Bin','Qty','UOM','Demand','Division','Picker','Shift','IC Qty Found','Status','Date','Archived?'],
+            rows.filter(r=>r.foundInShortedBin||r.icConfirmed==='erroneous').map(r=>[
+              r.productCode,r.shortedBin,r.qtyShorted,r.uom||'EA',r.pickDemand,r.division,r.picker,
+              shiftLabel(r),r.icQtyFound||'—',
+              isErrBackorder(r)?'Backorder Risk':'Erroneous (Bin Had Stock)',
+              normalizeDate(r.date),r._archived?'Yes':'No'
+            ])
+          )
+        : '<div class="empty">No erroneous shorts in this range.</div>'}
+    </div>
+    <div class="card no-break">
+      <div class="card-title">✓ Confirmed Short Bins</div>
+      ${rows.filter(r=>r.icConfirmed==='confirmed_short').length
+        ? table(
+            ['Product Code','Bin','Qty','UOM','Demand','Division','Picker','Shift','IC Notes','Date','Archived?'],
+            rows.filter(r=>r.icConfirmed==='confirmed_short').map(r=>[
+              r.productCode,r.shortedBin,r.qtyShorted,r.uom||'EA',r.pickDemand,r.division,r.picker,
+              shiftLabel(r),r.icNotes||'—',normalizeDate(r.date),r._archived?'Yes':'No'
+            ])
+          )
+        : '<div class="empty">No confirmed short bins in this range.</div>'}
+    </div>
+    ${rows.filter(r=>r.secondLocationFilled).length?`<div class="card no-break"><div class="card-title" style="color:var(--green)">2nd Location Finds — Inventory Adjustment Reference</div>${table(['Product Code','Div','Original Bin (Shorted)','2nd Location Bin(s)','Qty Filled','Demand','Picker','Shift','Date','Archived?'],rows.filter(r=>r.secondLocationFilled).map(r=>[r.productCode,r.division,r.shortedBin,secondarySummary(r),Array.isArray(r.secondaryLocations)?r.secondaryLocations.reduce((sum,x)=>sum+num(x.qty),0):'',r.pickDemand,r.picker,shiftLabel(r),normalizeDate(r.date),r._archived?'Yes':'No']))}</div>`:''}
+    ${rows.filter(r=>r.replenishedAfterPick).length?`<div class="card no-break"><div class="card-title">Replenished After Pick</div>${table(['Product Code','Bin','Qty','UOM','Demand','Division','Picker','Shift','Date','Archived?'],rows.filter(r=>r.replenishedAfterPick).map(r=>[r.productCode,r.shortedBin,r.qtyShorted,r.uom||'EA',r.pickDemand,r.division,r.picker,shiftLabel(r),normalizeDate(r.date),r._archived?'Yes':'No']))}</div>`:''}
+    ${rows.filter(isErrBackorder).length?`<div class="card no-break"><div class="card-title" style="color:var(--red)">Erroneous Shortages That Likely Became Backorders</div>${table(['Product Code','Bin Location','Qty Shorted','IC Qty Found','UOM','Demand','Picker','Shift','Date','Archived?'],rows.filter(isErrBackorder).map(r=>[r.productCode,r.shortedBin,r.qtyShorted,r.icQtyFound,r.icUom||r.uom,r.pickDemand,r.picker,shiftLabel(r),normalizeDate(r.date),r._archived?'Yes':'No']))}</div>`:''}
   `;
 }
 
@@ -842,6 +919,87 @@ function printSummaryReport(){
     <table style="width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:16pt"><thead><tr>${['Date','Total','1st Shift','2nd Shift','Wknd OT','2nd Location','⚠ Erroneous'].map(th).join('')}</tr></thead><tbody>
       ${Object.keys(byDay).sort().map((d,i)=>{const bg=i%2===0?'#fff':'#f3f4f6';return`<tr style="background:${bg}"><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${d}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${byDay[d].total}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${byDay[d].s1}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${byDay[d].s2}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;color:#047857;font-weight:600">${byDay[d].located}</td><td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;color:#92400e;font-weight:600">${byDay[d].erroneous}</td></tr>`;}).join('')}
     </tbody></table></div>
+
+    <!-- By Shift Status Breakdown (print) -->
+    <div style="page-break-before:always;page-break-inside:avoid">
+    <div style="font-size:8pt;font-weight:700;color:#374151;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #e5e7eb;padding-bottom:4pt;margin:14pt 0 8pt">By Shift — Shortages, Erroneous &amp; Confirmed Short Bins</div>
+    <table style="width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:16pt">
+      <thead><tr>${['Shift','Total','✓ Confirmed Short','⚠ Erroneous','Erroneous Backorder','2nd Location','Replenished','Archived'].map(th).join('')}</tr></thead>
+      <tbody>
+        ${[
+          {lbl:'1st Shift (6am–3:30pm)',f:r=>getShiftFromRecord(r)===1},
+          {lbl:'2nd Shift (3:30pm–12am)',f:r=>getShiftFromRecord(r)===2},
+          {lbl:'Weekend OT (6am–12am)',f:r=>getShiftFromRecord(r)===3},
+        ].map(({lbl,f},si)=>{
+          const sr=rows.filter(f);
+          if(!sr.length)return'';
+          const bg=si%2===0?'#fff':'#f3f4f6';
+          return `<tr style="background:${bg}">
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-weight:700">${lbl}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${sr.length}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;color:#047857;font-weight:700">${sr.filter(r=>r.icConfirmed==='confirmed_short').length}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;color:#92400e;font-weight:700">${sr.filter(r=>r.foundInShortedBin||r.icConfirmed==='erroneous').length}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;color:#b91c1c;font-weight:700">${sr.filter(isErrBackorder).length}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;color:#1d4ed8">${sr.filter(r=>r.secondLocationFilled).length}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${sr.filter(r=>r.replenishedAfterPick).length}</td>
+            <td style="padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;color:#6b7280">${sr.filter(r=>r._archived).length}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table></div>
+
+    ${rows.filter(r=>r.foundInShortedBin||r.icConfirmed==='erroneous').length?`
+    <div style="page-break-before:always;page-break-inside:avoid">
+    <div style="font-size:8pt;font-weight:700;color:#92400e;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #fed7aa;padding-bottom:4pt;margin:14pt 0 8pt">⚠ All Erroneous Shorts — Full Detail</div>
+    <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-bottom:16pt">
+      <thead><tr>${['Product','Bin','Qty','UOM','Demand','Div','Picker','Shift','IC Qty','Status','Date','Archived'].map(h=>`<th style="background:#92400e;color:#fff;padding:4pt 6pt;text-align:left;font-size:7.5pt;font-weight:600">${h}</th>`).join('')}</tr></thead>
+      <tbody>
+        ${rows.filter(r=>r.foundInShortedBin||r.icConfirmed==='erroneous').sort((a,b)=>(a.shortedBin||'').localeCompare(b.shortedBin||'')).map((r,i)=>{
+          const bg=i%2===0?'#fff':'#fff7ed';
+          const status=isErrBackorder(r)?'Backorder Risk':'Had Stock';
+          return `<tr style="background:${bg}">
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #fed7aa;font-family:'Courier New',monospace;font-weight:700;font-size:8pt">${esc(r.productCode||'—')}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #fed7aa;font-family:'Courier New',monospace;font-size:8pt">${esc(r.shortedBin||'—')}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #fed7aa;font-family:'Courier New',monospace">${r.qtyShorted||0}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #fed7aa;font-family:'Courier New',monospace">${esc(r.uom||'EA')}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #fed7aa;font-family:'Courier New',monospace">${esc(r.pickDemand||'—')}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #fed7aa;font-family:'Courier New',monospace">${esc(r.division||'—')}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #fed7aa">${esc(r.picker||'—')}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #fed7aa;font-size:7.5pt">${shiftLabel(r)}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #fed7aa;font-family:'Courier New',monospace;color:#b91c1c;font-weight:700">${r.icQtyFound||'—'}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #fed7aa;font-size:7pt;font-weight:600;color:#b91c1c">${status}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #fed7aa;font-size:7.5pt;color:#6b7280">${esc(normalizeDate(r.date))}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #fed7aa;font-size:7.5pt;color:${r._archived?'#7c3aed':'#6b7280'}">${r._archived?'Archived':'Active'}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table></div>`:''}
+
+    ${rows.filter(r=>r.icConfirmed==='confirmed_short').length?`
+    <div style="page-break-before:always;page-break-inside:avoid">
+    <div style="font-size:8pt;font-weight:700;color:#047857;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #d1fae5;padding-bottom:4pt;margin:14pt 0 8pt">✓ Confirmed Short Bins — Full Detail</div>
+    <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-bottom:16pt">
+      <thead><tr>${['Product','Bin','Qty','UOM','Demand','Div','Picker','Shift','IC Notes','Date','Archived'].map(h=>`<th style="background:#047857;color:#fff;padding:4pt 6pt;text-align:left;font-size:7.5pt;font-weight:600">${h}</th>`).join('')}</tr></thead>
+      <tbody>
+        ${rows.filter(r=>r.icConfirmed==='confirmed_short').sort((a,b)=>(a.shortedBin||'').localeCompare(b.shortedBin||'')).map((r,i)=>{
+          const bg=i%2===0?'#fff':'#f0fdf4';
+          return `<tr style="background:${bg}">
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #d1fae5;font-family:'Courier New',monospace;font-weight:700;font-size:8pt">${esc(r.productCode||'—')}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #d1fae5;font-family:'Courier New',monospace;font-size:8pt">${esc(r.shortedBin||'—')}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #d1fae5;font-family:'Courier New',monospace">${r.qtyShorted||0}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #d1fae5;font-family:'Courier New',monospace">${esc(r.uom||'EA')}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #d1fae5;font-family:'Courier New',monospace">${esc(r.pickDemand||'—')}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #d1fae5;font-family:'Courier New',monospace">${esc(r.division||'—')}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #d1fae5">${esc(r.picker||'—')}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #d1fae5;font-size:7.5pt">${shiftLabel(r)}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #d1fae5;font-size:7.5pt;color:#374151">${esc(r.icNotes||'—')}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #d1fae5;font-size:7.5pt;color:#6b7280">${esc(normalizeDate(r.date))}</td>
+            <td style="padding:3pt 6pt;border-bottom:.5pt solid #d1fae5;font-size:7.5pt;color:${r._archived?'#7c3aed':'#6b7280'}">${r._archived?'Archived':'Active'}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table></div>`:''}
+
     <div style="margin-top:20pt;padding-top:8pt;border-top:1pt solid #e5e7eb;font-size:7.5pt;color:#9ca3af;display:flex;justify-content:space-between">
       <span>815 Inventory Control Portal &middot; C &amp; F Enterprises &middot; Chapman Warehouse</span>
       <span>Printed ${today}</span>
