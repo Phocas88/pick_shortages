@@ -174,7 +174,57 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 <section id="shortageScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Outbound</div><h1>Shortage Entry</h1><p>Log shortage lines and review active records.</p></div><div id="shortageTopActions" class="actions"></div></div><div class="card" id="entryCard"><div class="form-row four"><div class="field"><label>Date &amp; Time</label><input id="sDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="sDiv"><option value="">Select</option><option value="NH">NH</option><option value="GT">GT</option><option value="FS">FS</option><option value="EE">EE</option><option value="BC">BC</option><option value="CF">CF</option><option value="VP">VP – VIP</option><option value="TP">TP – Transpac</option></select></div><div class="field"><label>Picker <em>*</em></label><select id="sPickerSelect" onchange="onPickerSelectChange('sPickerSelect','sPickerNew','sPicker')" style="flex:1"><option value="">-- Select Picker --</option></select><label style="display:inline-flex;align-items:center;gap:5px;margin-top:5px;font-size:11px;color:var(--orange);cursor:pointer;font-weight:600;background:var(--orange-l);border:1px solid rgba(251,146,60,.3);border-radius:6px;padding:3px 8px"><input type="checkbox" id="sPickerUnknown" onchange="toggleUnknownPicker('sPickerSelect','sPickerNewWrap','sPicker',this)" style="accent-color:var(--orange);width:14px;height:14px"> &#9888; Unknown Picker</label><div id="sPickerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="sPickerNew" placeholder="FirstInitialLastName e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('sPickerNew','picker');syncNewPersonToHidden('sPickerNew','sPicker')" onblur="validatePersonField('sPickerNew','picker');syncNewPersonToHidden('sPickerNew','sPicker')" onkeydown="handleSuggestKey(event,'sPickerNewSuggest')"><div class="suggest-box" id="sPickerNewSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name</div></div><input id="sPicker" type="hidden"></div><div class="field"><label>Pack Station</label><select id="sPackStation"><option value="">-- Select Station --</option></select></div><div class="field"><label>Pick Demand # <em>*</em></label><input id="sDemand" placeholder="e.g. NH00012345" oninput="autoDivisionFromDemand()"></div><div class="field"><label>Shift Override</label><select id="sShift"><option value="auto">Auto (use current time)</option><option value="1st">1st Shift (6am–3:30pm)</option><option value="2nd">2nd Shift (3:30pm–12am)</option><option value="weekend_ot">Weekend OT (6am–12am)</option></select></div></div><div class="card-title">Product Lines</div><div id="productLines"></div><div class="actions"><button class="btn" onclick="addProductLine()">+ Add Line</button><button class="btn" onclick="clearEntry()">Clear Form</button><button class="btn primary" style="flex:1" onclick="saveShortage()">+ Log All Shortages</button></div><div class="field" style="margin-top:12px"><label>Notes</label><textarea id="sNotes"></textarea></div></div><div class="filters"><input id="filterText" class="search" placeholder="Search by product, order, picker, division..." oninput="renderShortages()"><select id="viewMode" onchange="loadShortages(true)"><option value="active">Active</option><option value="archive">Archived History</option><option value="both">Active + Archived</option></select><input id="filterStart" type="date" onchange="renderShortages()"><input id="filterEnd" type="date" onchange="renderShortages()"><button class="btn" onclick="loadShortages(true)">Refresh Data</button></div><div id="archiveActions" class="actions" style="margin-bottom:10px"></div><div id="shortageList" class="shortage-list"></div></div></section>
 <section id="reportScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Reports</div><h1>Shortage Reports</h1><p>IC Team and IC Manager only.</p></div><div class="actions"><button class="btn primary" onclick="printSummaryReport()">Print Summary</button><button class="btn" onclick="printCheckReport()">Print IC Check Sheet</button></div></div><div class="card"><div class="form-row four"><div class="field"><label>Report Mode</label><select id="reportMode"><option value="active">Active Only</option><option value="archive">Archived History</option><option value="both">Active + Archived (Default)</option></select></div><div class="field"><label>Start Date</label><input id="reportStart" type="date"></div><div class="field"><label>End Date</label><input id="reportEnd" type="date"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="runReportPull()">Run Report</button></div></div><div class="notice" style="margin-top:8px;margin-bottom:0"><strong>Tip:</strong> When a date range is selected, both active and archived records for those dates are always included — archived shortages from older periods will appear in the report regardless of mode.</div></div><div id="reportBody"></div></div></section>
 <section id="restockScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Replenishment</div><h1>Replenishment Report</h1><p>IC Manager only.</p></div><button class="btn primary" onclick="printReplenReport()">Print</button></div><div class="card"><div class="card-title">Inventory Bin Report Import</div><p class="notice">Paste report columns: Bin Name, Product Code, Qty on Hand, Qty Allocated, Unit of Measure.</p><textarea id="binImport" style="width:100%;min-height:160px" placeholder="82-26-01&#9;DI1210&#9;12&#9;0&#9;EA"></textarea><div class="actions" style="margin-top:10px"><button class="btn primary" onclick="saveInventoryBinReport()">Import Bin Report</button></div></div><div id="restockBody"></div></div></section>
-<section id="pickerScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Personnel</div><h1>Manage Pickers &amp; Packers</h1><p>IC Manager only. Names stored as FirstInitialLastName (e.g. JDoe).</p></div></div><div class="card"><div class="card-title">Pickers</div><div class="form-row two"><div class="field"><label>Picker Name (FirstInitialLastName)</label><input id="pickerName" placeholder="JDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPickerManual()">Add Picker</button></div></div><div id="pickerList"></div></div><div class="card"><div class="card-title">Packers</div><div class="form-row two"><div class="field"><label>Packer Name (FirstInitialLastName)</label><input id="packerName" placeholder="MDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackerManual()">Add Packer</button></div></div><div id="packerList"></div></div><div class="card"><div class="card-title">Pack Stations</div><div class="form-row two"><div class="field"><label>Pack Station Name</label><input id="packStationName" placeholder="PS-01"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackStationManual()">Add Station</button></div></div><div id="packStationList"></div></div></div></section>
+<section id="pickerScreen" class="screen"><div class="wrap">
+  <div class="page-head"><div>
+    <div class="eyebrow">Personnel</div>
+    <h1>Manage Pickers &amp; Packers</h1>
+    <p>IC Manager only. Profiles include status, shift, and alias consolidation.</p>
+  </div></div>
+
+  <!-- PICKER PROFILES -->
+  <div class="card" style="margin-bottom:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+      <div class="card-title" style="margin:0">Picker Profiles</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <select id="pickerFilterStatus" onchange="renderPickers()" aria-label="Filter by status" style="font-size:13px;padding:5px 10px;border:1px solid var(--border);border-radius:8px">
+          <option value="">All Status</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+        <select id="pickerFilterShift" onchange="renderPickers()" aria-label="Filter by shift" style="font-size:13px;padding:5px 10px;border:1px solid var(--border);border-radius:8px">
+          <option value="">All Shifts</option>
+          <option value="1st">1st (6am-2:30pm)</option>
+          <option value="2nd">2nd (2:30pm-11pm)</option>
+          <option value="3rd">3rd (11pm-7am)</option>
+        </select>
+        <input id="pickerSearch" placeholder="Search name..." oninput="renderPickers()" style="padding:5px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;width:160px" aria-label="Search pickers">
+        <button class="btn primary" onclick="openAddPickerProfile()">+ Add Picker</button>
+        <button class="btn" onclick="openDuplicateFinder()">&#128269; Find Duplicates</button>
+      </div>
+    </div>
+    <div id="pickerList"></div>
+  </div>
+
+  <!-- PACKERS (simpler - no profiles) -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title">Packers</div>
+    <div class="form-row two">
+      <div class="field"><label>Packer Name (FirstInitialLastName)</label><input id="packerName" placeholder="MDoe" aria-label="Packer name"></div>
+      <div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackerManual()">Add Packer</button></div>
+    </div>
+    <div id="packerList"></div>
+  </div>
+
+  <!-- PACK STATIONS -->
+  <div class="card">
+    <div class="card-title">Pack Stations</div>
+    <div class="form-row two">
+      <div class="field"><label>Pack Station Name</label><input id="packStationName" placeholder="PS-01" aria-label="Pack station name"></div>
+      <div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackStationManual()">Add Station</button></div>
+    </div>
+    <div id="packStationList"></div>
+  </div>
+</div></section>
 <section id="migrationScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Migration</div><h1>Old Firebase Migration</h1><p>Copies old shortage records into the new shortage database. Does not delete the old database.</p></div></div><div class="card"><div class="notice">Source: <b>inventory-control-portal</b> collection <b>shortages</b>. Destination: current active collection.</div><div class="form-row three"><div class="field"><label>Old Collection</label><input id="oldCollection" value="shortages"></div><div class="field"><label>Limit</label><input id="migLimit" type="number" value="5000"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="runMigration()">Run Migration</button></div></div><div id="migrationResult"></div></div></div></section>
 <section id="settingsScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Settings</div><h1>Firebase Settings</h1><p>IC Manager only.</p></div></div><div class="card"><div class="form-row two"><div class="field"><label>API Key</label><input id="cfgApiKey"></div><div class="field"><label>Auth Domain</label><input id="cfgAuthDomain"></div><div class="field"><label>Project ID</label><input id="cfgProjectId"></div><div class="field"><label>Storage Bucket</label><input id="cfgStorageBucket"></div><div class="field"><label>Messaging Sender ID</label><input id="cfgSenderId"></div><div class="field"><label>App ID</label><input id="cfgAppId"></div><div class="field"><label>Active Collection</label><input id="cfgActiveCollection"></div><div class="field"><label>Archive Collection</label><input id="cfgArchiveCollection"></div></div><label class="toggle"><input id="themeToggle" type="checkbox" onchange="saveTheme(this.checked)"> Light mode</label><div class="actions" style="margin-top:14px"><button class="btn primary" onclick="saveSettings()">Save Settings</button><button class="btn" onclick="testFirebaseConnection()">&#128268; Test Connection</button><button class="btn red" onclick="forceReloadAllClients()" style="margin-left:auto">&#128257; Force Reload All Open Instances</button></div></div></div></section>
 <section id="overpullScreen" class="screen"><div class="wrap">
@@ -1502,6 +1552,381 @@ async function setPersonnelInFirestore(){
     packers:packers,
     packStations:stations
   });
+}
+
+// ════════════════════════════════════════════════════════
+// PICKER PROFILES
+// pickerProfiles = { "JDoe": {status:"active",shift:"1st",aliases:[],canonical:"JDoe"}, ... }
+// ════════════════════════════════════════════════════════
+
+function getProfile(name){
+  return pickerProfiles[name]||{status:'active',shift:'',aliases:[],canonical:name};
+}
+
+function saveProfile(name, profile){
+  pickerProfiles[name]=profile;
+  // Also ensure name is in pickerNames
+  if(!pickerNames.includes(name)){
+    pickerNames=[...new Set([...pickerNames,name])].sort();
+    localStorage.setItem('scp_pickers',JSON.stringify(pickerNames));
+  }
+  localStorage.removeItem('scp_personnel_cache');
+  setPersonnelInFirestore();
+}
+
+function renderPickers(){
+  if(!canManage())return;
+  const statusFilter=$('pickerFilterStatus')?.value||'';
+  const shiftFilter=$('pickerFilterShift')?.value||'';
+  const search=($('pickerSearch')?.value||'').toLowerCase();
+  const PRESET_SET=new Set([UNKNOWN_PICKER,...PRESET_PICKERS]);
+
+  // Combine pickerNames + any names in profiles not yet in pickerNames
+  const allNames=[...new Set([...pickerNames,...Object.keys(pickerProfiles)])].filter(n=>n&&n!==UNKNOWN_PICKER).sort();
+
+  const filtered=allNames.filter(p=>{
+    if(search&&!p.toLowerCase().includes(search))return false;
+    const prof=getProfile(p);
+    if(statusFilter&&prof.status!==statusFilter)return false;
+    if(shiftFilter&&prof.shift!==shiftFilter)return false;
+    return true;
+  });
+
+  if(!filtered.length){
+    $('pickerList').innerHTML='<div class="empty" style="padding:20px">No pickers match the current filter.</div>';
+  } else {
+    const SHIFT_LABELS={"1st":"1st (6am)","2nd":"2nd (2:30pm)","3rd":"3rd (11pm)","":""};
+    $('pickerList').innerHTML=`<table style="width:100%"><thead><tr>
+      <th>Name</th><th>Status</th><th>Shift</th><th>Aliases</th><th style="text-align:right">Actions</th>
+    </tr></thead><tbody>`+filtered.map(p=>{
+      const prof=getProfile(p);
+      const statusColor=prof.status==='active'?'var(--green)':'var(--muted)';
+      const statusLabel=prof.status==='active'?'Active':'Inactive';
+      const aliases=(prof.aliases||[]).join(', ')||'—';
+      const isPreset=PRESET_SET.has(p);
+      return `<tr>
+        <td style="font-family:var(--mono);font-weight:700;font-size:13px">${esc(p)}</td>
+        <td><span style="color:${statusColor};font-weight:600;font-size:12px">${statusLabel}</span></td>
+        <td style="font-size:12px;color:var(--muted)">${esc(SHIFT_LABELS[prof.shift]||prof.shift||'—')}</td>
+        <td style="font-size:11px;color:var(--muted);max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(aliases)}</td>
+        <td style="text-align:right;white-space:nowrap">
+          <button class="btn" style="padding:3px 8px;font-size:11px" onclick="openPickerProfile('${esc(p)}')">&#9998; Profile</button>
+          <button class="btn orange" style="padding:3px 8px;font-size:11px" onclick="openMergePerson('picker','${esc(p)}')">Merge</button>
+          <button class="btn red" style="padding:3px 8px;font-size:11px" onclick="removePicker('${esc(p)}')">Remove</button>
+        </td>
+      </tr>`;
+    }).join('')+'</tbody></table>';
+  }
+
+  // Packers list (unchanged - no profiles)
+  $('packerList').innerHTML=packerNames.filter(p=>p!==UNKNOWN_PICKER).length
+    ?packerNames.filter(p=>p!==UNKNOWN_PICKER).map(p=>`<div style="display:flex;align-items:center;gap:6px;padding:7px 0;border-bottom:1px solid var(--border)">
+        <span style="font-family:var(--mono);font-size:13px;font-weight:700;flex:1">${esc(p)}</span>
+        <button class="btn" style="padding:4px 10px;font-size:11px" onclick="openEditPerson('packer','${esc(p)}')">Edit</button>
+        <button class="btn orange" style="padding:4px 10px;font-size:11px" onclick="openMergePerson('packer','${esc(p)}')">Merge</button>
+        <button class="btn red" style="padding:4px 10px;font-size:11px" onclick="removePacker('${esc(p)}')">Remove</button>
+      </div>`).join('')
+    :'<div class="empty">No packers saved.</div>';
+
+  $('packStationList').innerHTML=packStations.filter(s=>!s.startsWith('PS-')||parseInt(s.slice(3))>20).length||packStations.length
+    ?packStations.map(s=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">
+        <span style="font-family:var(--mono);font-size:13px;font-weight:700;flex:1">${esc(s)}</span>
+        <button class="btn red" style="padding:3px 8px;font-size:11px" onclick="removePackStation('${esc(s)}')">Remove</button>
+      </div>`).join('')
+    :'<div class="empty">No custom stations.</div>';
+}
+
+// ── Add picker via profile modal ──────────────────────────
+function openAddPickerProfile(){
+  openPickerProfile(null);
+}
+
+// ── Open/edit picker profile ───────────────────────────────
+function openPickerProfile(name){
+  const isNew=!name;
+  const prof=name?getProfile(name):{status:'active',shift:'',aliases:[],canonical:name||''};
+  var el=document.getElementById('pickerProfileModal');if(el)el.remove();
+  el=document.createElement('div');el.id='pickerProfileModal';
+  el.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;background:rgba(15,20,40,.75);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;overflow-y:auto';
+  el.dataset.pickerName=name||'';
+  el.innerHTML=`<div style="background:var(--surface,#fff);border:1px solid var(--border,#ddd);border-radius:16px;width:100%;max-width:520px;box-shadow:0 8px 40px rgba(0,0,0,.5)">
+    <div style="padding:16px 22px;border-bottom:1px solid var(--border,#ddd);display:flex;justify-content:space-between;align-items:center">
+      <h3 style="margin:0;font-size:16px">${isNew?'Add Picker':'Edit Profile: '+esc(name)}</h3>
+      <button onclick="document.getElementById('pickerProfileModal').remove()" style="background:none;border:none;font-size:24px;cursor:pointer">&#215;</button>
+    </div>
+    <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
+      ${isNew?`<div>
+        <label style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">Picker Name</label>
+        <input id="ppName" placeholder="FirstInitialLastName (e.g. JDoe)" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:15px;margin-top:4px;box-sizing:border-box">
+      </div>`:''}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <label style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">Status</label>
+          <select id="ppStatus" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:14px;margin-top:4px">
+            <option value="active" ${prof.status==='active'?'selected':''}>Active</option>
+            <option value="inactive" ${prof.status==='inactive'?'selected':''}>Inactive</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">Shift</label>
+          <select id="ppShift" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:14px;margin-top:4px">
+            <option value="" ${!prof.shift?'selected':''}>Not Set</option>
+            <option value="1st" ${prof.shift==='1st'?'selected':''}>1st Shift (6am–2:30pm)</option>
+            <option value="2nd" ${prof.shift==='2nd'?'selected':''}>2nd Shift (2:30pm–11pm)</option>
+            <option value="3rd" ${prof.shift==='3rd'?'selected':''}>3rd Shift (11pm–7am)</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">Known Aliases / Duplicates</label>
+        <p style="font-size:11px;color:var(--muted);margin:3px 0 6px">Other names in the system that refer to this same person. Separate with commas.</p>
+        <input id="ppAliases" placeholder="e.g. JDoe1, J.Doe, JohnD" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:14px;box-sizing:border-box" value="${esc((prof.aliases||[]).join(', '))}">
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">Notes</label>
+        <input id="ppNotes" placeholder="Optional notes..." style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:14px;box-sizing:border-box" value="${esc(prof.notes||'')}">
+      </div>
+      <div id="ppStatus2" style="font-size:12px;color:var(--muted)"></div>
+    </div>
+    <div style="padding:16px 22px;border-top:1px solid var(--border,#ddd);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+      ${!isNew?`<button class="btn orange" onclick="openConsolidateFromProfile(document.getElementById('pickerProfileModal').dataset.pickerName)" style="margin-right:auto">&#128269; Find &amp; Consolidate Records</button>`:''}
+      <button class="btn" onclick="document.getElementById('pickerProfileModal').remove()">Cancel</button>
+      <button class="btn primary" onclick="savePickerProfile(document.getElementById('pickerProfileModal').dataset.pickerName||null)">&#10003; Save Profile</button>
+    </div>
+  </div>`;
+  document.body.appendChild(el);
+  if(isNew)document.getElementById('ppName').focus();
+}
+
+function savePickerProfile(existingName){
+  const isNew=!existingName;
+  var name=existingName;
+  if(isNew){
+    const raw=document.getElementById('ppName')?.value.trim();
+    name=normalizeName(raw);
+    if(!name){alert('Enter a valid name (FirstInitialLastName).');return;}
+    if(pickerNames.includes(name)&&!confirm(name+' already exists. Update their profile?')){return;}
+  }
+  const status=document.getElementById('ppStatus')?.value||'active';
+  const shift=document.getElementById('ppShift')?.value||'';
+  const notes=document.getElementById('ppNotes')?.value.trim()||'';
+  const aliasRaw=document.getElementById('ppAliases')?.value||'';
+  const aliases=aliasRaw.split(',').map(s=>normalizeName(s.trim())).filter(s=>s&&s!==name);
+  const prof={status,shift,notes,aliases,canonical:name,updatedAt:new Date().toISOString()};
+  saveProfile(name,prof);
+  document.getElementById('pickerProfileModal').remove();
+  renderPickers();
+  alert('Profile saved for '+name+'.');
+}
+
+// ── Open consolidate from within profile modal ────────────
+function openConsolidateFromProfile(name){
+  document.getElementById('pickerProfileModal').remove();
+  openDuplicateFinder(name);
+}
+
+// ════════════════════════════════════════════════════════
+// DUPLICATE FINDER & CONSOLIDATOR
+// ════════════════════════════════════════════════════════
+var _dupFinderData={shorts:[],ops:[]};
+
+async function openDuplicateFinder(preselect){
+  var el=document.getElementById('dupFinderModal');if(el)el.remove();
+  el=document.createElement('div');el.id='dupFinderModal';
+  el.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;background:rgba(15,20,40,.75);overflow-y:auto;padding:16px;box-sizing:border-box';
+  el.innerHTML=`<div style="background:var(--surface,#fff);border:1px solid var(--border,#ddd);border-radius:16px;max-width:900px;margin:0 auto;box-shadow:0 8px 40px rgba(0,0,0,.5)">
+    <div style="padding:16px 22px;border-bottom:1px solid var(--border,#ddd);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <h3 style="margin:0;font-size:16px">&#128269; Find &amp; Consolidate Records</h3>
+      <button onclick="document.getElementById('dupFinderModal').remove()" style="background:none;border:none;font-size:24px;cursor:pointer">&#215;</button>
+    </div>
+    <div style="padding:20px">
+      <p style="font-size:13px;color:var(--muted);margin:0 0 14px">Find all records belonging to a picker (including misspellings, duplicates, old names), preview them, then consolidate into one canonical name in Firestore.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+        <div style="flex:1;min-width:200px">
+          <label style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">Search Names</label>
+          <input id="dfSearch" placeholder="Type a picker name or partial..." style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:14px;margin-top:4px;box-sizing:border-box" value="${esc(preselect||'')}" oninput="dfSearchNames()">
+        </div>
+        <button class="btn primary" onclick="dfLoadAndSearch()">&#128257; Load &amp; Search Records</button>
+      </div>
+      <div id="dfNameMatches" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:6px"></div>
+      <div id="dfSelected" style="margin-top:10px;font-size:12px;color:var(--muted)">Select names above to include in the search.</div>
+    </div>
+    <div id="dfPreview" style="padding:0 20px 20px;display:none">
+      <div style="border-top:1px solid var(--border);padding-top:16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+        <div>
+          <div style="font-size:14px;font-weight:700" id="dfPreviewTitle">Records Found</div>
+          <div style="font-size:12px;color:var(--muted)" id="dfPreviewSub"></div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <label style="font-size:13px;font-weight:600">Consolidate to:</label>
+          <select id="dfCanonical" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px"></select>
+          <button class="btn primary" onclick="dfConsolidate()">&#9889; Consolidate All</button>
+        </div>
+      </div>
+      <div id="dfTable" style="overflow-x:auto;max-height:400px;overflow-y:auto"></div>
+    </div>
+    <div id="dfStatus" style="padding:12px 20px;font-size:13px;display:none"></div>
+  </div>`;
+  document.body.appendChild(el);
+
+  // Load all data upfront if not already loaded
+  if(!_dupFinderData.shorts.length){
+    await dfLoadData();
+  }
+  if(preselect){
+    dfSearchNames();
+    dfShowMatchingNames();
+  }
+}
+
+async function dfLoadData(){
+  if(!db)return;
+  const s=getSettings();
+  const status=document.getElementById('dfStatus');
+  if(status){status.style.display='block';status.textContent='Loading all records...';}
+  const [sa,sb,oa,ob]=await Promise.all([
+    db.collection(s.activeCollection||'shortages_active').limit(5000).get(),
+    db.collection(s.archiveCollection||'shortages_archive').limit(5000).get(),
+    db.collection(s.overpullCollection||'overpull_active').limit(5000).get(),
+    db.collection(s.overpullArchiveCollection||'overpull_archive').limit(5000).get()
+  ]);
+  _dupFinderData.shorts=[
+    ...sa.docs.map(d=>({id:d.id,col:s.activeCollection||'shortages_active',...normalizeShortage(d.data(),d.id,false)})),
+    ...sb.docs.map(d=>({id:d.id,col:s.archiveCollection||'shortages_archive',...normalizeShortage(d.data(),d.id,true)}))
+  ];
+  _dupFinderData.ops=[
+    ...oa.docs.map(d=>({id:d.id,col:s.overpullCollection||'overpull_active',...d.data()})),
+    ...ob.docs.map(d=>({id:d.id,col:s.overpullArchiveCollection||'overpull_archive',...d.data()}))
+  ];
+  if(status){status.textContent=`Loaded ${_dupFinderData.shorts.length} shortages + ${_dupFinderData.ops.length} over pull records.`;}
+}
+
+async function dfLoadAndSearch(){
+  await dfLoadData();
+  dfSearchNames();
+  dfShowMatchingNames();
+}
+
+var _dfSelectedNames=new Set();
+
+function dfSearchNames(){
+  const q=($('dfSearch')?.value||'').toLowerCase().trim();
+  if(!q){$('dfNameMatches').innerHTML='';return;}
+  // Find all unique picker names across both datasets
+  const allNames=new Set();
+  _dupFinderData.shorts.forEach(r=>{if(r.picker)allNames.add(r.picker);});
+  _dupFinderData.ops.forEach(r=>{if(r.picker)allNames.add(r.picker);});
+  pickerNames.forEach(n=>allNames.add(n));
+  // Filter to matches
+  const matches=[...allNames].filter(n=>n.toLowerCase().includes(q)).sort();
+  $('dfNameMatches').innerHTML=matches.map(n=>{
+    const sel=_dfSelectedNames.has(n);
+    return `<button onclick="dfToggleName('${esc(n)}')" style="padding:5px 12px;border:2px solid ${sel?'var(--green)':'var(--border)'};border-radius:20px;font-size:13px;font-family:var(--mono);background:${sel?'rgba(16,185,129,.1)':'var(--surface)'};cursor:pointer;color:var(--text)">${esc(n)}</button>`;
+  }).join('');
+}
+
+function dfToggleName(name){
+  if(_dfSelectedNames.has(name))_dfSelectedNames.delete(name);
+  else _dfSelectedNames.add(name);
+  dfSearchNames();
+  dfShowMatchingNames();
+}
+
+function dfShowMatchingNames(){
+  const sel=[..._dfSelectedNames];
+  if(!sel.length){
+    $('dfSelected').textContent='Select names above to include in the search.';
+    $('dfPreview').style.display='none';
+    return;
+  }
+  $('dfSelected').textContent='Selected: '+sel.join(', ');
+
+  // Find all records for any selected name
+  const matchShorts=_dupFinderData.shorts.filter(r=>sel.includes(r.picker));
+  const matchOps=_dupFinderData.ops.filter(r=>sel.includes(r.picker));
+  const total=matchShorts.length+matchOps.length;
+
+  $('dfPreviewTitle').textContent=`Found ${total} records (${matchShorts.length} shortages, ${matchOps.length} over pulls)`;
+  $('dfPreviewSub').textContent='Review below, then pick the canonical name to consolidate to.';
+  $('dfPreview').style.display='block';
+
+  // Canonical select — default to the one with most records or a profile
+  const canon=$('dfCanonical');
+  canon.innerHTML=sel.map(n=>`<option value="${esc(n)}">${esc(n)} (${matchShorts.filter(r=>r.picker===n).length+matchOps.filter(r=>r.picker===n).length} records)</option>`).join('');
+  // Pre-select canonical from profile if set
+  const profCanon=sel.find(n=>pickerProfiles[n]?.canonical===n)||sel[0];
+  canon.value=profCanon;
+
+  // Table preview
+  let html=`<table><thead><tr><th>Type</th><th>Collection</th><th>Date</th><th>Current Picker</th><th>Product/Order</th></tr></thead><tbody>`;
+  matchShorts.slice(0,200).forEach(r=>{
+    html+=`<tr><td><span style="font-size:11px;background:var(--accent);color:#fff;padding:2px 6px;border-radius:10px">Short</span></td>
+      <td style="font-size:11px;color:var(--muted)">${esc(r.col)}</td>
+      <td>${(r.date||'').toString().slice(0,10)}</td>
+      <td style="font-family:var(--mono);font-weight:600">${esc(r.picker)}</td>
+      <td style="font-family:var(--mono)">${esc(r.productCode||'')} ${esc(r.shortedBin||'')}</td></tr>`;
+  });
+  matchOps.slice(0,200).forEach(r=>{
+    html+=`<tr><td><span style="font-size:11px;background:var(--green);color:#fff;padding:2px 6px;border-radius:10px">OverPull</span></td>
+      <td style="font-size:11px;color:var(--muted)">${esc(r.col)}</td>
+      <td>${(r.date||r.dateTime||'').toString().slice(0,10)}</td>
+      <td style="font-family:var(--mono);font-weight:600">${esc(r.picker||'')}</td>
+      <td style="font-family:var(--mono)">${esc((r.items||[])[0]?.productCode||r.orderNum||'')}</td></tr>`;
+  });
+  if(total>400)html+=`<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:10px">Showing 400 of ${total} — all will be consolidated.</td></tr>`;
+  html+='</tbody></table>';
+  $('dfTable').innerHTML=html;
+}
+
+async function dfConsolidate(){
+  const sel=[..._dfSelectedNames];
+  const canonical=$('dfCanonical')?.value;
+  if(!canonical||!sel.length){alert('Select names and a canonical target.');return;}
+  const others=sel.filter(n=>n!==canonical);
+  if(!others.length){alert('All selected names are already the canonical name.');return;}
+  if(!confirm(`Consolidate ${others.join(', ')} → ${canonical}?\n\nThis will update all Firestore records and remove the old names from the personnel list. Cannot be undone.`)){return;}
+
+  const status=$('dfStatus');
+  status.style.display='block';status.textContent='Consolidating...';status.style.color='var(--accent)';
+  let totalUpdated=0;
+  try{
+    for(var i=0;i<others.length;i++){
+      const old=others[i];
+      // Update shortages and overpull in Firestore
+      const count=await updatePersonInFirestore('picker',old,canonical);
+      totalUpdated+=count;
+      // Update in-memory data
+      _dupFinderData.shorts.forEach(r=>{if(r.picker===old)r.picker=canonical;});
+      _dupFinderData.ops.forEach(r=>{if(r.picker===old)r.picker=canonical;});
+      // Remove from pickerNames
+      pickerNames=pickerNames.filter(p=>p!==old);
+      // Remove from profiles (merge aliases)
+      if(pickerProfiles[old]){
+        const oldProf=pickerProfiles[old];
+        const canonProf=getProfile(canonical);
+        canonProf.aliases=[...new Set([...(canonProf.aliases||[]),...(oldProf.aliases||[]),old])].filter(a=>a!==canonical);
+        pickerProfiles[canonical]=canonProf;
+        delete pickerProfiles[old];
+      } else {
+        const canonProf=getProfile(canonical);
+        canonProf.aliases=[...new Set([...(canonProf.aliases||[]),old])].filter(a=>a!==canonical);
+        pickerProfiles[canonical]=canonProf;
+      }
+      _dfSelectedNames.delete(old);
+    }
+    // Persist everything
+    localStorage.setItem('scp_pickers',JSON.stringify(pickerNames));
+    localStorage.removeItem('scp_personnel_cache');
+    await setPersonnelInFirestore();
+    status.textContent=`Done! Updated ${totalUpdated} records. ${others.join(', ')} consolidated into ${canonical}.`;
+    status.style.color='var(--green)';
+    renderPickers();
+    // Refresh preview
+    dfShowMatchingNames();
+  }catch(e){
+    status.textContent='Error: '+e.message;
+    status.style.color='var(--red)';
+  }
 }
 
 function addPickerManual(){
