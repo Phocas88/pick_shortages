@@ -831,13 +831,13 @@ async function toggleSecond(id){
 async function toggleReplenished(id){const r=shortages.find(x=>x.id===id&&!x._archived);if(r)await updateRecord(id,{replenishedAfterPick:!r.replenishedAfterPick})}
 function openEdit(id,archived){
   if(!shortages.length){loadShortages(true).then(()=>openEdit(id,archived));return;}
-  const a=archived===true||archived==='true';
-  const r=shortages.find(x=>x.id===id&&(x._archived===a||(!x._archived&&!a)));
+  var a=archived===true||archived==='true';
+  var r=shortages.find(function(x){return x.id===id&&(x._archived===a||(!x._archived&&!a));});
   if(!r){loadShortages(true).then(()=>openEdit(id,a));return;}
   editingId=id;editingArchive=a;
-  let el=document.getElementById('editModalDynamic');if(el)el.remove();
+  var el=document.getElementById('editModalDynamic');if(el)el.remove();
   try{
-    const f=`<div class="form-row two"><div class="field"><label>Date</label><input id="eDate" type="date" value="${esc(normalizeDate(r.date)||'')}"></div><div class="field"><label>Division</label><input id="eDiv" value="${esc(r.division||'')}"></div><div class="field"><label>Product Code</label><input id="eProduct" autocapitalize="characters" spellcheck="false" style="text-transform:uppercase" value="${esc(r.productCode||'')}"></div><div class="field"><label>Shorted Bin</label><div class="bin-input-wrap"><input id="eBin" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" value="${esc(r.shortedBin||'')}" oninput="liveBinValidate(this)" onblur="strictBinValidate(this)"><span class="bin-valid-icon"></span></div><div class="bin-format-hint">##-##-## &nbsp;·&nbsp; ##-##-# &nbsp;·&nbsp; P##### &nbsp;·&nbsp; BULK &nbsp;·&nbsp; ROOM &nbsp;·&nbsp; KEY ACCOUNT</div><div class="bin-format-err"></div></div><div class="field"><label>Qty Shorted</label><input id="eQty" type="number" value="${val(r.qtyShorted)}"></div><div class="field"><label>UOM</label><input id="eUom" value="${esc(r.uom||'')}"></div><div class="field"><label>Demand / Order</label><input id="eDemand" value="${esc(r.pickDemand||'')}"></div><div class="field"><label>Picker</label><input id="ePicker" value="${esc(r.picker||'')}"></div><div class="field"><label>IC Qty Found</label><input id="eIcQty" type="number" value="${val(r.icQtyFound)}"></div><div class="field"><label>IC UOM</label><input id="eIcUom" value="${esc(r.icUom||r.uom||'EA')}"></div></div><div class="form-row one"><div class="field"><label>Notes</label><textarea id="eNotes">${esc(r.notes||'')}</textarea></div><div class="field"><label>IC Notes</label><textarea id="eIcNotes">${esc(r.icNotes||'')}</textarea></div></div><label class="toggle"><input id="eErr" type="checkbox" ${r.foundInShortedBin?'checked':''}> Mark as erroneous bin short</label><br><label class="toggle"><input id="eSecond" type="checkbox" ${r.secondLocationFilled?'checked':''}> Product was filled from second location</label><div class="notice" style="margin-top:8px"><b>Second-location bins:</b> ${esc(secondarySummary(r)||'None saved. Use the Second Location Filled button on the row to add one or more bins with qty.')}</div><br><label class="toggle"><input id="eRep" type="checkbox" ${r.replenishedAfterPick?'checked':''}> Bin was replenished after pick</label><div class="actions" style="margin-top:14px"><button class="btn primary" onclick="saveEdit()">Save Changes</button><button class="btn" onclick="closeEdit()">Cancel</button></div>`;
+    var f=`<div class="form-row two"><div class="field"><label>Date</label><input id="eDate" type="date" value="${esc(normalizeDate(r.date)||'')}"></div><div class="field"><label>Division</label><input id="eDiv" value="${esc(r.division||'')}"></div><div class="field"><label>Product Code</label><input id="eProduct" autocapitalize="characters" spellcheck="false" style="text-transform:uppercase" value="${esc(r.productCode||'')}"></div><div class="field"><label>Shorted Bin</label><div class="bin-input-wrap"><input id="eBin" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" value="${esc(r.shortedBin||'')}" oninput="liveBinValidate(this)" onblur="strictBinValidate(this)"><span class="bin-valid-icon"></span></div><div class="bin-format-hint">##-##-## &nbsp;·&nbsp; ##-##-# &nbsp;·&nbsp; P##### &nbsp;·&nbsp; BULK &nbsp;·&nbsp; ROOM &nbsp;·&nbsp; KEY ACCOUNT</div><div class="bin-format-err"></div></div><div class="field"><label>Qty Shorted</label><input id="eQty" type="number" value="${val(r.qtyShorted)}"></div><div class="field"><label>UOM</label><input id="eUom" value="${esc(r.uom||'')}"></div><div class="field"><label>Demand / Order</label><input id="eDemand" value="${esc(r.pickDemand||'')}"></div><div class="field"><label>Picker</label><input id="ePicker" value="${esc(r.picker||'')}"></div><div class="field"><label>IC Qty Found</label><input id="eIcQty" type="number" value="${val(r.icQtyFound)}"></div><div class="field"><label>IC UOM</label><input id="eIcUom" value="${esc(r.icUom||r.uom||'EA')}"></div></div><div class="form-row one"><div class="field"><label>Notes</label><textarea id="eNotes">${esc(r.notes||'')}</textarea></div><div class="field"><label>IC Notes</label><textarea id="eIcNotes">${esc(r.icNotes||'')}</textarea></div></div><label class="toggle"><input id="eErr" type="checkbox" ${r.foundInShortedBin?'checked':''}> Mark as erroneous bin short</label><br><label class="toggle"><input id="eSecond" type="checkbox" ${r.secondLocationFilled?'checked':''}> Product was filled from second location</label><div class="notice" style="margin-top:8px"><b>Second-location bins:</b> ${esc(secondarySummary(r)||'None saved. Use the Second Location Filled button on the row to add one or more bins with qty.')}</div><br><label class="toggle"><input id="eRep" type="checkbox" ${r.replenishedAfterPick?'checked':''}> Bin was replenished after pick</label><div class="actions" style="margin-top:14px"><button class="btn primary" onclick="saveEdit()">Save Changes</button><button class="btn" onclick="closeEdit()">Cancel</button></div>`;
     el=document.createElement('div');el.id='editModalDynamic';
     el.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;background:rgba(15,20,40,.75);overflow-y:auto;padding:24px 16px;box-sizing:border-box';
     el.innerHTML='<div style="background:var(--surface,#fff);border:1px solid var(--border,#ddd);border-radius:16px;width:100%;max-width:820px;box-shadow:0 8px 40px rgba(0,0,0,.5);margin:0 auto">'
@@ -849,7 +849,7 @@ function openEdit(id,archived){
   }catch(err){alert('Edit error: '+err.message);}
 }
 
-function closeEdit(){const el=document.getElementById('editModalDynamic');if(el)el.remove();editingId=null;editingArchive=false;}
+function closeEdit(){var el=document.getElementById('editModalDynamic');if(el)el.remove();editingId=null;editingArchive=false;}
 async function saveEdit(){const binRaw=$('eBin').value.trim();if(binRaw&&!validateBinFormat(binRaw).ok){alert('Invalid bin format.\n\nValid: ##-##-##, ##-##-#, P#####, BULK, ROOM, KEY ACCOUNT');return}const data={date:$('eDate').value,division:$('eDiv').value.trim().toUpperCase(),productCode:$('eProduct').value.trim().toUpperCase(),shortedBin:binRaw.toUpperCase(),qtyShorted:num($('eQty').value),uom:$('eUom').value.trim().toUpperCase(),pickDemand:$('eDemand').value.trim(),picker:$('ePicker').value.trim(),notes:$('eNotes').value.trim(),icQtyFound:num($('eIcQty').value),icUom:$('eIcUom').value.trim().toUpperCase(),icNotes:$('eIcNotes').value.trim(),foundInShortedBin:$('eErr').checked,secondLocationFilled:$('eSecond').checked,replenishedAfterPick:$('eRep').checked,status:$('eErr').checked?'located':'open'};if(!data.foundInShortedBin){data.icQtyFound=0;data.icUom='';data.icNotes=data.icNotes}await updateRecord(editingId,data,editingArchive);closeEdit()}
 function selectVisible(on){document.querySelectorAll('.sr-check:not(:disabled)').forEach(c=>c.checked=on)}function selectedIds(){return [...document.querySelectorAll('.sr-check:checked')].map(c=>c.dataset.id)}async function archiveSelected(){const ids=selectedIds();if(!ids.length){alert('Select shortages first.');return}await archiveIds(ids)}async function archiveFiltered(){const ids=visibleShortages.filter(r=>!r._archived).map(r=>r.id);if(!ids.length){alert('No active filtered shortages to archive.');return}if(!confirm(`Archive ${ids.length} active filtered shortages?`))return;await archiveIds(ids)}
 async function archiveIds(ids){if(!canManage()){alert('IC Manager access required to archive.');return;}showLoading('Archiving shortages...');try{const s=getSettings();const batch=db.batch();ids.forEach(id=>{const r=shortages.find(x=>x.id===id&&!x._archived);if(!r)return;const src=db.collection(s.activeCollection).doc(id);const dst=db.collection(s.archiveCollection).doc(id);const data={...r,archivedAt:new Date().toISOString(),archivedBy:role};delete data.id;delete data._archived;batch.set(dst,data,{merge:true});batch.delete(src)});await batch.commit();clearCaches();await loadShortages(true)}catch(e){alert(e.message)}finally{hideLoading()}}
@@ -1037,6 +1037,23 @@ function renderReports(){
 
 function renderCheckPreview(){}
 
+function doPrint(h){
+  var css=[
+    "*{margin:0;padding:0;box-sizing:border-box}",
+    "body{font-family:Arial,sans-serif;color:#111;font-size:10pt;background:#fff;padding:.55in}",
+    "@media print{body{padding:0}@page{size:letter;margin:.55in}}",
+    "table{width:100%;border-collapse:collapse;margin-bottom:12pt}",
+    "th{background:#1a2038;color:#fff;padding:5pt 8pt;text-align:left;font-size:8pt}",
+    "td{padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-size:9pt}",
+    "tr:nth-child(even)td{background:#f9fafb}"
+  ].join("");
+  var b="<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>Report</title><style>"+css+"</style></head><body>"+h+"</body></html>";
+  var u=URL.createObjectURL(new Blob([b],{type:"text/html"}));
+  var w=window.open(u,"_blank");
+  if(!w){var a=document.createElement("a");a.href=u;a.download="report.html";a.click();return;}
+  w.addEventListener("load",function(){setTimeout(function(){w.print();},300);setTimeout(function(){URL.revokeObjectURL(u);},60000);});
+}
+
 function printSummaryReport(){
   const fromStr=$('reportStart')?.value;
   const toStr=$('reportEnd')?.value;
@@ -1210,7 +1227,6 @@ function printSummaryReport(){
       <span>Printed ${today}</span>
     </div>
   </div>`;
-  $('printArea').innerHTML=html;
   doPrint(html);
 }
 
@@ -1296,7 +1312,6 @@ function printCheckReport(){
       815 Inventory Control &middot; C &amp; F Enterprises &middot; Chapman Warehouse &middot; ${today}
     </div>
   </div>`;
-  $('printArea').innerHTML=html;
   doPrint(html);
 }
 function saveInventoryBinReport(){inventoryBins=parseBinImport($('binImport').value);localStorage.setItem('scp_inventory_bins',JSON.stringify(inventoryBins));alert(`Saved ${inventoryBins.length} inventory bin rows.`);buildReplenishmentReport()}function parseBinImport(text){return text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean).map(l=>{const p=l.split(/\t|,/);return{bin:(p[0]||'').trim().toUpperCase(),product:(p[1]||'').trim().toUpperCase(),onHand:num(p[2]),allocated:num(p[3]),uom:(p[4]||'').trim().toUpperCase()}}).filter(r=>r.bin&&r.product)}
@@ -1481,7 +1496,7 @@ function opInitForm(){
   ['opOrder','opDiv','opPacker','opPicker','opPackStation'].forEach(id=>{if($(id))$(id).value='';}); ['opPackerSelect','opPickerSelect'].forEach(id=>{const el=$(id);if(el){el.value='';el.disabled=false;el.style.opacity='';}}); ['opPackerNewWrap','opPickerNewWrap'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});
   ['opPackerUnknown','opPickerUnknown'].forEach(id=>{const el=$(id);if(el)el.checked=false;});
   $('opLines').innerHTML='';
-  const _omw=$('opMoreWrap');if(_omw)_omw.style.display='none';
+  var _omw=$('opMoreWrap');if(_omw)_omw.style.display='none';
   ['opPackerSuggest','opPickerSuggest','opPackStationSuggest'].forEach(id=>{const el=$(id);if(el)el.style.display='none';});
   opAddLine();
 }
@@ -1540,19 +1555,17 @@ function opPromptMore(){
   if(!opValidateHeader())return;
   const lines=opGetLines();
   if(!lines.length){alert('Add at least one item with a product code and qty.');return;}
-  const _omw2=$('opMoreWrap');
-  if(_omw2){_omw2.style.display='block';_omw2.scrollIntoView({behavior:'smooth',block:'nearest'});}
-  else{opSaveEntry();return;}
+  var _omw2=$('opMoreWrap');if(_omw2){_omw2.style.display='block';_omw2.scrollIntoView({behavior:'smooth',block:'nearest'});}
 }
 
 function opYesMore(){
-  const _omw3=$('opMoreWrap');if(_omw3)_omw3.style.display='none';
+  var _omw3=$('opMoreWrap');if(_omw3)_omw3.style.display='none';
   opAddLine();
   $('opLines').lastElementChild.querySelector('.op-product').focus();
 }
 
 function opFinishEntry(){
-  const _omw4=$('opMoreWrap');if(_omw4)_omw4.style.display='none';
+  var _omw4=$('opMoreWrap');if(_omw4)_omw4.style.display='none';
   opSaveEntry();
 }
 
@@ -2114,7 +2127,6 @@ function printOverPullReport(){
     </div>
   </div>`;
 
-  $('printArea').innerHTML=html;
   doPrint(html);
 }
 
@@ -2169,7 +2181,7 @@ function onPickerSelectChange(selectId, newInputId, hiddenId){
 function openIcConfirm(){
   if(!canRunReports()){alert('IC Team or Manager access required.');return;}
   icConfirmEdits={};
-  let el=document.getElementById('icModalDynamic');if(el)el.remove();
+  var el=document.getElementById('icModalDynamic');if(el)el.remove();
   el=document.createElement('div');el.id='icModalDynamic';
   el.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;z-index:99998;background:rgba(10,15,35,.75);overflow-y:auto;padding:16px;box-sizing:border-box';
   el.innerHTML=`<div style="background:var(--surface,#fff);border:1px solid var(--border,#ddd);border-radius:16px;max-width:1100px;margin:0 auto;box-shadow:0 8px 40px rgba(0,0,0,.5)">
@@ -2196,12 +2208,12 @@ function openIcConfirm(){
       <button class="btn primary" onclick="icConfirmSubmitAll()">&#10003; Save All Results</button>
       <button class="btn" onclick="closeIcConfirm()">Cancel</button></div></div>`;
   document.body.appendChild(el);
-  const go=()=>{renderIcConfirmSheet();icUpdateStats();};
-  if(!shortages.length){showLoading('Loading...');loadShortages(false).then(()=>{hideLoading();go();}).catch(e=>{hideLoading();alert('Load failed: '+e.message);});}
+  var go=function(){renderIcConfirmSheet();icUpdateStats();};
+  if(!shortages.length){showLoading('Loading...');loadShortages(false).then(function(){hideLoading();go();}).catch(function(e){hideLoading();alert('Load failed: '+e.message);});}
   else{go();}
 }
 
-function closeIcConfirm(){const el=document.getElementById('icModalDynamic');if(el)el.remove();icConfirmEdits={};}
+function closeIcConfirm(){var el=document.getElementById('icModalDynamic');if(el)el.remove();icConfirmEdits={};}
 
 function icConfirmFilteredRows(){
   const f=($('icDynFilter')||$('icConfirmFilter'))?.value||'all';
@@ -2213,15 +2225,15 @@ function icConfirmFilteredRows(){
 }
 
 function icUpdateStats(){
-  const all=shortages.filter(r=>!r._archived);
-  const done=all.filter(r=>r.icConfirmed||r.foundInShortedBin||r.secondLocationFilled).length;
-  const pct=all.length?Math.round(done/all.length*100):0;
-  const shown=icConfirmFilteredRows().length;
-  const sub=document.getElementById('icDynSubhead')||$('icConfirmSubhead');
+  var all=shortages.filter(function(r){return !r._archived;});
+  var done=all.filter(function(r){return r.icConfirmed||r.foundInShortedBin||r.secondLocationFilled;}).length;
+  var pct=all.length?Math.round(done/all.length*100):0;
+  var shown=icConfirmFilteredRows().length;
+  var sub=document.getElementById('icDynSubhead')||$('icConfirmSubhead');
   if(sub)sub.textContent=shown+' shown · '+done+'/'+all.length+' verified ('+pct+'%)';
-  const fill=document.getElementById('icDynProgFill')||$('icProgFill');
+  var fill=document.getElementById('icDynProgFill')||$('icProgFill');
   if(fill)fill.style.width=pct+'%';
-  const stats=document.getElementById('icDynStats')||$('icConfirmStats');
+  var stats=document.getElementById('icDynStats')||$('icConfirmStats');
   if(stats)stats.textContent=done+'/'+all.length+' ('+pct+'%)';
 }
 
@@ -2237,7 +2249,7 @@ function renderIcConfirmSheet(){
   icUpdateStats();
 
   if(!rows.length){
-    const _sh0=document.getElementById('icDynSheet')||$('icConfirmSheet');if(_sh0)_sh0.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted,#888)">No shortages match this filter.</div>';
+    var _sh0=document.getElementById('icDynSheet')||$('icConfirmSheet');if(_sh0)_sh0.innerHTML='<div style="padding:40px;text-align:center">No shortages match this filter.</div>';
     return;
   }
 
@@ -2297,7 +2309,7 @@ function renderIcConfirmSheet(){
     </div>`;
   }).join('');
 
-  const _sh=document.getElementById('icDynSheet')||$('icConfirmSheet');if(_sh)_sh.innerHTML=dataRows;
+  var _sh=document.getElementById('icDynSheet')||$('icConfirmSheet');if(_sh)_sh.innerHTML=dataRows;
 }
 
 function icResultChange(sel){
