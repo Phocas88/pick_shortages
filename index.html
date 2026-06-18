@@ -411,7 +411,7 @@ function ensureDb(){
 }
 function showLoading(t){$('loadingText').textContent=t||'Loading...';$('loading').classList.add('show')}function hideLoading(){$('loading').classList.remove('show')}
 function applyTheme(){const light=localStorage.getItem('scp_theme')==='light';document.body.classList.toggle('light-mode',light);if($('themeToggle'))$('themeToggle').checked=light}function saveTheme(light){localStorage.setItem('scp_theme',light?'light':'dark');applyTheme()}
-function showScreen(name){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const el=$(name+'Screen');if(el)el.classList.add('active');$('topbar').classList.toggle('show',name!=='login'&&name!=='pin');document.querySelectorAll('.nav-btn[data-screen]').forEach(b=>b.classList.toggle('active',b.dataset.screen===name));if(name==='shortage'){loadShortages(false);populateStationSelects();}if(name==='report')renderReports();if(name==='picker')renderPickers();if(name==='restock')buildReplenishmentReport();if(name==='settings')loadSettingsForm();if(name==='overpull'){if(role==='icteam'){alert('Over Pull access is not available for IC Team.');showScreen('shortage');return;}populatePickerSelects();populateStationSelects();opInitForm();opSwitchTab('entry');}}
+function showScreen(name){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const el=$(name+'Screen');if(el)el.classList.add('active');if(name==='analytics')setTimeout(()=>runAnalytics(),50);if(name==='ops'){opsShortData=[];opsOpData=[];$('opsResultCard').style.display='none';}$('topbar').classList.toggle('show',name!=='login'&&name!=='pin');document.querySelectorAll('.nav-btn[data-screen]').forEach(b=>b.classList.toggle('active',b.dataset.screen===name));if(name==='shortage'){loadShortages(false);populateStationSelects();}if(name==='report')renderReports();if(name==='picker')renderPickers();if(name==='restock')buildReplenishmentReport();if(name==='settings')loadSettingsForm();if(name==='overpull'){if(role==='icteam'){alert('Over Pull access is not available for IC Team.');showScreen('shortage');return;}populatePickerSelects();populateStationSelects();opInitForm();opSwitchTab('entry');}}
 function goPin(target){pinTarget=target;pinBuf='';$('pinBadge').textContent=ROLE_LABELS[target];updateDots();$('pinError').textContent='';showScreen('pin')}
 function pinKey(k){if(pinBuf.length>=4)return;pinBuf+=k;updateDots();document.querySelectorAll('.pin-key').forEach(btn=>{if(btn.dataset.key===k){btn.classList.add('active-press');setTimeout(()=>btn.classList.remove('active-press'),140)}});if(pinBuf.length===4)setTimeout(checkPin,120)}
 function pinBack(){pinBuf=pinBuf.slice(0,-1);updateDots()}function pinClear(){pinBuf='';updateDots();$('pinError').textContent=''}function updateDots(){document.querySelectorAll('#pinDots .pin-dot').forEach((d,i)=>d.classList.toggle('filled',i<pinBuf.length))}
@@ -419,7 +419,7 @@ function checkPin(){if(pinBuf!==PINS[pinTarget]){document.querySelectorAll('#pin
 function backToLogin(){role='';pinTarget='';pinBuf='';showScreen('login')}
 document.addEventListener('keydown',e=>{if(!$('pinScreen').classList.contains('active'))return;if(e.key>='0'&&e.key<='9')pinKey(e.key);else if(e.key==='Backspace')pinBack();else if(e.key==='Escape')pinClear();else if(e.key==='Enter'&&pinBuf.length===4)checkPin()});
 function canRunReports(){return role==='icteam'||role==='manager'}function canSettings(){return role==='manager'}function canManage(){return role==='manager'}
-function buildNav(){let nav=[['shortage','Shortages']];if(canRunReports())nav.push(['report','Reports']);if(role==='manager')nav.push(['restock','Replenishment'],['picker','Manage Pickers'],['migration','Migration'],['settings','Settings']);if(role!=='icteam')nav.push(['overpull','Over Pull']);if(role==='icteam'||role==='manager')nav.push(['link','IC Portal']);nav.push(['theme','Light/Dark'],['logout','Logout']);$('nav').innerHTML=nav.map(n=>n[0]==='link'?`<a class="nav-btn" href="${IC_PORTAL_URL}" target="_blank">${n[1]}</a>`:n[0]==='logout'?`<button class="nav-btn lock" onclick="logout()">${n[1]}</button>`:n[0]==='theme'?`<button class="nav-btn" onclick="saveTheme(!document.body.classList.contains('light-mode'))">${n[1]}</button>`:n[0]==='overpull'?`<button class="nav-btn" data-screen="overpull" onclick="showScreen('overpull')" style="color:var(--orange)">${n[1]}</button>`:`<button class="nav-btn" data-screen="${n[0]}" onclick="showScreen('${n[0]}')">${n[1]}</button>`).join('')}
+function buildNav(){let nav=[['shortage','Shortages']];if(canRunReports())nav.push(['report','Reports']);if(role==='manager')nav.push(['analytics','Analytics'],['ops','OPS Reports'],['restock','Replenishment'],['picker','Manage Pickers'],['migration','Migration'],['settings','Settings']);if(role!=='icteam')nav.push(['overpull','Over Pull']);if(role==='icteam'||role==='manager')nav.push(['link','IC Portal']);nav.push(['theme','Light/Dark'],['logout','Logout']);$('nav').innerHTML=nav.map(n=>n[0]==='link'?`<a class="nav-btn" href="${IC_PORTAL_URL}" target="_blank">${n[1]}</a>`:n[0]==='logout'?`<button class="nav-btn lock" onclick="logout()">${n[1]}</button>`:n[0]==='theme'?`<button class="nav-btn" onclick="saveTheme(!document.body.classList.contains('light-mode'))">${n[1]}</button>`:n[0]==='overpull'?`<button class="nav-btn" data-screen="overpull" onclick="showScreen('overpull')" style="color:var(--orange)">${n[1]}</button>`:`<button class="nav-btn" data-screen="${n[0]}" onclick="showScreen('${n[0]}')">${n[1]}</button>`).join('')}
 function login(r){role=r;$('roleChip').textContent=ROLE_LABELS[r];$('roleChip').className='role-chip '+(r==='manager'?'manager':r==='icteam'?'icteam':'clerk');buildNav();$('entryCard').classList.toggle('hide',r!=='clerk');$('shortageTopActions').innerHTML='';$('archiveActions').innerHTML=(canRunReports()?`<button class="btn green" onclick="openIcConfirm()" style="margin-right:auto">&#128203; IC Verify Sheet</button>`:'')+(canManage()?` <button class="btn" onclick="selectVisible(true)">Select Visible</button><button class="btn" onclick="selectVisible(false)">Clear Selection</button><button class="btn orange" onclick="archiveSelected()">Archive Selected</button><button class="btn red" onclick="archiveFiltered()">Archive Filtered Active</button>`:'');showScreen('shortage')}
 function logout(){role='';shortages=[];visibleShortages=[];showScreen('login')}
 const PRESET_STATIONS=[...Array(20)].map((_,i)=>`PS-${String(i+1).padStart(2,'0')}`);
@@ -3581,7 +3581,467 @@ document.addEventListener('input',function(e){
 });
 
 function startup(){applyTheme();initFirebase();$('sDate').value=nowLocalInput();loadAllPersonnel();populatePickerSelects();populateStationSelects();if($('productLines'))addProductLine();const sl=localStorage.getItem('scp_lang')||'en';setLang(sl);startResetListener();}
+// ════════════════════════════════════════════════════════
+// ANALYTICS SCREEN
+// ════════════════════════════════════════════════════════
+let anShortages=[], anOverpull=[], anLastGroup='', anResults=[];
+
+function showAnalytics(){showScreen('analytics');runAnalytics();}
+function showOps(){showScreen('ops');}
+
+async function runAnalytics(force){
+  if(!ensureDb())return;
+  showLoading('Loading analytics data...');
+  try{
+    const dataset=$('anDataset').value;
+    if((dataset==='shortages'||dataset==='both')&&(!anShortages.length||force)){
+      const s=getSettings();
+      const [a,b]=await Promise.all([
+        db.collection(s.activeCollection||'shortages_active').limit(5000).get(),
+        db.collection(s.archiveCollection||'shortages_archive').limit(5000).get()
+      ]);
+      anShortages=[
+        ...a.docs.map(d=>normalizeShortage(d.data(),d.id,false)),
+        ...b.docs.map(d=>normalizeShortage(d.data(),d.id,true))
+      ];
+    }
+    if((dataset==='overpull'||dataset==='both')&&(!anOverpull.length||force)){
+      const s=getSettings();
+      const [a,b]=await Promise.all([
+        db.collection(s.overpullCollection||'overpull_active').limit(5000).get(),
+        db.collection(s.overpullArchiveCollection||'overpull_archive').limit(5000).get()
+      ]);
+      anOverpull=[...a.docs.map(d=>({id:d.id,...d.data()})),...b.docs.map(d=>({id:d.id,...d.data()}))];
+    }
+  }catch(e){hideLoading();alert('Load failed: '+e.message);return;}
+  hideLoading();
+  renderAnalytics();
+}
+
+function anFilterDate(records, startId, endId){
+  const s=$( startId)?.value, e=$(endId)?.value;
+  if(!s&&!e)return records;
+  return records.filter(r=>{
+    const d=(r.date||r.dateTime||r.createdAt||'').toString().slice(0,10);
+    if(!d)return true;
+    if(s&&d<s)return false;
+    if(e&&d>e)return false;
+    return true;
+  });
+}
+
+function renderAnalytics(){
+  const group=$('anGroup').value;
+  const dataset=$('anDataset').value;
+  const div=$('anDiv').value;
+  const dateS=$('anStart').value, dateE=$('anEnd').value;
+
+  let shorts=anFilterDate(anShortages,'anStart','anEnd');
+  let ops=anFilterDate(anOverpull,'anStart','anEnd');
+  if(div){shorts=shorts.filter(r=>r.division===div);}
+
+  // Build aggregation map
+  const map={};
+  const key=r=>{
+    if(group==='picker')return r.picker||'Unknown';
+    if(group==='packer')return r.packer||r.packerName||'Unknown';
+    if(group==='division')return r.division||'Unknown';
+    if(group==='shift')return r.shift||'Unknown';
+    if(group==='product')return r.productCode||r.items?.[0]?.productCode||'Unknown';
+    if(group==='bin')return r.shortedBin||'Unknown';
+    return 'All';
+  };
+
+  if(dataset==='shortages'||dataset==='both'){
+    shorts.forEach(r=>{
+      const k=key(r);
+      if(!map[k])map[k]={key:k,shorts:0,shortQty:0,resolved:0,erroneous:0,op:0,opQty:0};
+      map[k].shorts++;
+      map[k].shortQty+=r.qtyShorted||0;
+      if(r.foundInShortedBin||r.secondLocationFilled||r.icConfirmed)map[k].resolved++;
+      if(r.icErroneous)map[k].erroneous++;
+    });
+  }
+  if(dataset==='overpull'||dataset==='both'){
+    ops.forEach(r=>{
+      const k=key(r);
+      if(!map[k])map[k]={key:k,shorts:0,shortQty:0,resolved:0,erroneous:0,op:0,opQty:0};
+      map[k].op++;
+      const items=Array.isArray(r.items)?r.items:[];
+      map[k].opQty+=items.reduce((s,i)=>s+(Number(i.qty)||0),0);
+    });
+  }
+
+  anResults=Object.values(map).sort((a,b)=>(b.shorts+b.op)-(a.shorts+a.op));
+  anLastGroup=group;
+
+  // KPIs
+  const totShorts=anResults.reduce((s,r)=>s+r.shorts,0);
+  const totOp=anResults.reduce((s,r)=>s+r.op,0);
+  const totResolved=anResults.reduce((s,r)=>s+r.resolved,0);
+  const totErr=anResults.reduce((s,r)=>s+r.erroneous,0);
+  const resRate=totShorts?Math.round(totResolved/totShorts*100):0;
+
+  $('anKpis').innerHTML=[
+    ['Total Shortages',totShorts,'var(--accent)'],
+    ['Total Over Pulls',totOp,'var(--green)'],
+    ['Resolved Shortages',totResolved+' ('+resRate+'%)','var(--blue,#3b82f6)'],
+    ['Erroneous',''+totErr,'var(--red)'],
+    [group.charAt(0).toUpperCase()+group.slice(1)+'s',anResults.length,'var(--muted)'],
+  ].map(([l,v,c])=>`<div class="card" style="padding:14px;text-align:center">
+    <div style="font-size:22px;font-weight:700;color:${c}">${v}</div>
+    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:2px">${l}</div>
+  </div>`).join('');
+
+  $('anTableTitle').textContent='Results by '+group.charAt(0).toUpperCase()+group.slice(1);
+  renderAnalyticsTable();
+}
+
+function renderAnalyticsTable(){
+  const search=($('anSearch')?.value||'').toLowerCase();
+  const rows=anResults.filter(r=>!search||r.key.toLowerCase().includes(search));
+  if(!rows.length){$('anTable').innerHTML='<div class="empty" style="padding:30px">No data. Click Refresh Data to load.</div>';return;}
+  const group=anLastGroup;
+  const showOp=($('anDataset')?.value||'')!=='shortages';
+  const showShort=($('anDataset')?.value||'')!=='overpull';
+  let html=`<table><thead><tr>
+    <th>${group.charAt(0).toUpperCase()+group.slice(1)}</th>
+    ${showShort?'<th>Shortages</th><th>Qty Shorted</th><th>Resolved</th><th>Res. Rate</th><th>Erroneous</th>':''}
+    ${showOp?'<th>Over Pulls</th><th>Op Qty</th>':''}
+  </tr></thead><tbody>`;
+  rows.forEach(r=>{
+    const rate=r.shorts?Math.round(r.resolved/r.shorts*100):0;
+    const rateColor=rate>=80?'var(--green)':rate>=50?'var(--yellow,#f59e0b)':'var(--red)';
+    html+=`<tr>
+      <td style="font-weight:600;font-family:var(--mono)">${esc(r.key)}</td>
+      ${showShort?`<td>${r.shorts}</td><td>${r.shortQty}</td><td>${r.resolved}</td>
+        <td><span style="color:${rateColor};font-weight:700">${rate}%</span></td>
+        <td>${r.erroneous||0}</td>`:''}
+      ${showOp?`<td>${r.op}</td><td>${r.opQty}</td>`:''}
+    </tr>`;
+  });
+  html+='</tbody></table>';
+  $('anTable').innerHTML=html;
+}
+
+function exportAnalyticsCsv(){
+  if(!anResults.length){alert('No data to export. Run analytics first.');return;}
+  const group=anLastGroup;
+  const headers=[group,'Shortages','Qty Shorted','Resolved','Resolution Rate','Erroneous','Over Pulls','OP Qty'];
+  const rows=anResults.map(r=>[
+    r.key,r.shorts,r.shortQty,r.resolved,
+    r.shorts?Math.round(r.resolved/r.shorts*100)+'%':'N/A',
+    r.erroneous||0,r.op,r.opQty
+  ]);
+  const csv=[headers,...rows].map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='analytics_'+group+'_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+}
+
+// ════════════════════════════════════════════════════════
+// OPS REPORTS SCREEN
+// ════════════════════════════════════════════════════════
+let opsShortData=[], opsOpData=[], opsMode='';
+
+async function opsRunShortageReport(){
+  if(!ensureDb())return;
+  const status=$('opsShortStatus');
+  status.textContent='Loading...';status.style.color='var(--accent)';
+  try{
+    const s=getSettings();
+    const mode=$('opsShortMode').value;
+    let rows=[];
+    if(mode==='active'||mode==='both'){
+      const snap=await db.collection(s.activeCollection||'shortages_active').limit(5000).get();
+      rows=rows.concat(snap.docs.map(d=>normalizeShortage(d.data(),d.id,false)));
+    }
+    if(mode==='archive'||mode==='both'){
+      const snap=await db.collection(s.archiveCollection||'shortages_archive').limit(5000).get();
+      rows=rows.concat(snap.docs.map(d=>normalizeShortage(d.data(),d.id,true)));
+    }
+    const start=$('opsShortStart').value, end=$('opsShortEnd').value;
+    if(start||end)rows=rows.filter(r=>{
+      const d=(r.date||'').toString().slice(0,10);
+      if(start&&d<start)return false;
+      if(end&&d>end)return false;
+      return true;
+    });
+    opsShortData=rows;opsMode='shortage';
+    status.textContent=rows.length+' records loaded.';status.style.color='var(--green)';
+    opsUpdateQuickStats();
+    opsRenderTable();
+    $('opsResultCard').style.display='';
+    $('opsResultTitle').textContent='Shortages ('+rows.length+' records)';
+  }catch(e){status.textContent='Error: '+e.message;status.style.color='var(--red)';}
+}
+
+async function opsRunOpReport(){
+  if(!ensureDb())return;
+  const status=$('opsOpStatus');
+  status.textContent='Loading...';status.style.color='var(--accent)';
+  try{
+    const s=getSettings();
+    const [a,b]=await Promise.all([
+      db.collection(s.overpullCollection||'overpull_active').limit(5000).get(),
+      db.collection(s.overpullArchiveCollection||'overpull_archive').limit(5000).get()
+    ]);
+    let rows=[...a.docs.map(d=>({id:d.id,...d.data()})),...b.docs.map(d=>({id:d.id,...d.data()}))];
+    const start=$('opsOpStart').value,end=$('opsOpEnd').value,div=$('opsOpDiv').value;
+    if(start||end)rows=rows.filter(r=>{
+      const d=(r.date||r.dateTime||'').toString().slice(0,10);
+      if(start&&d<start)return false;
+      if(end&&d>end)return false;
+      return true;
+    });
+    if(div)rows=rows.filter(r=>(r.division||'')===div);
+    opsOpData=rows;opsMode='overpull';
+    status.textContent=rows.length+' records loaded.';status.style.color='var(--green)';
+    opsUpdateQuickStats();
+    opsRenderTable();
+    $('opsResultCard').style.display='';
+    $('opsResultTitle').textContent='Over Pulls ('+rows.length+' records)';
+  }catch(e){status.textContent='Error: '+e.message;status.style.color='var(--red)';}
+}
+
+function opsUpdateQuickStats(){
+  const data=opsMode==='shortage'?opsShortData:opsOpData;
+  if(!data.length){$('opsQuickStats').textContent='No data.';return;}
+  if(opsMode==='shortage'){
+    const resolved=data.filter(r=>r.foundInShortedBin||r.secondLocationFilled||r.icConfirmed).length;
+    const erroneous=data.filter(r=>r.icErroneous).length;
+    const rate=Math.round(resolved/data.length*100);
+    const topPicker=Object.entries(data.reduce((m,r)=>{const k=r.picker||'?';m[k]=(m[k]||0)+1;return m;},{})).sort((a,b)=>b[1]-a[1])[0];
+    $('opsQuickStats').innerHTML=`
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div><div style="font-size:20px;font-weight:700;color:var(--accent)">${data.length}</div><div style="font-size:11px;color:var(--muted)">TOTAL SHORTAGES</div></div>
+        <div><div style="font-size:20px;font-weight:700;color:var(--green)">${rate}%</div><div style="font-size:11px;color:var(--muted)">RESOLVED</div></div>
+        <div><div style="font-size:20px;font-weight:700;color:var(--red)">${erroneous}</div><div style="font-size:11px;color:var(--muted)">ERRONEOUS</div></div>
+        <div><div style="font-size:16px;font-weight:700;color:var(--text)">${topPicker?topPicker[0]:'-'}</div><div style="font-size:11px;color:var(--muted)">TOP PICKER (${topPicker?topPicker[1]:0})</div></div>
+      </div>`;
+  } else {
+    const totalItems=data.reduce((s,r)=>s+(Array.isArray(r.items)?r.items.reduce((ss,i)=>ss+(Number(i.qty)||0),0):0),0);
+    const topPicker=Object.entries(data.reduce((m,r)=>{const k=r.picker||'?';m[k]=(m[k]||0)+1;return m;},{})).sort((a,b)=>b[1]-a[1])[0];
+    $('opsQuickStats').innerHTML=`
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div><div style="font-size:20px;font-weight:700;color:var(--green)">${data.length}</div><div style="font-size:11px;color:var(--muted)">TOTAL ENTRIES</div></div>
+        <div><div style="font-size:20px;font-weight:700;color:var(--accent)">${totalItems}</div><div style="font-size:11px;color:var(--muted)">TOTAL UNITS</div></div>
+        <div><div style="font-size:16px;font-weight:700;color:var(--text)">${topPicker?topPicker[0]:'-'}</div><div style="font-size:11px;color:var(--muted)">TOP PICKER (${topPicker?topPicker[1]:0})</div></div>
+      </div>`;
+  }
+}
+
+function opsRenderTable(){
+  const search=($('opsSearch')?.value||'').toLowerCase();
+  const data=(opsMode==='shortage'?opsShortData:opsOpData)
+    .filter(r=>!search||JSON.stringify(r).toLowerCase().includes(search));
+  if(!data.length){$('opsTable').innerHTML='<div class="empty" style="padding:30px">No records.</div>';return;}
+  let html='';
+  if(opsMode==='shortage'){
+    html=`<table><thead><tr><th>Date</th><th>Picker</th><th>Product</th><th>Bin</th><th>Qty</th><th>Division</th><th>Status</th></tr></thead><tbody>`;
+    data.slice(0,500).forEach(r=>{
+      const status=r.icErroneous?'<span style="color:var(--red)">Erroneous</span>':
+        r.foundInShortedBin?'<span style="color:var(--green)">Found in Bin</span>':
+        r.secondLocationFilled?'<span style="color:var(--green)">2nd Location</span>':
+        r.icConfirmed?'<span style="color:var(--blue,#3b82f6)">IC Confirmed</span>':
+        '<span style="color:var(--muted)">Pending</span>';
+      html+=`<tr><td>${(r.date||'').toString().slice(0,10)}</td><td style="font-family:var(--mono)">${esc(r.picker||'')}</td><td style="font-family:var(--mono)">${esc(r.productCode||'')}</td><td style="font-family:var(--mono)">${esc(r.shortedBin||'')}</td><td>${r.qtyShorted||0} ${esc(r.uom||'')}</td><td>${esc(r.division||'')}</td><td>${status}</td></tr>`;
+    });
+    if(data.length>500)html+=`<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:10px">Showing 500 of ${data.length} — export CSV for full data</td></tr>`;
+    html+='</tbody></table>';
+  } else {
+    html=`<table><thead><tr><th>Date</th><th>Picker</th><th>Packer</th><th>Division</th><th>Station</th><th>Items</th><th>Total Units</th></tr></thead><tbody>`;
+    data.slice(0,500).forEach(r=>{
+      const items=Array.isArray(r.items)?r.items:[];
+      const units=items.reduce((s,i)=>s+(Number(i.qty)||0),0);
+      html+=`<tr><td>${(r.date||r.dateTime||'').toString().slice(0,10)}</td><td style="font-family:var(--mono)">${esc(r.picker||'')}</td><td style="font-family:var(--mono)">${esc(r.packer||r.packerName||'')}</td><td>${esc(r.division||'')}</td><td style="font-family:var(--mono)">${esc(r.packStation||'')}</td><td>${items.length}</td><td>${units}</td></tr>`;
+    });
+    if(data.length>500)html+=`<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:10px">Showing 500 of ${data.length} — export CSV for full data</td></tr>`;
+    html+='</tbody></table>';
+  }
+  $('opsTable').innerHTML=html;
+}
+
+function opsExportShortage(){
+  if(!opsShortData.length){alert('Run the shortage report first.');return;}
+  const headers=['Date','Picker','Product','Bin','Qty','UOM','Division','Shift','Order','Status','Erroneous'];
+  const rows=opsShortData.map(r=>[
+    (r.date||'').toString().slice(0,10),r.picker||'',r.productCode||'',r.shortedBin||'',
+    r.qtyShorted||0,r.uom||'',r.division||'',r.shift||'',r.pickDemand||'',
+    r.icErroneous?'Erroneous':r.foundInShortedBin?'Found in Bin':r.secondLocationFilled?'2nd Location':r.icConfirmed?'IC Confirmed':'Pending',
+    r.icErroneous?'Yes':'No'
+  ]);
+  opsCsvDownload([headers,...rows],'shortages_'+new Date().toISOString().slice(0,10)+'.csv');
+}
+
+function opsExportOp(){
+  if(!opsOpData.length){alert('Run the over pull report first.');return;}
+  const headers=['Date','Picker','Packer','Division','Station','Shift','Items','Total Units','Order'];
+  const rows=opsOpData.map(r=>{
+    const items=Array.isArray(r.items)?r.items:[];
+    const units=items.reduce((s,i)=>s+(Number(i.qty)||0),0);
+    return [(r.date||r.dateTime||'').toString().slice(0,10),r.picker||'',r.packer||r.packerName||'',
+      r.division||'',r.packStation||'',r.shift||'',items.length,units,
+      Array.isArray(r.orders)?r.orders.map(o=>o.orderNum||'').join(';'):r.orderNum||''];
+  });
+  opsCsvDownload([headers,...rows],'overpull_'+new Date().toISOString().slice(0,10)+'.csv');
+}
+
+function opsCsvDownload(rows,filename){
+  const csv=rows.map(r=>r.map(v=>'"'+String(v||'').replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download=filename;a.click();
+}
+
+function opsPrintShortage(){
+  if(!opsShortData.length){alert('Run the shortage report first.');return;}
+  const today=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  const data=opsShortData;
+  const resolved=data.filter(r=>r.foundInShortedBin||r.secondLocationFilled||r.icConfirmed).length;
+  const rate=data.length?Math.round(resolved/data.length*100):0;
+  let html=`<h1 style="font-size:18pt;margin:0 0 4pt">Shortage Report</h1>
+    <p style="font-size:9pt;color:#6b7280;margin:0 0 14pt">Printed ${today} &bull; ${data.length} records &bull; ${rate}% resolved</p>
+    <table><thead><tr><th>Date</th><th>Picker</th><th>Product</th><th>Bin</th><th>Qty</th><th>Division</th><th>Status</th></tr></thead><tbody>`;
+  data.forEach(r=>{
+    const s=r.icErroneous?'Erroneous':r.foundInShortedBin?'Found in Bin':r.secondLocationFilled?'2nd Loc':r.icConfirmed?'IC Confirmed':'Pending';
+    html+=`<tr><td>${(r.date||'').toString().slice(0,10)}</td><td>${esc(r.picker||'')}</td><td>${esc(r.productCode||'')}</td><td>${esc(r.shortedBin||'')}</td><td>${r.qtyShorted||0} ${esc(r.uom||'')}</td><td>${esc(r.division||'')}</td><td>${s}</td></tr>`;
+  });
+  html+='</tbody></table>';
+  doPrint(html);
+}
+
+function opsPrintOp(){
+  if(!opsOpData.length){alert('Run the over pull report first.');return;}
+  const today=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  const data=opsOpData;
+  let html=`<h1 style="font-size:18pt;margin:0 0 4pt">Over Pull Report</h1>
+    <p style="font-size:9pt;color:#6b7280;margin:0 0 14pt">Printed ${today} &bull; ${data.length} entries</p>
+    <table><thead><tr><th>Date</th><th>Picker</th><th>Packer</th><th>Division</th><th>Station</th><th>Items</th><th>Units</th></tr></thead><tbody>`;
+  data.forEach(r=>{
+    const items=Array.isArray(r.items)?r.items:[];
+    const units=items.reduce((s,i)=>s+(Number(i.qty)||0),0);
+    html+=`<tr><td>${(r.date||r.dateTime||'').toString().slice(0,10)}</td><td>${esc(r.picker||'')}</td><td>${esc(r.packer||r.packerName||'')}</td><td>${esc(r.division||'')}</td><td>${esc(r.packStation||'')}</td><td>${items.length}</td><td>${units}</td></tr>`;
+  });
+  html+='</tbody></table>';
+  doPrint(html);
+}
+
 startup();
 </script>
+
+<!-- ANALYTICS SCREEN -->
+<div id="analyticsScreen" class="screen">
+  <div class="page-head"><h1>&#128200; Analytics</h1><p>Query shortage and over pull data by picker, packer, division, or date range.</p></div>
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title">Filters</div>
+    <div class="form-row" style="flex-wrap:wrap;gap:10px;align-items:flex-end">
+      <div class="field" style="flex:1;min-width:140px">
+        <label>Date From</label>
+        <input id="anStart" type="date" aria-label="Analytics start date" onchange="runAnalytics()">
+      </div>
+      <div class="field" style="flex:1;min-width:140px">
+        <label>Date To</label>
+        <input id="anEnd" type="date" aria-label="Analytics end date" onchange="runAnalytics()">
+      </div>
+      <div class="field" style="flex:1;min-width:140px">
+        <label>Division</label>
+        <select id="anDiv" onchange="runAnalytics()" aria-label="Division filter">
+          <option value="">All Divisions</option>
+          <option>NH</option><option>FR</option><option>DY</option><option>GC</option><option>HB</option>
+        </select>
+      </div>
+      <div class="field" style="flex:1;min-width:140px">
+        <label>Group By</label>
+        <select id="anGroup" onchange="runAnalytics()" aria-label="Group by">
+          <option value="picker">Picker</option>
+          <option value="packer">Packer</option>
+          <option value="division">Division</option>
+          <option value="shift">Shift</option>
+          <option value="product">Product Code</option>
+          <option value="bin">Bin Location</option>
+        </select>
+      </div>
+      <div class="field" style="flex:1;min-width:140px">
+        <label>Dataset</label>
+        <select id="anDataset" onchange="runAnalytics()" aria-label="Dataset">
+          <option value="shortages">Shortages</option>
+          <option value="overpull">Over Pulls</option>
+          <option value="both">Both</option>
+        </select>
+      </div>
+      <div class="field" style="flex:0 0 auto">
+        <label>&nbsp;</label>
+        <button class="btn primary" onclick="runAnalytics(true)">&#128257; Refresh Data</button>
+      </div>
+    </div>
+  </div>
+  <div id="anKpis" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:16px"></div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <div class="card-title" style="margin:0" id="anTableTitle">Results</div>
+      <div style="display:flex;gap:8px">
+        <input id="anSearch" placeholder="Search..." style="padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;width:180px" oninput="renderAnalyticsTable()">
+        <button class="btn" onclick="exportAnalyticsCsv()" style="font-size:12px">&#11015; CSV</button>
+      </div>
+    </div>
+    <div id="anTable" style="overflow-x:auto"></div>
+  </div>
+</div>
+
+<!-- OPS MANAGER SCREEN -->
+<div id="opsScreen" class="screen">
+  <div class="page-head"><h1>&#128196; OPS Reports</h1><p>Run and export shortage and over pull reports.</p></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:20px">
+
+    <div class="card">
+      <div class="card-title">Shortage Report</div>
+      <div class="field"><label>Date From</label><input id="opsShortStart" type="date" aria-label="Shortage start"></div>
+      <div class="field" style="margin-top:8px"><label>Date To</label><input id="opsShortEnd" type="date" aria-label="Shortage end"></div>
+      <div class="field" style="margin-top:8px"><label>View</label>
+        <select id="opsShortMode" aria-label="Shortage mode">
+          <option value="active">Active Only</option>
+          <option value="archive">Archived Only</option>
+          <option value="both">Active + Archived</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+        <button class="btn primary" style="flex:1" onclick="opsRunShortageReport()">&#9654; Run Report</button>
+        <button class="btn" onclick="opsPrintShortage()">&#128424; Print</button>
+        <button class="btn" onclick="opsExportShortage()">&#11015; CSV</button>
+      </div>
+      <div id="opsShortStatus" style="margin-top:8px;font-size:12px;color:var(--muted)"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Over Pull Report</div>
+      <div class="field"><label>Date From</label><input id="opsOpStart" type="date" aria-label="Over pull start"></div>
+      <div class="field" style="margin-top:8px"><label>Date To</label><input id="opsOpEnd" type="date" aria-label="Over pull end"></div>
+      <div class="field" style="margin-top:8px"><label>Division</label>
+        <select id="opsOpDiv" aria-label="Over pull division">
+          <option value="">All</option>
+          <option>NH</option><option>FR</option><option>DY</option><option>GC</option><option>HB</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+        <button class="btn primary" style="flex:1" onclick="opsRunOpReport()">&#9654; Run Report</button>
+        <button class="btn" onclick="opsPrintOp()">&#128424; Print</button>
+        <button class="btn" onclick="opsExportOp()">&#11015; CSV</button>
+      </div>
+      <div id="opsOpStatus" style="margin-top:8px;font-size:12px;color:var(--muted)"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Quick Stats</div>
+      <div id="opsQuickStats" style="font-size:13px;color:var(--muted)">Click Run on either report to see stats.</div>
+    </div>
+  </div>
+
+  <div class="card" id="opsResultCard" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <div class="card-title" style="margin:0" id="opsResultTitle">Results</div>
+      <input id="opsSearch" placeholder="Search..." style="padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;width:200px" oninput="opsRenderTable()">
+    </div>
+    <div id="opsTable" style="overflow-x:auto"></div>
+  </div>
+</div>
 </body>
 </html>
