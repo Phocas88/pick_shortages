@@ -1371,8 +1371,9 @@ async function confirmEditPerson(type, oldName){
   status.textContent='Updating Firestore records...';
   status.style.color='var(--accent,#6366f1)';
   try{
+    // 1. Update all shortage/overpull docs in Firestore
     var count=await updatePersonInFirestore(type, oldName, newName);
-    // Update local arrays
+    // 2. Update local arrays — replace old with new
     if(type==='picker'){
       pickerNames=pickerNames.map(p=>p===oldName?newName:p).filter((p,i,a)=>a.indexOf(p)===i).sort();
       localStorage.setItem('scp_pickers',JSON.stringify(pickerNames));
@@ -1380,11 +1381,13 @@ async function confirmEditPerson(type, oldName){
       packerNames=packerNames.map(p=>p===oldName?newName:p).filter((p,i,a)=>a.indexOf(p)===i).sort();
       localStorage.setItem('scp_packers',JSON.stringify(packerNames));
     }
-    await savePersonToFirestore(newName, type);
+    // 3. Write the FULL updated arrays to Firestore personnel doc (replaces, not appends)
+    await setPersonnelInFirestore();
     clearCaches();
+    localStorage.removeItem('scp_personnel_cache');
     renderPickers();
     document.getElementById('personEditModal').remove();
-    alert('Done! Renamed to '+newName+'. Updated '+count+' Firestore record(s).');
+    alert('Done! Renamed '+oldName+' to '+newName+'. Updated '+count+' Firestore record(s).');
   }catch(e){
     status.textContent='Error: '+e.message;
     status.style.color='var(--red,#ef4444)';
@@ -1436,18 +1439,10 @@ async function confirmMergePerson(type, fromName){
       packerNames=packerNames.filter(p=>p!==fromName);
       localStorage.setItem('scp_packers',JSON.stringify(packerNames));
     }
-    // Remove from Firestore personnel doc too
-    if(db){
-      var ref=db.collection('_system').doc('personnel');
-      var doc=await ref.get();
-      if(doc.exists){
-        var data=doc.data();
-        var key=type==='picker'?'pickers':'packers';
-        data[key]=(data[key]||[]).filter(p=>p!==fromName);
-        await ref.set(data);
-      }
-    }
+    // Write the FULL updated arrays to Firestore (replaces old doc entirely)
+    await setPersonnelInFirestore();
     clearCaches();
+    localStorage.removeItem('scp_personnel_cache');
     renderPickers();
     document.getElementById('personMergeModal').remove();
     alert('Done! Merged '+fromName+' into '+toName+'. Updated '+count+' Firestore record(s).');
@@ -1492,6 +1487,23 @@ async function updatePersonInFirestore(type, oldName, newName){
 }
 
 
+// Writes the current pickerNames/packerNames/packStations arrays
+// to Firestore as the authoritative source. Call after any rename/merge/remove.
+async function setPersonnelInFirestore(){
+  if(!db)return;
+  // Strip preset/unknown entries — only save user-added names
+  const PRESET_PICK=new Set([UNKNOWN_PICKER,...PRESET_PICKERS]);
+  const PRESET_STAT=new Set(PRESET_STATIONS);
+  var pickers=pickerNames.filter(p=>!PRESET_PICK.has(p));
+  var packers=packerNames.filter(p=>p!==UNKNOWN_PICKER);
+  var stations=packStations.filter(s=>!PRESET_STAT.has(s));
+  await db.collection('_system').doc('personnel').set({
+    pickers:pickers,
+    packers:packers,
+    packStations:stations
+  });
+}
+
 function addPickerManual(){
   const raw=$('pickerName').value.trim();
   if(!raw)return;
@@ -1520,8 +1532,22 @@ function addPackStationManual(){
   $('packStationName').value='';
   renderPickers();
 }
-function removePicker(n){pickerNames=pickerNames.filter(p=>p!==n);localStorage.setItem('scp_pickers',JSON.stringify(pickerNames));renderPickers();}
-function removePacker(n){packerNames=packerNames.filter(p=>p!==n);localStorage.setItem('scp_packers',JSON.stringify(packerNames));renderPickers();}
+function removePicker(n){
+  if(!confirm('Remove picker '+n+'? This only removes them from the personnel list, not from existing shortage records.'))return;
+  pickerNames=pickerNames.filter(p=>p!==n);
+  localStorage.setItem('scp_pickers',JSON.stringify(pickerNames));
+  localStorage.removeItem('scp_personnel_cache');
+  setPersonnelInFirestore();
+  renderPickers();
+}
+function removePacker(n){
+  if(!confirm('Remove packer '+n+'? This only removes them from the personnel list, not from existing over pull records.'))return;
+  packerNames=packerNames.filter(p=>p!==n);
+  localStorage.setItem('scp_packers',JSON.stringify(packerNames));
+  localStorage.removeItem('scp_personnel_cache');
+  setPersonnelInFirestore();
+  renderPickers();
+}
 function removePackStation(s){packStations=packStations.filter(p=>p!==s);localStorage.setItem('scp_packstations',JSON.stringify(packStations));renderPickers();}
 // Keep old addPicker alias for any legacy calls
 function addPicker(){addPickerManual();}
