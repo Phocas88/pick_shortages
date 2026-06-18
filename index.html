@@ -405,7 +405,7 @@ const OLD_CONFIG={apiKey:'AIzaSyA1m5P6MFUojFsEBqLXaSLumNiChgAH1Lw',authDomain:'i
 const DEFAULT_SETTINGS={firebaseConfig:DEFAULT_NEW_CONFIG,activeCollection:'shortages_active',archiveCollection:'shortages_archive',overpullCollection:'overpull_active',overpullArchiveCollection:'overpull_archive'};
 const UNKNOWN_PICKER='Unknown Picker';
 const PRESET_PICKERS=['ABrooks','ABurford','ACarter','ACherry','AJbari','ANazari','APayton','BChristian','BClaiborne','BZeyfuh','CArtis','CDavis','DAlston','DCooper','DLagatuz','DLee','DMartin','EBaysa','EKelly','EMoore','GMunford','HAkridge','JBoothe','JCary','JDelacruz','JLinwood','JRobles','KGreenhow','KHill','KRoberts','KWatford','MButler','MGracia','MHunt','MSimon','MWalker','NLewis','OZiyallah','QSills','RAlston','RCoy','RJoyner','SFnu','TMorgan','TPerry','TRobertson','WCooke','WCruz','WSellers'];
-let role='',pinTarget='',pinBuf='',db=null,oldDb=null,shortages=[],visibleShortages=[],pickerNames=[],packerNames=[],packStations=[],inventoryBins=[],editingId=null,editingArchive=false,lastLoadMode='active';
+let role='',pinTarget='',pinBuf='',db=null,oldDb=null,shortages=[],visibleShortages=[],pickerNames=[],packerNames=[],packStations=[],inventoryBins=[],pickerProfiles={},editingId=null,editingArchive=false,lastLoadMode='active';
 function esc(v){return String(v??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]))}
 function num(v){const n=Number(v);return isNaN(n)?0:n}function val(v){return v===undefined||v===null?'':v}
 function today(){return new Date().toISOString().slice(0,10)}
@@ -491,6 +491,7 @@ async function syncPersonnelFromFirestore(){
     if(doc.exists){
       const d=doc.data();
       const fsPickers=Array.isArray(d.pickers)?d.pickers:[];
+      pickerProfiles=d.pickerProfiles||{};
       const fsPackers=Array.isArray(d.packers)?d.packers:[];
       const fsStations=Array.isArray(d.packStations)?d.packStations:[];
       pickerNames=[...new Set([UNKNOWN_PICKER,...PRESET_PICKERS,...fsPickers,...JSON.parse(localStorage.getItem('scp_pickers')||'[]')])].sort();
@@ -1550,7 +1551,8 @@ async function setPersonnelInFirestore(){
   await db.collection('_system').doc('personnel').set({
     pickers:pickers,
     packers:packers,
-    packStations:stations
+    packStations:stations,
+    pickerProfiles:pickerProfiles
   });
 }
 
