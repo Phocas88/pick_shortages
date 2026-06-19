@@ -1079,11 +1079,22 @@ async function runOverPullReport(){
   var byDiv={};
   rows.forEach(function(r){
     var d=r.division||'—';
-    if(!byDiv[d])byDiv[d]={lines:0,qty:0,pickers:new Set(),packers:new Set(),orders:new Set()};
+    if(!byDiv[d])byDiv[d]={lines:0,qty:0,pickers:new Set(),packers:new Set(),orders:{},products:{}};
     byDiv[d].lines++;byDiv[d].qty+=num(r.qty);
     if(r.picker)byDiv[d].pickers.add(r.picker);
     if(r.packer)byDiv[d].packers.add(r.packer);
-    if(r.orderNumber)byDiv[d].orders.add(r.orderNumber);
+    if(r.orderNumber){
+      if(!byDiv[d].orders[r.orderNumber])byDiv[d].orders[r.orderNumber]={qty:0,products:new Set(),pickers:new Set()};
+      byDiv[d].orders[r.orderNumber].qty+=num(r.qty);
+      if(r.productCode)byDiv[d].orders[r.orderNumber].products.add(r.productCode);
+      if(r.picker)byDiv[d].orders[r.orderNumber].pickers.add(r.picker);
+    }
+    if(r.productCode){
+      if(!byDiv[d].products[r.productCode])byDiv[d].products[r.productCode]={qty:0,orders:new Set(),pickers:new Set()};
+      byDiv[d].products[r.productCode].qty+=num(r.qty);
+      if(r.orderNumber)byDiv[d].products[r.productCode].orders.add(r.orderNumber);
+      if(r.picker)byDiv[d].products[r.productCode].pickers.add(r.picker);
+    }
   });
 
   // ── build table helper ────────────────────────────────
@@ -1146,14 +1157,68 @@ async function runOverPullReport(){
     });
   var stationTbl=tbl(['Pack Station','Records','Qty','Pickers','Divisions'],stationRowsData);
 
-  // ── section: by division ──────────────────────────────
-  var divRowsData=Object.entries(byDiv).filter(function(e){return e[0]!=='—';})
+  // ── section: by division (summary + order breakdown + product breakdown) ──
+  var divHtml='';
+  Object.entries(byDiv).filter(function(e){return e[0]!=='—';})
     .sort(function(a,b){return b[1].lines-a[1].lines;})
-    .map(function(e){
-      return [esc(e[0]),e[1].lines,e[1].qty||'-',e[1].orders.size,
-        esc([...e[1].pickers].map(pickerName).join(', ')||'—')];
+    .forEach(function(e){
+      var div=e[0]; var d=e[1];
+      var orderKeys=Object.keys(d.orders).sort();
+      var productKeys=Object.keys(d.products).sort();
+
+      // Summary row
+      divHtml+='<div style="border:1px solid var(--border,#e5e7eb);border-radius:10px;overflow:hidden;margin-bottom:14px">';
+      divHtml+='<div style="background:var(--accent,#6366f1);color:#fff;padding:8px 14px;display:flex;justify-content:space-between;align-items:center">';
+      divHtml+='<span style="font-size:15px;font-weight:800">'+esc(div)+'</span>';
+      divHtml+='<span style="font-size:12px;opacity:.85">'+d.lines+' records &bull; qty: '+(d.qty||0)+' &bull; '+orderKeys.length+' orders &bull; '+productKeys.length+' products</span>';
+      divHtml+='</div>';
+      divHtml+='<div style="padding:10px 14px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--border,#e5e7eb)">';
+      divHtml+='<strong>Pickers:</strong> '+([...d.pickers].map(pickerName).join(', ')||'—');
+      divHtml+='&nbsp;&nbsp;<strong>Packers:</strong> '+([...d.packers].join(', ')||'—');
+      divHtml+='</div>';
+
+      // Orders breakdown
+      if(orderKeys.length){
+        divHtml+='<div style="padding:10px 14px">';
+        divHtml+='<div style="font-size:12px;font-weight:700;margin-bottom:6px;color:var(--accent,#6366f1)">Orders Involved ('+orderKeys.length+')</div>';
+        divHtml+=tbl(
+          ['Order #','Qty','Products','Pickers'],
+          orderKeys.map(function(o){
+            var od=d.orders[o];
+            return [
+              '<span style="font-family:monospace;font-weight:700">'+esc(o)+'</span>',
+              od.qty||'—',
+              esc([...od.products].sort().join(', ')||'—'),
+              esc([...od.pickers].map(pickerName).join(', ')||'—')
+            ];
+          })
+        );
+        divHtml+='</div>';
+      }
+
+      // Products breakdown
+      if(productKeys.length){
+        divHtml+='<div style="padding:0 14px 10px">';
+        divHtml+='<div style="font-size:12px;font-weight:700;margin-bottom:6px;color:var(--accent,#6366f1)">Product Codes Involved ('+productKeys.length+')</div>';
+        divHtml+=tbl(
+          ['Product Code','Total Qty','Orders','Pickers'],
+          productKeys.sort(function(a,b){
+            return (d.products[b].qty||0)-(d.products[a].qty||0);
+          }).map(function(p){
+            var pd=d.products[p];
+            return [
+              '<span style="font-family:monospace;font-weight:700">'+esc(p)+'</span>',
+              pd.qty||'—',
+              pd.orders.size,
+              esc([...pd.pickers].map(pickerName).join(', ')||'—')
+            ];
+          })
+        );
+        divHtml+='</div>';
+      }
+
+      divHtml+='</div>';
     });
-  var divTbl=tbl(['Division','Records','Qty','Unique Orders','Pickers'],divRowsData);
 
   // ── detail table ──────────────────────────────────────
   var detailRowsData=rows.map(function(r){
@@ -1186,7 +1251,7 @@ async function runOverPullReport(){
     +sec('By Picker', pickerRowsData.length?pickerTbl:'<div style="color:var(--muted);font-size:13px">No picker data.</div>')
     +sec('By Packer', packerRowsData.length?packerTbl:'<div style="color:var(--muted);font-size:13px">No packer data.</div>')
     +sec('By Pack Station', stationRowsData.length?stationTbl:'<div style="color:var(--muted);font-size:13px">No station data.</div>')
-    +sec('By Division', divRowsData.length?divTbl:'<div style="color:var(--muted);font-size:13px">No division data.</div>')
+    +sec('By Division', divHtml||'<div style="color:var(--muted);font-size:13px">No division data.</div>')
     +sec('Detail', detailTbl)
     +'</div>';
 }
@@ -1244,6 +1309,9 @@ function rowHtml(r){
     </div>`;
   }
   const chk=canManage()&&!r._archived?`<input class="sr-check" type="checkbox" data-id="${esc(r.id)}">`:'';const edit=canRunReports()?`<button class="btn" onclick="openEdit('${esc(r.id)}',${r._archived})">${t('btn.edit')}</button>`:'';const mark=!r._archived&&canRunReports()?`<button class="btn green" onclick="markErroneous('${esc(r.id)}')">${t('btn.found_bin')}</button><button class="btn" onclick="toggleSecond('${esc(r.id)}')">${t('btn.second_loc')}</button><button class="btn" onclick="toggleReplenished('${esc(r.id)}')">${t('btn.replenished')}</button>`:'';const unarch=r._archived&&canManage()?`<button class="btn orange" onclick="unarchiveOne('${esc(r.id)}')">${t('btn.unarchive')}</button>`:'';const sec=secondarySummary(r);
+  const _qtyNeeded=num(r.qtyShorted)||0;
+  const _qtyFilled=(Array.isArray(r.secondaryLocations)?r.secondaryLocations:[]).reduce(function(s,l){return s+num(l.qty);},0);
+  const _partialTag=r.secondLocationFilled&&_qtyFilled>0&&_qtyFilled<_qtyNeeded?' <span style="color:var(--orange);font-size:11px;font-weight:700">(Partial: '+_qtyFilled+' of '+_qtyNeeded+' filled)</span>':'';
   const icFoundLine=r.icQtyFound?`<div class="sr-meta" style="color:var(--green)">&#10003; ${t('row.ic_found')}: ${esc(r.icQtyFound)} ${esc(r.icUom||r.uom||'')}${r.icNotes?' &bull; '+esc(r.icNotes):''}</div>`:'';
   const badges=statusBadges(r);
   return `<div class="shortage-row ${r._archived?'archived':''} ${r.foundInShortedBin?'erroneous':''}">
@@ -1255,7 +1323,7 @@ function rowHtml(r){
         </div>
         <div class="sr-meta" style="margin-top:4px">${esc(r.date||'No date')} &bull; <strong>${esc(r.division||'')}</strong> &bull; ${t('row.qty')} <strong>${esc(r.qtyShorted||'')} ${esc(r.uom||'')}</strong> &bull; ${t('row.demand')} ${esc(r.pickDemand||'')} &bull; ${t('row.picker')} ${esc(r.picker||'')}${r.packStation?' &bull; '+esc(r.packStation):''}</div>
         ${icFoundLine}
-        ${sec?`<div class="sr-meta"><strong>${t('row.second_filled')}</strong> ${esc(sec)}</div>`:''}
+        ${sec?`<div class="sr-meta"><strong>${t('row.second_filled')}</strong>${_partialTag} ${esc(sec)}</div>`:''}
         <div class="sr-actions" style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">${edit}${mark}${unarch}</div>
       </div>
     </div>
@@ -1276,45 +1344,131 @@ function clearEntry(){['sDemand','sPicker','sNotes'].forEach(id=>{if($(id))$(id)
 function clearCaches(){Object.keys(localStorage).filter(k=>k.startsWith('scp_cache_')).forEach(k=>localStorage.removeItem(k))}
 async function updateRecord(id,data,archived=false){showLoading('Saving...');try{const s=getSettings();await db.collection(archived?s.archiveCollection:s.activeCollection).doc(id).set({...data,updatedAt:new Date().toISOString(),updatedBy:role},{merge:true});clearCaches();await loadShortages(true)}catch(e){alert(e.message)}finally{hideLoading()}}
 async function markErroneous(id){const r=shortages.find(x=>x.id===id&&!x._archived);if(!r)return;const qty=prompt('Qty found in the shorted bin:',r.icQtyFound||r.qtyShorted||'');if(qty===null)return;const uom=prompt('UOM:',r.icUom||r.uom||'EA');if(uom===null)return;await updateRecord(id,{foundInShortedBin:true,icQtyFound:num(qty),icUom:(uom||'EA').toUpperCase(),status:'located'},false)}
-async function toggleSecond(id){
-  const r=shortages.find(x=>x.id===id&&!x._archived);
-  if(!r)return;
-  let locs=Array.isArray(r.secondaryLocations)?[...r.secondaryLocations]:[];
-  if(locs.length){
-    const action=prompt(`This shortage already has ${locs.length} second-location bin(s).\n\nType A to add another bin.\nType C to clear all second-location bins.\nPress Cancel to keep as-is.`,'A');
-    if(action===null)return;
-    if(String(action).trim().toUpperCase()==='C'){
-      await updateRecord(id,{secondLocationFilled:false,secondaryLocations:[]},false);
-      return;
-    }
+async function toggleSecond(id){openSecondLocModal(id);}
+
+function openSecondLocModal(id){
+  var r=shortages.find(function(x){return x.id===id&&!x._archived;});
+  if(!r){alert('Record not found.');return;}
+  var locs=Array.isArray(r.secondaryLocations)?JSON.parse(JSON.stringify(r.secondaryLocations)):[];
+  var qtyNeeded=num(r.qtyShorted)||0;
+
+  var el=document.getElementById('secondLocModal');if(el)el.remove();
+  el=document.createElement('div');el.id='secondLocModal';
+  el.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;background:rgba(15,20,40,.8);display:flex;align-items:flex-start;justify-content:center;padding:20px;box-sizing:border-box;overflow-y:auto';
+  document.body.appendChild(el);
+
+  function renderModal(){
+    var qtyFilled=locs.reduce(function(s,l){return s+num(l.qty);},0);
+    var remaining=Math.max(0,qtyNeeded-qtyFilled);
+    var pct=qtyNeeded?Math.min(100,Math.round(qtyFilled/qtyNeeded*100)):0;
+    var statusColor=remaining<=0?'var(--green,#10b981)':qtyFilled>0?'var(--orange,#f59e0b)':'var(--red,#ef4444)';
+    var statusLabel=remaining<=0?'Fully Filled':qtyFilled>0?'Partial — '+remaining+' still short':'Not Filled';
+
+    var locRows=locs.length?locs.map(function(loc,i){
+      return '<div style="display:grid;grid-template-columns:2fr 70px 60px 1fr auto;gap:6px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border,#e5e7eb)">'
+        +'<div><span style="font-family:monospace;font-weight:700;font-size:13px">'+esc(loc.bin||'')+'</span>'
+        +(loc.icQtyOnHand?'<span style="font-size:11px;color:var(--muted);margin-left:6px">OH:'+loc.icQtyOnHand+'</span>':'')
+        +(loc.notes?'<div style="font-size:11px;color:var(--muted)">'+esc(loc.notes)+'</div>':'')+'</div>'
+        +'<div style="text-align:center;font-size:14px;font-weight:700">'+esc(String(loc.qty))+'</div>'
+        +'<div style="text-align:center;font-size:12px;color:var(--muted)">'+esc(loc.uom||r.uom||'EA')+'</div>'
+        +'<div style="font-size:11px;color:var(--muted)">by '+esc(loc.enteredBy||'')+'</div>'
+        +'<button onclick="slRemove('+i+')" style="background:none;border:none;color:var(--red,#ef4444);font-size:20px;cursor:pointer;line-height:1">&#215;</button>'
+        +'</div>';
+    }).join(''):'<div style="color:var(--muted);font-size:13px;padding:12px 0;text-align:center">No secondary locations added yet.</div>';
+
+    el.innerHTML=
+      '<div style="background:var(--surface,#fff);border-radius:16px;width:100%;max-width:600px;box-shadow:0 8px 40px rgba(0,0,0,.5);overflow:hidden;margin:auto">'
+      +'<div style="padding:16px 20px;background:var(--accent,#6366f1);color:#fff">'
+      +'<div style="font-size:16px;font-weight:700">&#128205; Secondary Locations</div>'
+      +'<div style="font-size:12px;opacity:.85;margin-top:3px">Product: <strong>'+esc(r.productCode||'—')+'</strong>'
+      +' &bull; Shorted Bin: <strong>'+esc(r.shortedBin||'—')+'</strong>'
+      +' &bull; Qty Needed: <strong>'+qtyNeeded+' '+esc(r.uom||'EA')+'</strong></div></div>'
+      // Progress bar
+      +'<div style="padding:10px 20px;border-bottom:1px solid var(--border,#e5e7eb);display:flex;align-items:center;gap:12px">'
+      +'<div style="flex:1;background:var(--border,#e5e7eb);height:10px;border-radius:5px">'
+      +'<div style="background:'+statusColor+';height:10px;border-radius:5px;width:'+pct+'%;transition:width .3s"></div></div>'
+      +'<div style="font-size:12px;font-weight:700;color:'+statusColor+';white-space:nowrap">'+statusLabel+'</div></div>'
+      // Locations list
+      +'<div style="padding:0 20px">'
+      +'<div style="display:grid;grid-template-columns:2fr 70px 60px 1fr auto;gap:6px;padding:6px 0;border-bottom:2px solid var(--border,#e5e7eb)">'
+      +'<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Location Bin</div>'
+      +'<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;text-align:center">Qty Found</div>'
+      +'<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;text-align:center">UOM</div>'
+      +'<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Entered By</div>'
+      +'<div></div></div>'
+      +locRows
+      +'</div>'
+      // Add form
+      +'<div style="padding:14px 20px;background:var(--panel2,#f9fafb);border-top:1px solid var(--border,#e5e7eb)">'
+      +'<div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:8px">+ Add a Location</div>'
+      +'<div style="display:grid;grid-template-columns:2fr 80px 65px;gap:8px;margin-bottom:8px">'
+      +'<input id="slBin" placeholder="Bin (e.g. 82-19-04)" style="padding:9px;border:1px solid var(--border);border-radius:7px;font-size:13px;text-transform:uppercase;box-sizing:border-box">'
+      +'<input id="slQty" type="number" min="0" step="1" placeholder="Qty" value="'+remaining+'" style="padding:9px;border:1px solid var(--border);border-radius:7px;font-size:14px;text-align:center;box-sizing:border-box">'
+      +'<input id="slUom" placeholder="UOM" value="'+esc(r.uom||'EA')+'" style="padding:9px;border:1px solid var(--border);border-radius:7px;font-size:13px;text-align:center;box-sizing:border-box">'
+      +'</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'
+      +'<input id="slNotes" placeholder="Notes (optional)" style="padding:9px;border:1px solid var(--border);border-radius:7px;font-size:13px;box-sizing:border-box">'
+      +'<input id="slOnHand" type="number" min="0" placeholder="IC qty on-hand at this bin (optional)" style="padding:9px;border:1px solid var(--border);border-radius:7px;font-size:13px;box-sizing:border-box">'
+      +'</div>'
+      +'<button class="btn primary" onclick="slAdd()" style="width:100%;padding:9px;font-size:14px">+ Add This Location</button>'
+      +'<div id="slErr" style="font-size:12px;color:var(--red,#ef4444);margin-top:6px;display:none"></div>'
+      +'</div>'
+      // Footer
+      +'<div style="padding:14px 20px;border-top:1px solid var(--border,#e5e7eb);display:flex;justify-content:space-between;align-items:center">'
+      +'<button class="btn red" onclick="slClearAll()" style="font-size:12px">&#215; Clear All Locations</button>'
+      +'<div style="display:flex;gap:8px">'
+      +'<button class="btn" onclick="closeSecondLocModal()">Cancel</button>'
+      +'<button class="btn primary" onclick="slSave()">&#10003; Save Locations</button>'
+      +'</div></div></div>';
   }
-  while(true){
-    const bin=prompt('Second location bin used to fill the shortage:','');
-    if(bin===null)break;
-    const cleanBin=bin.trim().toUpperCase();
-    if(!cleanBin){alert('Bin location is required.');continue;}
-    const qty=prompt('Qty filled from this second location:',r.qtyShorted||'');
-    if(qty===null)break;
-    const uom=prompt('UOM:',r.uom||'EA');
-    if(uom===null)break;
-    const onHand=prompt('IC qty on-hand in that second location, optional:','');
-    if(onHand===null)break;
-    const notes=prompt('Notes for this second location, optional:','');
-    locs.push({
-      bin:cleanBin,
-      qty:num(qty),
-      uom:(uom||r.uom||'EA').trim().toUpperCase(),
-      icQtyOnHand:num(onHand),
-      notes:(notes||'').trim(),
-      enteredAt:new Date().toISOString(),
-      enteredBy:role
-    });
-    if(!confirm('Add another second-location bin for this same shortage?'))break;
-  }
-  if(locs.length){
-    await updateRecord(id,{secondLocationFilled:true,secondaryLocations:locs,status:'located'},false);
-  }
+
+  window._slId=id;window._slLocs=locs;window._slRecord=r;
+  renderModal();
+
+  window.slAdd=function(){
+    var bin=(document.getElementById('slBin').value||'').trim().toUpperCase();
+    var qty=parseFloat(document.getElementById('slQty').value)||0;
+    var uom=(document.getElementById('slUom').value||r.uom||'EA').trim().toUpperCase();
+    var notes=(document.getElementById('slNotes').value||'').trim();
+    var onHand=parseFloat(document.getElementById('slOnHand').value)||0;
+    var errEl=document.getElementById('slErr');
+    if(!bin){errEl.textContent='Bin location is required.';errEl.style.display='block';return;}
+    if(qty<=0){errEl.textContent='Qty found must be greater than 0.';errEl.style.display='block';return;}
+    errEl.style.display='none';
+    window._slLocs.push({bin:bin,qty:qty,uom:uom,notes:notes,icQtyOnHand:onHand||null,enteredAt:new Date().toISOString(),enteredBy:role||'clerk'});
+    locs=window._slLocs;
+    renderModal();
+    setTimeout(function(){var b=document.getElementById('slBin');if(b){b.value='';b.focus();}var q=document.getElementById('slQty');if(q)q.value='';},50);
+  };
+
+  window.slRemove=function(i){window._slLocs.splice(i,1);locs=window._slLocs;renderModal();};
+
+  window.slClearAll=function(){
+    if(!confirm('Clear all secondary locations?'))return;
+    window._slLocs=[];locs=[];renderModal();
+  };
+
+  window.slSave=async function(){
+    var totalFilled=window._slLocs.reduce(function(s,l){return s+num(l.qty);},0);
+    var filled=window._slLocs.length>0;
+    var isPartial=filled&&totalFilled<num(window._slRecord.qtyShorted);
+    await updateRecord(window._slId,{
+      secondLocationFilled:filled,
+      secondaryLocations:window._slLocs,
+      qtyFilled:totalFilled,
+      partialShort:isPartial,
+      status:filled?(isPartial?'partial':'located'):'active'
+    },false);
+    closeSecondLocModal();
+  };
 }
+
+function closeSecondLocModal(){
+  var m=document.getElementById('secondLocModal');if(m)m.remove();
+  ['_slId','_slLocs','_slRecord','slAdd','slRemove','slClearAll','slSave'].forEach(function(k){delete window[k];});
+}
+
+
 async function toggleReplenished(id){const r=shortages.find(x=>x.id===id&&!x._archived);if(r)await updateRecord(id,{replenishedAfterPick:!r.replenishedAfterPick})}
 function openEdit(id,archived){
   if(!shortages.length){loadShortages(true).then(function(){openEdit(id,archived);});return;}
@@ -1518,7 +1672,7 @@ function renderReports(){
     </div>
     ${rows.filter(r=>r.secondLocationFilled).length?`<div class="card no-break"><div class="card-title" style="color:var(--green)">2nd Location Finds — Inventory Adjustment Reference</div>${table(['Product Code','Div','Original Bin (Shorted)','2nd Location Bin(s)','Qty Filled','Demand','Picker','Shift','Date','Archived?'],rows.filter(r=>r.secondLocationFilled).map(r=>[r.productCode,r.division,r.shortedBin,secondarySummary(r),Array.isArray(r.secondaryLocations)?r.secondaryLocations.reduce((sum,x)=>sum+num(x.qty),0):'',r.pickDemand,r.picker,shiftLabel(r),normalizeDate(r.date),r._archived?'Yes':'No']))}</div>`:''}
     ${rows.filter(r=>r.replenishedAfterPick).length?`<div class="card no-break"><div class="card-title">Replenished After Pick</div>${table(['Product Code','Bin','Qty','UOM','Demand','Division','Picker','Shift','Date','Archived?'],rows.filter(r=>r.replenishedAfterPick).map(r=>[r.productCode,r.shortedBin,r.qtyShorted,r.uom||'EA',r.pickDemand,r.division,r.picker,shiftLabel(r),normalizeDate(r.date),r._archived?'Yes':'No']))}</div>`:''}
-    ${rows.filter(isErrBackorder).length?`<div class="card no-break"><div class="card-title" style="color:var(--red)">Erroneous Shortages That Likely Became Backorders</div>${table(['Product Code','Bin Location','Qty Shorted','IC Qty Found','UOM','Demand','Picker','Shift','Date','Archived?'],rows.filter(isErrBackorder).map(r=>[r.productCode,r.shortedBin,r.qtyShorted,r.icQtyFound,r.icUom||r.uom,r.pickDemand,r.picker,shiftLabel(r),normalizeDate(r.date),r._archived?'Yes':'No']))}</div>`:''}
+    ${rows.filter(isErrBackorder).length?`<div class="card no-break"><div class="card-title" style="color:var(--red)">Erroneous Shortages That Likely Became Backorders</div>${table(['Product Code','Bin Shorted','Qty Short','2nd Locations','Qty Filled / Needed','Partial?','IC Qty Found','UOM','Demand','Picker','Shift','Date','Archived?'],rows.filter(isErrBackorder).map(r=>[r.productCode,r.shortedBin,r.qtyShorted,(()=>{var locs=Array.isArray(r.secondaryLocations)?r.secondaryLocations:[];return locs.length?(locs.map(function(l){return l.bin+(l.qty?' x'+l.qty:'');}).join(' | ')):'—';})(),(()=>{var locs=Array.isArray(r.secondaryLocations)?r.secondaryLocations:[];return locs.length?(locs.reduce(function(s,l){return s+num(l.qty);},0)+' / '+r.qtyShorted):'—';})(),r.partialShort?'Partial':'',r.icQtyFound,r.icUom||r.uom,r.pickDemand,r.picker,shiftLabel(r),normalizeDate(r.date),r._archived?'Yes':'No']))}</div>`:''}
   `;
 }
 
@@ -1564,6 +1718,8 @@ function printSummaryReport(){
     const d=r.division||'??';if(!byDiv[d])byDiv[d]={total:0,s1:0,s2:0,located:0,erroneous:0,notLoc:0};
     byDiv[d].total++;const _sh=getShiftFromRecord(r);if(_sh===1)byDiv[d].s1++;else if(_sh===3)byDiv[d].swot=((byDiv[d].swot||0)+1);else byDiv[d].s2++;
     if(r.foundInShortedBin)byDiv[d].erroneous++;else if(r.secondLocationFilled)byDiv[d].located++;else byDiv[d].notLoc++;
+    if(r.pickDemand){if(!byDiv[d].demands)byDiv[d].demands=new Set();byDiv[d].demands.add(r.pickDemand);}
+    if(r.productCode){if(!byDiv[d].products)byDiv[d].products=new Set();byDiv[d].products.add(r.productCode);}
   });
   const byPicker={};
   rows.forEach(r=>{
@@ -1678,7 +1834,29 @@ function printSummaryReport(){
       </tbody>
     </table></div>`:''}
 
-    ${rows.filter(r=>r.icConfirmed==='confirmed_short').length?`
+    
+    <div style="page-break-before:always;page-break-inside:avoid">
+    <div style="font-size:8pt;font-weight:700;color:#1a2038;letter-spacing:.1em;text-transform:uppercase;border-bottom:2pt solid #1a2038;padding-bottom:4pt;margin:0 0 12pt">Pick Demands Affected — By Division</div>
+    ${Object.entries(byDiv).sort((a,b)=>a[0].localeCompare(b[0])).filter(([d,v])=>(v.demands&&v.demands.size)||(v.products&&v.products.size)).map(([div,v])=>{
+      const demands=[...(v.demands||[])].sort();
+      const products=[...(v.products||[])].sort();
+      return `<div style="page-break-inside:avoid;margin-bottom:10pt;border:1pt solid #d1d5db;border-radius:4pt;overflow:hidden">
+        <div style="background:#1a2038;color:#fff;padding:5pt 8pt;font-size:8pt;font-weight:700;display:flex;justify-content:space-between;align-items:center">
+          <span>${esc(div)}</span>
+          <span style="font-weight:400;opacity:.75;font-size:7.5pt">${v.total} shortage${v.total!==1?'s':''} &bull; ${demands.length} pick demand${demands.length!==1?'s':''} &bull; ${products.length} product${products.length!==1?'s':''}</span>
+        </div>
+        ${demands.length?`<div style="padding:6pt 8pt;border-bottom:1pt solid #e5e7eb">
+          <div style="font-size:7pt;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5pt">Pick Demand Numbers</div>
+          <div>${demands.map(d=>`<span style="display:inline-block;margin:1.5pt 3pt 1.5pt 0;padding:2pt 7pt;font-family:'Courier New',monospace;font-size:8pt;background:#eff6ff;border:0.5pt solid #93c5fd;border-radius:3pt;color:#1d4ed8;font-weight:700">${esc(d)}</span>`).join('')}</div>
+        </div>`:''}
+        ${products.length?`<div style="padding:6pt 8pt">
+          <div style="font-size:7pt;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5pt">Product Codes Affected</div>
+          <div>${products.map(p=>`<span style="display:inline-block;margin:1.5pt 3pt 1.5pt 0;padding:2pt 7pt;font-family:'Courier New',monospace;font-size:8pt;background:#f0fdf4;border:0.5pt solid #86efac;border-radius:3pt;color:#166534;font-weight:700">${esc(p)}</span>`).join('')}</div>
+        </div>`:''}
+      </div>`;
+    }).join('')}
+    </div>
+${rows.filter(r=>r.icConfirmed==='confirmed_short').length?`
     <div style="page-break-before:always;page-break-inside:avoid">
     <div style="font-size:8pt;font-weight:700;color:#047857;letter-spacing:.1em;text-transform:uppercase;border-bottom:1pt solid #d1fae5;padding-bottom:4pt;margin:14pt 0 8pt">✓ Confirmed Short Bins — Full Detail</div>
     <table style="width:100%;border-collapse:collapse;font-size:8pt;margin-bottom:16pt">
@@ -2942,6 +3120,44 @@ function printOverPullReport(){
         }).join('')}
       </tbody>
     </table></div>
+
+
+    <!-- Orders by Division -->
+    <div style="page-break-before:always;page-break-inside:avoid">
+    <div style="font-size:8pt;font-weight:700;color:#1a2038;letter-spacing:.1em;text-transform:uppercase;border-bottom:2pt solid #1a2038;padding-bottom:4pt;margin:0 0 12pt">Orders Affected — By Division</div>
+    ${Object.entries(byDiv).sort((a,b)=>a[0].localeCompare(b[0])).map(([div,v])=>{
+      const orderKeys=Object.keys(v.orderDetails||{}).sort();
+      return `<div style="page-break-inside:avoid;margin-bottom:12pt;border:1pt solid #d1d5db;border-radius:4pt;overflow:hidden">
+        <div style="background:#1a2038;color:#fff;padding:5pt 8pt;font-size:8pt;font-weight:700;display:flex;justify-content:space-between;align-items:center">
+          <span>Division: ${esc(div)}</span>
+          <span style="font-weight:400;opacity:.75;font-size:7.5pt">${v.lines} line${v.lines!==1?'s':''} &bull; ${num(v.qty)} units &bull; ${orderKeys.length} order${orderKeys.length!==1?'s':''}</span>
+        </div>
+        <div style="padding:6pt 8pt;border-bottom:1pt solid #e5e7eb">
+          <div style="font-size:7pt;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5pt">Pickers: ${[...v.pickers].sort().join(', ')||'—'} &bull; Packers: ${[...v.packers].sort().join(', ')||'—'} &bull; Stations: ${[...v.stations].sort().join(', ')||'—'}</div>
+        </div>
+        ${orderKeys.length?`<table style="width:100%;border-collapse:collapse;font-size:8pt">
+          <thead><tr>
+            <th style="background:#92400e;color:#fff;padding:4pt 6pt;text-align:left;font-size:7.5pt">Order #</th>
+            <th style="background:#92400e;color:#fff;padding:4pt 6pt;text-align:left;font-size:7.5pt">Qty Over-Pulled</th>
+            <th style="background:#92400e;color:#fff;padding:4pt 6pt;text-align:left;font-size:7.5pt">Products Involved</th>
+            <th style="background:#92400e;color:#fff;padding:4pt 6pt;text-align:left;font-size:7.5pt">Packers</th>
+          </tr></thead>
+          <tbody>
+            ${orderKeys.map((o,i)=>{
+              const od=v.orderDetails[o];
+              const bg=i%2===0?'#fff':'#fff7ed';
+              return `<tr style="background:${bg}">
+                <td style="padding:4pt 6pt;border-bottom:.5pt solid #fed7aa;font-family:'Courier New',monospace;font-weight:700;color:#1d4ed8;font-size:8.5pt">${esc(o)}</td>
+                <td style="padding:4pt 6pt;border-bottom:.5pt solid #fed7aa;font-family:'Courier New',monospace;font-weight:700;color:#92400e">${od.qty}</td>
+                <td style="padding:4pt 6pt;border-bottom:.5pt solid #fed7aa;font-family:'Courier New',monospace;font-size:7.5pt">${[...od.products].sort().join(', ')||'—'}</td>
+                <td style="padding:4pt 6pt;border-bottom:.5pt solid #fed7aa;font-size:7.5pt">${[...od.packers].sort().join(', ')||'—'}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>`:'<div style="padding:6pt 8pt;font-size:8pt;color:#6b7280">No order details.</div>'}
+      </div>`;
+    }).join('')}
+    </div>
 
     <!-- Full Detail Log -->
     <div style="page-break-before:always;page-break-inside:avoid">
