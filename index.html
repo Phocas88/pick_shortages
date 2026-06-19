@@ -1011,24 +1011,20 @@ async function runOverPullReport(){
   var body=document.getElementById('opReportBody');
   if(!body)return;
   body.innerHTML='<div class="empty" style="padding:32px;text-align:center">Loading...</div>';
-
   showLoading('Loading over pull records...');
-  try{
-    await opLoadRecords(true);
-  }catch(e){}
+  try{await opLoadRecords(true);}catch(e){}
   hideLoading();
 
   var from=startStr?new Date(startStr+'T00:00:00'):null;
   var to  =endStr  ?new Date(endStr  +'T23:59:59'):null;
-
   var rows=(opRecords||[]).filter(function(r){
-    var d=new Date(r.dateTime||r.date||r.createdAt||'');
+    var d=new Date(r.date||r.dateTime||r.createdAt||'');
     if(from&&d<from)return false;
     if(to  &&d>to  )return false;
     if(picker&&r.picker!==picker)return false;
     return true;
   }).sort(function(a,b){
-    return new Date(b.dateTime||b.date||b.createdAt||0)-new Date(a.dateTime||a.date||a.createdAt||0);
+    return new Date(b.date||b.dateTime||b.createdAt||0)-new Date(a.date||a.dateTime||a.createdAt||0);
   });
 
   if(!rows.length){
@@ -1036,75 +1032,165 @@ async function runOverPullReport(){
     return;
   }
 
-  // Summary stats
-  var totalItems=rows.reduce(function(s,r){
-    if(Array.isArray(r.items))return s+r.items.reduce(function(ss,i){return ss+(parseInt(i.qty)||0);},0);
-    if(Array.isArray(r.orders))return s+r.orders.reduce(function(ss,o){return ss+(parseInt(o.qty)||0);},0);
-    return s+1;
-  },0);
+  // ── helpers ────────────────────────────────────────────
+  var num=function(v){return parseFloat(v)||0;};
+  var fmtDate=function(v){return v?new Date(v).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'-';};
+  var pickerName=function(n){var p=pickerProfiles&&pickerProfiles[n];return(p&&p.fullName&&p.fullName!==n)?p.fullName:n||'-';};
 
-  // By picker
+  // ── totals ────────────────────────────────────────────
+  var totalQty=rows.reduce(function(s,r){return s+num(r.qty);},0);
+  var startLabel=from?fmtDate(from):'Start';
+  var endLabel  =to  ?fmtDate(to)  :'Today';
+  var dateLabel =(from||to)?(startLabel+' – '+endLabel):'All Dates';
+  var pickerLabel=picker?(pickerName(picker)+(picker?(' ('+picker+')'):'')):'All Pickers';
+
+  // ── by picker ─────────────────────────────────────────
   var byPicker={};
   rows.forEach(function(r){
-    var n=r.picker||'Unknown';
-    byPicker[n]=(byPicker[n]||0)+1;
+    var p=r.picker||'—';
+    if(!byPicker[p])byPicker[p]={lines:0,qty:0,orders:new Set(),divs:new Set(),stations:new Set()};
+    byPicker[p].lines++;byPicker[p].qty+=num(r.qty);
+    if(r.orderNumber)byPicker[p].orders.add(r.orderNumber);
+    if(r.division)byPicker[p].divs.add(r.division);
+    if(r.packStation)byPicker[p].stations.add(r.packStation);
   });
 
-  // By division
+  // ── by packer ─────────────────────────────────────────
+  var byPacker={};
+  rows.forEach(function(r){
+    var p=r.packer||'—';
+    if(!byPacker[p])byPacker[p]={lines:0,qty:0,orders:new Set(),divs:new Set()};
+    byPacker[p].lines++;byPacker[p].qty+=num(r.qty);
+    if(r.orderNumber)byPacker[p].orders.add(r.orderNumber);
+    if(r.division)byPacker[p].divs.add(r.division);
+  });
+
+  // ── by pack station ───────────────────────────────────
+  var byStation={};
+  rows.forEach(function(r){
+    var s=r.packStation||'—';
+    if(!byStation[s])byStation[s]={lines:0,qty:0,pickers:new Set(),divs:new Set()};
+    byStation[s].lines++;byStation[s].qty+=num(r.qty);
+    if(r.picker)byStation[s].pickers.add(r.picker);
+    if(r.division)byStation[s].divs.add(r.division);
+  });
+
+  // ── by division ───────────────────────────────────────
   var byDiv={};
   rows.forEach(function(r){
-    var d=r.division||'?';
-    byDiv[d]=(byDiv[d]||0)+1;
+    var d=r.division||'—';
+    if(!byDiv[d])byDiv[d]={lines:0,qty:0,pickers:new Set(),packers:new Set(),orders:new Set()};
+    byDiv[d].lines++;byDiv[d].qty+=num(r.qty);
+    if(r.picker)byDiv[d].pickers.add(r.picker);
+    if(r.packer)byDiv[d].packers.add(r.packer);
+    if(r.orderNumber)byDiv[d].orders.add(r.orderNumber);
   });
 
-  var fmtD=function(d){return d?new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'-';};
-  var dateLabel=from||to ? ((from?fmtD(from):'Start')+' – '+(to?fmtD(to):'Today')) : 'All Dates';
-  var pickerLabel=picker?((pickerProfiles[picker]&&pickerProfiles[picker].fullName)||picker):'All Pickers';
+  // ── build table helper ────────────────────────────────
+  var tbl=function(headers,rowsData,colStyles){
+    var thCss='padding:6px 10px;text-align:left;background:var(--accent,#6366f1);color:#fff;font-size:12px;white-space:nowrap;';
+    var ths=headers.map(function(h,i){return '<th style="'+thCss+(colStyles&&colStyles[i]?colStyles[i]:'')+'">'+h+'</th>';}).join('');
+    var trs=rowsData.map(function(cells,ri){
+      var tds=cells.map(function(c,i){
+        return '<td style="padding:5px 10px;border-bottom:1px solid var(--border,#e5e7eb);font-size:13px;'+(colStyles&&colStyles[i]?colStyles[i]:'')+'">'+c+'</td>';
+      }).join('');
+      return '<tr style="background:'+(ri%2===0?'var(--surface,#fff)':'var(--panel2,#f9fafb)')+'">'+tds+'</tr>';
+    }).join('');
+    return '<table style="width:100%;border-collapse:collapse;margin-bottom:16px"><thead><tr>'+ths+'</tr></thead><tbody>'+trs+'</tbody></table>';
+  };
 
-  // Stat cards
-  var statsHtml='<div class="stat-grid" style="margin-bottom:16px">'
-    +'<div class="stat-card"><div class="stat-num">'+rows.length+'</div><div class="stat-label">Total Records</div></div>'
-    +'<div class="stat-card"><div class="stat-num">'+totalItems+'</div><div class="stat-label">Total Items Over-Pulled</div></div>'
-    +'<div class="stat-card"><div class="stat-num">'+Object.keys(byPicker).length+'</div><div class="stat-label">Pickers Involved</div></div>'
-    +'<div class="stat-card"><div class="stat-num">'+Object.keys(byDiv).length+'</div><div class="stat-label">Divisions</div></div>'
+  var sec=function(title,html){
+    return '<div style="margin-bottom:20px"><div style="font-size:14px;font-weight:700;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid var(--accent,#6366f1)">'+title+'</div>'+html+'</div>';
+  };
+
+  // ── stat cards ────────────────────────────────────────
+  var statCard=function(num2,label){
+    return '<div style="background:var(--surface,#fff);border:1px solid var(--border,#e5e7eb);border-radius:10px;padding:14px 18px;text-align:center">'
+      +'<div style="font-size:24px;font-weight:800;color:var(--accent,#6366f1)">'+num2+'</div>'
+      +'<div style="font-size:11px;color:var(--muted,#6b7280);font-weight:600;text-transform:uppercase;margin-top:2px">'+label+'</div></div>';
+  };
+  var statsHtml='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:20px">'
+    +statCard(rows.length,'Total Records')
+    +statCard(totalQty,'Total Qty Over-Pulled')
+    +statCard(Object.keys(byPicker).filter(function(k){return k!=='—';}).length,'Pickers Involved')
+    +statCard(Object.keys(byPacker).filter(function(k){return k!=='—';}).length,'Packers Involved')
+    +statCard(Object.keys(byDiv).filter(function(k){return k!=='—';}).length,'Divisions')
+    +statCard(Object.keys(byStation).filter(function(k){return k!=='—';}).length,'Pack Stations')
     +'</div>';
 
-  // By picker breakdown
-  var pickerRows=Object.entries(byPicker).sort(function(a,b){return b[1]-a[1];}).map(function(e){
-    var full=(pickerProfiles[e[0]]&&pickerProfiles[e[0]].fullName)||e[0];
-    return '<tr><td>'+esc(full)+'</td><td style="font-family:var(--mono);font-size:12px">'+esc(e[0])+'</td><td style="text-align:right;font-weight:700">'+e[1]+'</td></tr>';
-  }).join('');
+  // ── section: by picker ────────────────────────────────
+  var pickerRowsData=Object.entries(byPicker).filter(function(e){return e[0]!=='—';})
+    .sort(function(a,b){return b[1].lines-a[1].lines;})
+    .map(function(e){
+      return [esc(pickerName(e[0])),esc(e[0]),e[1].lines,e[1].qty||'-',
+        esc([...e[1].divs].sort().join(', ')||'—'),
+        esc([...e[1].stations].sort().join(', ')||'—')];
+    });
+  var pickerTbl=tbl(['Full Name','Canonical','Records','Qty','Divisions','Stations'],pickerRowsData);
 
-  // Detail table
-  var detailRows=rows.map(function(r){
-    var full=(pickerProfiles[r.picker]&&pickerProfiles[r.picker].fullName)||r.picker||'-';
-    var items=[];
-    if(Array.isArray(r.items))items=r.items;
-    else if(Array.isArray(r.orders))items=r.orders;
-    var itemStr=items.map(function(i){return (i.productCode||i.product||'')+(i.qty?' x'+i.qty:'');}).join(', ')||'-';
-    var dt=r.dateTime||r.date||r.createdAt||'';
-    return '<tr>'
-      +'<td style="font-size:12px">'+esc(dt?new Date(dt).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'')+'</td>'
-      +'<td>'+esc(full)+'</td>'
-      +'<td style="font-size:11px;color:var(--muted)">'+esc(r.division||'')+'</td>'
-      +'<td style="font-size:11px;color:var(--muted)">'+esc(r.packStation||'')+'</td>'
-      +'<td style="font-size:12px">'+esc(itemStr)+'</td>'
-      +'</tr>';
-  }).join('');
+  // ── section: by packer ────────────────────────────────
+  var packerRowsData=Object.entries(byPacker).filter(function(e){return e[0]!=='—';})
+    .sort(function(a,b){return b[1].lines-a[1].lines;})
+    .map(function(e){
+      return [esc(e[0]),e[1].lines,e[1].qty||'-',esc([...e[1].divs].sort().join(', ')||'—')];
+    });
+  var packerTbl=tbl(['Packer','Records','Qty','Divisions'],packerRowsData);
+
+  // ── section: by pack station ──────────────────────────
+  var stationRowsData=Object.entries(byStation).filter(function(e){return e[0]!=='—';})
+    .sort(function(a,b){return b[1].lines-a[1].lines;})
+    .map(function(e){
+      return [esc(e[0]),e[1].lines,e[1].qty||'-',
+        esc([...e[1].pickers].map(pickerName).join(', ')||'—'),
+        esc([...e[1].divs].sort().join(', ')||'—')];
+    });
+  var stationTbl=tbl(['Pack Station','Records','Qty','Pickers','Divisions'],stationRowsData);
+
+  // ── section: by division ──────────────────────────────
+  var divRowsData=Object.entries(byDiv).filter(function(e){return e[0]!=='—';})
+    .sort(function(a,b){return b[1].lines-a[1].lines;})
+    .map(function(e){
+      return [esc(e[0]),e[1].lines,e[1].qty||'-',e[1].orders.size,
+        esc([...e[1].pickers].map(pickerName).join(', ')||'—')];
+    });
+  var divTbl=tbl(['Division','Records','Qty','Unique Orders','Pickers'],divRowsData);
+
+  // ── detail table ──────────────────────────────────────
+  var detailRowsData=rows.map(function(r){
+    var dt=r.date||r.dateTime||r.createdAt||'';
+    var dateStr=dt?new Date(dt).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'-';
+    var shift=r.shift?r.shift:'—';
+    return [
+      dateStr,
+      esc(pickerName(r.picker||'')),
+      esc(r.packer||'—'),
+      esc(r.division||'—'),
+      esc(r.packStation||'—'),
+      esc(r.orderNumber||'—'),
+      r.productCode?esc(r.productCode):'—',
+      r.qty||'—',
+      esc(shift)
+    ];
+  });
+  var detailTbl=tbl(['Date','Picker','Packer','Div','Station','Order #','Product','Qty','Shift'],detailRowsData);
 
   body.innerHTML='<div class="card" style="margin-top:16px" id="opReportContent">'
-    +'<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;flex-wrap:wrap;gap:6px">'
-    +'<div><div style="font-size:16px;font-weight:700">Over Pull Report</div>'
-    +'<div style="font-size:12px;color:var(--muted)">'+esc(dateLabel)+' &bull; '+esc(pickerLabel)+'</div></div></div>'
+    +'<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;flex-wrap:wrap;gap:6px">'
+    +'<div>'
+    +'<div style="font-size:18px;font-weight:800">Over Pull Report</div>'
+    +'<div style="font-size:12px;color:var(--muted,#6b7280);margin-top:2px">'+esc(dateLabel)+' &bull; '+esc(pickerLabel)+'</div>'
+    +'</div>'
+    +'<button class="btn" onclick="reportPinGate(printOverPullReportFromBody)" style="font-size:12px">&#128438; Print This Report</button>'
+    +'</div>'
     +statsHtml
-    +'<div style="font-size:13px;font-weight:700;margin-bottom:8px;margin-top:4px">By Picker</div>'
-    +'<table style="width:100%;margin-bottom:16px"><thead><tr><th>Full Name</th><th>Canonical</th><th style="text-align:right">Records</th></tr></thead>'
-    +'<tbody>'+pickerRows+'</tbody></table>'
-    +'<div style="font-size:13px;font-weight:700;margin-bottom:8px">Detail</div>'
-    +'<table style="width:100%"><thead><tr><th>Date</th><th>Picker</th><th>Div</th><th>Station</th><th>Items</th></tr></thead>'
-    +'<tbody>'+detailRows+'</tbody></table>'
+    +sec('By Picker', pickerRowsData.length?pickerTbl:'<div style="color:var(--muted);font-size:13px">No picker data.</div>')
+    +sec('By Packer', packerRowsData.length?packerTbl:'<div style="color:var(--muted);font-size:13px">No packer data.</div>')
+    +sec('By Pack Station', stationRowsData.length?stationTbl:'<div style="color:var(--muted);font-size:13px">No station data.</div>')
+    +sec('By Division', divRowsData.length?divTbl:'<div style="color:var(--muted);font-size:13px">No division data.</div>')
+    +sec('Detail', detailTbl)
     +'</div>';
 }
+
 
 function printOverPullReportFromBody(){
   var el=document.getElementById('opReportContent');
