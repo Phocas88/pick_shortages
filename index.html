@@ -173,7 +173,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 <section id="pinScreen" class="screen"><div class="pin-card"><div id="pinBadge" class="pin-div-badge">Role</div><p style="color:var(--muted);font-size:12px">Enter PIN</p><div id="pinDots" class="pin-dots"><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span></div><div class="pin-keypad"><button class="pin-key" data-key="1" onclick="pinKey('1')">1</button><button class="pin-key" data-key="2" onclick="pinKey('2')">2</button><button class="pin-key" data-key="3" onclick="pinKey('3')">3</button><button class="pin-key" data-key="4" onclick="pinKey('4')">4</button><button class="pin-key" data-key="5" onclick="pinKey('5')">5</button><button class="pin-key" data-key="6" onclick="pinKey('6')">6</button><button class="pin-key" data-key="7" onclick="pinKey('7')">7</button><button class="pin-key" data-key="8" onclick="pinKey('8')">8</button><button class="pin-key" data-key="9" onclick="pinKey('9')">9</button><button class="pin-key clr" onclick="pinClear()">CLR</button><button class="pin-key" data-key="0" onclick="pinKey('0')">0</button><button class="pin-key clr" onclick="pinBack()">&#9003;</button></div><div id="pinError" class="pin-error"></div><button class="pin-back-btn" onclick="backToLogin()">Back</button></div></section>
 <section id="shortageScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Outbound</div><h1>Shortage Entry</h1><p>Log shortage lines and review active records.</p></div><div id="shortageTopActions" class="actions"></div></div><div class="card" id="entryCard"><div class="form-row four"><div class="field"><label>Date &amp; Time</label><input id="sDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="sDiv"><option value="">Select</option><option value="NH">NH</option><option value="GT">GT</option><option value="FS">FS</option><option value="EE">EE</option><option value="BC">BC</option><option value="CF">CF</option><option value="VP">VP – VIP</option><option value="TP">TP – Transpac</option></select></div><div class="field"><label>Picker <em>*</em></label><select id="sPickerSelect" onchange="onPickerSelectChange('sPickerSelect','sPickerNew','sPicker')" style="flex:1"><option value="">-- Select Picker --</option></select>
           <div id="addPickerBtnWrap" style="margin-top:6px;display:none"><button type="button" class="btn" style="font-size:12px;width:100%" onclick="openClerkAddPickerModal()">+ Add New Picker...</button></div><input id="sPicker" type="hidden"></div><div class="field"><label>Pack Station</label><select id="sPackStation"><option value="">-- Select Station --</option></select></div><div class="field"><label>Pick Demand # <em>*</em></label><input id="sDemand" placeholder="e.g. NH00012345" oninput="autoDivisionFromDemand()"></div><div class="field"><label>Shift Override</label><select id="sShift"><option value="auto">Auto (use current time)</option><option value="1st">1st Shift (6am–3:30pm)</option><option value="2nd">2nd Shift (3:30pm–12am)</option><option value="weekend_ot">Weekend OT (6am–12am)</option></select></div></div><div class="card-title">Product Lines</div><div id="productLines"></div><div class="actions"><button class="btn" onclick="addProductLine()">+ Add Line</button><button class="btn" onclick="clearEntry()">Clear Form</button><button class="btn primary" style="flex:1" onclick="saveShortage()">+ Log All Shortages</button></div><div class="field" style="margin-top:12px"><label>Notes</label><textarea id="sNotes"></textarea></div></div><div class="filters"><input id="filterText" class="search" placeholder="Search by product, order, picker, division..." oninput="renderShortages()"><select id="viewMode" onchange="loadShortages(true)"><option value="active">Active</option><option value="archive">Archived History</option><option value="both">Active + Archived</option></select><input id="filterStart" type="date" onchange="renderShortages()"><input id="filterEnd" type="date" onchange="renderShortages()"><button class="btn" onclick="loadShortages(true)">Refresh Data</button></div><div id="archiveActions" class="actions" style="margin-bottom:10px"></div><div id="shortageList" class="shortage-list"></div></div></section>
-<section id="reportScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Reports</div><h1>Shortage Reports</h1><p>IC Team and IC Manager only.</p></div><div class="actions"><button class="btn primary" onclick="reportPinGate(printSummaryReport)">Print Summary</button><button class="btn" onclick="reportPinGate(printCheckReport)">Print IC Check Sheet</button></div></div><div class="card"><div class="form-row four"><div class="field"><label>Report Mode</label><select id="reportMode"><option value="active">Active Only</option><option value="archive">Archived History</option><option value="both">Active + Archived (Default)</option></select></div><div class="field"><label>Start Date</label><input id="reportStart" type="date"></div><div class="field"><label>End Date</label><input id="reportEnd" type="date"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="reportPinGate(runReportPull)">Run Report</button></div></div><div class="notice" style="margin-top:8px;margin-bottom:0"><strong>Tip:</strong> When a date range is selected, both active and archived records for those dates are always included — archived shortages from older periods will appear in the report regardless of mode.</div></div><div id="reportBody"></div></div></section>
+<section id="reportScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Reports</div><h1>Shortage Reports</h1><p>IC Team and IC Manager only.</p></div><div class="actions" style="flex-wrap:wrap;gap:6px"><button class="btn primary" onclick="reportPinGate(printSummaryReport)">Print Summary</button><button class="btn" onclick="reportPinGate(printCheckReport)">Print IC Check Sheet</button><button class="btn orange" onclick="reportPinGate(openOverPullReport)" id="overPullReportBtn">Over Pull Report</button></div></div><div class="card"><div class="form-row four"><div class="field"><label>Report Mode</label><select id="reportMode"><option value="active">Active Only</option><option value="archive">Archived History</option><option value="both">Active + Archived (Default)</option></select></div><div class="field"><label>Start Date</label><input id="reportStart" type="date"></div><div class="field"><label>End Date</label><input id="reportEnd" type="date"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="reportPinGate(runReportPull)">Run Report</button></div></div><div class="notice" style="margin-top:8px;margin-bottom:0"><strong>Tip:</strong> When a date range is selected, both active and archived records for those dates are always included — archived shortages from older periods will appear in the report regardless of mode.</div></div><div id="reportBody"></div><div class="card" style="margin-top:16px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px"><div class="card-title" style="margin:0">&#128666; Over Pull Report</div><button class="btn orange" onclick="reportPinGate(openOverPullReport)">&#128438; Print Over Pull Report</button></div><p style="font-size:13px;color:var(--muted)">Prints all over pull records. Navigate to Over Pull first to filter by date range if needed.</p></div></div></section>
 <section id="restockScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Replenishment</div><h1>Replenishment Report</h1><p>IC Manager only.</p></div><button class="btn primary" onclick="printReplenReport()">Print</button></div><div class="card"><div class="card-title">Inventory Bin Report Import</div><p class="notice">Paste report columns: Bin Name, Product Code, Qty on Hand, Qty Allocated, Unit of Measure.</p><textarea id="binImport" style="width:100%;min-height:160px" placeholder="82-26-01&#9;DI1210&#9;12&#9;0&#9;EA"></textarea><div class="actions" style="margin-top:10px"><button class="btn primary" onclick="saveInventoryBinReport()">Import Bin Report</button></div></div><div id="restockBody"></div></div></section>
 <section id="pickerScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Personnel</div><h1>Manage Pickers &amp; Packers</h1><p>IC Manager only. Names stored as FirstInitialLastName (e.g. JDoe).</p></div></div><div class="card"><div class="card-title">Pickers</div><div class="form-row two"><div class="field"><label>Picker Name (FirstInitialLastName)</label><input id="pickerName" placeholder="JDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPickerManual()">Add Picker</button></div></div><div id="pickerList"></div></div><div class="card"><div class="card-title">Packers</div><div class="form-row two"><div class="field"><label>Packer Name (FirstInitialLastName)</label><input id="packerName" placeholder="MDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackerManual()">Add Packer</button></div></div><div id="packerList"></div></div><div class="card"><div class="card-title">Pack Stations</div><div class="form-row two"><div class="field"><label>Pack Station Name</label><input id="packStationName" placeholder="PS-01"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackStationManual()">Add Station</button></div></div><div id="packStationList"></div></div>
 <div class="card" id="clerkSkippedCard" style="margin-top:16px;border-left:4px solid var(--orange,#f59e0b)">
@@ -278,9 +278,9 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
         <div class="field"><label>Pack Station</label><select id="bpPackStation"><option value="">-- Select Station --</option></select></div>
         <div class="field"><label>Shift</label><select id="bpShift">
           <option value="auto">Auto (use current time)</option>
-          <option value="1st">1st Shift (6am&ndash;3:30pm)</option>
-          <option value="2nd">2nd Shift (3:30pm&ndash;12am)</option>
-          <option value="weekend_ot">Weekend OT (6am&ndash;12am)</option>
+          <option value="1st">1st Shift (6am–3:30pm)</option>
+          <option value="2nd">2nd Shift (3:30pm–12am)</option>
+          <option value="weekend_ot">Weekend OT (6am–12am)</option>
         </select></div>
       </div>
       <div class="card-title" style="margin-top:4px">Orders in this Batch Pick</div>
@@ -315,7 +315,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
   </div>
 
 </div></section>
-<div id="pickedTwiceOverlay" class="overlay"><div class="modal"><div class="modal-head"><h3 id="ptModalTitle">&#9888; Report: Order Picked Twice / Duplicate Pick</h3><button onclick="closePickedTwiceModal()">&#215;</button></div><div class="modal-body"><div class="notice" style="background:var(--orange-l);border-color:rgba(251,146,60,.35);margin-bottom:16px"><b id="ptWhatDoes">What this does:</b> <span id="ptWhatDesc">Flags an entire order as having been picked twice (over-pulled). No product lines needed — the whole order must be returned and investigated. This creates a Duplicate Pick record for IC and management review.</span></div><div class="form-row two"><div class="field"><label>Date &amp; Time <em>*</em></label><input id="ptDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="ptDiv"><option value="">Select</option><option value="NH">NH</option><option value="GT">GT</option><option value="FS">FS</option><option value="EE">EE</option><option value="BC">BC</option><option value="CF">CF</option><option value="VP">VP &ndash; VIP</option><option value="TP">TP &ndash; Transpac</option></select></div><div class="field"><label>Order Number <em>*</em></label><input id="ptDemand" placeholder="e.g. NH.45433" autocomplete="off" autocapitalize="characters" spellcheck="false" style="font-family:var(--mono);font-weight:700;letter-spacing:.06em" oninput="ptAutoDivision()" onblur="ptBlurOrder()"><div id="ptOrderHint" style="display:none;font-size:11px;color:var(--red);margin-top:3px"></div></div><div class="field"><label id="ptPickerLabel">Picker Involved <em>*</em></label><select id="ptPickerSelect" onchange="onPickerSelectChange('ptPickerSelect','ptPickerNew','ptPicker')"><option value="">-- Select Picker --</option></select><input id="ptPicker" type="hidden"></div></div><div class="field"><label>Shift</label><select id="ptShift"><option value="auto">Auto (use current time)</option><option value="1st">1st Shift (6am&ndash;3:30pm)</option><option value="2nd">2nd Shift (3:30pm&ndash;12am)</option><option value="weekend_ot">Weekend OT (6am&ndash;12am)</option></select></div><div class="field"><label id="ptNotesLabel">Notes / Details <em>*</em></label><textarea id="ptNotes" placeholder="Describe what happened — where was the duplicate pick found, who reported it, what action was taken..."></textarea></div><div class="actions" style="margin-top:8px"><button class="btn primary" onclick="savePickedTwice()" id="ptSubmitBtn">&#9888; Submit Duplicate Pick Report</button><button class="btn" onclick="closePickedTwiceModal()" id="ptCancelBtn">Cancel</button></div></div></div>
+<div id="pickedTwiceOverlay" class="overlay"><div class="modal"><div class="modal-head"><h3 id="ptModalTitle">&#9888; Report: Order Picked Twice / Duplicate Pick</h3><button onclick="closePickedTwiceModal()">&#215;</button></div><div class="modal-body"><div class="notice" style="background:var(--orange-l);border-color:rgba(251,146,60,.35);margin-bottom:16px"><b id="ptWhatDoes">What this does:</b> <span id="ptWhatDesc">Flags an entire order as having been picked twice (over-pulled). No product lines needed — the whole order must be returned and investigated. This creates a Duplicate Pick record for IC and management review.</span></div><div class="form-row two"><div class="field"><label>Date &amp; Time <em>*</em></label><input id="ptDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="ptDiv"><option value="">Select</option><option value="NH">NH</option><option value="GT">GT</option><option value="FS">FS</option><option value="EE">EE</option><option value="BC">BC</option><option value="CF">CF</option><option value="VP">VP &ndash; VIP</option><option value="TP">TP &ndash; Transpac</option></select></div><div class="field"><label>Order Number <em>*</em></label><input id="ptDemand" placeholder="e.g. NH.45433" autocomplete="off" autocapitalize="characters" spellcheck="false" style="font-family:var(--mono);font-weight:700;letter-spacing:.06em" oninput="ptAutoDivision()" onblur="ptBlurOrder()"><div id="ptOrderHint" style="display:none;font-size:11px;color:var(--red);margin-top:3px"></div></div><div class="field"><label id="ptPickerLabel">Picker Involved <em>*</em></label><select id="ptPickerSelect" onchange="onPickerSelectChange('ptPickerSelect','ptPickerNew','ptPicker')"><option value="">-- Select Picker --</option></select><input id="ptPicker" type="hidden"></div></div><div class="field"><label>Shift</label><select id="ptShift"><option value="auto">Auto (use current time)</option><option value="1st">1st Shift (6am–3:30pm)</option><option value="2nd">2nd Shift (3:30pm–12am)</option><option value="weekend_ot">Weekend OT (6am–12am)</option></select></div><div class="field"><label id="ptNotesLabel">Notes / Details <em>*</em></label><textarea id="ptNotes" placeholder="Describe what happened — where was the duplicate pick found, who reported it, what action was taken..."></textarea></div><div class="actions" style="margin-top:8px"><button class="btn primary" onclick="savePickedTwice()" id="ptSubmitBtn">&#9888; Submit Duplicate Pick Report</button><button class="btn" onclick="closePickedTwiceModal()" id="ptCancelBtn">Cancel</button></div></div></div>
 <div id="editOverlay" class="overlay"><div class="modal"><div class="modal-head"><h3>Edit Shortage</h3><button onclick="closeEdit()">&#215;</button></div><div id="editBody" class="modal-body"></div></div></div>
 <div id="icConfirmOverlay" class="ic-confirm-overlay">
   <div class="ic-confirm-modal">
@@ -895,7 +895,7 @@ function getShiftFromRecord(r){
   const sv=r.shift||'';
   if(sv==='1st'||sv===1||sv==='1')return 1;
   if(sv==='2nd'||sv===2||sv==='2')return 2;
-  if(sv==='weekend_ot'||sv==='3rd'||sv===3||sv==='3')return 3;
+  if(sv==='weekend_ot'||sv==='weekend_ot'||sv===3||sv==='3')return 3;
   return getShiftNum(r.date||r.createdAt||'');
 }
 function shiftLabel(r){
@@ -1398,6 +1398,8 @@ function importPickersFromFile(event){
 // ════════════════════════════════════════════════════════
 // EDIT PICKER PROFILE
 // ════════════════════════════════════════════════════════
+function closeEditPickerModal(){var m=document.getElementById("editPickerModal");if(m)m.remove();}
+
 function openEditPickerProfile(name){
   if(!name)return;
   var prof=(pickerProfiles&&pickerProfiles[name])||{status:'active',shift:'',fullName:name,suffix:''};
@@ -1420,9 +1422,9 @@ function openEditPickerProfile(name){
     +'<div><label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:4px">Shift</label>'
     +'<select id="epShift" style="width:100%;padding:9px;border:1px solid var(--border);border-radius:8px;font-size:14px">'
     +'<option value="">Not Set</option>'
-    +'<option value="1st"'+(prof.shift==="1st"?" selected":"")+'>1st Shift (6am–2:30pm)</option>'
-    +'<option value="2nd"'+(prof.shift==="2nd"?" selected":"")+'>2nd Shift (2:30pm–11pm)</option>'
-    +'<option value="3rd"'+(prof.shift==="3rd"?" selected":"")+'>3rd Shift (11pm–7am)</option>'
+    +'<option value="1st"'+(prof.shift==="1st"?" selected":"")+'>1st Shift (6am–3:30pm)</option>'
+    +'<option value="2nd"'+(prof.shift==="2nd"?" selected":"")+'>2nd Shift (3:30pm–12am)</option>'
+    +'<option value="weekend_ot"'+(prof.shift==="weekend_ot"?" selected":"")+'>Weekend OT (6am–12am)</option>'
     +'</select></div>'
     +'<div><label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:4px">Status</label>'
     +'<select id="epStatus" style="width:100%;padding:9px;border:1px solid var(--border);border-radius:8px;font-size:14px">'
@@ -1431,7 +1433,7 @@ function openEditPickerProfile(name){
     +'</select></div>'
     +'<div id="epError" style="font-size:12px;color:var(--red);display:none"></div></div>'
     +'<div style="padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end">'
-    +'<button class="btn" onclick="var m=document.getElementById(\"editPickerModal\");if(m)m.remove()">Cancel</button>'
+    +'<button class="btn" onclick="closeEditPickerModal()">Cancel</button>'
     +'<button class="btn primary" data-picker="'+esc(name)+'" onclick="savePickerProfileEdit(this.dataset.picker)">&#10003; Save</button>'
     +'</div></div>';
   document.body.appendChild(el);
@@ -1476,9 +1478,9 @@ function showClerkStep(){
   if(s===4){
     fieldHtml='<select id="capField" style="width:100%;padding:14px;border:2px solid var(--accent,#6366f1);border-radius:10px;font-size:17px;box-sizing:border-box">'
       +'<option value="">-- Select Shift --</option>'
-      +'<option value="1st">1st Shift (6am – 2:30pm)</option>'
-      +'<option value="2nd">2nd Shift (2:30pm – 11pm)</option>'
-      +'<option value="3rd">3rd Shift (11pm – 7am)</option>'
+      +'<option value="1st">1st Shift (6am–3:30pm)</option>'
+      +'<option value="2nd">2nd Shift (3:30pm–12am)</option>'
+      +'<option value="weekend_ot">Weekend OT (6am–12am)</option>'
       +'</select>';
   } else {
     fieldHtml='<input id="capField" placeholder="'+ph[s]+'" autocomplete="off" '
@@ -1569,7 +1571,7 @@ function renderPickers(){
     if(shiftF&&prof.shift!==shiftF)return false;
     return true;
   });
-  var SHIFT_LABEL={'1st':'1st (6am)','2nd':'2nd (2:30pm)','3rd':'3rd (11pm)'};
+  var SHIFT_LABEL={'1st':'1st (6am–3:30pm)','2nd':'2nd (3:30pm–12am)','weekend_ot':'Weekend OT'};
   var listEl=$('pickerList');
   if(!listEl)return;
   if(!filtered.length){listEl.innerHTML='<div class="empty" style="padding:24px">No pickers match the filter.</div>';return;}
@@ -1710,7 +1712,16 @@ function addPackStationManual(){
   $('packStationName').value='';
   renderPickers();
 }
-function removePicker(n){pickerNames=pickerNames.filter(p=>p!==n);localStorage.setItem('scp_pickers',JSON.stringify(pickerNames));renderPickers();}
+function removePicker(n){
+  if(!confirm('Remove picker '+n+'? This cannot be undone.'))return;
+  pickerNames=pickerNames.filter(function(p){return p!==n;});
+  if(pickerProfiles&&pickerProfiles[n])delete pickerProfiles[n];
+  localStorage.setItem('scp_pickers',JSON.stringify(pickerNames));
+  localStorage.removeItem('scp_personnel_cache');
+  setPersonnelInFirestore();
+  populatePickerSelects();
+  renderPickers();
+}
 function removePacker(n){packerNames=packerNames.filter(p=>p!==n);localStorage.setItem('scp_packers',JSON.stringify(packerNames));renderPickers();}
 function removePackStation(s){packStations=packStations.filter(p=>p!==s);localStorage.setItem('scp_packstations',JSON.stringify(packStations));renderPickers();}
 // Keep old addPicker alias for any legacy calls
@@ -2204,6 +2215,16 @@ async function opUnarchiveSelected(){
   }catch(e){hideLoading();alert('Unarchive failed: '+e.message);}
 }
 
+
+async function openOverPullReport(){
+  // Load overpull records if not already loaded
+  if(!opRecords||!opRecords.length){
+    showLoading('Loading over pull records...');
+    try{await opLoadRecords(true);}catch(e){}
+    hideLoading();
+  }
+  printOverPullReport();
+}
 function printOverPullReport(){
   const rows=opFilteredRows();
   if(!rows.length){alert('No over pull records in selected range.');return;}
