@@ -1308,10 +1308,11 @@ function rowHtml(r){
       </div></div>
     </div>`;
   }
-  const chk=canManage()&&!r._archived?`<input class="sr-check" type="checkbox" data-id="${esc(r.id)}">`:'';const edit=canRunReports()?`<button class="btn" onclick="openEdit('${esc(r.id)}',${r._archived})">${t('btn.edit')}</button>`:'';const mark=!r._archived&&canRunReports()?`<button class="btn green" onclick="markErroneous('${esc(r.id)}')">${t('btn.found_bin')}</button><button class="btn" onclick="toggleSecond('${esc(r.id)}')">${t('btn.second_loc')}</button><button class="btn" onclick="toggleReplenished('${esc(r.id)}')">${t('btn.replenished')}</button>`:'';const unarch=r._archived&&canManage()?`<button class="btn orange" onclick="unarchiveOne('${esc(r.id)}')">${t('btn.unarchive')}</button>`:'';const sec=secondarySummary(r);
+  const chk=canManage()&&!r._archived?`<input class="sr-check" type="checkbox" data-id="${esc(r.id)}">`:'';const _canAct=canRunReports()||role==='clerk';const edit=_canAct?`<button class="btn" onclick="openEdit('${esc(r.id)}',${r._archived})">${t('btn.edit')}</button>`:'';const mark=!r._archived&&_canAct?`<button class="btn green" onclick="markErroneous('${esc(r.id)}')">${t('btn.found_bin')}</button><button class="btn" onclick="toggleSecond('${esc(r.id)}')">${t('btn.second_loc')}</button><button class="btn orange" onclick="openPartialShortModal('${esc(r.id)}')">½ Partial Short</button><button class="btn" onclick="toggleReplenished('${esc(r.id)}')">${t('btn.replenished')}</button>`:'';const unarch=r._archived&&canManage()?`<button class="btn orange" onclick="unarchiveOne('${esc(r.id)}')">${t('btn.unarchive')}</button>`:'';const sec=secondarySummary(r);
   const _qtyNeeded=num(r.qtyShorted)||0;
   const _qtyFilled=(Array.isArray(r.secondaryLocations)?r.secondaryLocations:[]).reduce(function(s,l){return s+num(l.qty);},0);
-  const _partialTag=r.secondLocationFilled&&_qtyFilled>0&&_qtyFilled<_qtyNeeded?' <span style="color:var(--orange);font-size:11px;font-weight:700">(Partial: '+_qtyFilled+' of '+_qtyNeeded+' filled)</span>':'';
+  const _partialTag=(r.secondLocationFilled&&_qtyFilled>0&&_qtyFilled<_qtyNeeded)?' <span style="color:var(--orange);font-size:11px;font-weight:700">(2nd loc: '+_qtyFilled+' of '+_qtyNeeded+' filled)</span>':'';
+  const _origPartialLine=r.partialShort&&r.qtyInOriginalBin!=null?('<div class="sr-meta" style="color:var(--orange);font-size:12px">½ Partial — '+r.qtyInOriginalBin+' pulled from bin, '+r.qtyShorted+' still short'+(r.partialNotes?' · '+esc(r.partialNotes):'')+' </div>'):''; 
   const icFoundLine=r.icQtyFound?`<div class="sr-meta" style="color:var(--green)">&#10003; ${t('row.ic_found')}: ${esc(r.icQtyFound)} ${esc(r.icUom||r.uom||'')}${r.icNotes?' &bull; '+esc(r.icNotes):''}</div>`:'';
   const badges=statusBadges(r);
   return `<div class="shortage-row ${r._archived?'archived':''} ${r.foundInShortedBin?'erroneous':''}">
@@ -1323,7 +1324,7 @@ function rowHtml(r){
         </div>
         <div class="sr-meta" style="margin-top:4px">${esc(r.date||'No date')} &bull; <strong>${esc(r.division||'')}</strong> &bull; ${t('row.qty')} <strong>${esc(r.qtyShorted||'')} ${esc(r.uom||'')}</strong> &bull; ${t('row.demand')} ${esc(r.pickDemand||'')} &bull; ${t('row.picker')} ${esc(r.picker||'')}${r.packStation?' &bull; '+esc(r.packStation):''}</div>
         ${icFoundLine}
-        ${sec?`<div class="sr-meta"><strong>${t('row.second_filled')}</strong>${_partialTag} ${esc(sec)}</div>`:''}
+        ${_origPartialLine||''}${sec?`<div class="sr-meta"><strong>${t('row.second_filled')}</strong>${_partialTag} ${esc(sec)}</div>`:''}
         <div class="sr-actions" style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">${edit}${mark}${unarch}</div>
       </div>
     </div>
@@ -1835,8 +1836,49 @@ function printSummaryReport(){
     </table></div>`:''}
 
     
+    
     <div style="page-break-before:always;page-break-inside:avoid">
-    <div style="font-size:8pt;font-weight:700;color:#1a2038;letter-spacing:.1em;text-transform:uppercase;border-bottom:2pt solid #1a2038;padding-bottom:4pt;margin:0 0 12pt">Pick Demands Affected — By Division</div>
+    <div style="font-size:8pt;font-weight:700;color:#1a2038;letter-spacing:.1em;text-transform:uppercase;border-bottom:2pt solid #1a2038;padding-bottom:4pt;margin:0 0 12pt">Products &amp; Shorted Bin Locations</div>
+    ${(()=>{
+      const binMap={};
+      rows.forEach(r=>{
+        const key=(r.shortedBin||'?')+':::'+(r.productCode||'?');
+        if(!binMap[key])binMap[key]={bin:r.shortedBin||'?',product:r.productCode||'?',div:r.division||'?',total:0,qty:0,pickers:new Set(),erroneous:0,located:0,partial:0};
+        binMap[key].total++;
+        binMap[key].qty+=(parseFloat(r.qtyShorted)||0);
+        if(r.picker)binMap[key].pickers.add(r.picker);
+        if(r.foundInShortedBin)binMap[key].erroneous++;
+        else if(r.secondLocationFilled)binMap[key].located++;
+        if(r.partialShort)binMap[key].partial++;
+      });
+      const sorted=Object.values(binMap).sort((a,b)=>b.total-a.total);
+      if(!sorted.length)return '<div style="color:#6b7280;font-size:8pt">No data.</div>';
+      return `<table style="width:100%;border-collapse:collapse;font-size:8pt">
+        <thead><tr>
+          ${['Bin Location','Product','Div','Times Shorted','Total Qty','Pickers','Erroneous','2nd Loc Found','Partial'].map(h=>`<th style="background:#1a2038;color:#fff;padding:4pt 6pt;text-align:left;font-size:7.5pt;font-weight:600">${h}</th>`).join('')}
+        </tr></thead>
+        <tbody>
+          ${sorted.map((v,i)=>{
+            const bg=i%2===0?'#fff':'#f8fafc';
+            return `<tr style="background:${bg};page-break-inside:avoid">
+              <td style="padding:4pt 6pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;font-weight:700;font-size:8.5pt">${esc(v.bin)}</td>
+              <td style="padding:4pt 6pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace;font-weight:700;color:#1d4ed8">${esc(v.product)}</td>
+              <td style="padding:4pt 6pt;border-bottom:.5pt solid #e5e7eb;font-family:'Courier New',monospace">${esc(v.div)}</td>
+              <td style="padding:4pt 6pt;border-bottom:.5pt solid #e5e7eb;text-align:center;font-weight:700">${v.total}</td>
+              <td style="padding:4pt 6pt;border-bottom:.5pt solid #e5e7eb;text-align:center;font-weight:700;color:#92400e">${v.qty}</td>
+              <td style="padding:4pt 6pt;border-bottom:.5pt solid #e5e7eb;font-size:7.5pt">${[...v.pickers].sort().join(', ')||'—'}</td>
+              <td style="padding:4pt 6pt;border-bottom:.5pt solid #e5e7eb;text-align:center;color:${v.erroneous?'#dc2626':'#374151'};font-weight:${v.erroneous?'700':'400'}">${v.erroneous||'—'}</td>
+              <td style="padding:4pt 6pt;border-bottom:.5pt solid #e5e7eb;text-align:center;color:${v.located?'#047857':'#374151'}">${v.located||'—'}</td>
+              <td style="padding:4pt 6pt;border-bottom:.5pt solid #e5e7eb;text-align:center;color:${v.partial?'#d97706':'#374151'}">${v.partial||'—'}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>`;
+    })()}
+    </div>
+
+<div style="page-break-before:always;page-break-inside:avoid">
+    <div style="font-size:8pt;font-weight:700;color:#1a2038;letter-spacing:.1em;text-transform:uppercase;border-bottom:2pt solid #1a2038;padding-bottom:4pt;margin:0 0 12pt">Orders Affected by Division</div>
     ${Object.entries(byDiv).sort((a,b)=>a[0].localeCompare(b[0])).filter(([d,v])=>(v.demands&&v.demands.size)||(v.products&&v.products.size)).map(([div,v])=>{
       const demands=[...(v.demands||[])].sort();
       const products=[...(v.products||[])].sort();
@@ -1846,7 +1888,7 @@ function printSummaryReport(){
           <span style="font-weight:400;opacity:.75;font-size:7.5pt">${v.total} shortage${v.total!==1?'s':''} &bull; ${demands.length} pick demand${demands.length!==1?'s':''} &bull; ${products.length} product${products.length!==1?'s':''}</span>
         </div>
         ${demands.length?`<div style="padding:6pt 8pt;border-bottom:1pt solid #e5e7eb">
-          <div style="font-size:7pt;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5pt">Pick Demand Numbers</div>
+          <div style="font-size:7pt;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5pt">Order / Pick Demand Numbers</div>
           <div>${demands.map(d=>`<span style="display:inline-block;margin:1.5pt 3pt 1.5pt 0;padding:2pt 7pt;font-family:'Courier New',monospace;font-size:8pt;background:#eff6ff;border:0.5pt solid #93c5fd;border-radius:3pt;color:#1d4ed8;font-weight:700">${esc(d)}</span>`).join('')}</div>
         </div>`:''}
         ${products.length?`<div style="padding:6pt 8pt">
@@ -2169,14 +2211,6 @@ function clerkBack(){if(_cap.step>1){_cap.step--;showClerkStep();}}
 function closeClerkPickerModal(){var m=document.getElementById('clerkAddPickerModal');if(m)m.remove();}
 
 function submitClerkAddPicker(){
-  var pin=prompt('Enter authorization PIN to save this picker:');
-  if(pin===null){closeClerkPickerModal();return;}
-  if(String(pin).trim()!=='1969'){
-    var e=document.getElementById('capErr');
-    if(e){e.textContent='Incorrect PIN. Picker not saved.';e.style.display='block';}
-    else alert('Incorrect PIN.');
-    return;
-  }
   var first=_cap.first,last=_cap.last,suffix=_cap.suffix||'';
   var shift=_cap.shift,yourName=_cap.yourName;
   var canonical=first[0].toUpperCase()+last[0].toUpperCase()+last.slice(1).toLowerCase().replace(/ +/g,'');
