@@ -1347,6 +1347,71 @@ async function updateRecord(id,data,archived=false){showLoading('Saving...');try
 async function markErroneous(id){const r=shortages.find(x=>x.id===id&&!x._archived);if(!r)return;const qty=prompt('Qty found in the shorted bin:',r.icQtyFound||r.qtyShorted||'');if(qty===null)return;const uom=prompt('UOM:',r.icUom||r.uom||'EA');if(uom===null)return;await updateRecord(id,{foundInShortedBin:true,icQtyFound:num(qty),icUom:(uom||'EA').toUpperCase(),status:'located'},false)}
 async function toggleSecond(id){openSecondLocModal(id);}
 
+function openPartialShortModal(id){
+  var r=shortages.find(function(x){return x.id===id&&!x._archived;});
+  if(!r){alert('Record not found.');return;}
+  var qtyNeeded=parseFloat(r.qtyShorted)||0;
+  var el=document.getElementById('partialShortModal');if(el)el.remove();
+  el=document.createElement('div');el.id='partialShortModal';
+  el.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;background:rgba(15,20,40,.8);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box';
+  el.innerHTML=
+    '<div style="background:var(--surface,#fff);border-radius:16px;width:100%;max-width:440px;box-shadow:0 8px 40px rgba(0,0,0,.5);overflow:hidden">'
+    +'<div style="padding:16px 20px;background:var(--orange,#f59e0b);color:#fff">'
+    +'<div style="font-size:16px;font-weight:700">\u00bd Partial Shortage</div>'
+    +'<div style="font-size:12px;opacity:.9;margin-top:3px">Product: <strong>'+esc(r.productCode||'\u2014')+'</strong>'
+    +' &bull; Bin: <strong>'+esc(r.shortedBin||'\u2014')+'</strong>'
+    +' &bull; Full qty needed: <strong>'+qtyNeeded+'</strong></div></div>'
+    +'<div style="padding:20px;display:flex;flex-direction:column;gap:14px">'
+    +'<div style="background:var(--panel2,#f9fafb);border-radius:8px;padding:12px;font-size:13px;color:var(--muted)">'
+    +'Use this when the bin was short but you could pull <em>some</em> of the needed qty from the original bin. '
+    +'Enter how many were actually in the bin.</div>'
+    +'<div><label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:6px">Qty Actually In The Bin (how many you could pull)</label>'
+    +'<input id="psQtyInBin" type="number" min="0" step="1" placeholder="e.g. 2" style="width:100%;padding:11px;border:2px solid var(--orange,#f59e0b);border-radius:8px;font-size:22px;text-align:center;box-sizing:border-box">'
+    +'<div id="psCalc" style="font-size:13px;color:var(--muted);margin-top:6px;text-align:center;min-height:20px"></div></div>'
+    +'<div><label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:6px">Notes (optional)</label>'
+    +'<input id="psNotes" placeholder="e.g. Bin only had 2 of 4 needed" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:14px;box-sizing:border-box"></div>'
+    +'<div id="psError" style="font-size:12px;color:var(--red,#ef4444);display:none"></div>'
+    +'</div>'
+    +'<div style="padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end">'
+    +'<button class="btn" onclick="closePartialShortModal()">Cancel</button>'
+    +'<button class="btn orange" data-id="'+esc(id)+'" data-needed="'+qtyNeeded+'" onclick="savePartialShort(this.dataset.id,parseFloat(this.dataset.needed))">\u2713 Save Partial Shortage</button>'
+    +'</div></div>';
+  document.body.appendChild(el);
+  var inp=document.getElementById('psQtyInBin');
+  if(inp){
+    inp.focus();
+    inp.oninput=function(){
+      var v=parseFloat(this.value)||0;
+      var short=Math.max(0,qtyNeeded-v);
+      var calc=document.getElementById('psCalc');
+      if(calc)calc.innerHTML=v>=0?('<span style="color:var(--green)">\u2713 '+v+' pulled from bin</span> &bull; <span style="color:var(--orange);font-weight:700">'+short+' still short</span>'):'';
+    };
+  }
+}
+
+function closePartialShortModal(){var m=document.getElementById('partialShortModal');if(m)m.remove();}
+
+async function savePartialShort(id,qtyNeeded){
+  var qtyInBin=parseFloat((document.getElementById('psQtyInBin')||{}).value);
+  var notes=((document.getElementById('psNotes')||{}).value||'').trim();
+  var errEl=document.getElementById('psError');
+  if(isNaN(qtyInBin)||qtyInBin<0||qtyInBin>=qtyNeeded){
+    if(errEl){errEl.textContent='Enter a qty between 0 and '+qtyNeeded+' (exclusive).';errEl.style.display='block';}
+    return;
+  }
+  var qtyShort=qtyNeeded-qtyInBin;
+  var autoNote='Bin had '+qtyInBin+' of '+qtyNeeded+' needed; '+qtyShort+' still short.';
+  await updateRecord(id,{
+    partialShort:true,
+    qtyInOriginalBin:qtyInBin,
+    qtyShorted:qtyShort,
+    partialNotes:notes||autoNote,
+    status:'partial'
+  },false);
+  closePartialShortModal();
+}
+
+
 function openSecondLocModal(id){
   var r=shortages.find(function(x){return x.id===id&&!x._archived;});
   if(!r){alert('Record not found.');return;}
