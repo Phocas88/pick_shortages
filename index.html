@@ -434,13 +434,17 @@ function login(r){role=r;$('roleChip').textContent=ROLE_LABELS[r];$('roleChip').
 function logout(){role='';shortages=[];visibleShortages=[];showScreen('login')}
 const PRESET_STATIONS=[...Array(20)].map((_,i)=>`PS-${String(i+1).padStart(2,'0')}`);
 function loadAllPersonnel(){
-  // Merge local preset + localStorage
+  // Seed profiles from defaults first so dropdowns show full names immediately
+  Object.keys(PICKER_PROFILE_DEFAULTS).forEach(function(name){
+    if(!pickerProfiles[name])pickerProfiles[name]=PICKER_PROFILE_DEFAULTS[name];
+  });
+  // Merge names
   const saved=JSON.parse(localStorage.getItem('scp_pickers')||'null');
-  pickerNames=[...new Set([UNKNOWN_PICKER,...PRESET_PICKERS,...(saved||[])])].sort();
-  packerNames=[...new Set([UNKNOWN_PICKER,...JSON.parse(localStorage.getItem('scp_packers')||'[]')])].sort();
+  pickerNames=[...new Set([...PRESET_PICKERS,...(saved||[])])].filter(Boolean).sort();
+  packerNames=[...new Set([...JSON.parse(localStorage.getItem('scp_packers')||'[]')])].filter(Boolean).sort();
   const savedStations=JSON.parse(localStorage.getItem('scp_packstations')||'[]');
   packStations=[...new Set([...PRESET_STATIONS,...savedStations])].sort();
-  // Sync from Firestore in background
+  // Sync from Firestore in background (will refresh dropdowns when done)
   syncPersonnelFromFirestore();
 }
 
@@ -450,11 +454,19 @@ async function syncPersonnelFromFirestore(){
     const doc=await db.collection('_system').doc('personnel').get();
     if(doc.exists){
       const d=doc.data();
+      // Load profiles — merge Firestore profiles with local defaults
+      const fsProfiles=d.pickerProfiles||{};
+      Object.keys(PICKER_PROFILE_DEFAULTS).forEach(function(name){
+        if(!pickerProfiles[name])pickerProfiles[name]=PICKER_PROFILE_DEFAULTS[name];
+      });
+      Object.keys(fsProfiles).forEach(function(name){
+        pickerProfiles[name]=Object.assign({},PICKER_PROFILE_DEFAULTS[name]||{},fsProfiles[name]);
+      });
       const fsPickers=Array.isArray(d.pickers)?d.pickers:[];
       const fsPackers=Array.isArray(d.packers)?d.packers:[];
       const fsStations=Array.isArray(d.packStations)?d.packStations:[];
-      pickerNames=[...new Set([UNKNOWN_PICKER,...PRESET_PICKERS,...fsPickers,...JSON.parse(localStorage.getItem('scp_pickers')||'[]')])].sort();
-      packerNames=[...new Set([UNKNOWN_PICKER,...fsPackers,...JSON.parse(localStorage.getItem('scp_packers')||'[]')])].sort();
+      pickerNames=[...new Set([...PRESET_PICKERS,...fsPickers,...JSON.parse(localStorage.getItem('scp_pickers')||'[]')])].filter(Boolean).sort();
+      packerNames=[...new Set([...fsPackers,...JSON.parse(localStorage.getItem('scp_packers')||'[]')])].filter(Boolean).sort();
       packStations=[...new Set([...PRESET_STATIONS,...fsStations,...JSON.parse(localStorage.getItem('scp_packstations')||'[]')])].sort();
       populatePickerSelects();
       populateStationSelects();
@@ -3613,18 +3625,9 @@ function bpInitForm(){
   const recent=$('bpRecentList');if(recent)recent.innerHTML='';
 }
 function bpPopulatePickers(){
-  const sel=$('bpPickerSelect');if(sel){
-    const opts=['<option value="">-- Select Picker --</option>',
-      ...pickerNames.filter(n=>n!==UNKNOWN_PICKER).map(n=>`<option value="${esc(n)}">${esc(n)}</option>`),
-      '<option value="__new__">+ Add New Picker...</option>'].join('');
-    const cur=sel.value;sel.innerHTML=opts;if(cur)sel.value=cur;
-  }
-  const psel=$('bpPackerSelect');if(psel){
-    const popts=['<option value="">-- Select Packer --</option>',
-      ...packerNames.filter(n=>n!==UNKNOWN_PICKER).map(n=>`<option value="${esc(n)}">${esc(n)}</option>`),
-      '<option value="__new__">+ Add New Packer...</option>'].join('');
-    const cur=psel.value;psel.innerHTML=popts;if(cur)psel.value=cur;
-  }
+  // Uses the same populatePickerSelects() — already handles bpPickerSelect correctly
+  // with full names and no __new__ option. Just call the shared function.
+  populatePickerSelects();
 }
 function bpAutoDiv(input){
   const raw=(input.value||'').replace('.','').slice(0,2).toUpperCase();
@@ -3681,9 +3684,9 @@ async function saveBatchPick(){
   const product=($('bpProduct').value||'').trim().toUpperCase();
   const div=($('bpDiv').value||'').trim();
   const bpSel=$('bpPickerSelect');
-  const pickerVal=($('bpPicker').value||'').trim()||
-    ($('bpPickerNewWrap')?.style.display!=='none'?($('bpPickerNew')?.value||'').trim():'')||
-    (bpSel&&bpSel.value&&bpSel.value!=='__new__'?bpSel.value:'')||UNKNOWN_PICKER;
+  const pickerVal=($('bpPicker')?.value||'').trim()||
+    (bpSel&&bpSel.value&&bpSel.value!==''?bpSel.value:'');
+  if(!pickerVal){alert('Picker is required.');return;}
   const bpkSel=$('bpPackerSelect');
   const packerVal=($('bpPacker').value||'').trim()||
     ($('bpPackerNewWrap')?.style.display!=='none'?($('bpPackerNew')?.value||'').trim():'')||
