@@ -1450,17 +1450,27 @@ function openSecondLocModal(id){
   };
 
   window.slSave=async function(){
-    var totalFilled=window._slLocs.reduce(function(s,l){return s+num(l.qty);},0);
-    var filled=window._slLocs.length>0;
-    var isPartial=filled&&totalFilled<num(window._slRecord.qtyShorted);
-    await updateRecord(window._slId,{
-      secondLocationFilled:filled,
-      secondaryLocations:window._slLocs,
-      qtyFilled:totalFilled,
-      partialShort:isPartial,
-      status:filled?(isPartial?'partial':'located'):'active'
-    },false);
-    closeSecondLocModal();
+    try{
+      var locs=JSON.parse(JSON.stringify(window._slLocs||[]));
+      var totalFilled=locs.reduce(function(s,l){return s+num(l.qty);},0);
+      var filled=locs.length>0;
+      var needed=num((window._slRecord||{}).qtyShorted)||0;
+      var isPartial=filled&&totalFilled<needed;
+      var id=window._slId;
+      if(!id){alert('Error: record ID missing.');return;}
+      console.log('[slSave] saving',locs.length,'locations for id',id);
+      closeSecondLocModal();
+      await updateRecord(id,{
+        secondLocationFilled:filled,
+        secondaryLocations:locs,
+        qtyFilled:totalFilled,
+        partialShort:isPartial,
+        status:filled?(isPartial?'partial':'located'):'active'
+      },false);
+    }catch(err){
+      console.error('[slSave] error:',err);
+      alert('Save failed: '+err.message);
+    }
   };
 }
 
@@ -3369,7 +3379,8 @@ function renderIcConfirmSheet(){
   icUpdateStats();
 
   if(!rows.length){
-    $('icConfirmSheet').innerHTML='<div class="empty" style="padding:40px">No shortages match this filter.</div>';
+    var _ics=document.getElementById('icDynSheet')||$('icConfirmSheet');
+  if(_ics)_ics.innerHTML='<div class="empty" style="padding:40px">No shortages match this filter.</div>';
     return;
   }
 
@@ -3429,7 +3440,8 @@ function renderIcConfirmSheet(){
     </div>`;
   }).join('');
 
-  $('icConfirmSheet').innerHTML=dataRows;
+  var _ics2=document.getElementById('icDynSheet')||$('icConfirmSheet');
+  if(_ics2)_ics2.innerHTML=dataRows;
 }
 
 function icResultChange(sel){
