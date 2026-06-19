@@ -10,7 +10,7 @@
 :root{--bg:#181c27;--surface:#1e2334;--panel:#242840;--panel2:#2c3250;--border:#343d5c;--border2:#485070;--text:#dde2f0;--muted:#8892ac;--subtle:#5a6480;--accent:#4f83f5;--accent-l:rgba(79,131,245,.12);--green:#10b981;--green-l:rgba(16,185,129,.12);--yellow:#f59e0b;--yellow-l:rgba(245,158,11,.12);--red:#f87171;--red-l:rgba(248,113,113,.12);--orange:#fb923c;--orange-l:rgba(251,146,60,.12);--purple:#a78bfa;--purple-l:rgba(167,139,250,.12);--shadow:0 1px 4px rgba(0,0,0,.4),0 4px 20px rgba(0,0,0,.25);--radius:8px;--mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif}
 body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;--border:#d4d9e8;--border2:#bcc4d8;--text:#1a2038;--muted:#5a6480;--subtle:#8892ac;--accent:#2563eb;--green:#059669;--yellow:#d97706;--red:#dc2626;--orange:#ea580c;--purple:#7c3aed;--shadow:0 1px 4px rgba(0,0,0,.1),0 4px 16px rgba(0,0,0,.08)}
 *{box-sizing:border-box;margin:0;padding:0}html,body{margin:0;min-height:100%}body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;line-height:1.55}button,input,select,textarea{font-family:var(--sans)}select option{background:var(--panel);color:var(--text)}
-.screen{display:none}.screen.active{display:block}.topbar{display:none;align-items:center;gap:14px;padding:0 20px;height:54px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(0,0,0,.2)}.topbar.show{display:flex}.brand{font-weight:700}.role-chip{font-family:var(--mono);font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.06em;text-transform:uppercase;background:var(--accent-l);color:var(--accent);border:1px solid rgba(79,131,245,.2)}.nav{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}.nav-btn{font-size:12px;font-weight:700;padding:6px 12px;border-radius:20px;border:1px solid transparent;cursor:pointer;background:none;color:var(--muted);text-decoration:none}.nav-btn:hover,.nav-btn.active{color:#fff;background:var(--accent)}.nav-btn.lock:hover{background:var(--red);color:#fff}
+.screen{display:none}.screen.active{display:block}.topbar{display:none;align-items:center;gap:14px;padding:0 20px;height:54px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(0,0,0,.2)}.topbar.show{display:flex}.brand{font-weight:700}.role-chip{font-family:var(--mono);font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.06em;text-transform:uppercase;background:var(--accent-l);color:var(--accent);border:1px solid rgba(79,131,245,.2)}.nav{display:flex;gap:4px;margin-left:auto;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;min-width:0}.nav-btn{font-size:11px;font-weight:700;padding:5px 9px;border-radius:20px;border:1px solid transparent;cursor:pointer;background:none;white-space:nowrap;flex-shrink:0;color:var(--muted);text-decoration:none}.nav-btn:hover,.nav-btn.active{color:#fff;background:var(--accent)}.nav-btn.lock:hover{background:var(--red);color:#fff}
 #loginScreen,#pinScreen{min-height:100vh;display:none;align-items:center;justify-content:center;background:linear-gradient(135deg,#e8edf5 0%,#f0f4fb 50%,#e4eaf4 100%)}#loginScreen.active,#pinScreen.active{display:flex}.login-wrap{max-width:560px;width:100%;padding:22px}.login-header{text-align:center;margin-bottom:26px}.login-header h1{font-size:24px;margin-bottom:4px;color:#1a2038}.login-header p{color:#5a6480}.login-header .credit{font-size:10px;color:#8892ac;margin-top:6px}.login-group-label{font-size:10px;font-family:var(--mono);font-weight:700;color:#5a6480;letter-spacing:.12em;text-transform:uppercase;margin:16px 0 8px}.ic-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}@media(max-width:620px){.ic-btns{grid-template-columns:1fr}}.ic-login-btn{display:flex;flex-direction:column;gap:5px;align-items:center;justify-content:center;padding:18px 12px;background:#ffffff;border:1.5px solid #d4d9e8;border-radius:12px;cursor:pointer;color:#1a2038;box-shadow:0 2px 8px rgba(0,0,0,.08)}.ic-login-btn:hover{border-color:#2563eb;background:#eff4ff;box-shadow:0 4px 16px rgba(37,99,235,.15)}.ib-icon{font-size:24px}.ib-title{font-weight:700;color:#1a2038}.ib-sub{font-size:11px;color:#5a6480}.pin-card{width:320px;text-align:center;background:var(--panel2);border:1px solid var(--border);border-radius:16px;padding:32px 28px;box-shadow:var(--shadow)}.pin-div-badge{display:inline-flex;padding:8px 16px;border-radius:10px;margin-bottom:14px;font-weight:700;background:var(--accent-l);color:var(--accent)}.pin-dots{display:flex;justify-content:center;gap:12px;margin:18px 0 22px}.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border2)}.pin-dot.filled{background:var(--accent);border-color:var(--accent)}.pin-dot.error{background:var(--red);border-color:var(--red)}.pin-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.pin-key{font-family:var(--mono);font-size:18px;font-weight:700;padding:13px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--text);cursor:pointer}.pin-key:hover,.pin-key.active-press{background:var(--border2)}.pin-error{color:var(--red);font-size:12px;margin-top:12px;min-height:16px}.pin-back-btn{background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;margin-top:12px;text-decoration:underline;width:100%}
 .wrap{max-width:1240px;margin:0 auto;padding:24px 20px 70px}.page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}.eyebrow{display:inline-flex;font-family:var(--mono);font-size:10px;font-weight:700;color:var(--green);background:var(--green-l);border:1px solid rgba(16,185,129,.2);border-radius:20px;padding:3px 10px;margin-bottom:8px;letter-spacing:.08em;text-transform:uppercase}h1{font-size:22px}.page-head p{font-size:13px;color:var(--muted)}.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px;box-shadow:var(--shadow)}.card-title{font-size:11px;font-weight:700;font-family:var(--mono);color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:10px}.card-title:after{content:'';flex:1;height:1px;background:var(--border)}.hide{display:none!important}
 .form-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.form-row.two{grid-template-columns:1fr 1fr}.form-row.three{grid-template-columns:1fr 1fr 1fr}.form-row.one{grid-template-columns:1fr}@media(max-width:820px){.form-row,.form-row.two,.form-row.three{grid-template-columns:1fr}}.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}.field label{font-size:12px;font-weight:600}.field label em{color:var(--red);font-style:normal}.field input,.field select,.field textarea{background:var(--panel2);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;padding:9px 12px;width:100%}.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,131,245,.15)}.field textarea{resize:vertical;min-height:90px}.product-line-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:8px}.product-line-grid{display:grid;grid-template-columns:minmax(120px,2fr) 90px minmax(140px,2fr) 42px;gap:10px;align-items:end}@media(max-width:820px){.product-line-grid{grid-template-columns:1fr 1fr;gap:8px}.product-line-grid .bin-col{grid-column:1/-1}}.remove-line-btn{height:38px;width:42px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
@@ -171,12 +171,12 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 <button class="btn" style="font-size:11px;padding:5px 10px;background:#fff;border-color:#d4d9e8;color:#1a2038" onclick="setLang('fil')" id="loginLangFil"><span style="font-weight:700">FIL</span> Filipino</button>
 </div></div></div><div class="login-group-label">Select role</div><div class="ic-btns"><button class="ic-login-btn" onclick="goPin('clerk')"><span class="ib-icon">&#128203;</span><span class="ib-title">Outbound Clerk</span><span class="ib-sub">Shortage Entry</span></button><button class="ic-login-btn" onclick="goPin('icteam')"><span class="ib-icon">&#128270;</span><span class="ib-title">IC Team</span><span class="ib-sub">Verify and Report</span></button><button class="ic-login-btn" onclick="goPin('manager')"><span class="ib-icon">&#9881;&#65039;</span><span class="ib-title">IC Manager</span><span class="ib-sub">Settings and Migration</span></button></div><div class="login-group-label" style="margin-top:16px">No Login Required</div><div style="display:grid;grid-template-columns:1fr;gap:10px"><button class="ic-login-btn" onclick="enterOverPull()" style="border-color:rgba(251,146,60,.4);background:var(--orange-l);grid-column:1/-1"><span class="ib-icon">&#128202;</span><span class="ib-title" style="color:var(--orange)">Over Pull Portal</span><span class="ib-sub">Over Pull &amp; Batch Pick &mdash; no PIN needed</span></button></div></div></section>
 <section id="pinScreen" class="screen"><div class="pin-card"><div id="pinBadge" class="pin-div-badge">Role</div><p style="color:var(--muted);font-size:12px">Enter PIN</p><div id="pinDots" class="pin-dots"><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span></div><div class="pin-keypad"><button class="pin-key" data-key="1" onclick="pinKey('1')">1</button><button class="pin-key" data-key="2" onclick="pinKey('2')">2</button><button class="pin-key" data-key="3" onclick="pinKey('3')">3</button><button class="pin-key" data-key="4" onclick="pinKey('4')">4</button><button class="pin-key" data-key="5" onclick="pinKey('5')">5</button><button class="pin-key" data-key="6" onclick="pinKey('6')">6</button><button class="pin-key" data-key="7" onclick="pinKey('7')">7</button><button class="pin-key" data-key="8" onclick="pinKey('8')">8</button><button class="pin-key" data-key="9" onclick="pinKey('9')">9</button><button class="pin-key clr" onclick="pinClear()">CLR</button><button class="pin-key" data-key="0" onclick="pinKey('0')">0</button><button class="pin-key clr" onclick="pinBack()">&#9003;</button></div><div id="pinError" class="pin-error"></div><button class="pin-back-btn" onclick="backToLogin()">Back</button></div></section>
-<section id="shortageScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Outbound</div><h1>Shortage Entry</h1><p>Log shortage lines and review active records.</p></div><div id="shortageTopActions" class="actions"></div></div><div class="card" id="entryCard"><div class="form-row four"><div class="field"><label>Date &amp; Time</label><input id="sDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="sDiv"><option value="">Select</option><option value="NH">NH</option><option value="GT">GT</option><option value="FS">FS</option><option value="EE">EE</option><option value="BC">BC</option><option value="CF">CF</option><option value="VP">VP – VIP</option><option value="TP">TP – Transpac</option></select></div><div class="field"><label>Picker <em>*</em></label><select id="sPickerSelect" onchange="onPickerSelectChange('sPickerSelect','sPickerNew','sPicker')" style="flex:1"><option value="">-- Select Picker --</option></select><label style="display:inline-flex;align-items:center;gap:5px;margin-top:5px;font-size:11px;color:var(--orange);cursor:pointer;font-weight:600;background:var(--orange-l);border:1px solid rgba(251,146,60,.3);border-radius:6px;padding:3px 8px"><input type="checkbox" id="sPickerUnknown" onchange="toggleUnknownPicker('sPickerSelect','sPickerNewWrap','sPicker',this)" style="accent-color:var(--orange);width:14px;height:14px"> &#9888; Unknown Picker</label><div id="sPickerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="sPickerNew" placeholder="FirstInitialLastName e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('sPickerNew','picker');syncNewPersonToHidden('sPickerNew','sPicker')" onblur="validatePersonField('sPickerNew','picker');syncNewPersonToHidden('sPickerNew','sPicker')" onkeydown="handleSuggestKey(event,'sPickerNewSuggest')"><div class="suggest-box" id="sPickerNewSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name</div></div><input id="sPicker" type="hidden"></div><div class="field"><label>Pack Station</label><select id="sPackStation"><option value="">-- Select Station --</option></select></div><div class="field"><label>Pick Demand # <em>*</em></label><input id="sDemand" placeholder="e.g. NH00012345" oninput="autoDivisionFromDemand()"></div><div class="field"><label>Shift Override</label><select id="sShift"><option value="auto">Auto (use current time)</option><option value="1st">1st Shift (6am–3:30pm)</option><option value="2nd">2nd Shift (3:30pm–12am)</option><option value="weekend_ot">Weekend OT (6am–12am)</option></select></div></div><div class="card-title">Product Lines</div><div id="productLines"></div><div class="actions"><button class="btn" onclick="addProductLine()">+ Add Line</button><button class="btn" onclick="clearEntry()">Clear Form</button><button class="btn primary" style="flex:1" onclick="saveShortage()">+ Log All Shortages</button></div><div class="field" style="margin-top:12px"><label>Notes</label><textarea id="sNotes"></textarea></div></div><div class="filters"><input id="filterText" class="search" placeholder="Search by product, order, picker, division..." oninput="renderShortages()"><select id="viewMode" onchange="loadShortages(true)"><option value="active">Active</option><option value="archive">Archived History</option><option value="both">Active + Archived</option></select><input id="filterStart" type="date" onchange="renderShortages()"><input id="filterEnd" type="date" onchange="renderShortages()"><button class="btn" onclick="loadShortages(true)">Refresh Data</button></div><div id="archiveActions" class="actions" style="margin-bottom:10px"></div><div id="shortageList" class="shortage-list"></div></div>
+<section id="shortageScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Outbound</div><h1>Shortage Entry</h1><p>Log shortage lines and review active records.</p></div><div id="shortageTopActions" class="actions"></div></div><div class="card" id="entryCard"><div class="form-row four"><div class="field"><label>Date &amp; Time</label><input id="sDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="sDiv"><option value="">Select</option><option value="NH">NH</option><option value="GT">GT</option><option value="FS">FS</option><option value="EE">EE</option><option value="BC">BC</option><option value="CF">CF</option><option value="VP">VP – VIP</option><option value="TP">TP – Transpac</option></select></div><div class="field"><label>Picker <em>*</em></label><select id="sPickerSelect" onchange="onPickerSelectChange('sPickerSelect','sPickerNew','sPicker')" style="flex:1"><option value="">-- Select Picker --</option></select><div id="sPickerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="sPickerNew" placeholder="FirstInitialLastName e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('sPickerNew','picker');syncNewPersonToHidden('sPickerNew','sPicker')" onblur="validatePersonField('sPickerNew','picker');syncNewPersonToHidden('sPickerNew','sPicker')" onkeydown="handleSuggestKey(event,'sPickerNewSuggest')"><div class="suggest-box" id="sPickerNewSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name</div></div><input id="sPicker" type="hidden"></div><div class="field"><label>Pack Station</label><select id="sPackStation"><option value="">-- Select Station --</option></select></div><div class="field"><label>Pick Demand # <em>*</em></label><input id="sDemand" placeholder="e.g. NH00012345" oninput="autoDivisionFromDemand()"></div><div class="field"><label>Shift Override</label><select id="sShift"><option value="auto">Auto (use current time)</option><option value="1st">1st Shift (6am–3:30pm)</option><option value="2nd">2nd Shift (3:30pm–12am)</option><option value="weekend_ot">Weekend OT (6am–12am)</option></select></div></div><div class="card-title">Product Lines</div><div id="productLines"></div><div class="actions"><button class="btn" onclick="addProductLine()">+ Add Line</button><button class="btn" onclick="clearEntry()">Clear Form</button><button class="btn primary" style="flex:1" onclick="saveShortage()">+ Log All Shortages</button></div><div class="field" style="margin-top:12px"><label>Notes</label><textarea id="sNotes"></textarea></div></div><div class="filters"><input id="filterText" class="search" placeholder="Search by product, order, picker, division..." oninput="renderShortages()"><select id="viewMode" onchange="loadShortages(true)"><option value="active">Active</option><option value="archive">Archived History</option><option value="both">Active + Archived</option></select><input id="filterStart" type="date" onchange="renderShortages()"><input id="filterEnd" type="date" onchange="renderShortages()"><button class="btn" onclick="loadShortages(true)">Refresh Data</button></div><div id="archiveActions" class="actions" style="margin-bottom:10px"></div><div id="shortageList" class="shortage-list"></div></div>
 <div class="card" style="margin-top:16px;border-left:4px solid var(--orange,#f59e0b)">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
     <div>
       <div class="card-title" style="margin:0">&#9888; Clerk-Skipped Shortages</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:2px">Shorts given directly to packers — bypassing the outbound clerk. These appear on reports as <strong>Clerk Skipped Shorts</strong>.</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">Shorts given directly to packers — bypassing the outbound clerk. Appear on reports as <strong>Clerk Skipped Shorts</strong>.</div>
     </div>
     <button class="btn orange" onclick="openSkippedShortEntry()" style="font-size:13px">+ Log Skipped Short</button>
   </div>
@@ -185,9 +185,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 </section>
 <section id="reportScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Reports</div><h1>Shortage Reports</h1><p>IC Team and IC Manager only.</p></div><div class="actions"><button class="btn primary" onclick="reportPinGate(printSummaryReport)">Print Summary</button><button class="btn" onclick="reportPinGate(printCheckReport)">Print IC Check Sheet</button></div></div><div class="card"><div class="form-row four"><div class="field"><label>Report Mode</label><select id="reportMode"><option value="active">Active Only</option><option value="archive">Archived History</option><option value="both">Active + Archived (Default)</option></select></div><div class="field"><label>Start Date</label><input id="reportStart" type="date"></div><div class="field"><label>End Date</label><input id="reportEnd" type="date"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="reportPinGate(runReportPull)">Run Report</button></div></div><div class="notice" style="margin-top:8px;margin-bottom:0"><strong>Tip:</strong> When a date range is selected, both active and archived records for those dates are always included — archived shortages from older periods will appear in the report regardless of mode.</div></div><div id="reportBody"></div></div></section>
 <section id="restockScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Replenishment</div><h1>Replenishment Report</h1><p>IC Manager only.</p></div><button class="btn primary" onclick="printReplenReport()">Print</button></div><div class="card"><div class="card-title">Inventory Bin Report Import</div><p class="notice">Paste report columns: Bin Name, Product Code, Qty on Hand, Qty Allocated, Unit of Measure.</p><textarea id="binImport" style="width:100%;min-height:160px" placeholder="82-26-01&#9;DI1210&#9;12&#9;0&#9;EA"></textarea><div class="actions" style="margin-top:10px"><button class="btn primary" onclick="saveInventoryBinReport()">Import Bin Report</button></div></div><div id="restockBody"></div></div></section>
-<section id="pickerScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Personnel</div><h1>Manage Pickers &amp; Packers</h1><p>IC Manager only. Names stored as FirstInitialLastName (e.g. JDoe).</p></div></div><div class="card"><div class="card-title">Pickers</div><div class="form-row two"><div class="field"><label>Picker Name (FirstInitialLastName)</label><input id="pickerName" placeholder="JDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPickerManual()">+ Add Picker</button>
-        <button class="btn" onclick="document.getElementById('pickerImportInput').click()" style="font-size:12px">&#11015; Import CSV</button>
-        <input id="pickerImportInput" type="file" accept=".csv" style="display:none" onchange="importPickersFromFile(event)"></div></div><div id="pickerList"></div></div><div class="card"><div class="card-title">Packers</div><div class="form-row two"><div class="field"><label>Packer Name (FirstInitialLastName)</label><input id="packerName" placeholder="MDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackerManual()">Add Packer</button></div></div><div id="packerList"></div></div><div class="card"><div class="card-title">Pack Stations</div><div class="form-row two"><div class="field"><label>Pack Station Name</label><input id="packStationName" placeholder="PS-01"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackStationManual()">Add Station</button></div></div><div id="packStationList"></div></div></div></section>
+<section id="pickerScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Personnel</div><h1>Manage Pickers &amp; Packers</h1><p>IC Manager only. Names stored as FirstInitialLastName (e.g. JDoe).</p></div></div><div class="card"><div class="card-title">Pickers</div><div class="form-row two"><div class="field"><label>Picker Name (FirstInitialLastName)</label><input id="pickerName" placeholder="JDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPickerManual()">Add Picker</button></div></div><div id="pickerList"></div></div><div class="card"><div class="card-title">Packers</div><div class="form-row two"><div class="field"><label>Packer Name (FirstInitialLastName)</label><input id="packerName" placeholder="MDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackerManual()">Add Packer</button></div></div><div id="packerList"></div></div><div class="card"><div class="card-title">Pack Stations</div><div class="form-row two"><div class="field"><label>Pack Station Name</label><input id="packStationName" placeholder="PS-01"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackStationManual()">Add Station</button></div></div><div id="packStationList"></div></div></div></section>
 <section id="migrationScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Migration</div><h1>Old Firebase Migration</h1><p>Copies old shortage records into the new shortage database. Does not delete the old database.</p></div></div><div class="card"><div class="notice">Source: <b>inventory-control-portal</b> collection <b>shortages</b>. Destination: current active collection.</div><div class="form-row three"><div class="field"><label>Old Collection</label><input id="oldCollection" value="shortages"></div><div class="field"><label>Limit</label><input id="migLimit" type="number" value="5000"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="runMigration()">Run Migration</button></div></div><div id="migrationResult"></div></div></div></section>
 <section id="settingsScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Settings</div><h1>Firebase Settings</h1><p>IC Manager only.</p></div></div><div class="card"><div class="form-row two"><div class="field"><label>API Key</label><input id="cfgApiKey"></div><div class="field"><label>Auth Domain</label><input id="cfgAuthDomain"></div><div class="field"><label>Project ID</label><input id="cfgProjectId"></div><div class="field"><label>Storage Bucket</label><input id="cfgStorageBucket"></div><div class="field"><label>Messaging Sender ID</label><input id="cfgSenderId"></div><div class="field"><label>App ID</label><input id="cfgAppId"></div><div class="field"><label>Active Collection</label><input id="cfgActiveCollection"></div><div class="field"><label>Archive Collection</label><input id="cfgArchiveCollection"></div></div><label class="toggle"><input id="themeToggle" type="checkbox" onchange="saveTheme(this.checked)"> Light mode</label><div class="actions" style="margin-top:14px"><button class="btn primary" onclick="saveSettings()">Save Settings</button><button class="btn" onclick="testFirebaseConnection()">&#128268; Test Connection</button><button class="btn red" onclick="forceReloadAllClients()" style="margin-left:auto">&#128257; Force Reload All Open Instances</button></div></div></div></section>
 <section id="overpullScreen" class="screen"><div class="wrap">
@@ -198,6 +196,9 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
       <div class="eyebrow" style="color:var(--orange);background:var(--orange-l);border-color:rgba(251,146,60,.25)">Operations</div>
       <h1>Over Pull Log</h1>
       <p>No login required &mdash; log items pulled in excess of the pick demand.</p>
+    </div>
+    <div class="actions">
+      <button class="btn" onclick="saveTheme(!document.body.classList.contains('light-mode'))" style="font-size:12px">&#9788; Light/Dark</button>
     </div>
   </div>
 
@@ -218,7 +219,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
       </div>
       <div class="form-row three">
         <div class="field"><label>Packer Name <em>*</em></label><select id="opPackerSelect" onchange="onPickerSelectChange('opPackerSelect','opPackerNew','opPacker')"><option value="">-- Select Packer --</option></select><label style="display:inline-flex;align-items:center;gap:5px;margin-top:5px;font-size:11px;color:var(--orange);cursor:pointer;font-weight:600;background:var(--orange-l);border:1px solid rgba(251,146,60,.3);border-radius:6px;padding:3px 8px"><input type="checkbox" id="opPackerUnknown" onchange="toggleUnknownPicker('opPackerSelect','opPackerNewWrap','opPacker',this)" style="accent-color:var(--orange);width:14px;height:14px"> &#9888; Unknown Packer</label><div id="opPackerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="opPackerNew" placeholder="e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('opPackerNew','packer');syncNewPersonToHidden('opPackerNew','opPacker')" onblur="validatePersonField('opPackerNew','packer');syncNewPersonToHidden('opPackerNew','opPacker')" onkeydown="handleSuggestKey(event,'opPackerNewSuggest')"><div class="suggest-box" id="opPackerNewSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name</div></div><input id="opPacker" type="hidden"></div>
-        <div class="field"><label>Picker Name</label><select id="opPickerSelect" onchange="onPickerSelectChange('opPickerSelect','opPickerNew','opPicker')"><option value="">-- Select Picker --</option></select><label style="display:inline-flex;align-items:center;gap:5px;margin-top:5px;font-size:11px;color:var(--orange);cursor:pointer;font-weight:600;background:var(--orange-l);border:1px solid rgba(251,146,60,.3);border-radius:6px;padding:3px 8px"><input type="checkbox" id="opPickerUnknown" onchange="toggleUnknownPicker('opPickerSelect','opPickerNewWrap','opPicker',this)" style="accent-color:var(--orange);width:14px;height:14px"> &#9888; Unknown Picker</label><div id="opPickerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="opPickerNew" placeholder="e.g. MDoe" autocomplete="off" oninput="livePersonSuggest('opPickerNew','picker');syncNewPersonToHidden('opPickerNew','opPicker')" onblur="validatePersonField('opPickerNew','picker');syncNewPersonToHidden('opPickerNew','opPicker')" onkeydown="handleSuggestKey(event,'opPickerNewSuggest')"><div class="suggest-box" id="opPickerNewSuggest" style="display:none"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--mono)">First initial + Last name</div></div><input id="opPicker" type="hidden"></div>
+        <div class="field"><label>Picker Name</label><select id="opPickerSelect" onchange="onPickerSelectChange('opPickerSelect','opPickerNew','opPicker')"><option value="">-- Select Picker --</option></select><input id="opPicker" type="hidden"></div>
         <div class="field"><label>Pack Station</label><select id="opPackStation"><option value="">-- Select Station --</option></select></div>
       </div>
       <div class="card-title" style="margin-top:4px">Items Over-Pulled</div>
@@ -244,14 +245,8 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
           <select id="bpPickerSelect" onchange="onPickerSelectChange('bpPickerSelect','bpPickerNew','bpPicker')">
             <option value="">-- Select Picker --</option>
           </select>
-          <div id="bpPickerNewWrap" style="display:none;margin-top:6px">
-            <div class="field-wrap"><input id="bpPickerNew" placeholder="e.g. JDoe" autocomplete="off"
-              oninput="livePersonSuggest('bpPickerNew','picker');syncNewPersonToHidden('bpPickerNew','bpPicker')"
-              onblur="validatePersonField('bpPickerNew','picker');syncNewPersonToHidden('bpPickerNew','bpPicker')"
-              onkeydown="handleSuggestKey(event,'bpPickerNewSuggest')">
-            <div class="suggest-box" id="bpPickerNewSuggest" style="display:none"></div></div>
-          </div>
-          <label style="display:inline-flex;align-items:center;gap:5px;margin-top:5px;font-size:11px;color:var(--orange);cursor:pointer;font-weight:600;background:var(--orange-l);border:1px solid rgba(251,146,60,.3);border-radius:6px;padding:3px 8px"><input type="checkbox" id="bpPickerUnknown" onchange="toggleUnknownPicker('bpPickerSelect','bpPickerNewWrap','bpPicker',this)" style="accent-color:var(--orange);width:14px;height:14px"> &#9888; Unknown Picker</label>
+          
+          
           <input id="bpPicker" type="hidden">
         </div>
         <div class="field"><label>Packer</label>
@@ -320,7 +315,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
   </div>
 
 </div></section>
-<div id="pickedTwiceOverlay" class="overlay"><div class="modal"><div class="modal-head"><h3 id="ptModalTitle">&#9888; Report: Order Picked Twice / Duplicate Pick</h3><button onclick="closePickedTwiceModal()">&#215;</button></div><div class="modal-body"><div class="notice" style="background:var(--orange-l);border-color:rgba(251,146,60,.35);margin-bottom:16px"><b id="ptWhatDoes">What this does:</b> <span id="ptWhatDesc">Flags an entire order as having been picked twice (over-pulled). No product lines needed — the whole order must be returned and investigated. This creates a Duplicate Pick record for IC and management review.</span></div><div class="form-row two"><div class="field"><label>Date &amp; Time <em>*</em></label><input id="ptDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="ptDiv"><option value="">Select</option><option value="NH">NH</option><option value="GT">GT</option><option value="FS">FS</option><option value="EE">EE</option><option value="BC">BC</option><option value="CF">CF</option><option value="VP">VP &ndash; VIP</option><option value="TP">TP &ndash; Transpac</option></select></div><div class="field"><label>Order Number <em>*</em></label><input id="ptDemand" placeholder="e.g. NH.45433" autocomplete="off" autocapitalize="characters" spellcheck="false" style="font-family:var(--mono);font-weight:700;letter-spacing:.06em" oninput="ptAutoDivision()" onblur="ptBlurOrder()"><div id="ptOrderHint" style="display:none;font-size:11px;color:var(--red);margin-top:3px"></div></div><div class="field"><label id="ptPickerLabel">Picker Involved <em>*</em></label><select id="ptPickerSelect" onchange="onPickerSelectChange('ptPickerSelect','ptPickerNew','ptPicker')"><option value="">-- Select Picker --</option></select><label style="display:inline-flex;align-items:center;gap:5px;margin-top:5px;font-size:11px;color:var(--orange);cursor:pointer;font-weight:600;background:var(--orange-l);border:1px solid rgba(251,146,60,.3);border-radius:6px;padding:3px 8px"><input type="checkbox" id="ptPickerUnknown" onchange="toggleUnknownPicker('ptPickerSelect','ptPickerNewWrap','ptPicker',this)" style="accent-color:var(--orange);width:14px;height:14px"> &#9888; Unknown Picker</label><div id="ptPickerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="ptPickerNew" placeholder="e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('ptPickerNew','picker');syncNewPersonToHidden('ptPickerNew','ptPicker')" onblur="validatePersonField('ptPickerNew','picker');syncNewPersonToHidden('ptPickerNew','ptPicker')" onkeydown="handleSuggestKey(event,'ptPickerNewSuggest')"><div class="suggest-box" id="ptPickerNewSuggest" style="display:none"></div></div></div><input id="ptPicker" type="hidden"></div></div><div class="field"><label>Shift</label><select id="ptShift"><option value="auto">Auto (use current time)</option><option value="1st">1st Shift (6am&ndash;3:30pm)</option><option value="2nd">2nd Shift (3:30pm&ndash;12am)</option><option value="weekend_ot">Weekend OT (6am&ndash;12am)</option></select></div><div class="field"><label id="ptNotesLabel">Notes / Details <em>*</em></label><textarea id="ptNotes" placeholder="Describe what happened — where was the duplicate pick found, who reported it, what action was taken..."></textarea></div><div class="actions" style="margin-top:8px"><button class="btn primary" onclick="savePickedTwice()" id="ptSubmitBtn">&#9888; Submit Duplicate Pick Report</button><button class="btn" onclick="closePickedTwiceModal()" id="ptCancelBtn">Cancel</button></div></div></div>
+<div id="pickedTwiceOverlay" class="overlay"><div class="modal"><div class="modal-head"><h3 id="ptModalTitle">&#9888; Report: Order Picked Twice / Duplicate Pick</h3><button onclick="closePickedTwiceModal()">&#215;</button></div><div class="modal-body"><div class="notice" style="background:var(--orange-l);border-color:rgba(251,146,60,.35);margin-bottom:16px"><b id="ptWhatDoes">What this does:</b> <span id="ptWhatDesc">Flags an entire order as having been picked twice (over-pulled). No product lines needed — the whole order must be returned and investigated. This creates a Duplicate Pick record for IC and management review.</span></div><div class="form-row two"><div class="field"><label>Date &amp; Time <em>*</em></label><input id="ptDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="ptDiv"><option value="">Select</option><option value="NH">NH</option><option value="GT">GT</option><option value="FS">FS</option><option value="EE">EE</option><option value="BC">BC</option><option value="CF">CF</option><option value="VP">VP &ndash; VIP</option><option value="TP">TP &ndash; Transpac</option></select></div><div class="field"><label>Order Number <em>*</em></label><input id="ptDemand" placeholder="e.g. NH.45433" autocomplete="off" autocapitalize="characters" spellcheck="false" style="font-family:var(--mono);font-weight:700;letter-spacing:.06em" oninput="ptAutoDivision()" onblur="ptBlurOrder()"><div id="ptOrderHint" style="display:none;font-size:11px;color:var(--red);margin-top:3px"></div></div><div class="field"><label id="ptPickerLabel">Picker Involved <em>*</em></label><select id="ptPickerSelect" onchange="onPickerSelectChange('ptPickerSelect','ptPickerNew','ptPicker')"><option value="">-- Select Picker --</option></select><div id="ptPickerNewWrap" style="display:none;margin-top:6px"><div class="field-wrap"><input id="ptPickerNew" placeholder="e.g. JDoe" autocomplete="off" oninput="livePersonSuggest('ptPickerNew','picker');syncNewPersonToHidden('ptPickerNew','ptPicker')" onblur="validatePersonField('ptPickerNew','picker');syncNewPersonToHidden('ptPickerNew','ptPicker')" onkeydown="handleSuggestKey(event,'ptPickerNewSuggest')"><div class="suggest-box" id="ptPickerNewSuggest" style="display:none"></div></div></div><input id="ptPicker" type="hidden"></div></div><div class="field"><label>Shift</label><select id="ptShift"><option value="auto">Auto (use current time)</option><option value="1st">1st Shift (6am&ndash;3:30pm)</option><option value="2nd">2nd Shift (3:30pm&ndash;12am)</option><option value="weekend_ot">Weekend OT (6am&ndash;12am)</option></select></div><div class="field"><label id="ptNotesLabel">Notes / Details <em>*</em></label><textarea id="ptNotes" placeholder="Describe what happened — where was the duplicate pick found, who reported it, what action was taken..."></textarea></div><div class="actions" style="margin-top:8px"><button class="btn primary" onclick="savePickedTwice()" id="ptSubmitBtn">&#9888; Submit Duplicate Pick Report</button><button class="btn" onclick="closePickedTwiceModal()" id="ptCancelBtn">Cancel</button></div></div></div>
 <div id="editOverlay" class="overlay"><div class="modal"><div class="modal-head"><h3>Edit Shortage</h3><button onclick="closeEdit()">&#215;</button></div><div id="editBody" class="modal-body"></div></div></div>
 <div id="icConfirmOverlay" class="ic-confirm-overlay">
   <div class="ic-confirm-modal">
@@ -455,7 +450,6 @@ async function syncPersonnelFromFirestore(){
     const doc=await db.collection('_system').doc('personnel').get();
     if(doc.exists){
       const d=doc.data();
-      pickerProfiles=d.pickerProfiles||pickerProfiles||{};
       const fsPickers=Array.isArray(d.pickers)?d.pickers:[];
       const fsPackers=Array.isArray(d.packers)?d.packers:[];
       const fsStations=Array.isArray(d.packStations)?d.packStations:[];
@@ -855,12 +849,9 @@ function openEdit(id,archived){
   try{
     var f=`<div class="form-row two"><div class="field"><label>Date</label><input id="eDate" type="date" value="${esc(normalizeDate(r.date)||'')}"></div><div class="field"><label>Division</label><input id="eDiv" value="${esc(r.division||'')}"></div><div class="field"><label>Product Code</label><input id="eProduct" autocapitalize="characters" spellcheck="false" style="text-transform:uppercase" value="${esc(r.productCode||'')}"></div><div class="field"><label>Shorted Bin</label><div class="bin-input-wrap"><input id="eBin" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" value="${esc(r.shortedBin||'')}" oninput="liveBinValidate(this)" onblur="strictBinValidate(this)"><span class="bin-valid-icon"></span></div><div class="bin-format-hint">##-##-## &nbsp;·&nbsp; ##-##-# &nbsp;·&nbsp; P##### &nbsp;·&nbsp; BULK &nbsp;·&nbsp; ROOM &nbsp;·&nbsp; KEY ACCOUNT</div><div class="bin-format-err"></div></div><div class="field"><label>Qty Shorted</label><input id="eQty" type="number" value="${val(r.qtyShorted)}"></div><div class="field"><label>UOM</label><input id="eUom" value="${esc(r.uom||'')}"></div><div class="field"><label>Demand / Order</label><input id="eDemand" value="${esc(r.pickDemand||'')}"></div><div class="field"><label>Picker</label><input id="ePicker" value="${esc(r.picker||'')}"></div><div class="field"><label>IC Qty Found</label><input id="eIcQty" type="number" value="${val(r.icQtyFound)}"></div><div class="field"><label>IC UOM</label><input id="eIcUom" value="${esc(r.icUom||r.uom||'EA')}"></div></div><div class="form-row one"><div class="field"><label>Notes</label><textarea id="eNotes">${esc(r.notes||'')}</textarea></div><div class="field"><label>IC Notes</label><textarea id="eIcNotes">${esc(r.icNotes||'')}</textarea></div></div><label class="toggle"><input id="eErr" type="checkbox" ${r.foundInShortedBin?'checked':''}> Mark as erroneous bin short</label><br><label class="toggle"><input id="eSecond" type="checkbox" ${r.secondLocationFilled?'checked':''}> Product was filled from second location</label><div class="notice" style="margin-top:8px"><b>Second-location bins:</b> ${esc(secondarySummary(r)||'None saved. Use the Second Location Filled button on the row to add one or more bins with qty.')}</div><br><label class="toggle"><input id="eRep" type="checkbox" ${r.replenishedAfterPick?'checked':''}> Bin was replenished after pick</label><div class="actions" style="margin-top:14px"><button class="btn primary" onclick="saveEdit()">Save Changes</button><button class="btn" onclick="closeEdit()">Cancel</button></div>`;
     el=document.createElement('div');el.id='editModalDynamic';
-    el.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;'
-      +'background:rgba(15,20,40,.75);overflow-y:auto;padding:24px 16px;box-sizing:border-box';
-    el.innerHTML='<div style="background:var(--surface,#fff);border:1px solid var(--border,#ddd);'
-      +'border-radius:16px;width:100%;max-width:820px;box-shadow:0 8px 40px rgba(0,0,0,.5);margin:0 auto">'
-      +'<div style="display:flex;justify-content:space-between;align-items:center;'
-      +'padding:16px 22px;border-bottom:1px solid var(--border,#ddd)">'
+    el.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;background:rgba(15,20,40,.75);overflow-y:auto;padding:24px 16px;box-sizing:border-box';
+    el.innerHTML='<div style="background:var(--surface,#fff);border:1px solid var(--border,#ddd);border-radius:16px;width:100%;max-width:820px;box-shadow:0 8px 40px rgba(0,0,0,.5);margin:0 auto">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;padding:16px 22px;border-bottom:1px solid var(--border,#ddd)">'
       +'<h3 style="margin:0;font-size:16px">Edit Shortage</h3>'
       +'<button onclick="closeEdit()" style="background:none;border:none;font-size:28px;cursor:pointer">&#215;</button></div>'
       +'<div id="editBody" style="padding:20px">'+f+'</div></div>';
@@ -1056,13 +1047,15 @@ function renderReports(){
 
 function renderCheckPreview(){}
 
+
 function doPrint(h){
-  var css='*{margin:0;padding:0;box-sizing:border-box}body{font-family:"Segoe UI",Arial,sans-serif;color:#111;font-size:10pt;background:#fff;padding:.55in}@media print{body{padding:0}@page{size:letter;margin:.55in}}table{width:100%;border-collapse:collapse}th{background:#1a2038;color:#fff;padding:5pt 8pt;text-align:left;font-size:8pt}td{padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-size:9pt}tr:nth-child(even)td{background:#f9fafb}';
-  var b='<!DOCTYPE html><html><head><meta charset="utf-8"><title>Report</title><style>'+css+'</style></head><body>'+h+'</body></html>';
+  var c='*{margin:0;padding:0;box-sizing:border-box}body{font-family:"Segoe UI",Arial,sans-serif;color:#111;font-size:10pt;background:#fff;padding:.55in}@media print{body{padding:0}@page{size:letter;margin:.55in}}table{width:100%;border-collapse:collapse}th{background:#1a2038;color:#fff;padding:5pt 8pt;text-align:left;font-size:8pt}td{padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-size:9pt}tr:nth-child(even)td{background:#f9fafb}';
+  var b='<!DOCTYPE html><html><head><meta charset="utf-8"><title>Report</title><style>'+c+'</style></head><body>'+h+'</body></html>';
   var u=URL.createObjectURL(new Blob([b],{type:'text/html'}));
   var w=window.open(u,'_blank');
   if(!w){var a=document.createElement('a');a.href=u;a.download='report.html';a.click();return;}
-  w.addEventListener('load',function(){setTimeout(function(){w.print();},300);setTimeout(function(){URL.revokeObjectURL(u);},60000);});
+  w.addEventListener('load',function(){setTimeout(function(){w.print();},300);
+    setTimeout(function(){URL.revokeObjectURL(u);},60000);});
 }
 
 function printSummaryReport(){
@@ -1329,18 +1322,9 @@ function printCheckReport(){
 }
 function saveInventoryBinReport(){inventoryBins=parseBinImport($('binImport').value);localStorage.setItem('scp_inventory_bins',JSON.stringify(inventoryBins));alert(`Saved ${inventoryBins.length} inventory bin rows.`);buildReplenishmentReport()}function parseBinImport(text){return text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean).map(l=>{const p=l.split(/\t|,/);return{bin:(p[0]||'').trim().toUpperCase(),product:(p[1]||'').trim().toUpperCase(),onHand:num(p[2]),allocated:num(p[3]),uom:(p[4]||'').trim().toUpperCase()}}).filter(r=>r.bin&&r.product)}
 function buildReplenishmentReport(){if(!canManage())return;inventoryBins=JSON.parse(localStorage.getItem('scp_inventory_bins')||'[]');if($('binImport')&&!$('binImport').value&&inventoryBins.length)$('binImport').value=inventoryBins.map(r=>[r.bin,r.product,r.onHand,r.allocated,r.uom].join('\t')).join('\n');const active=shortages.filter(r=>!r._archived);const moves=[],noRes=[];active.forEach(s=>{const reserves=inventoryBins.filter(b=>b.product===(s.productCode||'').toUpperCase()&&b.bin!==(s.shortedBin||'').toUpperCase()&&b.onHand>0&&b.allocated<=0).sort((a,b)=>a.bin.localeCompare(b.bin));if(reserves.length)moves.push({product:s.productCode,toBin:s.shortedBin,fromBin:reserves[0].bin,qty:Math.min(num(s.qtyShorted)||1,reserves[0].onHand),uom:reserves[0].uom||s.uom});else noRes.push(s)});$('restockBody').innerHTML=`<div class="card"><div class="card-title">Replenishment Moves</div>${table(['Product Code','From Reserve Bin','To Shorted Bin','Qty','UOM'],moves.sort((a,b)=>a.fromBin.localeCompare(b.fromBin)).map(m=>[m.product,m.fromBin,m.toBin,m.qty,m.uom]))}</div><div class="card"><div class="card-title">Products With No Reserve Bins</div>${table(['Product Code','Shorted Bin','Qty Shorted','UOM'],noRes.map(r=>[r.productCode,r.shortedBin,r.qtyShorted,r.uom]))}</div>`}function printReplenReport(){buildReplenishmentReport();$('printArea').innerHTML=`<h1>Replenishment Report</h1>${$('restockBody').innerHTML}`;window.print()}
-function renderPickers(){
-  if(!canManage())return;
-  $('pickerList').innerHTML=pickerNames.length
-    ?pickerNames.map(p=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)"><span style="font-family:var(--mono);font-size:13px;font-weight:700;flex:1">${esc(p)}</span><button class="btn red" style="padding:4px 10px;font-size:11px" onclick="removePicker('${esc(p)}')">Remove</button></div>`).join('')
-    :'<div class="empty">No pickers saved.</div>';
-  $('packerList').innerHTML=packerNames.length
-    ?packerNames.map(p=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)"><span style="font-family:var(--mono);font-size:13px;font-weight:700;flex:1">${esc(p)}</span><button class="btn red" style="padding:4px 10px;font-size:11px" onclick="removePacker('${esc(p)}')">Remove</button></div>`).join('')
-    :'<div class="empty">No packers saved.</div>';
-  $('packStationList').innerHTML=packStations.length
-    ?packStations.map(s=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)"><span style="font-family:var(--mono);font-size:13px;font-weight:700;flex:1">${esc(s)}</span><button class="btn red" style="padding:4px 10px;font-size:11px" onclick="removePackStation('${esc(s)}')">Remove</button></div>`).join('')
-    :'<div class="empty">No pack stations saved.</div>';
-}
+// ════════════════════════════════════════════════════════
+// SET PERSONNEL IN FIRESTORE
+// ════════════════════════════════════════════════════════
 async function setPersonnelInFirestore(){
   if(!db)return;
   var PRESET_PICK=new Set([UNKNOWN_PICKER].concat(PRESET_PICKERS));
@@ -1350,13 +1334,26 @@ async function setPersonnelInFirestore(){
   var st=packStations.filter(function(s){return !PRESET_STAT.has(s);});
   try{
     await db.collection('_system').doc('personnel').set({
-      pickers:pk, packers:pa, packStations:st,
+      pickers:pk,packers:pa,packStations:st,
       pickerProfiles:pickerProfiles||{}
     });
     localStorage.removeItem('scp_personnel_cache');
   }catch(e){console.warn('setPersonnel failed:',e.message);}
 }
 
+// ════════════════════════════════════════════════════════
+// POPULATE PICKER SELECTS — full names, sorted by first name
+// Shortage entry: includes "+ Add New Picker" for clerks
+// Overpull/batch: no new picker option
+// ════════════════════════════════════════════════════════
+
+// ════════════════════════════════════════════════════════
+// SEED PRESETS
+// ════════════════════════════════════════════════════════
+
+// ════════════════════════════════════════════════════════
+// IMPORT PICKERS FROM CSV
+// ════════════════════════════════════════════════════════
 function importPickersFromFile(event){
   var file=event.target.files[0];if(!file)return;
   var reader=new FileReader();
@@ -1367,19 +1364,12 @@ function importPickersFromFile(event){
       if(i===0&&/first|name|picker/i.test(line))return;
       var cols=line.split(',').map(function(c){return c.trim().replace(/^"|"$/g,'');});
       var can='',shift='',full='';
-      if(cols.length>=3){
-        var fi=cols[0],la=cols[1];shift=cols[2]||'';
-        if(!fi||!la){skipped++;return;}
-        can=fi[0].toUpperCase()+la[0].toUpperCase()+la.slice(1).toLowerCase();
-        full=fi+' '+la;
-      }else if(cols.length>=2){can=cols[0];shift=cols[1];full=can;}
+      if(cols.length>=3){var fi=cols[0],la=cols[1];shift=cols[2]||'';if(!fi||!la){skipped++;return;}can=fi[0].toUpperCase()+la[0].toUpperCase()+la.slice(1).toLowerCase();full=fi+' '+la;}
+      else if(cols.length>=2){can=cols[0];shift=cols[1];full=can;}
       else if(cols[0]){can=cols[0];full=can;}
-      can=normalizeName(can);
-      if(!can){skipped++;return;}
+      can=normalizeName(can);if(!can){skipped++;return;}
       if(!pickerNames.includes(can)){
-        if(!pickerProfiles)pickerProfiles={};
-        pickerProfiles[can]={status:'active',shift:shift||'',aliases:[],
-          canonical:can,fullName:full||can,addedAt:new Date().toISOString(),notes:'Imported'};
+        pickerProfiles[can]={status:'active',shift:shift||'',aliases:[],canonical:can,fullName:full||can,addedAt:new Date().toISOString(),notes:'Imported'};
         pickerNames.push(can);added++;names.push(full||can);
       }else{skipped++;}
     });
@@ -1389,12 +1379,14 @@ function importPickersFromFile(event){
     setPersonnelInFirestore();populatePickerSelects();
     if(typeof renderPickers==='function')renderPickers();
     event.target.value='';
-    alert('Import done!\nAdded: '+added+'\nSkipped/duplicate: '+skipped
-      +(names.length?'\n\n'+names.slice(0,15).join(', ')+(names.length>15?'...':''):''));
+    alert('Import done!\nAdded: '+added+'\nSkipped: '+skipped+(names.length?'\n\n'+names.slice(0,15).join(', ')+(names.length>15?'...':''):''));
   };
   reader.readAsText(file);
 }
 
+// ════════════════════════════════════════════════════════
+// EDIT PICKER PROFILE
+// ════════════════════════════════════════════════════════
 function openEditPickerProfile(name){
   if(!name)return;
   var prof=(pickerProfiles&&pickerProfiles[name])||{status:'active',shift:'',fullName:name,suffix:''};
@@ -1402,10 +1394,8 @@ function openEditPickerProfile(name){
   el=document.createElement('div');el.id='editPickerModal';
   el.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;background:rgba(15,20,40,.8);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box';
   var nameParts=(prof.fullName||name).split(' ');
-  var firstVal=nameParts[0]||'';
-  var lastVal=nameParts.slice(1).join(' ')||'';
-  el.innerHTML=
-     '<div style="background:var(--surface,#fff);border-radius:16px;width:100%;max-width:460px;box-shadow:0 8px 40px rgba(0,0,0,.5);overflow:hidden">'
+  var firstVal=nameParts[0]||'';var lastVal=nameParts.slice(1).join(' ')||'';
+  el.innerHTML='<div style="background:var(--surface,#fff);border-radius:16px;width:100%;max-width:460px;box-shadow:0 8px 40px rgba(0,0,0,.5);overflow:hidden">'
     +'<div style="padding:16px 22px;border-bottom:1px solid var(--border)">'
     +'<h3 style="margin:0;font-size:16px">Edit Picker: '+esc(name)+'</h3></div>'
     +'<div style="padding:20px;display:flex;flex-direction:column;gap:12px">'
@@ -1431,14 +1421,12 @@ function openEditPickerProfile(name){
     +'<div id="epError" style="font-size:12px;color:var(--red);display:none"></div></div>'
     +'<div style="padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end">'
     +'<button class="btn" onclick="var m=document.getElementById(\"editPickerModal\");if(m)m.remove()">Cancel</button>'
-    +'<button class="btn primary" onclick="savePickerProfileEdit()" data-picker="'+esc(name)+'">&#10003; Save</button>'
+    +'<button class="btn primary" data-picker="'+esc(name)+'" onclick="savePickerProfileEdit(this.dataset.picker)">&#10003; Save</button>'
     +'</div></div>';
   document.body.appendChild(el);
 }
 
-function savePickerProfileEdit(){
-  var btn=document.querySelector('[data-picker]');
-  var name=btn?btn.dataset.picker:'';
+function savePickerProfileEdit(name){
   if(!name)return;
   var first=(($('epFirst')||{}).value||'').trim();
   var last=(($('epLast')||{}).value||'').trim();
@@ -1447,167 +1435,16 @@ function savePickerProfileEdit(){
   var status=($('epStatus')||{}).value||'active';
   if(!first||!last){var e=$('epError');if(e){e.textContent='First and last name required.';e.style.display='block';}return;}
   var fullName=first+' '+last+(suffix?' '+suffix:'');
-  if(!pickerProfiles)pickerProfiles={};
   pickerProfiles[name]=Object.assign({},pickerProfiles[name]||{},{fullName:fullName,suffix:suffix,shift:shift,status:status,updatedAt:new Date().toISOString()});
   localStorage.removeItem('scp_personnel_cache');
-  setPersonnelInFirestore();
-  populatePickerSelects();
+  setPersonnelInFirestore();populatePickerSelects();
   var m=document.getElementById('editPickerModal');if(m)m.remove();
   renderPickers();
 }
 
-function removePackStation(n){
-  if(!confirm('Remove station '+n+'?'))return;
-  packStations=packStations.filter(function(s){return s!==n;});
-  localStorage.setItem('scp_packstations',JSON.stringify(packStations));
-  setPersonnelInFirestore();renderPickers();
-}
-
-// ── CLERK-SKIPPED SHORTAGES ──────────────────────────────
-// Shorts given directly to packers, bypassing the outbound clerk
-var skippedShorts = [];
-
-function openSkippedShortEntry(){
-  var el=document.getElementById('skippedShortModal');if(el)el.remove();
-  el=document.createElement('div');el.id='skippedShortModal';
-  el.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;background:rgba(15,20,40,.8);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box';
-
-  // Build picker options
-  var pickerOpts='<option value="">-- Select Picker --</option>'
-    +pickerNames.filter(function(n){return n!==UNKNOWN_PICKER;}).map(function(n){
-      var full=(pickerProfiles[n]&&pickerProfiles[n].fullName)||n;
-      return '<option value="'+esc(n)+'">'+(full!==n?full+' ('+n+')':n)+'</option>';
-    }).join('');
-
-  el.innerHTML='<div style="background:var(--surface,#fff);border-radius:16px;width:100%;max-width:500px;box-shadow:0 8px 40px rgba(0,0,0,.5);overflow:hidden">'
-    +'<div style="padding:16px 22px;border-bottom:1px solid var(--border);background:var(--orange,#f59e0b);color:#fff">'
-    +'<h3 style="margin:0;font-size:16px">&#9888; Log Clerk-Skipped Shortage</h3>'
-    +'<p style="margin:4px 0 0;font-size:12px;opacity:.9">Picker gave shortage directly to packer — clerk was bypassed.</p></div>'
-    +'<div style="padding:20px;display:flex;flex-direction:column;gap:12px">'
-    +'<div class="form-row two">'
-    +'<div class="field"><label>Date <em>*</em></label><input id="ssDate" type="date" value="'+new Date().toISOString().slice(0,10)+'"></div>'
-    +'<div class="field"><label>Division <em>*</em></label><select id="ssDiv">'
-    +'<option value="">Select</option><option value="NH">NH</option><option value="GT">GT</option>'
-    +'<option value="FS">FS</option><option value="EE">EE</option><option value="BC">BC</option>'
-    +'<option value="CF">CF</option><option value="VP">VP</option></select></div></div>'
-    +'<div class="form-row two">'
-    +'<div class="field"><label>Picker <em>*</em></label><select id="ssPicker">'+pickerOpts+'</select></div>'
-    +'<div class="field"><label>Pack Station <em>*</em></label><select id="ssStation">'
-    +'<option value="">Select</option>'
-    +packStations.map(function(s){return '<option value="'+esc(s)+'">'+esc(s)+'</option>';}).join('')
-    +'</select></div></div>'
-    +'<div class="form-row two">'
-    +'<div class="field"><label>Product Code <em>*</em></label><input id="ssProd" placeholder="e.g. 12345" style="text-transform:uppercase"></div>'
-    +'<div class="field"><label>Qty Short <em>*</em></label><input id="ssQty" type="number" min="1" placeholder="1"></div></div>'
-    +'<div class="field"><label>Bin Location <em>*</em></label><input id="ssBin" placeholder="e.g. 82-19-04" style="text-transform:uppercase"></div>'
-    +'<div class="field"><label>Reported By (Packer name) <em>*</em></label><input id="ssReporter" placeholder="Who is reporting this short?"></div>'
-    +'<div id="ssError" style="font-size:12px;color:var(--red,#ef4444);display:none"></div>'
-    +'</div>'
-    +'<div style="padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end">'
-    +'<button class="btn" onclick="closeSkippedShortModal()">Cancel</button>'
-    +'<button class="btn orange" onclick="saveSkippedShort()">&#10003; Save Skipped Short</button>'
-    +'</div></div>';
-  document.body.appendChild(el);
-}
-
-function closeSkippedShortModal(){var m=document.getElementById("skippedShortModal");if(m)m.remove();}
-
-async function saveSkippedShort(){
-  var get=function(id){return (($( id)||{}).value||'').trim();};
-  var date=get('ssDate'),div=get('ssDiv'),picker=get('ssPicker');
-  var station=get('ssStation'),prod=get('ssProd').toUpperCase();
-  var qty=parseInt(get('ssQty'))||0,bin=get('ssBin').toUpperCase();
-  var reporter=get('ssReporter');
-  var errEl=$('ssError');
-  function err(msg){if(errEl){errEl.textContent=msg;errEl.style.display='block';}return;}
-  if(!date)return err('Date is required.');
-  if(!div)return err('Division is required.');
-  if(!picker)return err('Picker is required.');
-  if(!station)return err('Pack station is required.');
-  if(!prod)return err('Product code is required.');
-  if(!qty||qty<1)return err('Valid quantity is required.');
-  if(!bin)return err('Bin location is required.');
-  if(!reporter)return err('Reporter name is required.');
-
-  var record={
-    date:date,division:div,picker:picker,packStation:station,
-    productCode:prod,qtyShorted:qty,shortedBin:bin,
-    clerkSkipped:true,reportedBy:reporter,
-    shift:shiftValue()||'',
-    createdAt:new Date().toISOString(),createdBy:'packer_report',
-    source:'clerk_skipped'
-  };
-
-  showLoading('Saving...');
-  try{
-    var s=getSettings();
-    var ref=await db.collection(s.activeCollection||'shortages_active').add(record);
-    clearCaches();
-    hideLoading();
-    var m=document.getElementById('skippedShortModal');if(m)m.remove();
-    renderSkippedShorts();
-    alert('Clerk-skipped shortage logged. It will appear on reports as a Clerk Skipped Short.');
-  }catch(e){hideLoading();if($('ssError')){$('ssError').textContent='Save failed: '+e.message;$('ssError').style.display='block';}}
-}
-
-async function renderSkippedShorts(){
-  var listEl=$('skippedShortList');
-  if(!listEl)return;
-  if(!db){listEl.textContent='Not connected.';return;}
-  try{
-    var s=getSettings();
-    var snap=await db.collection(s.activeCollection||'shortages_active')
-      .where('clerkSkipped','==',true).limit(50).get();
-    if(snap.empty){listEl.innerHTML='<div class="empty" style="padding:16px">No clerk-skipped shortages logged.</div>';return;}
-    var rows=snap.docs.map(function(d){
-      var r=d.data();
-      var prof=(pickerProfiles&&pickerProfiles[r.picker])||{};
-      var dispName=(prof.fullName&&prof.fullName!==r.picker)?prof.fullName+' ('+r.picker+')':r.picker;
-      return '<tr>'
-        +'<td style="font-size:12px">'+esc(r.date||'')+'</td>'
-        +'<td>'+esc(dispName)+'</td>'
-        +'<td style="font-family:var(--mono);font-size:12px">'+esc(r.productCode||'')+'</td>'
-        +'<td>'+esc(r.shortedBin||'')+'</td>'
-        +'<td>'+( r.qtyShorted||0)+'</td>'
-        +'<td style="font-size:11px;color:var(--muted)">'+esc(r.reportedBy||'')+'</td>'
-        +'</tr>';
-    }).join('');
-    listEl.innerHTML='<table style="width:100%"><thead><tr>'
-      +'<th>Date</th><th>Picker</th><th>Product</th><th>Bin</th><th>Qty</th><th>Reported By</th>'
-      +'</tr></thead><tbody>'+rows+'</tbody></table>';
-  }catch(e){listEl.textContent='Could not load: '+e.message;}
-}
-
-function addPickerManual(){
-  if(!canManage()){openClerkAddPickerModal();}
-  else{openManagerAddPicker();}
-}
-
-function openManagerAddPicker(){
-  var name=prompt('Canonical name (FirstInitialLastName):');
-  if(!name)return;
-  name=normalizeName(name.trim());
-  if(!name){alert('Invalid name.');return;}
-  var first=prompt('First name:');if(!first)return;
-  var last=prompt('Last name:');if(!last)return;
-  var suf=prompt('Suffix (Jr, Sr, II) — press OK to skip:');suf=(suf||'').trim();
-  var shift=prompt('Shift: enter 1st, 2nd, or 3rd');shift=(shift||'').trim();
-  if(!['1st','2nd','3rd'].includes(shift)){alert('Enter 1st, 2nd, or 3rd.');return;}
-  if(!pickerProfiles)pickerProfiles={};
-  var full=first.trim()+' '+last.trim()+(suf?' '+suf:'');
-  pickerProfiles[name]={status:'active',shift:shift,aliases:[],canonical:name,
-    fullName:full,suffix:suf,addedAt:new Date().toISOString()};
-  pickerNames=[...new Set([...pickerNames,name])].sort();
-  localStorage.setItem('scp_pickers',JSON.stringify(pickerNames));
-  setPersonnelInFirestore();populatePickerSelects();
-  if(typeof renderPickers==='function')renderPickers();
-  alert('Picker '+name+' ('+full+') added.');
-}
-
-function closeClerkPickerModal(){
-  var m=document.getElementById('clerkAddPickerModal');if(m)m.remove();
-}
-
+// ════════════════════════════════════════════════════════
+// CLERK STEP-BY-STEP ADD PICKER WIZARD
+// ════════════════════════════════════════════════════════
 var _cap={step:0,first:'',last:'',suffix:'',shift:'',yourName:''};
 
 function openClerkAddPickerModal(){
@@ -1619,8 +1456,7 @@ function showClerkStep(){
   var el=document.getElementById('clerkAddPickerModal');if(el)el.remove();
   el=document.createElement('div');el.id='clerkAddPickerModal';
   el.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;'
-    +'background:rgba(15,20,40,.8);display:flex;align-items:center;'
-    +'justify-content:center;padding:20px;box-sizing:border-box';
+    +'background:rgba(15,20,40,.8);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box';
   var s=_cap.step;
   var titles=['','First Name','Last Name','Suffix','Shift','Your Name'];
   var ph=['','e.g. Kevin','e.g. Hill','Jr, Sr, II — or leave blank','','e.g. Jane Smith'];
@@ -1629,38 +1465,30 @@ function showClerkStep(){
   if(s===4){
     fieldHtml='<select id="capField" style="width:100%;padding:14px;border:2px solid var(--accent,#6366f1);border-radius:10px;font-size:17px;box-sizing:border-box">'
       +'<option value="">-- Select Shift --</option>'
-      +'<option value="1st">1st Shift (6am \u2013 2:30pm)</option>'
-      +'<option value="2nd">2nd Shift (2:30pm \u2013 11pm)</option>'
-      +'<option value="3rd">3rd Shift (11pm \u2013 7am)</option>'
+      +'<option value="1st">1st Shift (6am – 2:30pm)</option>'
+      +'<option value="2nd">2nd Shift (2:30pm – 11pm)</option>'
+      +'<option value="3rd">3rd Shift (11pm – 7am)</option>'
       +'</select>';
   } else {
     fieldHtml='<input id="capField" placeholder="'+ph[s]+'" autocomplete="off" '
-      +'style="width:100%;padding:14px;border:2px solid var(--accent,#6366f1);border-radius:10px;'
-      +'font-size:17px;box-sizing:border-box">';
+      +'style="width:100%;padding:14px;border:2px solid var(--accent,#6366f1);border-radius:10px;font-size:17px;box-sizing:border-box">';
   }
   var summary='';
-  if(_cap.first)summary='<div style="font-size:12px;color:var(--muted);margin-top:10px;padding:8px 10px;'
-    +'background:var(--panel2,#f9fafb);border-radius:6px">'
-    +esc(_cap.first)+(_cap.last?' '+esc(_cap.last):'')
-    +(_cap.suffix?' '+esc(_cap.suffix):'')
-    +(_cap.shift?' &bull; '+esc(_cap.shift)+' shift':'')+'</div>';
+  if(_cap.first)summary='<div style="font-size:12px;color:var(--muted);margin-top:10px;padding:8px 10px;background:var(--panel2,#f9fafb);border-radius:6px">'
+    +esc(_cap.first)+(_cap.last?' '+esc(_cap.last):'')+(_cap.suffix?' '+esc(_cap.suffix):'')+(_cap.shift?' &bull; '+esc(_cap.shift)+' shift':'')+'</div>';
   el.innerHTML='<div style="background:var(--surface,#fff);border-radius:16px;width:100%;max-width:420px;box-shadow:0 8px 40px rgba(0,0,0,.5);overflow:hidden">'
     +'<div style="background:var(--accent,#6366f1);color:#fff;padding:16px 22px">'
-    +'<div style="font-size:12px;opacity:.7;margin-bottom:3px">Step '+s+' of 5 \u2014 Add New Picker</div>'
+    +'<div style="font-size:12px;opacity:.7;margin-bottom:3px">Step '+s+' of 5 — Add New Picker</div>'
     +'<div style="font-size:18px;font-weight:700">'+titles[s]+'</div>'
     +'<div style="background:rgba(255,255,255,.25);height:4px;border-radius:2px;margin-top:10px">'
     +'<div style="background:#fff;height:4px;border-radius:2px;width:'+pct+'%"></div></div></div>'
-    +'<div style="padding:20px">'
-    +fieldHtml
-    +summary
-    +'<div id="capErr" style="font-size:13px;color:var(--red,#ef4444);margin-top:8px;display:none"></div>'
-    +'</div>'
+    +'<div style="padding:20px">'+fieldHtml+summary
+    +'<div id="capErr" style="font-size:13px;color:var(--red,#ef4444);margin-top:8px;display:none"></div></div>'
     +'<div style="padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px">'
     +(s>1?'<button class="btn" onclick="clerkBack()">&#8592; Back</button>':'')
     +'<button class="btn" onclick="closeClerkPickerModal()"'+(s===1?' style="margin-right:auto"':'')+'>Cancel</button>'
     +'<button class="btn primary" style="margin-left:auto" onclick="clerkNext()">'
-    +(s<5?'Next &#8594;':'&#10003; Save Picker')
-    +'</button></div></div>';
+    +(s<5?'Next &#8594;':'&#10003; Save Picker')+'</button></div></div>';
   document.body.appendChild(el);
   setTimeout(function(){var f=document.getElementById('capField');if(f){f.focus();if(f.tagName==='INPUT'&&f.value)f.select();}},50);
 }
@@ -1669,57 +1497,189 @@ function clerkNext(){
   var f=document.getElementById('capField');
   var v=f?(f.tagName==='SELECT'?f.value:(f.value||'').trim()):'';
   var s=_cap.step;
-  var errEl=document.getElementById('capErr');
-  if(errEl)errEl.style.display='none';
+  var errEl=document.getElementById('capErr');if(errEl)errEl.style.display='none';
   if(s===1&&!v){if(errEl){errEl.textContent='First name is required.';errEl.style.display='block';}return;}
   if(s===2&&!v){if(errEl){errEl.textContent='Last name is required.';errEl.style.display='block';}return;}
   if(s===4&&!v){if(errEl){errEl.textContent='Please select a shift.';errEl.style.display='block';}return;}
   if(s===5&&!v){if(errEl){errEl.textContent='Your name is required for accountability.';errEl.style.display='block';}return;}
-  if(s===1)_cap.first=v;
-  if(s===2)_cap.last=v;
-  if(s===3)_cap.suffix=v;
-  if(s===4)_cap.shift=v;
+  if(s===1)_cap.first=v;if(s===2)_cap.last=v;if(s===3)_cap.suffix=v;if(s===4)_cap.shift=v;
   if(s===5){_cap.yourName=v;submitClerkAddPicker();return;}
   _cap.step++;showClerkStep();
 }
 
-function clerkBack(){
-  if(_cap.step>1){_cap.step--;showClerkStep();}
-}
+function clerkBack(){if(_cap.step>1){_cap.step--;showClerkStep();}}
 
-
+function closeClerkPickerModal(){var m=document.getElementById('clerkAddPickerModal');if(m)m.remove();}
 
 function submitClerkAddPicker(){
-  var pin=prompt("Enter authorization PIN to save this picker:");
+  var pin=prompt('Enter authorization PIN to save this picker:');
   if(pin===null){closeClerkPickerModal();return;}
-  if(String(pin).trim()!=="1969"){
-    var e=document.getElementById("capErr");
-    if(e){e.textContent="Incorrect PIN. Picker not saved.";e.style.display="block";}
-    else alert("Incorrect PIN.");
+  if(String(pin).trim()!=='1969'){
+    var e=document.getElementById('capErr');
+    if(e){e.textContent='Incorrect PIN. Picker not saved.';e.style.display='block';}
+    else alert('Incorrect PIN.');
     return;
   }
-  var first=_cap.first,last=_cap.last,suffix=_cap.suffix||"";
+  var first=_cap.first,last=_cap.last,suffix=_cap.suffix||'';
   var shift=_cap.shift,yourName=_cap.yourName;
-  var canonical=first[0].toUpperCase()+last[0].toUpperCase()+last.slice(1).toLowerCase().replace(/ +/g,"");
-  var fullName=first+" "+last+(suffix?" "+suffix:"");
-  if(pickerNames.includes(canonical)){
-    alert(canonical+" already exists in the system.");return;
-  }
-  if(!pickerProfiles)pickerProfiles={};
-  pickerProfiles[canonical]={status:"active",shift:shift,aliases:[],canonical:canonical,
+  var canonical=first[0].toUpperCase()+last[0].toUpperCase()+last.slice(1).toLowerCase().replace(/ +/g,'');
+  var fullName=first+' '+last+(suffix?' '+suffix:'');
+  if(pickerNames.includes(canonical)){alert(canonical+' already exists.');return;}
+  pickerProfiles[canonical]={status:'active',shift:shift,aliases:[],canonical:canonical,
     fullName:fullName,suffix:suffix,addedBy:yourName,
-    addedAt:new Date().toISOString(),notes:"Added by "+yourName+" on "+new Date().toLocaleDateString()};
+    addedAt:new Date().toISOString(),notes:'Added by '+yourName+' on '+new Date().toLocaleDateString()};
   pickerNames=[...new Set([...pickerNames,canonical])].sort();
-  localStorage.setItem("scp_pickers",JSON.stringify(pickerNames));
-  localStorage.removeItem("scp_personnel_cache");
-  setPersonnelInFirestore();
-  populatePickerSelects();
+  localStorage.setItem('scp_pickers',JSON.stringify(pickerNames));
+  localStorage.removeItem('scp_personnel_cache');
+  setPersonnelInFirestore();populatePickerSelects();
   closeClerkPickerModal();
-  if(typeof renderPickers==="function")renderPickers();
-  alert("Picker added: "+fullName+" ("+canonical+", "+shift+" shift)\nAdded by: "+yourName);
+  if(typeof renderPickers==='function')renderPickers();
+  alert('Picker added: '+fullName+' ('+canonical+', '+shift+' shift)\nAdded by: '+yourName);
+}
+
+// ════════════════════════════════════════════════════════
+// RENDER PICKERS (manage pickers screen)
+// ════════════════════════════════════════════════════════
+function renderPickers(){
+  if(!canManage())return;
+  var statusF=($('pickerFilterStatus')||{}).value||'';
+  var shiftF=($('pickerFilterShift')||{}).value||'';
+  var search=(($('pickerSearch')||{}).value||'').toLowerCase();
+  var allNames=[...new Set([...pickerNames,...Object.keys(pickerProfiles||{})])]
+    .filter(function(n){return n&&n!==UNKNOWN_PICKER;}).sort(function(a,b){
+      var fa=(pickerProfiles[a]&&pickerProfiles[a].fullName)||a;
+      var fb=(pickerProfiles[b]&&pickerProfiles[b].fullName)||b;
+      return fa.localeCompare(fb);
+    });
+  var filtered=allNames.filter(function(n){
+    var prof=(pickerProfiles&&pickerProfiles[n])||{};
+    if(search&&!(n.toLowerCase().includes(search)||(prof.fullName||'').toLowerCase().includes(search)))return false;
+    if(statusF&&prof.status!==statusF)return false;
+    if(shiftF&&prof.shift!==shiftF)return false;
+    return true;
+  });
+  var SHIFT_LABEL={'1st':'1st (6am)','2nd':'2nd (2:30pm)','3rd':'3rd (11pm)'};
+  var listEl=$('pickerList');
+  if(!listEl)return;
+  if(!filtered.length){listEl.innerHTML='<div class="empty" style="padding:24px">No pickers match the filter.</div>';return;}
+  var rows=filtered.map(function(n){
+    var prof=(pickerProfiles&&pickerProfiles[n])||{status:'active',shift:'',fullName:n};
+    var statusColor=prof.status==='active'?'var(--green)':'var(--muted)';
+    return '<tr>'
+      +'<td style="font-family:var(--mono);font-weight:700;font-size:13px">'+esc(n)+'</td>'
+      +'<td>'+esc(prof.fullName||n)+'</td>'
+      +'<td><span style="color:'+statusColor+';font-weight:600;font-size:12px">'+(prof.status==='active'?'Active':'Inactive')+'</span></td>'
+      +'<td style="font-size:12px;color:var(--muted)">'+esc(SHIFT_LABEL[prof.shift]||prof.shift||'—')+'</td>'
+      +'<td style="text-align:right;white-space:nowrap">'
+      +'<button class="btn" style="padding:3px 8px;font-size:11px" data-name="'+esc(n)+'" onclick="openEditPickerProfile(this.dataset.name)">&#9998; Edit</button> '
+      +'<button class="btn red" style="padding:3px 8px;font-size:11px" data-name="'+esc(n)+'" onclick="removePicker(this.dataset.name)">Remove</button>'
+      +'</td></tr>';
+  }).join('');
+  listEl.innerHTML='<table style="width:100%"><thead><tr>'
+    +'<th>Canonical</th><th>Full Name</th><th>Status</th><th>Shift</th><th style="text-align:right">Actions</th>'
+    +'</tr></thead><tbody>'+rows+'</tbody></table>';
+  var stList=$('packStationList');
+  if(stList)stList.innerHTML=packStations.length
+    ?packStations.map(function(s){return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)"><span style="font-family:var(--mono);font-size:13px;flex:1">'+esc(s)+'</span>'
+      +'<button class="btn red" style="padding:3px 8px;font-size:11px" data-name="'+esc(s)+'" onclick="removePackStation(this.dataset.name)">Remove</button></div>';}).join('')
+    :'<div class="empty">No custom stations.</div>';
 }
 
 
+// ════════════════════════════════════════════════════════
+// CLERK-SKIPPED SHORTAGES
+// ════════════════════════════════════════════════════════
+function closeSkippedShortModal(){var m=document.getElementById('skippedShortModal');if(m)m.remove();}
+
+function openSkippedShortEntry(){
+  var el=document.getElementById('skippedShortModal');if(el)el.remove();
+  el=document.createElement('div');el.id='skippedShortModal';
+  el.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;background:rgba(15,20,40,.8);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;overflow-y:auto';
+  var pickerOpts='<option value="">-- Select Picker --</option>'
+    +pickerNames.filter(function(n){return n!==UNKNOWN_PICKER;}).map(function(n){
+      var full=(pickerProfiles[n]&&pickerProfiles[n].fullName)||n;
+      return '<option value="'+esc(n)+'">'+(full!==n?full+' ('+n+')':n)+'</option>';
+    }).join('');
+  el.innerHTML='<div style="background:var(--surface,#fff);border-radius:16px;width:100%;max-width:500px;box-shadow:0 8px 40px rgba(0,0,0,.5);overflow:hidden">'
+    +'<div style="padding:16px 22px;background:var(--orange,#f59e0b);color:#fff">'
+    +'<h3 style="margin:0;font-size:16px">&#9888; Log Clerk-Skipped Shortage</h3>'
+    +'<p style="margin:4px 0 0;font-size:12px;opacity:.9">Picker gave shortage directly to packer — clerk bypassed.</p></div>'
+    +'<div style="padding:20px;display:flex;flex-direction:column;gap:12px">'
+    +'<div class="form-row two">'
+    +'<div class="field"><label>Date *</label><input id="ssDate" type="date" value="'+new Date().toISOString().slice(0,10)+'"></div>'
+    +'<div class="field"><label>Division *</label><select id="ssDiv"><option value="">Select</option>'
+    +'<option>NH</option><option>GT</option><option>FS</option><option>EE</option><option>BC</option><option>CF</option><option>VP</option></select></div></div>'
+    +'<div class="form-row two">'
+    +'<div class="field"><label>Picker *</label><select id="ssPicker">'+pickerOpts+'</select></div>'
+    +'<div class="field"><label>Pack Station *</label><select id="ssStation"><option value="">Select</option>'
+    +packStations.map(function(s){return '<option value="'+esc(s)+'">'+esc(s)+'</option>';}).join('')+'</select></div></div>'
+    +'<div class="form-row two">'
+    +'<div class="field"><label>Product Code *</label><input id="ssProd" placeholder="e.g. D11210" style="text-transform:uppercase"></div>'
+    +'<div class="field"><label>Qty Short *</label><input id="ssQty" type="number" min="1" placeholder="1"></div></div>'
+    +'<div class="field"><label>Bin Location *</label><input id="ssBin" placeholder="e.g. 82-19-04" style="text-transform:uppercase"></div>'
+    +'<div class="field"><label>Reported By (Packer name) *</label><input id="ssReporter" placeholder="Who is reporting this short?"></div>'
+    +'<div id="ssError" style="font-size:12px;color:var(--red,#ef4444);display:none"></div>'
+    +'</div>'
+    +'<div style="padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end">'
+    +'<button class="btn" onclick="closeSkippedShortModal()">Cancel</button>'
+    +'<button class="btn orange" onclick="saveSkippedShort()">&#10003; Save Skipped Short</button>'
+    +'</div></div>';
+  document.body.appendChild(el);
+}
+
+async function saveSkippedShort(){
+  var g=function(id){return (($( id)||{}).value||'').trim();};
+  var date=g('ssDate'),div=g('ssDiv'),picker=g('ssPicker');
+  var station=g('ssStation'),prod=g('ssProd').toUpperCase();
+  var qty=parseInt(g('ssQty'))||0,bin=g('ssBin').toUpperCase(),reporter=g('ssReporter');
+  var errEl=$('ssError');function err(msg){if(errEl){errEl.textContent=msg;errEl.style.display='block';}return;}
+  if(!date)return err('Date is required.');if(!div)return err('Division is required.');
+  if(!picker)return err('Picker is required.');if(!station)return err('Pack station is required.');
+  if(!prod)return err('Product code is required.');if(!qty||qty<1)return err('Valid quantity is required.');
+  if(!bin)return err('Bin location is required.');if(!reporter)return err('Reporter name is required.');
+  var record={date:date,division:div,picker:picker,packStation:station,productCode:prod,
+    qtyShorted:qty,shortedBin:bin,clerkSkipped:true,reportedBy:reporter,
+    shift:shiftValue()||'',createdAt:new Date().toISOString(),createdBy:'packer_report',source:'clerk_skipped'};
+  showLoading('Saving...');
+  try{
+    var s=getSettings();
+    await db.collection(s.activeCollection||'shortages_active').add(record);
+    clearCaches();hideLoading();closeSkippedShortModal();
+    renderSkippedShorts();
+    alert('Clerk-skipped shortage logged successfully.');
+  }catch(e){hideLoading();if($('ssError')){$('ssError').textContent='Save failed: '+e.message;$('ssError').style.display='block';}}
+}
+
+async function renderSkippedShorts(){
+  var listEl=$('skippedShortList');if(!listEl)return;
+  if(!db){listEl.textContent='Not connected.';return;}
+  try{
+    var s=getSettings();
+    var snap=await db.collection(s.activeCollection||'shortages_active').where('clerkSkipped','==',true).limit(50).get();
+    if(snap.empty){listEl.innerHTML='<div class="empty" style="padding:16px">No clerk-skipped shortages logged.</div>';return;}
+    var rows=snap.docs.map(function(d){
+      var r=d.data();
+      var prof=(pickerProfiles&&pickerProfiles[r.picker])||{};
+      var dispName=(prof.fullName&&prof.fullName!==r.picker)?prof.fullName+' ('+r.picker+')':r.picker;
+      return '<tr><td style="font-size:12px">'+esc(r.date||'')+'</td><td>'+esc(dispName)+'</td>'
+        +'<td style="font-family:var(--mono);font-size:12px">'+esc(r.productCode||'')+'</td>'
+        +'<td>'+esc(r.shortedBin||'')+'</td><td>'+(r.qtyShorted||0)+'</td>'
+        +'<td style="font-size:11px;color:var(--muted)">'+esc(r.reportedBy||'')+'</td></tr>';
+    }).join('');
+    listEl.innerHTML='<table style="width:100%"><thead><tr><th>Date</th><th>Picker</th><th>Product</th><th>Bin</th><th>Qty</th><th>Reported By</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  }catch(e){listEl.textContent='Could not load: '+e.message;}
+}
+
+function addPickerManual(){
+  const raw=$('pickerName').value.trim();
+  if(!raw)return;
+  const n=normalizeName(raw);
+  if(!n){alert('Enter a valid name (e.g. JDoe)');return;}
+  pickerNames=[...new Set([...pickerNames,n])].sort();
+  localStorage.setItem('scp_pickers',JSON.stringify(pickerNames));
+  $('pickerName').value='';
+  renderPickers();
+}
 function addPackerManual(){
   const raw=$('packerName').value.trim();
   if(!raw)return;
@@ -1740,7 +1700,7 @@ function addPackStationManual(){
 }
 function removePicker(n){pickerNames=pickerNames.filter(p=>p!==n);localStorage.setItem('scp_pickers',JSON.stringify(pickerNames));renderPickers();}
 function removePacker(n){packerNames=packerNames.filter(p=>p!==n);localStorage.setItem('scp_packers',JSON.stringify(packerNames));renderPickers();}
-
+function removePackStation(s){packStations=packStations.filter(p=>p!==s);localStorage.setItem('scp_packstations',JSON.stringify(packStations));renderPickers();}
 // Keep old addPicker alias for any legacy calls
 function addPicker(){addPickerManual();}
 function loadSettingsForm(){if(!canSettings()){showScreen('shortage');return}const s=getSettings();$('cfgApiKey').value=s.firebaseConfig.apiKey||'';$('cfgAuthDomain').value=s.firebaseConfig.authDomain||'';$('cfgProjectId').value=s.firebaseConfig.projectId||'';$('cfgStorageBucket').value=s.firebaseConfig.storageBucket||'';$('cfgSenderId').value=s.firebaseConfig.messagingSenderId||'';$('cfgAppId').value=s.firebaseConfig.appId||'';$('cfgActiveCollection').value=s.activeCollection;$('cfgArchiveCollection').value=s.archiveCollection;applyTheme()}
@@ -1929,8 +1889,8 @@ function opValidateHeader(){
     ($('opPackerNewWrap')?.style.display!=='none'?($('opPackerNew')?.value||'').trim():'') ||
     (opkSel&&opkSel.value&&opkSel.value!=='__new__'?opkSel.value:'')
   );
-  var stn=$('opPackStation')?$('opPackStation').value:'';
-  if(!stn){alert('Pack Station is required.');return false;}
+  if(!packerVal){alert('Packer Name is required. Select a packer from the dropdown.');return false;}
+  const h=$('opPacker');if(h&&!h.value.trim())h.value=normalizeName(packerVal)||packerVal;
   return true;
 }
 function opPromptMore(){
@@ -2526,18 +2486,10 @@ function populateStationSelects(){
 }
 function populatePickerSelects(){
   // Build option lists for all person selects
-  var _pickOpts=['<option value="">-- Select Picker --</option>'];
-  pickerNames.filter(function(n){return n!==UNKNOWN_PICKER;}).slice().sort(function(a,b){
-    var fa=(pickerProfiles[a]&&pickerProfiles[a].fullName)||a;
-    var fb=(pickerProfiles[b]&&pickerProfiles[b].fullName)||b;
-    return fa.localeCompare(fb);
-  }).forEach(function(n){
-    var full=(pickerProfiles[n]&&pickerProfiles[n].fullName)||n;
-    var label=(full!==n)?(full+' ('+n+')')  :n;
-    _pickOpts.push('<option value="'+n+'">'+label+'</option>');
-  });
-  _pickOpts.push('<option value="__new__">+ Add New Picker...</option>');
-  const pickerOpts=_pickOpts.join('');
+  const pickerOpts=['<option value="">-- Select Picker --</option>',
+    ...pickerNames.filter(n=>n!==UNKNOWN_PICKER).map(n=>`<option value="${esc(n)}">${esc(n)}</option>`),
+    '<option value="__new__">+ Add New Picker...</option>'
+  ].join('');
   const packerOpts=['<option value="">-- Select Packer --</option>',
     ...packerNames.filter(n=>n!==UNKNOWN_PICKER).map(n=>`<option value="${esc(n)}">${esc(n)}</option>`),
     '<option value="__new__">+ Add New Packer...</option>'
@@ -2922,7 +2874,7 @@ const LANGS={
     'row.qty':'Qty','row.demand':'Demand','row.picker':'Picker',
     'pin.incorrect':'Incorrect PIN',
     'op.title':'Over Pull Log','op.subtitle':'No login required — log items pulled in excess of the pick demand.',
-    'op.tab_entry':'📝 Log Entry','op.tab_batch':'📋 Batch Pick Sheet','op.batch_title':'Mga Detalye ng Batch Pick','op.batch_orders_title':'Mga Order sa Batch Pick na ito','op.batch_add_order':'+ Magdagdag ng Order','op.batch_submit':'+ I-log ang Batch Pick Shortage','op.batch_title':'Batch Pick Details','op.batch_orders_title':'Orders in this Batch Pick','op.batch_add_order':'+ Add Order','op.batch_submit':'+ Log Batch Pick Shortage','op.tab_records':'📊 Records & Stats',
+    'op.tab_entry':'📝 Log Entry','op.tab_batch':'Batch Pick Sheet','op.batch_title':'Mga Detalye ng Batch Pick','op.batch_orders_title':'Mga Order sa Batch Pick na ito','op.batch_add_order':'+ Magdagdag ng Order','op.batch_submit':'+ I-log ang Batch Pick Shortage','op.batch_title':'Batch Pick Details','op.batch_orders_title':'Orders in this Batch Pick','op.batch_add_order':'+ Add Order','op.batch_submit':'+ Log Batch Pick Shortage','op.tab_records':'📊 Records & Stats',
     'op.new_entry':'New Over Pull Entry','op.order_num':'Order Number',
     'op.packer_name':'Packer Name','op.picker_name':'Picker Name','op.pack_station':'Pack Station',
     'op.items_title':'Items Over-Pulled','op.add_item':'+ Add Item','op.clear':'Clear Form',
@@ -2974,7 +2926,7 @@ const LANGS={
     'row.qty':'Cant.','row.demand':'Demanda','row.picker':'Recolector',
     'pin.incorrect':'PIN Incorrecto',
     'op.title':'Registro de Exceso','op.subtitle':'Sin inicio de sesión — registre artículos en exceso.',
-    'op.tab_entry':'📝 Entrada','op.tab_batch':'📋 Hoja de Recogida por Lotes','op.batch_title':'Detalles de Recogida por Lotes','op.batch_orders_title':'Órdenes en esta Recogida por Lotes','op.batch_add_order':'+ Agregar Orden','op.batch_submit':'+ Registrar Recogida por Lotes','op.tab_records':'📊 Registros y Estadísticas',
+    'op.tab_entry':'📝 Entrada','op.tab_batch':'Hoja de Recogida por Lotes','op.batch_title':'Detalles de Recogida por Lotes','op.batch_orders_title':'Órdenes en esta Recogida por Lotes','op.batch_add_order':'+ Agregar Orden','op.batch_submit':'+ Registrar Recogida por Lotes','op.tab_records':'📊 Registros y Estadísticas',
     'op.new_entry':'Nueva Entrada de Exceso','op.order_num':'Número de Orden',
     'op.packer_name':'Nombre del Empacador','op.picker_name':'Nombre del Recolector','op.pack_station':'Estación de Empaque',
     'op.items_title':'Artículos en Exceso','op.add_item':'+ Agregar Artículo','op.clear':'Limpiar',
@@ -3026,7 +2978,7 @@ const LANGS={
     'row.qty':'تعداد','row.demand':'تقاضا','row.picker':'جمع‌آورنده',
     'pin.incorrect':'پین نادرست است',
     'op.title':'ثبت مازاد','op.subtitle':'بدون ورود — اقلام مازاد را ثبت کنید.',
-    'op.tab_entry':'📝 ورود داده','op.tab_batch':'📋 برگه برداشت دسته‌ای','op.batch_title':'جزئیات برداشت دسته‌ای','op.batch_orders_title':'سفارش‌ها در این برداشت دسته‌ای','op.batch_add_order':'+ افزودن سفارش','op.batch_submit':'+ ثبت کمبود برداشت دسته‌ای','op.tab_records':'📊 سوابق و آمار',
+    'op.tab_entry':'📝 ورود داده','op.tab_batch':'برگه برداشت دسته‌ای','op.batch_title':'جزئیات برداشت دسته‌ای','op.batch_orders_title':'سفارش‌ها در این برداشت دسته‌ای','op.batch_add_order':'+ افزودن سفارش','op.batch_submit':'+ ثبت کمبود برداشت دسته‌ای','op.tab_records':'📊 سوابق و آمار',
     'op.new_entry':'ورود مازاد جدید','op.order_num':'شماره سفارش',
     'op.packer_name':'نام بسته‌بند','op.picker_name':'نام جمع‌آورنده','op.pack_station':'ایستگاه بسته‌بندی',
     'op.items_title':'اقلام مازاد','op.add_item':'+ افزودن قلم','op.clear':'پاک کردن',
@@ -3078,7 +3030,7 @@ const LANGS={
     'row.qty':'Dami','row.demand':'Demand','row.picker':'Tagapulot',
     'pin.incorrect':'Maling PIN',
     'op.title':'Log ng Sobra','op.subtitle':'Hindi kailangan ng login — i-log ang mga item na sobra.',
-    'op.tab_entry':'📝 Pagpasok','op.tab_batch':'📋 Batch Pick Sheet','op.tab_records':'📊 Mga Rekord at Stats',
+    'op.tab_entry':'📝 Pagpasok','op.tab_batch':'Batch Pick Sheet','op.tab_records':'📊 Mga Rekord at Stats',
     'op.new_entry':'Bagong Entry ng Sobra','op.order_num':'Numero ng Order',
     'op.packer_name':'Pangalan ng Tagabalot','op.picker_name':'Pangalan ng Tagapulot','op.pack_station':'Estasyon ng Pagbabalot',
     'op.items_title':'Mga Item na Sobra','op.add_item':'+ Magdagdag ng Item','op.clear':'I-clear',
@@ -3131,7 +3083,7 @@ const LANGS={
     'row.qty':'الكمية','row.demand':'الطلب','row.picker':'جامع البضائع',
     'pin.incorrect':'رمز PIN غير صحيح',
     'op.title':'سجل الزيادة','op.subtitle':'بدون تسجيل دخول — سجّل العناصر التي تم سحبها بزيادة.',
-    'op.tab_entry':'📝 إدخال البيانات','op.tab_batch':'📋 ورقة الانتقاء الدُفعي','op.batch_title':'تفاصيل الانتقاء الدُفعي','op.batch_orders_title':'الطلبات في هذا الانتقاء الدُفعي','op.batch_add_order':'+ إضافة طلب','op.batch_submit':'+ تسجيل نقص الانتقاء الدُفعي','op.tab_records':'📊 السجلات والإحصاءات',
+    'op.tab_entry':'📝 إدخال البيانات','op.tab_batch':'ورقة الانتقاء الدُفعي','op.batch_title':'تفاصيل الانتقاء الدُفعي','op.batch_orders_title':'الطلبات في هذا الانتقاء الدُفعي','op.batch_add_order':'+ إضافة طلب','op.batch_submit':'+ تسجيل نقص الانتقاء الدُفعي','op.tab_records':'📊 السجلات والإحصاءات',
     'op.new_entry':'إدخال زيادة جديد','op.order_num':'رقم الطلب',
     'op.packer_name':'اسم المعبّئ','op.picker_name':'اسم الجامع','op.pack_station':'محطة التعبئة',
     'op.items_title':'العناصر الزائدة','op.add_item':'+ إضافة عنصر','op.clear':'مسح النموذج',
@@ -3331,7 +3283,7 @@ function applyLangToForms(){
   const opDesc=document.querySelector('#overpullScreen .page-head p');
   if(opDesc)opDesc.textContent=t('op.subtitle');
   const et=$('opTab-entry');if(et)et.innerHTML=t('op.tab_entry')||'&#128221; Log Entry';
-  const bt=$('opTab-batch');if(bt)bt.innerHTML=t('op.tab_batch')||'Batch Pick Sheet';
+  const bt=$('opTab-batch');if(bt)bt.innerHTML='&#128203; '+(t('op.tab_batch')||'Batch Pick Sheet');
   const rt=$('opTab-records');if(rt)rt.innerHTML=t('op.tab_records')||'&#128202; Records &amp; Stats';
   lbl('opOrder','op.order_num');
   lbl('opPackerSelect','op.packer_name');
@@ -3788,16 +3740,10 @@ function startup(){applyTheme();initFirebase();$('sDate').value=nowLocalInput();
 function seedPresetsIfNeeded(){
   var changed=false;
   Object.keys(PICKER_PROFILE_DEFAULTS).forEach(function(name){
-    if(!pickerProfiles[name]){
-      pickerProfiles[name]=PICKER_PROFILE_DEFAULTS[name];
-      changed=true;
-    }
+    if(!pickerProfiles[name]){pickerProfiles[name]=PICKER_PROFILE_DEFAULTS[name];changed=true;}
     if(pickerNames.indexOf(name)<0){pickerNames.push(name);changed=true;}
   });
-  if(changed){
-    pickerNames=[...new Set(pickerNames)].sort();
-    localStorage.setItem('scp_pickers',JSON.stringify(pickerNames));
-  }
+  if(changed){pickerNames=[...new Set(pickerNames)].sort();localStorage.setItem('scp_pickers',JSON.stringify(pickerNames));}
 }
 
 seedPresetsIfNeeded();
