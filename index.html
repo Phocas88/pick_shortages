@@ -592,6 +592,8 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
     <div id="icConfirmSheet"></div>
     <div style="padding:16px 22px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end">
       <button class="btn green" onclick="icConfirmSubmitAll()">
+<div id="loading" class="loading"><div class="loading-card" id="loadingText">Loading...</div></div>
+<div id="printArea" class="print-area"></div>
 <script>
 const $=id=>document.getElementById(id);
 const PINS={clerk:'3366',icteam:'7150',manager:'1988'};
@@ -620,7 +622,7 @@ function initFirebase(){
       app=firebase.initializeApp(s.firebaseConfig);
     }
     db=app?app.firestore():firebase.firestore();
-    try{db.settings({ignoreUndefinedProperties:true});}catch(x){/* already set */}
+    try{db.settings({ignoreUndefinedProperties:true,merge:true});}catch(x){/* already set */}
     console.log('[Firebase] Connected to project:',s.firebaseConfig.projectId);
     updateDbStatus(true);
   }catch(e){
@@ -1792,7 +1794,8 @@ function renderCheckPreview(){}
 
 function doPrint(h){
   var c='*{margin:0;padding:0;box-sizing:border-box}body{font-family:"Segoe UI",Arial,sans-serif;color:#111;font-size:10pt;background:#fff;padding:.55in}@media print{body{padding:0}@page{size:letter;margin:.55in}}table{width:100%;border-collapse:collapse}th{background:#1a2038;color:#fff;padding:5pt 8pt;text-align:left;font-size:8pt}td{padding:4pt 8pt;border-bottom:.5pt solid #e5e7eb;font-size:9pt}tr:nth-child(even)td{background:#f9fafb}';
-  var b='<!DOCTYPE html><html><head><meta charset="utf-8"><title>Report</title><style>'+c+'</style></head><body>'+h+'</body></html>';
+  var b='<!DOCTYPE html><html><head><meta charset="utf-8"><title>Report</title><style>'+c+'</style></head><body>'+h+
+'</body></html>';
   var u=URL.createObjectURL(new Blob([b],{type:'text/html'}));
   var w=window.open(u,'_blank');
   if(!w){var a=document.createElement('a');a.href=u;a.download='report.html';a.click();return;}
