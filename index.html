@@ -445,6 +445,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
   <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:18px">
     <button id="opTab-entry" onclick="opSwitchTab('entry')" style="padding:10px 22px;font-size:13px;font-weight:700;border:none;border-bottom:3px solid var(--orange);margin-bottom:-2px;background:none;color:var(--orange);cursor:pointer">&#128221; Log Entry</button>
     <button id="opTab-batch" onclick="opSwitchTab('batch')" style="padding:10px 22px;font-size:13px;font-weight:700;border:none;border-bottom:3px solid transparent;margin-bottom:-2px;background:none;color:var(--muted);cursor:pointer">Batch Pick Sheet</button>
+    <button id="opTab-records" onclick="opSwitchTab('records')" style="padding:8px 14px">&#128203; Records</button>
     
   </div>
 
@@ -548,7 +549,12 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
       <button class="btn" onclick="opLoadRecords(true)">Refresh</button>
       <button class="btn orange" onclick="reportPinGate(printOverPullReport)">&#128438; Print KPI Report</button>
     </div>
-    <div id="opArchiveActions" style="margin-bottom:8px;display:flex;gap:8px"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px">
+      <div id="opArchiveActions" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <label style="font-size:12px;color:var(--muted)"><input type="checkbox" id="opSelectAll" onchange="document.querySelectorAll('.op-row-check').forEach(function(c){c.checked=document.getElementById('opSelectAll').checked})" style="margin-right:4px">Select All</label>
+      </div>
+    </div>
     <div id="opKpiBar" class="stat-grid" style="margin-bottom:14px"></div>
     <div id="opList" class="shortage-list"></div>
   </div>
@@ -583,16 +589,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
     </div>
     <div id="icConfirmSheet"></div>
     <div style="padding:16px 22px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn green" onclick="icConfirmSubmitAll()">&#10003; Save All Results</button>
-      <button class="btn" onclick="closeIcConfirm()">Cancel</button>
-    </div>
-  </div>
-</div>
-<div id="loading" class="loading"><div class="loading-card" id="loadingText">Loading...</div></div>
-<div id="printArea" class="print-area"></div>
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-<script>
+      <button class="btn green" onclick="icConfirmSubmit
 const $=id=>document.getElementById(id);
 const PINS={clerk:'3366',icteam:'7150',manager:'1988'};
 const REPORT_PIN=1969;
@@ -1050,11 +1047,12 @@ async function runOverPullReport(){
   var byPicker={};
   rows.forEach(function(r){
     var p=r.picker||'—';
-    if(!byPicker[p])byPicker[p]={lines:0,qty:0,orders:new Set(),divs:new Set(),stations:new Set()};
+    if(!byPicker[p])byPicker[p]={lines:0,qty:0,orders:new Set(),divs:new Set(),stations:new Set(),packers:new Set()};
     byPicker[p].lines++;byPicker[p].qty+=num(r.qty);
     if(r.orderNumber)byPicker[p].orders.add(r.orderNumber);
     if(r.division)byPicker[p].divs.add(r.division);
     if(r.packStation)byPicker[p].stations.add(r.packStation);
+    if(r.packer)byPicker[p].packers.add(r.packer);
   });
 
   // ── by packer ─────────────────────────────────────────
@@ -1151,9 +1149,10 @@ async function runOverPullReport(){
     .map(function(e){
       return [esc(pickerName(e[0])),esc(e[0]),e[1].lines,e[1].qty||'-',
         esc([...e[1].divs].sort().join(', ')||'—'),
-        esc([...e[1].stations].sort().join(', ')||'—')];
+        esc([...e[1].stations].sort().join(', ')||'—'),
+        esc([...e[1].packers].sort().join(', ')||'—')];
     });
-  var pickerTbl=tbl(['Full Name','Canonical','Records','Qty','Divisions','Stations'],pickerRowsData);
+  var pickerTbl=tbl(['Full Name','Canonical','Records','Qty','Divisions','Stations','Packers'],pickerRowsData);
 
   // ── section: by packer ────────────────────────────────
   var packerRowsData=Object.entries(byPacker).filter(function(e){return e[0]!=='—';})
@@ -2626,19 +2625,19 @@ function opBlurOrder(){
   }
 }
 
-function opSwitchTab(tab){
-  ['entry','batch','records'].forEach(t=>{
-    const pane=$('opPane-'+t);
-    const btn=$('opTab-'+t);
-    if(pane) pane.style.display=t===tab?'':'none';
+function opSwitchTab(t){
+  ['entry','batch','records'].forEach(function(tab){
+    var btn=document.getElementById('opTab-'+tab);
+    var pane=document.getElementById('opPane-'+tab);
     if(btn){
-      const activeColor=t==='batch'?'var(--purple)':'var(--orange)';
-      btn.style.color=t===tab?activeColor:'var(--muted)';
-      btn.style.borderBottomColor=t===tab?activeColor:'transparent';
+      btn.style.fontWeight=tab===t?'700':'400';
+      btn.style.borderBottom=tab===t?'3px solid var(--orange)':'3px solid transparent';
+      btn.style.color=tab===t?'var(--orange)':'var(--text)';
     }
+    if(pane)pane.style.display=tab===t?'block':'none';
   });
-  if(tab==='records'){opLoadRecords(false);opRenderList();}
-  if(tab==='batch'){populatePickerSelects();bpInitForm();bpPopulatePickers();}
+  if(t==='records')opLoadRecords(false);
+  if(t==='batch')bpPopulatePickers();
 }
 
 function opInitForm(){
@@ -3012,11 +3011,30 @@ async function openOverPullReport(){
   printOverPullReport();
 }
 function printOverPullReport(){
-  const rows=opFilteredRows();
+  // Apply date filters from report tab inputs if present
+  const _repStart=($('opReportStart')||{}).value||'';
+  const _repEnd=($('opReportEnd')||{}).value||'';
+  const _repPicker=($('opReportPicker')||{}).value||'';
+  const _hasRepFilter=_repStart||_repEnd||_repPicker;
+  let rows;
+  if(_hasRepFilter){
+    const _from=_repStart?new Date(_repStart+'T00:00:00'):null;
+    const _to=_repEnd?new Date(_repEnd+'T23:59:59'):null;
+    rows=(opRecords||[]).filter(function(r){
+      var d=new Date(r.date||r.dateTime||r.createdAt||'');
+      if(_from&&d<_from)return false;
+      if(_to&&d>_to)return false;
+      if(_repPicker&&r.picker!==_repPicker)return false;
+      return true;
+    });
+  } else {
+    rows=opFilteredRows();
+  }
+
   if(!rows.length){alert('No over pull records in selected range.');return;}
   const today=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
-  const fromStr=$('opFilterStart')?.value;
-  const toStr=$('opFilterEnd')?.value;
+  const fromStr=$('opReportStart')?.value||$('opFilterStart')?.value||'';
+  const toStr=$('opReportEnd')?.value||$('opFilterEnd')?.value||'';
   const dateRange=fromStr||toStr?(fromStr||'All')+' to '+(toStr||'today'):'All Dates';
 
   const totalLines=rows.length;
