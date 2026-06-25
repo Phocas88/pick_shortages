@@ -2834,8 +2834,7 @@ async function opSaveEntry(){
   const rawStation=(($('opPackStation')?.value)||'').toUpperCase();
   if(rawPacker&&rawPacker!==UNKNOWN_PICKER&&!fuzzyMatchPerson(rawPacker,'packer'))savePerson(rawPacker,'packer');
   if(rawPicker&&rawPicker!==UNKNOWN_PICKER&&!fuzzyMatchPerson(rawPicker,'picker'))savePerson(rawPicker,'picker');
-  if(rawStation&&!packStations.includes(rawStation)){packStations=[...new Set([...packStations,rawStation])].sort();localStorage.setItem('scp_packstations',JSON.stringify(packStations));}
-  const base={
+    const base={
     date:$('opDate').value||nowLocalInput(),
     orderNumber:$('opOrder').value.trim().toUpperCase(),
     division:$('opDiv').value.trim().toUpperCase(),
@@ -3205,12 +3204,12 @@ function printOverPullReport(){
   const totalStations=new Set(rows.map(r=>r.packStation).filter(Boolean)).size;
   const totalOrders=new Set(rows.map(r=>r.orderNumber).filter(Boolean)).size;
 
-    const _sfTime=function(dt){if(!dt)return '2nd';var d=new Date(dt),h=d.getHours(),mn=d.getMinutes(),day=d.getDay();if(day===0||day===6)return 'Weekend OT';var mins=h*60+mn;return(mins>=360&&mins<930)?'1st':'2nd';};
+    const _sfTime=function(dt){if(!dt)return '2nd';dt=String(dt);var d=new Date(dt),h=d.getHours(),mn=d.getMinutes(),day=d.getDay();if(day===0||day===6)return 'Weekend OT';var mins=h*60+mn;return(mins>=360&&mins<930)?'1st':'2nd';};
   const _sfLabel=function(sh){return sh==='1st'?'1st Shift (6am–3:30pm)':sh==='2nd'?'2nd Shift (3:30pm–12am)':sh==='weekend_ot'?'Weekend OT':sh||'Unknown';};
   const byShift={};
   rows.forEach(function(r){
     var profSh=pickerProfiles&&pickerProfiles[r.picker]&&pickerProfiles[r.picker].shift;
-    var raw=profSh||_sfTime(r.dateTime||r.date||r.createdAt);
+    var raw=profSh||_sfTime(r.createdAt||r.dateTime||r.date);
     var sh=_sfLabel(raw);
     if(!byShift[sh])byShift[sh]={lines:0,qty:0,pickers:new Set(),packers:new Set(),divs:new Set(),orders:new Set()};
     byShift[sh].lines++;byShift[sh].qty+=num(r.qty);
@@ -3447,6 +3446,28 @@ const html=`<div style="font-family:'Segoe UI',Arial,sans-serif;color:#111;font-
         </tr>`).join('')}
       </tbody>
     </table>
+    </div>
+
+    <!-- By Shift — Picker & Packer Breakdown -->
+    <div style="page-break-inside:avoid;margin-bottom:18pt">
+    <div style="font-size:9pt;font-weight:700;color:#1a2038;letter-spacing:.08em;text-transform:uppercase;border-bottom:2pt solid #1a2038;padding-bottom:4pt;margin:0 0 12pt">BY SHIFT — PICKER & PACKER BREAKDOWN</div>
+    ${Object.entries(byShift).sort((a,b)=>a[0].localeCompare(b[0])).map(([sh,v])=>`
+      <div style="page-break-inside:avoid;margin-bottom:10pt;border:1pt solid #d1d5db;border-radius:4pt;overflow:hidden">
+        <div style="background:#1a2038;color:#fff;padding:5pt 8pt;display:flex;justify-content:space-between;font-size:8pt">
+          <span style="font-weight:700">${esc(sh)}</span>
+          <span style="opacity:.8">${v.lines} lines &bull; ${v.qty} units &bull; ${v.pickers.size} picker${v.pickers.size!==1?'s':''} &bull; ${v.packers.size} packer${v.packers.size!==1?'s':''}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
+          <div style="padding:6pt 8pt;border-right:1pt solid #e5e7eb">
+            <div style="font-size:7pt;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4pt">Pickers</div>
+            <div style="font-size:8pt">${[...v.pickers].sort().join('<br>')}</div>
+          </div>
+          <div style="padding:6pt 8pt">
+            <div style="font-size:7pt;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4pt">Packers</div>
+            <div style="font-size:8pt">${[...v.packers].sort().join('<br>')}</div>
+          </div>
+        </div>
+      </div>`).join('')}
     </div>
 
     <!-- Full Detail Log -->
@@ -3852,13 +3873,28 @@ async function icConfirmSubmitAll(){
     if(count>0)batches.push(batch);
     for(const b of batches)await b.commit();
 
+    // Auto-archive confirmed and erroneous records
+    const toArchive=entries.filter(([,e])=>e.result==='confirmed_short'||e.result==='erroneous').map(([id])=>id);
+    if(toArchive.length){
+      const archBatch=db.batch();
+      for(const id of toArchive){
+        const r=shortages.find(x=>x.id===id&&!x._archived);
+        if(!r)continue;
+        const srcRef=db.collection(s.activeCollection).doc(id);
+        const dstRef=db.collection(s.archiveCollection).doc(id);
+        archBatch.set(dstRef,{...r,_archived:true,archivedAt:verifiedAt,archivedBy:verifiedBy,archiveReason:r.icConfirmed||'ic_verified'},{merge:true});
+        archBatch.delete(srcRef);
+      }
+      await archBatch.commit();
+    }
     clearCaches();
     icConfirmEdits={};
     await loadShortages(true);
     renderIcConfirmSheet();
     if($('reportScreen').classList.contains('active'))renderReports();
     hideLoading();
-    alert(`Saved! ${entries.length} shortage(s) verified.`);
+    const archMsg=toArchive.length?' ('+toArchive.length+' auto-archived)':'';
+    alert('Saved! '+entries.length+' shortage(s) verified'+archMsg);
   }catch(e){
     hideLoading();
     alert('Save failed: '+e.message);
