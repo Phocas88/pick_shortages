@@ -1004,7 +1004,7 @@ async function runPickerKpi(){
     p.recentShorts.push(r.date||r.createdAt||'');
   });
 
-  filtOP.forEach(function(r){
+  filtOp.forEach(function(r){
     var p=getPicker(r.picker);
     p.totalOP++;p.totalOPQty+=num(r.qty||0);
     if(r.division)p.divOP[r.division]=(p.divOP[r.division]||0)+1;
