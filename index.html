@@ -298,7 +298,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
         </div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
-        <button class="btn orange" onclick="reportPinGate(printOverPullReport)">&#128438; Print Full Over Pull Report</button>
+        <button class="btn orange" onclick="reportPinGate(openOverPullReport)">&#128438; Print Full Over Pull Report</button>
         <button class="btn" onclick="reportPinGate(printOverPullReportFromBody)" id="printOpBodyBtn" style="display:none">&#128438; Print This View</button>
       </div>
       <div class="notice" style="margin-top:8px;margin-bottom:0"><strong>Tip:</strong> "Run Report" shows an interactive view filtered by your selections. "Print Full" generates the complete formatted print report.</div>
@@ -3094,7 +3094,13 @@ async function openOverPullReport(){
   }
   printOverPullReport();
 }
-function printOverPullReport(){
+async function printOverPullReport(){
+  // Load records first if not already loaded
+  if(!opRecords||!opRecords.length){
+    showLoading('Loading over pull records...');
+    try{await opLoadRecords(true);}catch(e){console.warn('opLoadRecords:',e);}
+    hideLoading();
+  }
   // Apply date filters from report tab inputs if present
   const _repStart=($('opReportStart')||{}).value||'';
   const _repEnd=($('opReportEnd')||{}).value||'';
@@ -3112,7 +3118,8 @@ function printOverPullReport(){
       return true;
     });
   } else {
-    rows=opFilteredRows();
+    // No report-tab filters — use ALL loaded records (not the overpull screen filters)
+    rows=(opRecords||[]).filter(function(r){return !r._archived;});
   }
 
   if(!rows.length){alert('No over pull records in selected range.');return;}
@@ -3207,6 +3214,7 @@ function printOverPullReport(){
     const _sfTime=function(dt){if(!dt)return '2nd';dt=String(dt);var d=new Date(dt),h=d.getHours(),mn=d.getMinutes(),day=d.getDay();if(day===0||day===6)return 'Weekend OT';var mins=h*60+mn;return(mins>=360&&mins<930)?'1st':'2nd';};
   const _sfLabel=function(sh){return sh==='1st'?'1st Shift (6am–3:30pm)':sh==='2nd'?'2nd Shift (3:30pm–12am)':sh==='weekend_ot'?'Weekend OT':sh||'Unknown';};
   const byShift={};
+  console.log('[printOverPullReport] rows:',rows.length,'opRecords:',opRecords.length);
   rows.forEach(function(r){
     var profSh=pickerProfiles&&pickerProfiles[r.picker]&&pickerProfiles[r.picker].shift;
     var raw=profSh||_sfTime(r.createdAt||r.dateTime||r.date);
