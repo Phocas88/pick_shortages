@@ -232,11 +232,53 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
       style="border-color:rgba(99,102,241,.4);background:rgba(99,102,241,.07);flex-direction:column;padding:18px 14px;gap:6px">
       <span style="font-size:28px">&#128202;</span>
       <span class="ib-label" style="align-items:center;text-align:center">
-        <span class="ib-title" style="color:var(--accent,#6366f1)">Reports</span>
-        <span class="ib-sub">Shortage &amp; Over Pull reports &mdash; PIN required</span>
+        <span class="ib-title" style="color:var(--accent,#6366f1)">Master Report Module</span>
+        <span class="ib-sub">Shortage, Over Pull &amp; Picker KPI &mdash; PIN required</span>
       </span>
     </button>
 
+  </div>
+
+  <!-- PICKER KPI PANE -->
+  <div id="rPane-kpi" style="display:none">
+    <div class="card">
+      <div style="font-size:14px;font-weight:700;margin-bottom:12px">Filters</div>
+      <div class="form-row" style="flex-wrap:wrap;gap:10px">
+        <div class="field" style="min-width:140px"><label>Start Date</label><input id="kpiStart" type="date"></div>
+        <div class="field" style="min-width:140px"><label>End Date</label><input id="kpiEnd" type="date"></div>
+        <div class="field" style="min-width:140px"><label>Picker</label>
+          <select id="kpiPicker"><option value="">All Pickers</option></select>
+        </div>
+        <div class="field" style="min-width:120px"><label>Shift</label>
+          <select id="kpiShift">
+            <option value="">All Shifts</option>
+            <option value="1st">1st Shift</option>
+            <option value="2nd">2nd Shift</option>
+            <option value="weekend_ot">Weekend OT</option>
+          </select>
+        </div>
+        <div class="field" style="min-width:100px"><label>Division</label>
+          <select id="kpiDiv">
+            <option value="">All Divisions</option>
+            <option>NH</option><option>GT</option><option>FS</option>
+            <option>EE</option><option>BC</option><option>CF</option><option>VP</option>
+          </select>
+        </div>
+        <div class="field" style="min-width:130px"><label>Sort By</label>
+          <select id="kpiSort">
+            <option value="name">Name (A–Z)</option>
+            <option value="shorts_desc">Shortages ↓</option>
+            <option value="erroneous_desc">Erroneous ↓</option>
+            <option value="overpull_desc">Over Pull ↓</option>
+            <option value="accuracy_desc">Accuracy ↓</option>
+          </select>
+        </div>
+        <div class="field" style="min-width:100px"><label>&nbsp;</label>
+          <button class="btn primary" onclick="runPickerKpi()">&#9654; Run KPI</button>
+        </div>
+      </div>
+    </div>
+    <div id="kpiBody"></div>
   </div>
 
 </div></section>
@@ -254,6 +296,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
   <div class="tabs" style="margin-bottom:16px">
     <button id="rTab-shortage" class="tab-btn active" onclick="switchReportTab('shortage')">&#128203; Shortage Report</button>
     <button id="rTab-overpull" class="tab-btn" onclick="switchReportTab('overpull')">&#128666; Over Pull Report</button>
+    <button id="rTab-kpi" class="tab-btn" onclick="switchReportTab('kpi')">&#127942; Picker KPI</button>
   </div>
 
   <!-- SHORTAGE REPORT PANE -->
@@ -1059,14 +1102,263 @@ function normalizeShortage(raw,id,arch){
 }
 function shortageSortValue(r){const d=r.date||r.createdAt||r.timestamp||'';if(d&&d.toDate)return d.toDate().getTime();const t=Date.parse(d);return isNaN(t)?0:t}
 async function loadShortages(force){if(!db){if(force){alert('Not connected to Firebase. Log in as IC Manager → Settings and save your Firebase config.');} return;}const mode=$('viewMode')?.value||lastLoadMode||'active';if(!force&&useCache(mode))return;showLoading('Loading shortages...');try{const s=getSettings();let rows=[];async function getCol(col,arch){const snap=await db.collection(col).limit(2500).get();return snap.docs.map(d=>normalizeShortage(d.data(),d.id,arch))}if(mode==='active'||mode==='both')rows=rows.concat(await getCol(s.activeCollection,false));if(mode==='archive'||mode==='both')rows=rows.concat(await getCol(s.archiveCollection,true));rows.sort((a,b)=>shortageSortValue(b)-shortageSortValue(a));shortages=rows;lastLoadMode=mode;localStorage.setItem(cacheKey(mode),JSON.stringify({t:Date.now(),rows}));renderShortages();if($('reportScreen').classList.contains('active'))renderReports()}catch(e){alert('Load failed: '+e.message)}finally{hideLoading()}}
+// ════════════════════════════════════════════════════════
+// PICKER KPI MODULE
+// ════════════════════════════════════════════════════════
+function populateKpiPicker(){
+  var sel=document.getElementById('kpiPicker');
+  if(!sel)return;
+  var cur=sel.value;
+  sel.innerHTML='<option value="">All Pickers</option>'
+    +pickerNames.filter(function(n){return n!==UNKNOWN_PICKER;}).slice()
+    .sort(function(a,b){
+      var fa=(pickerProfiles[a]&&pickerProfiles[a].fullName)||a;
+      var fb=(pickerProfiles[b]&&pickerProfiles[b].fullName)||b;
+      return fa.localeCompare(fb);
+    }).map(function(n){
+      var full=(pickerProfiles[n]&&pickerProfiles[n].fullName)||n;
+      var label=(full&&full!==n)?(full+' ('+n+')'):n;
+      return '<option value="'+n+'">'+label+'</option>';
+    }).join('');
+  if(cur)sel.value=cur;
+}
+
+async function runPickerKpi(){
+  var kpiBody=document.getElementById('kpiBody');
+  if(!kpiBody)return;
+  kpiBody.innerHTML='<div style="padding:32px;text-align:center;color:var(--muted)">Loading KPI data...</div>';
+
+  // Load both shortages and overpull records
+  showLoading('Loading KPI data...');
+  try{
+    if(!shortages.length) await loadShortages(true);
+    if(!opRecords||!opRecords.length) await opLoadRecords(true);
+  }catch(e){console.warn('KPI load:',e);}
+  hideLoading();
+
+  // Read filters
+  var kpiStart=(document.getElementById('kpiStart')||{}).value||'';
+  var kpiEnd=(document.getElementById('kpiEnd')||{}).value||'';
+  var kpiPicker=(document.getElementById('kpiPicker')||{}).value||'';
+  var kpiShift=(document.getElementById('kpiShift')||{}).value||'';
+  var kpiDiv=(document.getElementById('kpiDiv')||{}).value||'';
+  var kpiSortVal=(document.getElementById('kpiSort')||{}).value||'name';
+
+  var fromDate=kpiStart?new Date(kpiStart+'T00:00:00'):null;
+  var toDate=kpiEnd?new Date(kpiEnd+'T23:59:59'):null;
+
+  // Filter shortages
+  var filtShort=(shortages||[]).filter(function(r){
+    if(!r.picker)return false;
+    if(kpiPicker&&r.picker!==kpiPicker)return false;
+    if(kpiDiv&&r.division!==kpiDiv)return false;
+    var d=new Date(r.date||r.createdAt||'');
+    if(fromDate&&d<fromDate)return false;
+    if(toDate&&d>toDate)return false;
+    if(kpiShift){
+      var profSh=pickerProfiles&&pickerProfiles[r.picker]&&pickerProfiles[r.picker].shift;
+      var rShift=profSh||r.shift||shiftLabel(r)||'';
+      if(rShift&&!rShift.toLowerCase().includes(kpiShift.replace('_ot','').replace('_',' ')))return false;
+    }
+    return true;
+  });
+
+  // Filter overpull
+  var filtOp=(opRecords||[]).filter(function(r){
+    if(!r.picker)return false;
+    if(kpiPicker&&r.picker!==kpiPicker)return false;
+    if(kpiDiv&&r.division!==kpiDiv)return false;
+    var d=new Date(r.createdAt||r.date||'');
+    if(fromDate&&d<fromDate)return false;
+    if(toDate&&d>toDate)return false;
+    if(kpiShift){
+      var profSh=pickerProfiles&&pickerProfiles[r.picker]&&pickerProfiles[r.picker].shift;
+      var rShift=profSh||r.shift||'';
+      if(rShift&&rShift!==kpiShift)return false;
+    }
+    return true;
+  });
+
+  // Aggregate per picker
+  var stats={};
+  function getPicker(n){
+    if(!stats[n])stats[n]={
+      canonical:n,
+      fullName:(pickerProfiles[n]&&pickerProfiles[n].fullName)||n,
+      shift:(pickerProfiles[n]&&pickerProfiles[n].shift)||'',
+      totalShorts:0,confirmedShorts:0,erroneousShorts:0,partialShorts:0,
+      openShorts:0,totalOP:0,totalOPQty:0,
+      divShorts:{},divOP:{},recentShorts:[],recentOP:[]
+    };
+    return stats[n];
+  }
+
+  filtShort.forEach(function(r){
+    var p=getPicker(r.picker);
+    p.totalShorts++;
+    if(r.icConfirmed==='confirmed_short')p.confirmedShorts++;
+    else if(r.icConfirmed==='erroneous')p.erroneousShorts++;
+    else if(r.partialShort)p.partialShorts++;
+    else p.openShorts++;
+    if(r.division)p.divShorts[r.division]=(p.divShorts[r.division]||0)+1;
+    p.recentShorts.push(r.date||r.createdAt||'');
+  });
+
+  filtOP.forEach(function(r){
+    var p=getPicker(r.picker);
+    p.totalOP++;p.totalOPQty+=num(r.qty||0);
+    if(r.division)p.divOP[r.division]=(p.divOP[r.division]||0)+1;
+    p.recentOP.push(r.createdAt||r.date||'');
+  });
+
+  var rows=Object.values(stats);
+  if(!rows.length){
+    kpiBody.innerHTML='<div class="card" style="margin-top:16px"><div class="empty" style="padding:32px;text-align:center">No data found for the selected filters.</div></div>';
+    return;
+  }
+
+  // Sort
+  var sortFns={
+    name:function(a,b){return a.fullName.localeCompare(b.fullName);},
+    shorts_desc:function(a,b){return b.totalShorts-a.totalShorts;},
+    erroneous_desc:function(a,b){return b.erroneousShorts-a.erroneousShorts;},
+    overpull_desc:function(a,b){return b.totalOP-a.totalOP;},
+    accuracy_desc:function(a,b){
+      var aa=a.totalShorts>0?Math.round(a.erroneousShorts/a.totalShorts*100):0;
+      var ba=b.totalShorts>0?Math.round(b.erroneousShorts/b.totalShorts*100):0;
+      return ba-aa;
+    }
+  };
+  rows.sort(sortFns[kpiSortVal]||sortFns.name);
+
+  // Totals row
+  var totals={
+    totalShorts:rows.reduce(function(s,r){return s+r.totalShorts;},0),
+    confirmedShorts:rows.reduce(function(s,r){return s+r.confirmedShorts;},0),
+    erroneousShorts:rows.reduce(function(s,r){return s+r.erroneousShorts;},0),
+    partialShorts:rows.reduce(function(s,r){return s+r.partialShorts;},0),
+    openShorts:rows.reduce(function(s,r){return s+r.openShorts;},0),
+    totalOP:rows.reduce(function(s,r){return s+r.totalOP;},0),
+    totalOPQty:rows.reduce(function(s,r){return s+r.totalOPQty;},0)
+  };
+
+  // Build summary stat cards
+  var statCard=function(n,lbl,color){
+    return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;text-align:center">'
+      +'<div style="font-size:22px;font-weight:800;color:'+color+'">'+n+'</div>'
+      +'<div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;margin-top:2px">'+lbl+'</div>'
+      +'</div>';
+  };
+  var summaryCards='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:16px">'
+    +statCard(rows.length,'Pickers','var(--accent)')
+    +statCard(totals.totalShorts,'Total Shortages','var(--accent)')
+    +statCard(totals.erroneousShorts,'Erroneous','var(--green)')
+    +statCard(totals.confirmedShorts,'Confirmed Short','var(--red)')
+    +statCard(totals.partialShorts,'Partial Short','var(--orange)')
+    +statCard(totals.openShorts,'Open/Pending','var(--muted)')
+    +statCard(totals.totalOP,'Over Pull Events','#7c3aed')
+    +statCard(totals.totalOPQty,'Total Qty Over-Pulled','#92400e')
+    +'</div>';
+
+  // Build picker rows
+  var tableRows=rows.map(function(p,i){
+    var errPct=p.totalShorts>0?Math.round(p.erroneousShorts/p.totalShorts*100):0;
+    var confPct=p.totalShorts>0?Math.round(p.confirmedShorts/p.totalShorts*100):0;
+    var errColor=errPct>=50?'var(--green)':errPct>=25?'var(--orange)':'var(--red)';
+    var confColor=confPct>=50?'var(--red)':confPct>=25?'var(--orange)':'var(--green)';
+    var shiftLabel2=p.shift==='1st'?'1st (6am)':p.shift==='2nd'?'2nd (3:30pm)':p.shift==='weekend_ot'?'OT':p.shift||'—';
+    var divSummary=Object.entries(Object.assign({},p.divShorts))
+      .sort(function(a,b){return b[1]-a[1];}).slice(0,4)
+      .map(function(e){return '<span style="font-family:monospace;font-size:11px;background:var(--panel2);padding:1px 5px;border-radius:3px;margin-right:2px">'+esc(e[0])+'&nbsp;'+e[1]+'</span>';}).join('');
+    var opDivSummary=Object.entries(Object.assign({},p.divOP))
+      .sort(function(a,b){return b[1]-a[1];}).slice(0,3)
+      .map(function(e){return '<span style="font-family:monospace;font-size:11px;background:rgba(124,58,237,.1);padding:1px 5px;border-radius:3px;margin-right:2px">'+esc(e[0])+'&nbsp;'+e[1]+'</span>';}).join('');
+    var bg=i%2===0?'var(--surface)':'var(--panel2)';
+    return '<tr style="background:'+bg+'">'
+      +'<td style="padding:8px 10px;border-bottom:1px solid var(--border)">'
+      +'<div style="font-weight:700;font-size:14px">'+esc(p.fullName)+'</div>'
+      +'<div style="font-size:11px;color:var(--muted);font-family:monospace">'+esc(p.canonical)+'</div>'
+      +'</td>'
+      +'<td style="padding:8px 10px;border-bottom:1px solid var(--border);font-size:12px;color:var(--muted);white-space:nowrap">'+shiftLabel2+'</td>'
+      +'<td style="padding:8px 10px;border-bottom:1px solid var(--border);text-align:center;font-weight:700;font-size:16px">'+p.totalShorts+'</td>'
+      +'<td style="padding:8px 10px;border-bottom:1px solid var(--border);text-align:center;font-weight:700;color:var(--green)">'+p.erroneousShorts+'<div style="font-size:10px;color:'+errColor+'">'+errPct+'%</div></td>'
+      +'<td style="padding:8px 10px;border-bottom:1px solid var(--border);text-align:center;font-weight:700;color:var(--red)">'+p.confirmedShorts+'<div style="font-size:10px;color:'+confColor+'">'+confPct+'%</div></td>'
+      +'<td style="padding:8px 10px;border-bottom:1px solid var(--border);text-align:center;color:var(--orange)">'+p.partialShorts+'</td>'
+      +'<td style="padding:8px 10px;border-bottom:1px solid var(--border);font-size:11px">'+(divSummary||'<span style="color:var(--muted)">—</span>')+'</td>'
+      +'<td style="padding:8px 10px;border-bottom:1px solid var(--border);text-align:center;font-weight:700;color:#7c3aed">'+p.totalOP+'<div style="font-size:10px;color:var(--muted)">'+p.totalOPQty+' units</div></td>'
+      +'<td style="padding:8px 10px;border-bottom:1px solid var(--border);font-size:11px">'+(opDivSummary||'<span style="color:var(--muted)">—</span>')+'</td>'
+      +'</tr>';
+  }).join('');
+
+  var thStyle='padding:8px 10px;background:var(--accent);color:#fff;font-size:11px;font-weight:700;text-align:left;white-space:nowrap;';
+  var thCtr=thStyle+'text-align:center;';
+  var tableHtml='<div style="overflow-x:auto">'
+    +'<table style="width:100%;border-collapse:collapse;font-size:13px">'
+    +'<thead><tr>'
+    +'<th style="'+thStyle+'">Picker</th>'
+    +'<th style="'+thStyle+'">Shift</th>'
+    +'<th style="'+thCtr+'">Total Shorts</th>'
+    +'<th style="'+thCtr+'">Erroneous</th>'
+    +'<th style="'+thCtr+'">Confirmed Short</th>'
+    +'<th style="'+thCtr+'">Partial</th>'
+    +'<th style="'+thStyle+'">Short Divisions</th>'
+    +'<th style="'+thCtr+'">Over Pull Events</th>'
+    +'<th style="'+thStyle+'">OP Divisions</th>'
+    +'</tr></thead>'
+    +'<tbody>'+tableRows+'</tbody>'
+    +'<tfoot><tr style="background:var(--panel2)">'
+    +'<td colspan="2" style="padding:8px 10px;font-weight:700;font-size:13px">TOTALS</td>'
+    +'<td style="padding:8px 10px;text-align:center;font-weight:700">'+totals.totalShorts+'</td>'
+    +'<td style="padding:8px 10px;text-align:center;font-weight:700;color:var(--green)">'+totals.erroneousShorts+'</td>'
+    +'<td style="padding:8px 10px;text-align:center;font-weight:700;color:var(--red)">'+totals.confirmedShorts+'</td>'
+    +'<td style="padding:8px 10px;text-align:center;font-weight:700;color:var(--orange)">'+totals.partialShorts+'</td>'
+    +'<td style="padding:8px 10px"></td>'
+    +'<td style="padding:8px 10px;text-align:center;font-weight:700;color:#7c3aed">'+totals.totalOP+'</td>'
+    +'<td style="padding:8px 10px"></td>'
+    +'</tr></tfoot>'
+    +'</table></div>';
+
+  var filterLabel='';
+  if(kpiStart||kpiEnd)filterLabel+=(kpiStart||'Start')+' \u2013 '+(kpiEnd||'Today');
+  if(kpiPicker){var pn=(pickerProfiles[kpiPicker]&&pickerProfiles[kpiPicker].fullName)||kpiPicker;filterLabel+=(filterLabel?' \u00b7 ':'')+pn;}
+  if(kpiShift)filterLabel+=(filterLabel?' \u00b7 ':'')+kpiShift+' Shift';
+  if(kpiDiv)filterLabel+=(filterLabel?' \u00b7 ':'')+kpiDiv;
+
+  kpiBody.innerHTML='<div class="card" style="margin-top:16px" id="kpiReportContent">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">'
+    +'<div>'
+    +'<div style="font-size:18px;font-weight:800">\u{1F3C6} Picker KPI Report</div>'
+    +(filterLabel?'<div style="font-size:12px;color:var(--muted);margin-top:2px">'+esc(filterLabel)+'</div>':'')
+    +'</div>'
+    +'<button class="btn" onclick="printPickerKpi()" style="font-size:12px">\u{1F5A8} Print This Report</button>'
+    +'</div>'
+    +summaryCards
+    +tableHtml
+    +'</div>';
+}
+
+function printPickerKpi(){
+  var el=document.getElementById('kpiReportContent');
+  if(!el){alert('Run the KPI report first.');return;}
+  var css='*{margin:0;padding:0;box-sizing:border-box}body{font-family:"Segoe UI",Arial,sans-serif;color:#111;font-size:9pt;background:#fff;padding:.5in}'
+    +'table{width:100%;border-collapse:collapse}th{background:#1a2038!important;color:#fff!important;padding:4pt 6pt;font-size:7.5pt;font-weight:700}'
+    +'td{padding:4pt 6pt;border-bottom:.5pt solid #e5e7eb;font-size:8pt}'
+    +'tr:nth-child(even)td{background:#f9fafb}'
+    +'.empty{color:#6b7280;padding:20px;text-align:center}'
+    +'@media print{@page{size:letter landscape;margin:.5in}}';
+  doPrint('<style>'+css+'</style>'+el.outerHTML);
+}
+
+
 function switchReportTab(tab){
-  ['shortage','overpull'].forEach(function(t){
+  ['shortage','overpull','kpi'].forEach(function(t){
     var btn=document.getElementById('rTab-'+t);
     var pane=document.getElementById('rPane-'+t);
     if(btn) btn.classList.toggle('active', t===tab);
     if(pane) pane.style.display=(t===tab?'block':'none');
   });
   if(tab==='overpull') populateOpReportPicker();
+  if(tab==='kpi') populateKpiPicker();
 }
 
 function populateOpReportPicker(){
@@ -3918,12 +4210,12 @@ let currentLang='en';
 
 const LANGS={
   en:{dir:'ltr',
-    'login.title':'Shortage Control Portal','login.subtitle':'Separate shortage reporting app',
+    'login.title':'Picker Accountability Portal','login.subtitle':'Short Picks &amp; Over Pick Report System — 815 Chapman',
     'login.select_role':'Select role',
     'login.clerk_title':'Outbound Clerk','login.clerk_sub':'Shortage Entry',
     'login.ic_title':'IC Team','login.ic_sub':'Verify and Report',
     'login.manager_title':'IC Manager','login.manager_sub':'Settings and Migration',
-    'login.no_login':'No Login Required','login.batch_btn':'Batch Pick Sheet','login.batch_sub':'One item, multiple orders','login.op_btn':'Over Pull Portal','login.op_sub':'Log over-pulled items',
+    'login.no_login':'No Login Required','login.batch_btn':'Master Report Module','login.batch_sub':'Picker KPI & analytics reports','login.op_btn':'Over Pull Portal','login.op_sub':'Log over-pulled items',
     'login.shortage_portal':'Over Pull Portal','login.shortage_portal_sub':'Opens the standalone shortage app (new tab)',
     'login.enter_pin':'Enter PIN','login.back':'Back',
     'form.date_time':'Date & Time','form.division':'Division','form.picker':'Picker',
@@ -3974,7 +4266,7 @@ const LANGS={
     'login.clerk_title':'Empleado de Salida','login.clerk_sub':'Entrada de Escasez',
     'login.ic_title':'Equipo IC','login.ic_sub':'Verificar e Informar',
     'login.manager_title':'Gerente IC','login.manager_sub':'Configuración y Migración',
-    'login.no_login':'Sin Inicio de Sesión','login.batch_btn':'Hoja de Recogida por Lotes','login.batch_sub':'Un artículo, múltiples órdenes','login.op_btn':'Portal de Exceso','login.op_sub':'Registrar artículos en exceso',
+    'login.no_login':'Sin Inicio de Sesión','login.batch_btn':'Módulo de Reportes','login.batch_sub':'Un artículo, múltiples órdenes','login.op_btn':'Portal de Exceso','login.op_sub':'Registrar artículos en exceso',
     'login.shortage_portal':'Portal de Escasez y Exceso','login.shortage_portal_sub':'Abre la app de escasez (nueva pestaña)',
     'login.enter_pin':'Ingresar PIN','login.back':'Regresar',
     'form.date_time':'Fecha y Hora','form.division':'División','form.picker':'Recolector',
@@ -4026,7 +4318,7 @@ const LANGS={
     'login.clerk_title':'کارمند خروجی','login.clerk_sub':'ورود کمبود',
     'login.ic_title':'تیم IC','login.ic_sub':'تأیید و گزارش',
     'login.manager_title':'مدیر IC','login.manager_sub':'تنظیمات و انتقال',
-    'login.no_login':'بدون ورود','login.batch_btn':'برگه برداشت دسته‌ای','login.batch_sub':'یک محصول، چند سفارش','login.op_btn':'پورتل مازاد','login.op_sub':'ثبت اقلام مازاد',
+    'login.no_login':'بدون ورود','login.batch_btn':'ماژول گزارش اصلی','login.batch_sub':'یک محصول، چند سفارش','login.op_btn':'پورتل مازاد','login.op_sub':'ثبت اقلام مازاد',
     'login.shortage_portal':'پورتل کمبود و مازاد','login.shortage_portal_sub':'برنامه کمبود را باز می‌کند (تب جدید)',
     'login.enter_pin':'پین را وارد کنید','login.back':'برگشت',
     'form.date_time':'تاریخ و ساعت','form.division':'بخش','form.picker':'جمع‌آورنده',
@@ -4078,7 +4370,7 @@ const LANGS={
     'login.clerk_title':'Outbound Clerk','login.clerk_sub':'Pagpasok ng Kakulangan',
     'login.ic_title':'Koponan ng IC','login.ic_sub':'I-verify at Mag-ulat',
     'login.manager_title':'IC Manager','login.manager_sub':'Mga Setting at Paglipat',
-    'login.no_login':'Walang Login','login.batch_btn':'Batch Pick Sheet','login.batch_sub':'Isang item, maraming orders','login.op_btn':'Over Pull Portal','login.op_sub':'I-log ang mga item na sobra',
+    'login.no_login':'Walang Login','login.batch_btn':'Master Report Module','login.batch_sub':'Isang item, maraming orders','login.op_btn':'Over Pull Portal','login.op_sub':'I-log ang mga item na sobra',
     'login.shortage_portal':'Portal ng Kakulangan at Sobra','login.shortage_portal_sub':'Binubuksan ang standalone app (bagong tab)',
     'login.enter_pin':'Ilagay ang PIN','login.back':'Bumalik',
     'form.date_time':'Petsa at Oras','form.division':'Dibisyon','form.picker':'Tagapulot',
@@ -4130,7 +4422,7 @@ const LANGS={
     'login.clerk_title':'موظف الشحن','login.clerk_sub':'إدخال النقص',
     'login.ic_title':'فريق IC','login.ic_sub':'التحقق والتقرير',
     'login.manager_title':'مدير IC','login.manager_sub':'الإعدادات والترحيل',
-    'login.no_login':'بدون تسجيل دخول','login.batch_btn':'ورقة الانتقاء الدُفعي','login.batch_sub':'منتج واحد، طلبات متعددة','login.op_btn':'بوابة الزيادة','login.op_sub':'تسجيل العناصر الزائدة',
+    'login.no_login':'بدون تسجيل دخول','login.batch_btn':'وحدة التقارير الرئيسية','login.batch_sub':'منتج واحد، طلبات متعددة','login.op_btn':'بوابة الزيادة','login.op_sub':'تسجيل العناصر الزائدة',
     'login.shortage_portal':'بوابة النقص والزيادة','login.shortage_portal_sub':'يفتح تطبيق النقص (تبويب جديد)',
     'login.enter_pin':'أدخل رمز PIN','login.back':'رجوع',
     'form.date_time':'التاريخ والوقت','form.division':'القسم','form.picker':'جامع البضائع',
