@@ -352,7 +352,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 </div></section>
 
 <section id="restockScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Replenishment</div><h1>Replenishment Report</h1><p>IC Manager only.</p></div><button class="btn primary" onclick="printReplenReport()">Print</button></div><div class="card"><div class="card-title">Inventory Bin Report Import</div><p class="notice">Paste report columns: Bin Name, Product Code, Qty on Hand, Qty Allocated, Unit of Measure.</p><textarea id="binImport" style="width:100%;min-height:160px" placeholder="82-26-01&#9;DI1210&#9;12&#9;0&#9;EA"></textarea><div class="actions" style="margin-top:10px"><button class="btn primary" onclick="saveInventoryBinReport()">Import Bin Report</button></div></div><div id="restockBody"></div></div></section>
-<section id="pickerScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Personnel</div><h1>Manage Pickers &amp; Packers</h1><p>IC Manager only. Names stored as FirstInitialLastName (e.g. JDoe).</p></div></div><div class="card"><div class="card-title">Pickers</div><div class="form-row two"><div class="field"><label>Picker Name (FirstInitialLastName)</label><input id="pickerName" placeholder="JDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPickerManual()">Add Picker</button></div></div><div id="pickerList"></div></div><div class="card"><div class="card-title">Packers</div><div class="form-row two"><div class="field"><label>Packer Name (FirstInitialLastName)</label><input id="packerName" placeholder="MDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackerManual()">Add Packer</button></div></div><div id="packerList"></div></div><div class="card"><div class="card-title">Pack Stations</div><div class="form-row two"><div class="field"><label>Pack Station Name</label><input id="packStationName" placeholder="PS-01"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackStationManual()">Add Station</button></div></div><div id="packStationList"></div></div>
+<section id="pickerScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Personnel</div><h1>Manage Pickers &amp; Packers</h1><p>IC Manager only. Names stored as FirstInitialLastName (e.g. JDoe).</p></div></div><div class="card"><div class="card-title">Pickers</div><div class="form-row two"><div class="field"><label>Picker Name (FirstInitialLastName)</label><input id="pickerName" placeholder="JDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPickerManual()">Add Picker</button></div></div><div id="pickerList"></div></div><div class="card" style="border-left:4px solid var(--accent,#6366f1)"><div class="card-title">&#128279; Merge Duplicate Pickers</div><p style="font-size:13px;color:var(--muted);margin-bottom:12px">Combine duplicate picker entries into one. All shortage and over pull records from the duplicate will be reassigned to the picker you keep.</p><div class="form-row" style="flex-wrap:wrap;gap:10px;align-items:flex-end"><div class="field" style="min-width:180px"><label>Merge FROM (duplicate to remove)</label><select id="mergeFrom"><option value="">Select duplicate...</option></select></div><div class="field" style="min-width:180px"><label>Merge INTO (picker to keep)</label><select id="mergeInto"><option value="">Select keeper...</option></select></div><div class="field"><label>&nbsp;</label><button class="btn orange" onclick="mergePickers()">&#128279; Merge</button></div></div><div id="mergeStatus" style="font-size:13px;margin-top:8px"></div></div><div class="card" style="border-left:4px solid var(--green,#10b981)"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px"><div class="card-title" style="margin:0">&#128221; Picker Add Log</div><button class="btn" style="font-size:12px" onclick="renderAddLog()">&#8635; Refresh Log</button></div><p style="font-size:13px;color:var(--muted);margin-bottom:8px">Audit trail of who added each picker and when.</p><div id="addLogList" style="font-size:13px"></div></div><div class="card"><div class="card-title">Packers</div><div class="form-row two"><div class="field"><label>Packer Name (FirstInitialLastName)</label><input id="packerName" placeholder="MDoe"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackerManual()">Add Packer</button></div></div><div id="packerList"></div></div><div class="card"><div class="card-title">Pack Stations</div><div class="form-row two"><div class="field"><label>Pack Station Name</label><input id="packStationName" placeholder="PS-01"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="addPackStationManual()">Add Station</button></div></div><div id="packStationList"></div></div>
 <div class="card" id="clerkSkippedCard" style="margin-top:16px;border-left:4px solid var(--orange,#f59e0b)">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
     <div>
@@ -923,6 +923,63 @@ function populateKpiPicker(){
   if(cur)sel.value=cur;
 }
 
+function buildKpiTrendChart(trendData){
+  if(!trendData||trendData.length<2){
+    return '<div style="background:var(--panel2);border:1px dashed var(--border);border-radius:10px;padding:24px;text-align:center;color:var(--muted);margin-bottom:16px;font-size:13px">Not enough data across time to show a trend chart. Need at least 2 weeks of records.</div>';
+  }
+  var W=720,H=280,padL=44,padR=20,padT=24,padB=50;
+  var plotW=W-padL-padR,plotH=H-padT-padB;
+  var n=trendData.length;
+  var maxVal=Math.max(1,...trendData.map(function(d){return Math.max(d.shorts,d.overpull,d.erroneous);}));
+  var stepX=n>1?plotW/(n-1):plotW;
+  var x=function(i){return padL+i*stepX;};
+  var y=function(v){return padT+plotH-(v/maxVal)*plotH;};
+
+  // Grid lines + y labels
+  var grid='';
+  var ticks=4;
+  for(var t=0;t<=ticks;t++){
+    var val=Math.round(maxVal/ticks*t);
+    var yy=y(val);
+    grid+='<line x1="'+padL+'" y1="'+yy+'" x2="'+(W-padR)+'" y2="'+yy+'" stroke="#e5e7eb" stroke-width="1"/>';
+    grid+='<text x="'+(padL-8)+'" y="'+(yy+3)+'" text-anchor="end" font-size="9" fill="#9ca3af">'+val+'</text>';
+  }
+
+  // X labels (week start dates)
+  var xlabels='';
+  trendData.forEach(function(d,i){
+    if(n>10&&i%2!==0)return; // skip some labels if crowded
+    var label=d.week.slice(5); // MM-DD
+    xlabels+='<text x="'+x(i)+'" y="'+(H-padB+16)+'" text-anchor="middle" font-size="9" fill="#6b7280">'+label+'</text>';
+  });
+
+  // Build polyline for a series
+  function line(key,color){
+    var pts=trendData.map(function(d,i){return x(i)+','+y(d[key]);}).join(' ');
+    var dots=trendData.map(function(d,i){return '<circle cx="'+x(i)+'" cy="'+y(d[key])+'" r="3" fill="'+color+'"/>';}).join('');
+    return '<polyline points="'+pts+'" fill="none" stroke="'+color+'" stroke-width="2.5"/>'+dots;
+  }
+
+  var shortLine=line('shorts','#6366f1');
+  var errLine=line('erroneous','#10b981');
+  var opLine=line('overpull','#7c3aed');
+
+  var legend='<div style="display:flex;gap:16px;justify-content:center;margin-top:8px;flex-wrap:wrap;font-size:12px">'
+    +'<span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:3px;background:#6366f1;display:inline-block;border-radius:2px"></span>Total Shortages</span>'
+    +'<span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:3px;background:#10b981;display:inline-block;border-radius:2px"></span>Erroneous (found in bin)</span>'
+    +'<span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:3px;background:#7c3aed;display:inline-block;border-radius:2px"></span>Over Pull Events</span>'
+    +'</div>';
+
+  return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px">'
+    +'<div style="font-size:14px;font-weight:700;margin-bottom:4px">Weekly Trend</div>'
+    +'<div style="font-size:11px;color:var(--muted);margin-bottom:8px">Lower shortages and over pulls over time = improvement. Higher erroneous % means the picker is being blamed for items that were actually in the bin.</div>'
+    +'<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;max-height:300px">'
+    +'<rect x="'+padL+'" y="'+padT+'" width="'+plotW+'" height="'+plotH+'" fill="#fafafa"/>'
+    +grid+xlabels+opLine+shortLine+errLine
+    +'</svg>'+legend
+    +'</div>';
+}
+
 async function runPickerKpi(){
   var kpiBody=document.getElementById('kpiBody');
   if(!kpiBody)return;
@@ -1010,6 +1067,31 @@ async function runPickerKpi(){
     if(r.division)p.divOP[r.division]=(p.divOP[r.division]||0)+1;
     p.recentOP.push(r.createdAt||r.date||'');
   });
+
+  // ── Build weekly trend data ──────────────────────
+  function weekKey(dateStr){
+    if(!dateStr)return null;
+    var d=new Date(dateStr);
+    if(isNaN(d))return null;
+    // ISO week start (Monday)
+    var day=d.getDay();var diff=d.getDate()-day+(day===0?-6:1);
+    var monday=new Date(d.setDate(diff));
+    return monday.toISOString().slice(0,10);
+  }
+  var trendMap={};
+  filtShort.forEach(function(r){
+    var wk=weekKey(r.date||r.createdAt);if(!wk)return;
+    if(!trendMap[wk])trendMap[wk]={week:wk,shorts:0,erroneous:0,confirmed:0,overpull:0};
+    trendMap[wk].shorts++;
+    if(r.icConfirmed==='erroneous')trendMap[wk].erroneous++;
+    else if(r.icConfirmed==='confirmed_short')trendMap[wk].confirmed++;
+  });
+  filtOp.forEach(function(r){
+    var wk=weekKey(r.createdAt||r.date);if(!wk)return;
+    if(!trendMap[wk])trendMap[wk]={week:wk,shorts:0,erroneous:0,confirmed:0,overpull:0};
+    trendMap[wk].overpull++;
+  });
+  var trendData=Object.values(trendMap).sort(function(a,b){return a.week.localeCompare(b.week);});
 
   var rows=Object.values(stats);
   if(!rows.length){
@@ -1124,6 +1206,9 @@ async function runPickerKpi(){
   if(kpiShift)filterLabel+=(filterLabel?' \u00b7 ':'')+kpiShift+' Shift';
   if(kpiDiv)filterLabel+=(filterLabel?' \u00b7 ':'')+kpiDiv;
 
+  // ── Build trend chart SVG ─────────────────────────
+  var chartHtml=buildKpiTrendChart(trendData);
+
   kpiBody.innerHTML='<div class="card" style="margin-top:16px" id="kpiReportContent">'
     +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">'
     +'<div>'
@@ -1133,6 +1218,7 @@ async function runPickerKpi(){
     +'<button class="btn" onclick="printPickerKpi()" style="font-size:12px">\u{1F5A8} Print This Report</button>'
     +'</div>'
     +summaryCards
+    +chartHtml
     +tableHtml
     +'</div>';
 }
@@ -2515,7 +2601,160 @@ function submitClerkAddPicker(){
 // ════════════════════════════════════════════════════════
 // RENDER PICKERS (manage pickers screen)
 // ════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════
+// MERGE DUPLICATE PICKERS
+// ════════════════════════════════════════════════════════
+function populateMergeDropdowns(){
+  var fromSel=document.getElementById('mergeFrom');
+  var intoSel=document.getElementById('mergeInto');
+  if(!fromSel||!intoSel)return;
+  var names=pickerNames.filter(function(n){return n!==UNKNOWN_PICKER;}).slice()
+    .sort(function(a,b){
+      var fa=(pickerProfiles[a]&&pickerProfiles[a].fullName)||a;
+      var fb=(pickerProfiles[b]&&pickerProfiles[b].fullName)||b;
+      return fa.localeCompare(fb);
+    });
+  var opts=names.map(function(n){
+    var full=(pickerProfiles[n]&&pickerProfiles[n].fullName)||n;
+    var label=(full&&full!==n)?(full+' ('+n+')'):n;
+    return '<option value="'+esc(n)+'">'+esc(label)+'</option>';
+  }).join('');
+  var curFrom=fromSel.value,curInto=intoSel.value;
+  fromSel.innerHTML='<option value="">Select duplicate...</option>'+opts;
+  intoSel.innerHTML='<option value="">Select keeper...</option>'+opts;
+  if(curFrom)fromSel.value=curFrom;
+  if(curInto)intoSel.value=curInto;
+}
+
+async function mergePickers(){
+  var from=(document.getElementById('mergeFrom')||{}).value||'';
+  var into=(document.getElementById('mergeInto')||{}).value||'';
+  var statusEl=document.getElementById('mergeStatus');
+  function setStatus(msg,color){if(statusEl){statusEl.innerHTML='<span style="color:'+(color||'var(--text)')+'">'+msg+'</span>';}}
+  if(!from||!into){setStatus('Select both pickers.','var(--red)');return;}
+  if(from===into){setStatus('Cannot merge a picker into itself.','var(--red)');return;}
+  var fromFull=(pickerProfiles[from]&&pickerProfiles[from].fullName)||from;
+  var intoFull=(pickerProfiles[into]&&pickerProfiles[into].fullName)||into;
+  if(!confirm('Merge "'+fromFull+'" INTO "'+intoFull+'"?\n\nAll records from '+from+' will be reassigned to '+into+', and '+from+' will be removed. This cannot be undone.'))return;
+
+  setStatus('Merging records...','var(--muted)');
+  showLoading('Reassigning records...');
+  var reassigned=0;
+  try{
+    var s=getSettings();
+    // Reassign shortage records (active + archive)
+    for(var col of [s.activeCollection,s.archiveCollection]){
+      var snap=await db.collection(col).where('picker','==',from).get();
+      var batch=db.batch();var cnt=0;
+      snap.docs.forEach(function(d){
+        batch.update(d.ref,{picker:into,mergedFrom:from,mergedAt:new Date().toISOString()});
+        cnt++;reassigned++;
+        if(cnt%450===0){batch.commit();batch=db.batch();cnt=0;}
+      });
+      if(cnt>0)await batch.commit();
+    }
+    // Reassign overpull records
+    for(var col2 of [s.opActiveCollection||'overpull_active',s.opArchiveCollection||'overpull_archive']){
+      try{
+        var snap2=await db.collection(col2).where('picker','==',from).get();
+        var batch2=db.batch();var cnt2=0;
+        snap2.docs.forEach(function(d){
+          batch2.update(d.ref,{picker:into,mergedFrom:from,mergedAt:new Date().toISOString()});
+          cnt2++;reassigned++;
+          if(cnt2%450===0){batch2.commit();batch2=db.batch();cnt2=0;}
+        });
+        if(cnt2>0)await batch2.commit();
+      }catch(opErr){console.warn('overpull merge:',opErr);}
+    }
+    // Merge profile: keep "into", add "from" as alias
+    if(pickerProfiles[into]){
+      pickerProfiles[into].aliases=pickerProfiles[into].aliases||[];
+      if(!pickerProfiles[into].aliases.includes(from))pickerProfiles[into].aliases.push(from);
+    }
+    // Record merge in add log
+    var log=JSON.parse(localStorage.getItem('scp_picker_log')||'[]');
+    log.push({action:'merge',from:from,into:into,by:role||'manager',at:new Date().toISOString(),records:reassigned});
+    localStorage.setItem('scp_picker_log',JSON.stringify(log));
+    // Remove the duplicate
+    delete pickerProfiles[from];
+    pickerNames=pickerNames.filter(function(p){return p!==from;});
+    localStorage.setItem('scp_pickers',JSON.stringify(pickerNames));
+    localStorage.removeItem('scp_personnel_cache');
+    await setPersonnelInFirestore();
+    clearCaches();
+    populatePickerSelects();renderPickers();
+    hideLoading();
+    setStatus('&#10003; Merged! '+reassigned+' record(s) reassigned from '+from+' to '+into+'.','var(--green)');
+  }catch(e){
+    hideLoading();
+    setStatus('Merge failed: '+e.message,'var(--red)');
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// PICKER ADD LOG (audit trail)
+// ════════════════════════════════════════════════════════
+function renderAddLog(){
+  var listEl=document.getElementById('addLogList');
+  if(!listEl)return;
+  // Build from pickerProfiles addedBy/addedAt + the merge log
+  var entries=[];
+  Object.keys(pickerProfiles||{}).forEach(function(n){
+    var p=pickerProfiles[n];
+    if(p.addedBy||p.addedAt){
+      entries.push({
+        type:'add',name:n,fullName:p.fullName||n,
+        by:p.addedBy||'(unknown)',at:p.addedAt||'',
+        shift:p.shift||''
+      });
+    }
+  });
+  var mergeLog=JSON.parse(localStorage.getItem('scp_picker_log')||'[]');
+  mergeLog.forEach(function(m){
+    if(m.action==='merge'){
+      entries.push({type:'merge',name:m.from,into:m.into,by:m.by,at:m.at,records:m.records});
+    }
+  });
+  entries.sort(function(a,b){return (b.at||'').localeCompare(a.at||'');});
+
+  if(!entries.length){
+    listEl.innerHTML='<div style="color:var(--muted);padding:12px">No picker additions logged yet. The log records who adds each picker (name required at entry).</div>';
+    return;
+  }
+
+  var rows=entries.map(function(e){
+    var when=e.at?new Date(e.at).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'}):'—';
+    if(e.type==='merge'){
+      return '<tr style="background:rgba(251,146,60,.06)">'
+        +'<td style="padding:6px 10px;border-bottom:1px solid var(--border)"><span style="color:var(--orange);font-weight:700">&#128279; MERGED</span></td>'
+        +'<td style="padding:6px 10px;border-bottom:1px solid var(--border);font-family:monospace">'+esc(e.name)+' &rarr; '+esc(e.into)+'</td>'
+        +'<td style="padding:6px 10px;border-bottom:1px solid var(--border)">'+esc(e.by)+'</td>'
+        +'<td style="padding:6px 10px;border-bottom:1px solid var(--border);font-size:12px;color:var(--muted)">'+when+'</td>'
+        +'<td style="padding:6px 10px;border-bottom:1px solid var(--border);font-size:12px">'+(e.records||0)+' records</td>'
+        +'</tr>';
+    }
+    return '<tr>'
+      +'<td style="padding:6px 10px;border-bottom:1px solid var(--border)"><span style="color:var(--green);font-weight:700">+ ADDED</span></td>'
+      +'<td style="padding:6px 10px;border-bottom:1px solid var(--border)"><strong>'+esc(e.fullName)+'</strong> <span style="font-family:monospace;font-size:12px;color:var(--muted)">('+esc(e.name)+')</span></td>'
+      +'<td style="padding:6px 10px;border-bottom:1px solid var(--border)">'+esc(e.by)+'</td>'
+      +'<td style="padding:6px 10px;border-bottom:1px solid var(--border);font-size:12px;color:var(--muted)">'+when+'</td>'
+      +'<td style="padding:6px 10px;border-bottom:1px solid var(--border);font-size:12px">'+esc(e.shift||'—')+' shift</td>'
+      +'</tr>';
+  }).join('');
+
+  listEl.innerHTML='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">'
+    +'<thead><tr>'
+    +'<th style="padding:6px 10px;background:var(--panel2);text-align:left;font-size:11px;text-transform:uppercase;color:var(--muted)">Action</th>'
+    +'<th style="padding:6px 10px;background:var(--panel2);text-align:left;font-size:11px;text-transform:uppercase;color:var(--muted)">Picker</th>'
+    +'<th style="padding:6px 10px;background:var(--panel2);text-align:left;font-size:11px;text-transform:uppercase;color:var(--muted)">By</th>'
+    +'<th style="padding:6px 10px;background:var(--panel2);text-align:left;font-size:11px;text-transform:uppercase;color:var(--muted)">When</th>'
+    +'<th style="padding:6px 10px;background:var(--panel2);text-align:left;font-size:11px;text-transform:uppercase;color:var(--muted)">Detail</th>'
+    +'</tr></thead><tbody>'+rows+'</tbody></table></div>';
+}
+
 function renderPickers(){
+  if(typeof populateMergeDropdowns==='function')populateMergeDropdowns();
+  if(typeof renderAddLog==='function')renderAddLog();
   if(!canManage())return;
   var statusF=($('pickerFilterStatus')||{}).value||'';
   var shiftF=($('pickerFilterShift')||{}).value||'';
