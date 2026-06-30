@@ -366,7 +366,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 
 </div></section>
 <section id="migrationScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Migration</div><h1>Old Firebase Migration</h1><p>Copies old shortage records into the new shortage database. Does not delete the old database.</p></div></div><div class="card"><div class="notice">Source: <b>inventory-control-portal</b> collection <b>shortages</b>. Destination: current active collection.</div><div class="form-row three"><div class="field"><label>Old Collection</label><input id="oldCollection" value="shortages"></div><div class="field"><label>Limit</label><input id="migLimit" type="number" value="5000"></div><div class="field"><label>&nbsp;</label><button class="btn primary" onclick="runMigration()">Run Migration</button></div></div><div id="migrationResult"></div></div></div></section>
-<section id="settingsScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Settings</div><h1>Firebase Settings</h1><p>IC Manager only.</p></div></div><div class="card"><div class="form-row two"><div class="field"><label>API Key</label><input id="cfgApiKey"></div><div class="field"><label>Auth Domain</label><input id="cfgAuthDomain"></div><div class="field"><label>Project ID</label><input id="cfgProjectId"></div><div class="field"><label>Storage Bucket</label><input id="cfgStorageBucket"></div><div class="field"><label>Messaging Sender ID</label><input id="cfgSenderId"></div><div class="field"><label>App ID</label><input id="cfgAppId"></div><div class="field"><label>Active Collection</label><input id="cfgActiveCollection"></div><div class="field"><label>Archive Collection</label><input id="cfgArchiveCollection"></div></div><label class="toggle"><input id="themeToggle" type="checkbox" onchange="saveTheme(this.checked)"> Light mode</label><div class="actions" style="margin-top:14px"><button class="btn primary" onclick="saveSettings()">Save Settings</button><button class="btn" onclick="testFirebaseConnection()">&#128268; Test Connection</button><button class="btn red" onclick="forceReloadAllClients()" style="margin-left:auto">&#128257; Force Reload All Open Instances</button></div></div></div></section>
+<section id="settingsScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Settings</div><h1>Firebase Settings</h1><p>IC Manager only.</p></div></div><div class="card" style="border-left:4px solid var(--orange)"><div class="card-title">&#128295; Data Maintenance</div><p style="font-size:13px;color:var(--muted);margin-bottom:12px">If archived records are missing their IC labels (Confirmed Short, Erroneous Bin, 2nd Location) in reports, run this one-time repair to restore them from saved data.</p><button class="btn orange" onclick="repairArchivedIcLabels()">&#128295; Repair Archived IC Labels</button></div><div class="card"><div class="form-row two"><div class="field"><label>API Key</label><input id="cfgApiKey"></div><div class="field"><label>Auth Domain</label><input id="cfgAuthDomain"></div><div class="field"><label>Project ID</label><input id="cfgProjectId"></div><div class="field"><label>Storage Bucket</label><input id="cfgStorageBucket"></div><div class="field"><label>Messaging Sender ID</label><input id="cfgSenderId"></div><div class="field"><label>App ID</label><input id="cfgAppId"></div><div class="field"><label>Active Collection</label><input id="cfgActiveCollection"></div><div class="field"><label>Archive Collection</label><input id="cfgArchiveCollection"></div></div><label class="toggle"><input id="themeToggle" type="checkbox" onchange="saveTheme(this.checked)"> Light mode</label><div class="actions" style="margin-top:14px"><button class="btn primary" onclick="saveSettings()">Save Settings</button><button class="btn" onclick="testFirebaseConnection()">&#128268; Test Connection</button><button class="btn red" onclick="forceReloadAllClients()" style="margin-left:auto">&#128257; Force Reload All Open Instances</button></div></div></div></section>
 <section id="overpullScreen" class="screen"><div class="wrap">
 
   <!-- Header -->
@@ -4189,6 +4189,7 @@ async function icConfirmSubmitAll(){
     const verifiedAt=new Date().toISOString();
     const verifiedBy=role;
 
+    const updateMap={};
     for(const [id,edit] of entries){
       const r=shortages.find(x=>x.id===id&&!x._archived);
       if(!r)continue;
@@ -4222,6 +4223,7 @@ async function icConfirmSubmitAll(){
         update.status='confirmed_short';
       }
       // skip = no status change, stays open for next pass
+      updateMap[id]=update;
       batch.set(ref,update,{merge:true});
       count++;
       if(count%499===0){batches.push(batch);batch=db.batch();count=0;}
@@ -4238,7 +4240,16 @@ async function icConfirmSubmitAll(){
         if(!r)continue;
         const srcRef=db.collection(s.activeCollection).doc(id);
         const dstRef=db.collection(s.archiveCollection).doc(id);
-        archBatch.set(dstRef,{...r,_archived:true,archivedAt:verifiedAt,archivedBy:verifiedBy,archiveReason:r.icConfirmed||'ic_verified'},{merge:true});
+        // Merge the IC verification update so confirmed_short/erroneous/status
+        // and all IC fields are preserved in the archived copy.
+        const icUpdate=updateMap[id]||{};
+        const archivedRecord=Object.assign({},r,icUpdate,{
+          _archived:true,archivedAt:verifiedAt,archivedBy:verifiedBy,
+          archiveReason:icUpdate.icConfirmed||r.icConfirmed||'ic_verified'
+        });
+        // Strip transient/local-only fields that shouldn't persist
+        delete archivedRecord.id;
+        archBatch.set(dstRef,archivedRecord,{merge:true});
         archBatch.delete(srcRef);
       }
       await archBatch.commit();
