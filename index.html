@@ -1558,13 +1558,12 @@ function printOverPullReportFromBody(){
 }
 
 async function runReportPull(){
-  const mode=$('reportMode').value;
-  const hasDateRange=!!($('reportStart').value||$('reportEnd').value);
-  // When a date range is specified, always pull both active + archive so
-  // archived records from older dates appear in the report
-  const loadMode=hasDateRange?'both':mode;
-  $('viewMode').value=loadMode;
+  // Reports ALWAYS load both active + archived so IC-confirmed records
+  // (which get auto-archived after verification) always appear.
+  $('viewMode').value='both';
+  showLoading('Loading all records...');
   await loadShortages(true);
+  hideLoading();
   renderReports();
 }
 function normalizeDate(v){if(!v)return '';try{if(v.toDate)return v.toDate().toISOString().slice(0,10);const str=String(v);if(/^\d{4}-\d{2}-\d{2}/.test(str))return str.slice(0,10);const t=Date.parse(str);return isNaN(t)?str.slice(0,10):new Date(t).toISOString().slice(0,10)}catch(e){return ''}}
@@ -1579,12 +1578,9 @@ function filteredRows(forReport=false){
     // When a date range is given for reports, include all matching records
     // regardless of archive status — archived = historical data still belongs in report
     if(forReport&&(start||end)){/* include all — already loaded 'both' */}
-    else if(forReport&&mode==='active'&&r._archived){
-      // Keep IC-verified records (confirmed/erroneous) even if archived —
-      // they were auto-archived after IC review but belong in active reports
-      if(!(r.icConfirmed==='confirmed_short'||r.icConfirmed==='erroneous'||r.foundInShortedBin||r.secondLocationFilled))return false;
-    }
-    else if(forReport&&mode==='archive'&&!r._archived)return false;
+    // Reports include BOTH active and archived records by default —
+    // only filter by archive status if user explicitly chose archive-only
+    if(forReport&&mode==='archive'&&!r._archived)return false;
     if(!text)return true;
     return [r.productCode,r.shortedBin,r.picker,r.pickDemand,r.division,r.notes].join(' ').toLowerCase().includes(text);
   });
@@ -1902,8 +1898,15 @@ function hasSecondLocationEvidence(r){
 }
 function isErrBackorder(r){return !!r.foundInShortedBin&&!hasSecondLocationEvidence(r);}
 
-function renderReports(){
+async function renderReports(){
   if(!canRunReports()){showScreen('shortage');return}
+  // Ensure both active + archived are loaded for complete report
+  if(lastLoadMode!=='both'){
+    var _vm=$('viewMode');if(_vm)_vm.value='both';
+    showLoading('Loading all records...');
+    try{await loadShortages(true);}catch(e){}
+    hideLoading();
+  }
   const rows=filteredRows(true);
   const st=reportStats(rows);
   const duplicate=Object.values(rows.reduce((a,r)=>{
