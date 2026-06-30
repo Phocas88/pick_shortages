@@ -265,7 +265,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
           <select id="reportMode">
             <option value="active">Active Only</option>
             <option value="archive">Archived History</option>
-            <option value="both">Active + Archived (Default)</option>
+            <option value="both" selected>Active + Archived (Default)</option>
           </select>
         </div>
         <div class="field"><label>Start Date</label><input id="reportStart" type="date"></div>
@@ -1579,7 +1579,11 @@ function filteredRows(forReport=false){
     // When a date range is given for reports, include all matching records
     // regardless of archive status — archived = historical data still belongs in report
     if(forReport&&(start||end)){/* include all — already loaded 'both' */}
-    else if(forReport&&mode==='active'&&r._archived)return false;
+    else if(forReport&&mode==='active'&&r._archived){
+      // Keep IC-verified records (confirmed/erroneous) even if archived —
+      // they were auto-archived after IC review but belong in active reports
+      if(!(r.icConfirmed==='confirmed_short'||r.icConfirmed==='erroneous'||r.foundInShortedBin||r.secondLocationFilled))return false;
+    }
     else if(forReport&&mode==='archive'&&!r._archived)return false;
     if(!text)return true;
     return [r.productCode,r.shortedBin,r.picker,r.pickDemand,r.division,r.notes].join(' ').toLowerCase().includes(text);
@@ -2060,7 +2064,13 @@ function doPrint(h){
     setTimeout(function(){URL.revokeObjectURL(u);},60000);});
 }
 
-function printSummaryReport(){
+async function printSummaryReport(){
+  // Always load BOTH active + archived so IC-confirmed (auto-archived)
+  // records with second locations / erroneous flags appear in the report
+  var _vm=$('viewMode');if(_vm)_vm.value='both';
+  showLoading('Loading all records...');
+  try{await loadShortages(true);}catch(e){console.warn('print load:',e);}
+  hideLoading();
   const fromStr=$('reportStart')?.value;
   const toStr=$('reportEnd')?.value;
   const mode=$('reportMode')?.value||lastLoadMode;
@@ -2302,7 +2312,11 @@ ${rows.filter(r=>r.icConfirmed==='confirmed_short').length?`
   doPrint(html);
 }
 
-function printCheckReport(){
+async function printCheckReport(){
+  var _vm2=$('viewMode');if(_vm2)_vm2.value='both';
+  showLoading('Loading all records...');
+  try{await loadShortages(true);}catch(e){}
+  hideLoading();
   const fromStr=$('reportStart')?.value;
   const toStr=$('reportEnd')?.value;
   const today=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
