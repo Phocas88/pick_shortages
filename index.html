@@ -243,7 +243,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 
 <section id="pinScreen" class="screen"><div class="pin-card"><div id="pinBadge" class="pin-div-badge">Role</div><p style="color:var(--muted);font-size:12px">Enter PIN</p><div id="pinDots" class="pin-dots"><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span><span class="pin-dot"></span></div><div class="pin-keypad"><button class="pin-key" data-key="1" onclick="pinKey('1')">1</button><button class="pin-key" data-key="2" onclick="pinKey('2')">2</button><button class="pin-key" data-key="3" onclick="pinKey('3')">3</button><button class="pin-key" data-key="4" onclick="pinKey('4')">4</button><button class="pin-key" data-key="5" onclick="pinKey('5')">5</button><button class="pin-key" data-key="6" onclick="pinKey('6')">6</button><button class="pin-key" data-key="7" onclick="pinKey('7')">7</button><button class="pin-key" data-key="8" onclick="pinKey('8')">8</button><button class="pin-key" data-key="9" onclick="pinKey('9')">9</button><button class="pin-key clr" onclick="pinClear()">CLR</button><button class="pin-key" data-key="0" onclick="pinKey('0')">0</button><button class="pin-key clr" onclick="pinBack()">&#9003;</button></div><div id="pinError" class="pin-error"></div><button class="pin-back-btn" onclick="backToLogin()">Back</button></div></section>
 <section id="shortageScreen" class="screen"><div class="wrap"><div class="page-head"><div><div class="eyebrow">Outbound</div><h1>Shortage Entry</h1><p>Log shortage lines and review active records.</p></div><div id="shortageTopActions" class="actions"></div></div><div class="card" id="entryCard"><div class="form-row four"><div class="field"><label>Date &amp; Time</label><input id="sDate" type="datetime-local"></div><div class="field"><label>Division <em>*</em></label><select id="sDiv"><option value="">Select</option><option value="NH">NH</option><option value="GT">GT</option><option value="FS">FS</option><option value="EE">EE</option><option value="BC">BC</option><option value="CF">CF</option><option value="VP">VP – VIP</option><option value="TP">TP – Transpac</option></select></div><div class="field"><label>Picker <em>*</em></label><select id="sPickerSelect" onchange="onPickerSelectChange('sPickerSelect','sPickerNew','sPicker')" style="flex:1"><option value="">-- Select Picker --</option></select>
-          <div id="addPickerBtnWrap" style="margin-top:6px;display:none"><button type="button" class="btn" style="font-size:12px;width:100%" onclick="openClerkAddPickerModal()">+ Add New Picker...</button></div><input id="sPicker" type="hidden"></div><div class="field"><label>Pack Station</label><select id="sPackStation"><option value="">-- Select Station --</option></select></div><div class="field"><label>Pick Demand # <em>*</em></label><input id="sDemand" placeholder="e.g. NH00012345" oninput="autoDivisionFromDemand()"></div><div class="field"><label>Shift Override</label><select id="sShift"><option value="auto">Auto (use current time)</option><option value="1st">1st Shift (6am–3:30pm)</option><option value="2nd">2nd Shift (3:30pm–12am)</option><option value="weekend_ot">Weekend OT (6am–12am)</option></select></div></div><div class="card-title">Product Lines</div><div id="productLines"></div><div class="actions"><button class="btn" onclick="addProductLine()">+ Add Line</button><button class="btn" onclick="clearEntry()">Clear Form</button><button class="btn primary" style="flex:1" onclick="saveShortage()">+ Log All Shortages</button></div><div class="field" style="margin-top:12px"><label>Notes</label><textarea id="sNotes"></textarea></div></div><div class="filters"><input id="filterText" class="search" placeholder="Search by product, order, picker, division..." oninput="renderShortages()"><select id="viewMode" onchange="loadShortages(true)"><option value="active">Active</option><option value="archive">Archived History</option><option value="both">Active + Archived</option></select><input id="filterStart" type="date" onchange="renderShortages()"><input id="filterEnd" type="date" onchange="renderShortages()"><button class="btn" onclick="loadShortages(true)">Refresh Data</button></div><div id="archiveActions" class="actions" style="margin-bottom:10px"></div><div id="shortageList" class="shortage-list"></div></div></section>
+          <div id="addPickerBtnWrap" style="margin-top:6px;display:none"><button type="button" class="btn" style="font-size:12px;width:100%" onclick="openClerkAddPickerModal()">+ Add New Picker...</button></div><input id="sPicker" type="hidden"></div><div class="field"><label>Pack Station</label><select id="sPackStation"><option value="">-- Select Station --</option></select></div><div class="field"><label>Pick Demand # <em>*</em></label><input id="sDemand" placeholder="e.g. NH00012345" oninput="autoDivisionFromDemand()"></div><div class="field"><label>Shift Override</label><select id="sShift"><option value="auto">Auto (use current time)</option><option value="1st">1st Shift (6am–3:30pm)</option><option value="2nd">2nd Shift (3:30pm–12am)</option><option value="weekend_ot">Weekend OT (6am–12am)</option></select></div></div><div class="card-title">Product Lines</div><div id="productLines"></div><div class="actions"><button class="btn" onclick="addProductLine()">+ Add Line</button><button class="btn" style="border-color:rgba(99,102,241,.4);color:var(--accent,#6366f1)" onclick="openBatchShortModal()">&#128230; Batch Order Short (1 bin, many orders)</button><button class="btn" onclick="clearEntry()">Clear Form</button><button class="btn primary" style="flex:1" onclick="saveShortage()">+ Log All Shortages</button></div><div class="field" style="margin-top:12px"><label>Notes</label><textarea id="sNotes"></textarea></div></div><div class="filters"><input id="filterText" class="search" placeholder="Search by product, order, picker, division..." oninput="renderShortages()"><select id="viewMode" onchange="loadShortages(true)"><option value="active">Active</option><option value="archive">Archived History</option><option value="both">Active + Archived</option></select><input id="filterStart" type="date" onchange="renderShortages()"><input id="filterEnd" type="date" onchange="renderShortages()"><button class="btn" onclick="loadShortages(true)">Refresh Data</button></div><div id="archiveActions" class="actions" style="margin-bottom:10px"></div><div id="shortageList" class="shortage-list"></div></div></section>
 <section id="reportScreen" class="screen"><div class="wrap">
   <div class="page-head"><div>
     <div class="eyebrow">Reports</div>
@@ -498,6 +498,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
   </div>
 
 </div></section>
+
 <div id="loading" class="loading"><div class="loading-card" id="loadingText">Loading...</div></div>
 <div id="printArea" class="print-area"></div>
 <script>
@@ -1585,7 +1586,50 @@ function filteredRows(forReport=false){
     return [r.productCode,r.shortedBin,r.picker,r.pickDemand,r.division,r.notes].join(' ').toLowerCase().includes(text);
   });
 }
-function renderShortages(){visibleShortages=filteredRows(false);$('shortageList').innerHTML=visibleShortages.length?visibleShortages.map(rowHtml).join(''):`<div class="empty">${t('list.no_shortages')}</div>`;renderCheckPreview();}
+// ════════════════════════════════════════════════════════
+// GROUP SHORTAGES — combine batch-order records & identical
+// bin/product entries so IC sees one line instead of many.
+// ════════════════════════════════════════════════════════
+function groupShortages(rows){
+  var groups={};
+  var singles=[];
+  rows.forEach(function(r){
+    // Group key: batchGroupId if present, else product+bin+picker+date(day)
+    var key;
+    if(r.batchGroupId){
+      key=r.batchGroupId;
+    } else {
+      // Also auto-group identical product+bin+picker on same day (multiple orders)
+      var day=(r.date||r.createdAt||'').slice(0,10);
+      key='AUTO::'+(r.productCode||'')+'::'+(r.shortedBin||'')+'::'+(r.picker||'')+'::'+day+'::'+(r._archived?'a':'x')+'::'+(r.icConfirmed||'')+'::'+(r.secondLocationFilled?'2':'')+'::'+(r.foundInShortedBin?'e':'');
+    }
+    if(!groups[key])groups[key]={members:[],orders:new Set(),totalQty:0};
+    groups[key].members.push(r);
+    if(r.pickDemand)groups[key].orders.add(r.pickDemand);
+    groups[key].totalQty+=num(r.qtyShorted);
+  });
+  var result=[];
+  Object.values(groups).forEach(function(g){
+    if(g.members.length===1){
+      result.push(g.members[0]);
+    } else {
+      // Build a combined representative record
+      var rep=Object.assign({},g.members[0]);
+      rep._grouped=true;
+      rep._groupCount=g.members.length;
+      rep._groupOrders=[...g.orders].sort();
+      rep._groupMembers=g.members;
+      rep.qtyShorted=g.totalQty;
+      rep._groupIds=g.members.map(function(m){return m.id;});
+      result.push(rep);
+    }
+  });
+  // Preserve sort order (most recent first)
+  result.sort(function(a,b){return shortageSortValue(b)-shortageSortValue(a);});
+  return result;
+}
+
+function renderShortages(){var raw=filteredRows(false);visibleShortages=groupShortages(raw);$('shortageList').innerHTML=visibleShortages.length?visibleShortages.map(rowHtml).join(''):`<div class="empty">${t('list.no_shortages')}</div>`;renderCheckPreview();}
 function isBackorderRisk(r){return !!r.foundInShortedBin&&!r.secondLocationFilled}
 function statusBadges(r){let b=[];if(r.batchPick)b.push('<span class="badge purple">Batch Pick</span>');if(r._archived)b.push(`<span class="badge purple">${t('badge.archived')}</span>`);if(r.icConfirmed==='confirmed_short')b.push(`<span class="badge green">&#10003; ${t('badge.confirmed')}</span>`);if(r.icConfirmed==='erroneous')b.push(`<span class="badge yellow">&#9888; ${t('badge.erroneous')}</span>`);else if(r.foundInShortedBin)b.push(`<span class="badge yellow">${t('badge.erroneous')}</span>`);if(isBackorderRisk(r))b.push(`<span class="badge red">${t('badge.backorder')}</span>`);if(r.secondLocationFilled)b.push(`<span class="badge blue">${t('badge.second_loc')}</span>`);if(r.replenishedAfterPick)b.push(`<span class="badge green">${t('badge.replenished')}</span>`);return b.join(' ')}
 function secondarySummary(r){const locs=Array.isArray(r.secondaryLocations)?r.secondaryLocations:[];return locs.map(x=>`${x.bin||'NO BIN'}: ${x.qty||0} ${x.uom||r.uom||'EA'}${x.icQtyOnHand?` (OH ${x.icQtyOnHand})`:''}${x.notes?` - ${x.notes}`:''}`).join(' | ')}
@@ -1618,11 +1662,155 @@ function rowHtml(r){
         </div>
         <div class="sr-meta" style="margin-top:4px">${esc(r.date||'No date')} &bull; <strong>${esc(r.division||'')}</strong> &bull; ${t('row.qty')} <strong>${esc(r.qtyShorted||'')} ${esc(r.uom||'')}</strong> &bull; ${t('row.demand')} ${esc(r.pickDemand||'')} &bull; ${t('row.picker')} ${esc(r.picker||'')}${r.packStation?' &bull; '+esc(r.packStation):''}</div>
         ${icFoundLine}
-        ${_origPartialLine||''}${sec?`<div class="sr-meta"><strong>${t('row.second_filled')}</strong>${_partialTag} ${esc(sec)}</div>`:''}
+        ${r._grouped?`<div class="sr-meta" style="color:var(--accent,#6366f1);font-weight:700">&#128230; Batch: ${r._groupCount} orders affected — ${esc(r._groupOrders.join(', '))} (total qty ${r.qtyShorted})</div>`:''}${_origPartialLine||''}${sec?`<div class="sr-meta"><strong>${t('row.second_filled')}</strong>${_partialTag} ${esc(sec)}</div>`:''}
         <div class="sr-actions" style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">${edit}${mark}${unarch}</div>
       </div>
     </div>
   </div>`}
+// ════════════════════════════════════════════════════════
+// BATCH ORDER SHORTAGE — one product/bin shorted across many orders
+// ════════════════════════════════════════════════════════
+function openBatchShortModal(){
+  var el=document.getElementById('batchShortModal');if(el)el.remove();
+  el=document.createElement('div');el.id='batchShortModal';
+  el.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;z-index:99999;background:rgba(15,20,40,.8);display:flex;align-items:flex-start;justify-content:center;padding:20px;box-sizing:border-box;overflow-y:auto';
+  el.innerHTML=
+    '<div style="background:var(--surface,#fff);border-radius:16px;width:100%;max-width:560px;box-shadow:0 8px 40px rgba(0,0,0,.5);overflow:hidden;margin:auto">'
+    +'<div style="padding:16px 20px;background:var(--accent,#6366f1);color:#fff">'
+    +'<div style="font-size:16px;font-weight:700">&#128230; Batch Order Shortage</div>'
+    +'<div style="font-size:12px;opacity:.9;margin-top:3px">One product short in one bin, affecting multiple orders (batch pick).</div></div>'
+    +'<div style="padding:20px;display:flex;flex-direction:column;gap:14px">'
+    // Shared product/bin/qty
+    +'<div style="display:grid;grid-template-columns:1fr 90px;gap:10px">'
+    +'<div><label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:5px">Product Code *</label>'
+    +'<input id="bsProduct" placeholder="E.G. DI1210" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:14px;text-transform:uppercase;box-sizing:border-box"></div>'
+    +'<div><label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:5px">Total Qty Short *</label>'
+    +'<input id="bsQty" type="number" min="0" step="1" placeholder="0" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:14px;text-align:center;box-sizing:border-box"></div>'
+    +'</div>'
+    +'<div><label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:5px">Bin Shorted *</label>'
+    +'<input id="bsBin" placeholder="82-26-01 / P12345 / BULK" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:14px;text-transform:uppercase;box-sizing:border-box"></div>'
+    // Orders list
+    +'<div><label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:5px">Pick Demand # / Orders Affected *</label>'
+    +'<div style="font-size:11px;color:var(--muted);margin-bottom:6px">Add each order number that was short this product from this bin.</div>'
+    +'<div style="display:flex;gap:6px;margin-bottom:8px">'
+    +'<input id="bsOrderInput" placeholder="e.g. NH00012345" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:14px;text-transform:uppercase;box-sizing:border-box" onkeydown="if(event.key===\'Enter\'){event.preventDefault();bsAddOrder();}">'
+    +'<button class="btn primary" onclick="bsAddOrder()" style="white-space:nowrap">+ Add</button>'
+    +'</div>'
+    +'<div id="bsOrderList" style="display:flex;flex-wrap:wrap;gap:6px;min-height:30px"></div>'
+    +'</div>'
+    +'<div id="bsError" style="font-size:12px;color:var(--red,#ef4444);display:none"></div>'
+    +'</div>'
+    +'<div style="padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end">'
+    +'<button class="btn" onclick="closeBatchShortModal()">Cancel</button>'
+    +'<button class="btn primary" onclick="saveBatchShort()">&#10003; Log Batch Shortage</button>'
+    +'</div></div>';
+  document.body.appendChild(el);
+  window._bsOrders=[];
+  setTimeout(function(){var p=document.getElementById('bsProduct');if(p)p.focus();},50);
+}
+
+function closeBatchShortModal(){
+  var m=document.getElementById('batchShortModal');if(m)m.remove();
+  delete window._bsOrders;
+}
+
+function bsAddOrder(){
+  var inp=document.getElementById('bsOrderInput');
+  var val=(inp.value||'').trim().toUpperCase();
+  if(!val)return;
+  if(!window._bsOrders)window._bsOrders=[];
+  if(window._bsOrders.includes(val)){inp.value='';return;}
+  window._bsOrders.push(val);
+  inp.value='';inp.focus();
+  bsRenderOrders();
+}
+
+function bsRemoveOrder(o){
+  window._bsOrders=(window._bsOrders||[]).filter(function(x){return x!==o;});
+  bsRenderOrders();
+}
+
+function bsRenderOrders(){
+  var listEl=document.getElementById('bsOrderList');
+  if(!listEl)return;
+  var orders=window._bsOrders||[];
+  if(!orders.length){listEl.innerHTML='<span style="color:var(--muted);font-size:12px">No orders added yet.</span>';return;}
+  listEl.innerHTML=orders.map(function(o){
+    return '<span style="display:inline-flex;align-items:center;gap:5px;background:var(--accent-l,rgba(99,102,241,.1));color:var(--accent,#6366f1);padding:4px 10px;border-radius:14px;font-size:13px;font-family:monospace;font-weight:700">'
+      +esc(o)+'<span onclick="bsRemoveOrder(\''+esc(o)+'\')" style="cursor:pointer;font-size:16px;line-height:1">&times;</span></span>';
+  }).join('');
+}
+
+async function saveBatchShort(){
+  if(!ensureDb())return;
+  var product=(document.getElementById('bsProduct').value||'').trim().toUpperCase();
+  var qty=num(document.getElementById('bsQty').value);
+  var bin=(document.getElementById('bsBin').value||'').trim().toUpperCase();
+  var orders=window._bsOrders||[];
+  var errEl=document.getElementById('bsError');
+  function showErr(m){if(errEl){errEl.textContent=m;errEl.style.display='block';}}
+
+  if(!product){showErr('Product Code is required.');return;}
+  if(!bin){showErr('Bin Shorted is required.');return;}
+  if(!validateBinFormat(bin).ok){showErr('Invalid bin format.');return;}
+  if(qty<=0){showErr('Total Qty Short must be greater than 0.');return;}
+  if(!orders.length){showErr('Add at least one order number.');return;}
+
+  // Read shared header fields from the main form
+  var _pickerVal=($('sPicker').value||'').trim()||(function(){var s=$('sPickerSelect');return s&&s.value?s.value:'';})();
+  if(!_pickerVal){showErr('Select a Picker in the main form first.');return;}
+  var division=$('sDiv').value||demandDivision(orders[0])||'';
+  if(!division){showErr('Select a Division in the main form first.');return;}
+
+  // Create a batch group ID so IC can see these as ONE combined entry
+  var batchId='BATCH-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);
+
+  var base={
+    date:$('sDate').value||nowLocalInput(),
+    division:division,
+    picker:normalizeName(_pickerVal),
+    packStation:($('sPackStation')?.value||''),
+    shift:shiftValue(),
+    uom:'EA',
+    productCode:product,
+    shortedBin:bin,
+    createdAt:new Date().toISOString(),
+    createdBy:role,
+    foundInShortedBin:false,
+    secondLocationFilled:false,
+    replenishedAfterPick:false,
+    status:'open',
+    // Batch grouping fields
+    batchGroupId:batchId,
+    batchOrderCount:orders.length,
+    batchOrders:orders.slice()
+  };
+
+  showLoading('Logging batch shortage...');
+  try{
+    var batch=db.batch();
+    var col=db.collection(getSettings().activeCollection);
+    // Distribute qty across orders (or log full qty per order — use per-order qty)
+    // Each order gets its own record but shares batchGroupId
+    orders.forEach(function(ord){
+      batch.set(col.doc(),Object.assign({},base,{
+        pickDemand:ord,
+        qtyShorted:qty
+      }));
+    });
+    await batch.commit();
+    clearCaches();
+    closeBatchShortModal();
+    var vm=$('viewMode');if(vm)vm.value='active';
+    await loadShortages(true);
+    hideLoading();
+    alert('Batch shortage logged!\n'+product+' short in '+bin+'\nAffecting '+orders.length+' order(s): '+orders.join(', '));
+  }catch(e){
+    hideLoading();
+    showErr('Save failed: '+e.message);
+  }
+}
+
 async function saveShortage(){if(!ensureDb())return;autoDivisionFromDemand();validatePickerInput();// Read picker from hidden field OR from select directly
   const _pickerVal=($('sPicker').value||'').trim()||
     (()=>{var s=$('sPickerSelect');return s&&s.value&&s.value!==''?s.value:'';})();
@@ -2083,6 +2271,8 @@ async function printSummaryReport(){
   const dateRange=fromStr||toStr?fmtD(from)+' \u2014 '+fmtD(to):'All Dates';
   const today=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
   const rows=filteredRows(true);
+  // Grouped view for the detail table — combines batch-order shortages
+  const groupedRows=typeof groupShortages==='function'?groupShortages(rows):rows;
   const total=rows.length;
   const located2nd=rows.filter(r=>r.secondLocationFilled).length;
   const erroneous=rows.filter(r=>r.foundInShortedBin).length;
