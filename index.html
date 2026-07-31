@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Picker Accountability Portal — 815 Chapman</title>
+<title>Inventory Accountability Portal — 815 Chapman</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;700&family=DM+Sans:wght@300;400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700;800&family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -11,7 +11,8 @@
 body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;--border:#d4d9e8;--border2:#bcc4d8;--text:#1a2038;--muted:#5a6480;--subtle:#8892ac;--accent:#2563eb;--green:#059669;--yellow:#d97706;--red:#dc2626;--orange:#ea580c;--purple:#7c3aed;--shadow:0 1px 4px rgba(0,0,0,.1),0 4px 16px rgba(0,0,0,.08)}
 *{box-sizing:border-box;margin:0;padding:0}html,body{margin:0;min-height:100%}body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14px;line-height:1.55}button,input,select,textarea{font-family:var(--sans)}select option{background:var(--panel);color:var(--text)}
 .screen{display:none}.screen.active{display:block}.topbar{display:none;align-items:center;gap:14px;padding:0 20px;height:54px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(0,0,0,.2)}.topbar.show{display:flex}.brand{font-weight:700}.role-chip{font-family:var(--mono);font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.06em;text-transform:uppercase;background:var(--accent-l);color:var(--accent);border:1px solid rgba(79,131,245,.2)}.nav{display:flex;gap:4px;margin-left:auto;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;min-width:0}.nav-btn{font-size:11px;font-weight:700;padding:5px 9px;border-radius:20px;border:1px solid transparent;cursor:pointer;background:none;white-space:nowrap;flex-shrink:0;color:var(--muted);text-decoration:none}.nav-btn:hover,.nav-btn.active{color:#fff;background:var(--accent)}.nav-btn.lock:hover{background:var(--red);color:#fff}
-#loginScreen,#pinScreen{min-height:100vh;display:none;align-items:center;justify-content:center;background:linear-gradient(135deg,#e8edf5 0%,#f0f4fb 50%,#e4eaf4 100%)}#loginScreen.active,#pinScreen.active{display:flex}.login-wrap{max-width:560px;width:100%;padding:22px}.login-header{text-align:center;margin-bottom:26px}.login-header h1{font-size:24px;margin-bottom:4px;color:#1a2038}.login-header p{color:#5a6480}.login-header .credit{font-size:10px;color:#8892ac;margin-top:6px}.login-group-label{font-size:10px;font-family:var(--mono);font-weight:700;color:#5a6480;letter-spacing:.12em;text-transform:uppercase;margin:16px 0 8px}.ic-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}@media(max-width:620px){.ic-btns{grid-template-columns:1fr}}.ic-login-btn{display:flex;flex-direction:column;gap:5px;align-items:center;justify-content:center;padding:18px 12px;background:#ffffff;border:1.5px solid #d4d9e8;border-radius:12px;cursor:pointer;color:#1a2038;box-shadow:0 2px 8px rgba(0,0,0,.08)}.ic-login-btn:hover{border-color:#2563eb;background:#eff4ff;box-shadow:0 4px 16px rgba(37,99,235,.15)}.ib-icon{font-size:24px}.ib-title{font-weight:700;color:#1a2038}.ib-label{display:flex;flex-direction:column;align-items:center;gap:2px}.ib-sub{font-size:11px;color:#5a6480}.pin-card{width:320px;text-align:center;background:var(--panel2);border:1px solid var(--border);border-radius:16px;padding:32px 28px;box-shadow:var(--shadow)}.pin-div-badge{display:inline-flex;padding:8px 16px;border-radius:10px;margin-bottom:14px;font-weight:700;background:var(--accent-l);color:var(--accent)}.pin-dots{display:flex;justify-content:center;gap:12px;margin:18px 0 22px}.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border2)}.pin-dot.filled{background:var(--accent);border-color:var(--accent)}.pin-dot.error{background:var(--red);border-color:var(--red)}.pin-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.pin-key{font-family:var(--mono);font-size:18px;font-weight:700;padding:13px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--text);cursor:pointer}.pin-key:hover,.pin-key.active-press{background:var(--border2)}.pin-error{color:var(--red);font-size:12px;margin-top:12px;min-height:16px}.pin-back-btn{background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;margin-top:12px;text-decoration:underline;width:100%}
+#loginScreen,#pinScreen{min-height:100vh;display:none;align-items:flex-start;justify-content:center;overflow-y:auto;background:linear-gradient(160deg,#0d1f3d 0%,#12294a 45%,#0d1f3d 100%)}#loginScreen.active,#pinScreen.active{display:flex}#pinScreen{align-items:center}.login-wrap{max-width:600px;width:100%;padding:34px 22px 80px}.login-header{text-align:center;margin-bottom:26px}.login-header h1{font-size:24px;margin-bottom:4px;color:#fff}.login-header p{color:#a8bce0}.login-header .credit{font-size:10px;color:rgba(200,215,240,.6);margin-top:6px}.login-group-label{font-size:10px;font-family:var(--mono);font-weight:700;color:#8fa8d0;letter-spacing:.12em;text-transform:uppercase;margin:20px 0 10px}.ic-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}@media(max-width:620px){.ic-btns{grid-template-columns:1fr}}.ic-login-btn{display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;padding:20px 14px;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.12);border-radius:14px;cursor:pointer;color:#fff;transition:all .16s}.ic-login-btn:hover{border-color:var(--accent);background:rgba(255,255,255,.1);transform:translateY(-2px);box-shadow:0 8px 26px rgba(0,0,0,.35)}.ib-icon{font-size:26px}.ib-title{font-weight:700;color:#fff}.ib-label{display:flex;flex-direction:column;align-items:center;gap:2px}.ib-sub{font-size:11px;color:#a8bce0}.login-lang-btn{background:rgba(255,255,255,.08)!important;border-color:rgba(255,255,255,.18)!important;color:#dbe6f7!important}.login-lang-btn:hover{background:rgba(255,255,255,.16)!important;border-color:var(--accent)!important}.login-lang-btn.lang-active{background:var(--accent)!important;border-color:var(--accent)!important;color:#fff!important}.pin-card{width:320px;text-align:center;background:var(--panel2);border:1px solid var(--border);border-radius:16px;padding:32px 28px;box-shadow:var(--shadow)}.pin-div-badge{display:inline-flex;padding:8px 16px;border-radius:10px;margin-bottom:14px;font-weight:700;background:var(--accent-l);color:var(--accent)}.pin-dots{display:flex;justify-content:center;gap:12px;margin:18px 0 22px}.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border2)}.pin-dot.filled{background:var(--accent);border-color:var(--accent)}.pin-dot.error{background:var(--red);border-color:var(--red)}.pin-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.pin-key{font-family:var(--mono);font-size:18px;font-weight:700;padding:13px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--text);cursor:pointer}.pin-key:hover,.pin-key.active-press{background:var(--border2)}.pin-error{color:var(--red);font-size:12px;margin-top:12px;min-height:16px}.pin-back-btn{background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;margin-top:12px;text-decoration:underline;width:100%}
+.app-dev-credit{position:fixed;bottom:6px;right:12px;padding:3px 10px;background:var(--surface);border:1px solid var(--border);border-radius:6px;z-index:900;font-family:var(--mono);font-size:11px;color:var(--muted)}
 .wrap{max-width:1240px;margin:0 auto;padding:24px 20px 70px}.page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}.eyebrow{display:inline-flex;font-family:var(--mono);font-size:10px;font-weight:700;color:var(--green);background:var(--green-l);border:1px solid rgba(16,185,129,.2);border-radius:20px;padding:3px 10px;margin-bottom:8px;letter-spacing:.08em;text-transform:uppercase}h1{font-size:22px}.page-head p{font-size:13px;color:var(--muted)}.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px;box-shadow:var(--shadow)}.card-title{font-size:11px;font-weight:700;font-family:var(--mono);color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:10px}.card-title:after{content:'';flex:1;height:1px;background:var(--border)}.hide{display:none!important}
 .form-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.form-row.two{grid-template-columns:1fr 1fr}.form-row.three{grid-template-columns:1fr 1fr 1fr}.form-row.one{grid-template-columns:1fr}@media(max-width:820px){.form-row,.form-row.two,.form-row.three{grid-template-columns:1fr}}.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}.field label{font-size:12px;font-weight:600}.field label em{color:var(--red);font-style:normal}.field input,.field select,.field textarea{background:var(--panel2);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;padding:9px 12px;width:100%}.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,131,245,.15)}.field textarea{resize:vertical;min-height:90px}.product-line-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:8px}.product-line-grid{display:grid;grid-template-columns:minmax(120px,2fr) 90px minmax(140px,2fr) 42px;gap:10px;align-items:end}@media(max-width:820px){.product-line-grid{grid-template-columns:1fr 1fr;gap:8px}.product-line-grid .bin-col{grid-column:1/-1}}.remove-line-btn{height:38px;width:42px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 14px;border-radius:8px;border:1.5px solid var(--border);background:var(--panel2);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;text-decoration:none}.btn:hover{border-color:var(--accent)}.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}.btn.green{background:var(--green-l);border-color:rgba(16,185,129,.35);color:var(--green)}.btn.red{background:var(--red-l);border-color:rgba(248,113,113,.35);color:var(--red)}.btn.orange{background:var(--orange-l);border-color:rgba(251,146,60,.35);color:var(--orange)}.btn.purple{background:var(--purple-l);border-color:rgba(167,139,250,.35);color:var(--purple)}.actions,.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.filters{margin:12px 0}.filters input,.filters select{background:var(--panel2);border:1.5px solid var(--border);border-radius:8px;color:var(--text);padding:8px 10px;font-size:12px}.filters .search{flex:1;min-width:220px}
@@ -158,7 +159,8 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 </head>
 <body>
-<div id="topbar" class="topbar"><div class="brand">Picker Accountability Portal</div><span id="roleChip" class="role-chip"></span><div id="nav" class="nav"></div><div class="actions" style="margin-left:8px;gap:4px" title="Select Language">
+<div class="app-dev-credit" id="appDevCredit">Developed by Ruben V. Mendoza · 2026 &nbsp;·&nbsp; <span style="opacity:.75">v<span id="dcVer">&mdash;</span> · patch <span id="dcPatch">&mdash;</span></span></div>
+<div id="topbar" class="topbar"><div class="brand">Inventory Accountability Portal</div><span id="roleChip" class="role-chip"></span><div id="nav" class="nav"></div><div class="actions" style="margin-left:8px;gap:4px" title="Select Language">
 <button class="btn" style="font-size:10px;padding:3px 8px" onclick="setLang('en')" id="langEn" title="English">EN</button>
 <button class="btn" style="font-size:10px;padding:3px 8px" onclick="setLang('es')" id="langEs" title="Español">ES</button>
 <button class="btn" style="font-size:10px;padding:3px 8px;font-family:'Noto Naskh Arabic',sans-serif" onclick="setLang('fa')" id="langFa" title="Dari">داری</button>
@@ -169,27 +171,26 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
 
   <!-- Header -->
   <div class="login-header">
-    <div style="font-size:13px;font-weight:700;color:var(--accent,#6366f1);text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px">815 Chapman Warehouse</div>
-    <h1 id="i18n-title" style="color:#1a2038;font-size:28px;font-weight:900;line-height:1.2;margin-bottom:6px">Picker Accountability Portal</h1>
-    <p id="i18n-subtitle" style="color:#5a6480;font-size:14px;font-weight:500">Short Picks &amp; Over Pick Report System</p>
-    <p class="credit" style="margin-top:4px">Built by Ruben Mendoza &mdash; IC Manager &amp; Analytic Developer</p>
+    <div style="font-size:13px;font-weight:700;color:#6ea3f5;text-transform:uppercase;letter-spacing:.12em;margin-bottom:6px">815 Chapman Warehouse</div>
+    <h1 id="i18n-title" style="color:#fff;font-size:28px;font-weight:900;line-height:1.2;margin-bottom:6px">Inventory Accountability Portal</h1>
 
     <!-- Language selector -->
     <div style="margin-top:16px">
-      <div style="font-size:10px;font-weight:700;color:#8892ac;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;text-align:center">Select Language &mdash; اختر اللغة &mdash; Seleccionar Idioma</div>
+      <div style="font-size:10px;font-weight:700;color:#8fa8d0;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;text-align:center">Select Language &mdash; اختر اللغة &mdash; Seleccionar Idioma</div>
       <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap">
-        <button class="btn" style="font-size:11px;padding:5px 12px;background:#fff;border-color:#d4d9e8;color:#1a2038" onclick="setLang('en')" id="loginLangEn"><span style="font-weight:700">EN</span> English</button>
-        <button class="btn" style="font-size:11px;padding:5px 12px;background:#fff;border-color:#d4d9e8;color:#1a2038" onclick="setLang('es')" id="loginLangEs"><span style="font-weight:700">ES</span> Español</button>
-        <button class="btn" style="font-size:11px;padding:5px 12px;background:#fff;border-color:#d4d9e8;color:#1a2038;font-family:'Noto Naskh Arabic',sans-serif" onclick="setLang('fa')" id="loginLangFa"><span style="font-weight:700">داری</span> Dari</button>
-        <button class="btn" style="font-size:11px;padding:5px 12px;background:#fff;border-color:#d4d9e8;color:#1a2038;font-family:'Noto Naskh Arabic',sans-serif" onclick="setLang('ar')" id="loginLangAr"><span style="font-weight:700">عربي</span> Arabic</button>
-        <button class="btn" style="font-size:11px;padding:5px 12px;background:#fff;border-color:#d4d9e8;color:#1a2038" onclick="setLang('fil')" id="loginLangFil"><span style="font-weight:700">FIL</span> Filipino</button>
+        <button class="btn login-lang-btn" style="font-size:11px;padding:5px 12px" onclick="setLang('en')" id="loginLangEn"><span style="font-weight:700">EN</span> English</button>
+        <button class="btn login-lang-btn" style="font-size:11px;padding:5px 12px" onclick="setLang('es')" id="loginLangEs"><span style="font-weight:700">ES</span> Español</button>
+        <button class="btn login-lang-btn" style="font-size:11px;padding:5px 12px;font-family:'Noto Naskh Arabic',sans-serif" onclick="setLang('fa')" id="loginLangFa"><span style="font-weight:700">داری</span> Dari</button>
+        <button class="btn login-lang-btn" style="font-size:11px;padding:5px 12px;font-family:'Noto Naskh Arabic',sans-serif" onclick="setLang('ar')" id="loginLangAr"><span style="font-weight:700">عربي</span> Arabic</button>
+        <button class="btn login-lang-btn" style="font-size:11px;padding:5px 12px" onclick="setLang('fil')" id="loginLangFil"><span style="font-weight:700">FIL</span> Filipino</button>
       </div>
     </div>
   </div>
 
   <!-- Role buttons -->
-  <div class="login-group-label" style="margin-top:4px">Select Role</div>
-  <div class="ic-btns" style="grid-template-columns:repeat(3,1fr)">
+  <!-- Direct entry (no PIN): Outbound Clerk + Packer Reported Over-Pulls -->
+  <div class="login-group-label" style="margin-top:4px">Outbound — No PIN Required</div>
+  <div class="ic-btns" style="grid-template-columns:1fr 1fr">
     <button class="ic-login-btn" onclick="goPin('clerk')">
       <span class="ib-icon">&#128203;</span>
       <span class="ib-label">
@@ -197,15 +198,28 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
         <span class="ib-sub">Shortage Entry</span>
       </span>
     </button>
+    <button class="ic-login-btn" onclick="enterOverPull()"
+      style="border-color:rgba(251,146,60,.4);background:var(--orange-l)">
+      <span class="ib-icon">&#128230;</span>
+      <span class="ib-label">
+        <span class="ib-title" style="color:var(--orange)">Packer Reported Over-Pulls</span>
+        <span class="ib-sub">Log over-pulled items</span>
+      </span>
+    </button>
+  </div>
+
+  <!-- Inventory Control (PIN required) -->
+  <div class="login-group-label" style="margin-top:20px">Inventory Control — PIN Required</div>
+  <div class="ic-btns" style="grid-template-columns:1fr 1fr">
     <button class="ic-login-btn" onclick="goPin('icteam')">
-      <span class="ib-icon">&#128270;</span>
+      <span class="ib-icon">&#128269;</span>
       <span class="ib-label">
         <span class="ib-title">IC Team</span>
         <span class="ib-sub">Verify and Report</span>
       </span>
     </button>
     <button class="ic-login-btn" onclick="goPin('manager')">
-      <span class="ib-icon">&#9881;&#65039;</span>
+      <span class="ib-icon">&#128188;</span>
       <span class="ib-label">
         <span class="ib-title">IC Manager</span>
         <span class="ib-sub">Settings and Migration</span>
@@ -213,30 +227,17 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
     </button>
   </div>
 
-  <!-- No-login access -->
-  <div class="login-group-label" style="margin-top:20px">Direct Access</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-
-    <!-- Over Pull Portal -->
-    <button class="ic-login-btn" onclick="enterOverPull()"
-      style="border-color:rgba(251,146,60,.4);background:var(--orange-l);flex-direction:column;padding:18px 14px;gap:6px">
-      <span style="font-size:28px">&#128666;</span>
-      <span class="ib-label" style="align-items:center;text-align:center">
-        <span class="ib-title" style="color:var(--orange)">Over Pull Portal</span>
-        <span class="ib-sub">Log over-pulled items &mdash; no PIN needed</span>
-      </span>
-    </button>
-
-    <!-- Reports -->
+  <!-- Master Report Module (PIN required) -->
+  <div class="login-group-label" style="margin-top:20px">Reporting — PIN Required</div>
+  <div class="ic-btns" style="grid-template-columns:1fr">
     <button class="ic-login-btn" onclick="enterReportsMode()"
-      style="border-color:rgba(99,102,241,.4);background:rgba(99,102,241,.07);flex-direction:column;padding:18px 14px;gap:6px">
-      <span style="font-size:28px">&#128202;</span>
-      <span class="ib-label" style="align-items:center;text-align:center">
+      style="border-color:rgba(99,102,241,.4);background:rgba(99,102,241,.07)">
+      <span class="ib-icon">&#128202;</span>
+      <span class="ib-label">
         <span class="ib-title" style="color:var(--accent,#6366f1)">Master Report Module</span>
-        <span class="ib-sub">Shortage, Over Pull &amp; Picker KPI &mdash; PIN required</span>
+        <span class="ib-sub">Shortage, Over Pull &amp; Picker KPI</span>
       </span>
     </button>
-
   </div>
 
 </div></section>
@@ -373,7 +374,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
   <div class="page-head">
     <div>
       <div class="eyebrow" style="color:var(--orange);background:var(--orange-l);border-color:rgba(251,146,60,.25)">Operations</div>
-      <h1>Over Pull Log</h1>
+      <h1>Packer Reported Over-Pulls</h1>
       <p>No login required &mdash; log items pulled in excess of the pick demand.</p>
     </div>
     <div class="actions"><button class="btn" onclick="saveTheme(!document.body.classList.contains('light-mode'))" style="font-size:12px">&#9788; Light/Dark</button></div>
@@ -507,6 +508,8 @@ const PINS={clerk:'3366',icteam:'7150',manager:'1988'};
 const REPORT_PIN=1969;
 const ROLE_LABELS={clerk:'Outbound Clerk',icteam:'IC Team',manager:'IC Manager'};
 const IC_PORTAL_URL='https://phocas88.github.io/Chapman_Inventory_Control_Portal/';
+const IAP_VERSION='2.0.0';
+const IAP_PATCH='2026.02.04';
 const DEFAULT_NEW_CONFIG={apiKey:"AIzaSyAbLkTbc0bpzqF5NyTLUi97kP1OnN_EyVw",authDomain:"new-picker-report-database.firebaseapp.com",projectId:"new-picker-report-database",storageBucket:"new-picker-report-database.firebasestorage.app",messagingSenderId:"579793542671",appId:"1:579793542671:web:4d2a75af117b35a6de0d7a"}
 const OLD_CONFIG={apiKey:'AIzaSyA1m5P6MFUojFsEBqLXaSLumNiChgAH1Lw',authDomain:'inventory-control-portal.firebaseapp.com',projectId:'inventory-control-portal',storageBucket:'inventory-control-portal.firebasestorage.app',messagingSenderId:'925547075268',appId:'1:925547075268:web:e6ebce91417aa6885a1b91'};
 const DEFAULT_SETTINGS={firebaseConfig:DEFAULT_NEW_CONFIG,activeCollection:'shortages_active',archiveCollection:'shortages_archive',overpullCollection:'overpull_active',overpullArchiveCollection:'overpull_archive'};
@@ -3194,7 +3197,7 @@ function enterOverPull(){if(role==='icteam'){alert('Over Pull access is not avai
     $('topbar').classList.add('show');
     $('roleChip').textContent='Operations';
     $('roleChip').className='role-chip';
-    $('nav').innerHTML=`<button class="nav-btn" onclick="enterOverPull()">Over Pull Portal</button>`
+    $('nav').innerHTML=`<button class="nav-btn" onclick="enterOverPull()">Packer Reported Over-Pulls</button>`
       +`<button class="nav-btn lock" onclick="location.reload()">Exit</button>`;
   }
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -4467,12 +4470,12 @@ let currentLang='en';
 
 const LANGS={
   en:{dir:'ltr',
-    'login.title':'Picker Accountability Portal','login.subtitle':'Short Picks &amp; Over Pick Report System — 815 Chapman',
+    'login.title':'Inventory Accountability Portal','login.subtitle':'Short Picks &amp; Over Pick Report System — 815 Chapman',
     'login.select_role':'Select role',
     'login.clerk_title':'Outbound Clerk','login.clerk_sub':'Shortage Entry',
     'login.ic_title':'IC Team','login.ic_sub':'Verify and Report',
     'login.manager_title':'IC Manager','login.manager_sub':'Settings and Migration',
-    'login.no_login':'No Login Required','login.batch_btn':'Master Report Module','login.batch_sub':'Picker KPI & analytics reports','login.op_btn':'Over Pull Portal','login.op_sub':'Log over-pulled items',
+    'login.no_login':'No Login Required','login.batch_btn':'Master Report Module','login.batch_sub':'Picker KPI & analytics reports','login.op_btn':'Packer Reported Over-Pulls','login.op_sub':'Log over-pulled items',
     'login.shortage_portal':'Over Pull Portal','login.shortage_portal_sub':'Opens the standalone shortage app (new tab)',
     'login.enter_pin':'Enter PIN','login.back':'Back',
     'form.date_time':'Date & Time','form.division':'Division','form.picker':'Picker',
@@ -4518,7 +4521,7 @@ const LANGS={
     'form.duplicate_order':'Report: Order Picked Twice','dup.modal_title':'⚠ Report: Order Picked Twice / Duplicate Pick','dup.modal_btn':'⚠ Report Duplicate Pick — Entire Order Picked Twice','dup.what_does':'What this does:','dup.what_desc':'Flags an entire order as having been picked twice (over-pulled). No product lines needed — the whole order must be returned and investigated. This creates a Duplicate Pick record for IC and management review.','dup.picker_involved':'Picker Involved','dup.notes_label':'Notes / Details','dup.notes_ph':'Describe what happened — where was the duplicate pick found, who reported it, what action was taken...','dup.submit':'⚠ Submit Duplicate Pick Report','dup.cancel':'Cancel','dup.alert':'Duplicate pick report filed for order {0}.\nIC team and management have been flagged for investigation.',
   },
   es:{dir:'ltr',
-    'login.title':'Portal de Control de Escasez','login.subtitle':'Aplicación separada de informes de escasez',
+    'login.title':'Portal de Responsabilidad de Inventario','login.subtitle':'Aplicación separada de informes de escasez',
     'login.select_role':'Seleccionar rol',
     'login.clerk_title':'Empleado de Salida','login.clerk_sub':'Entrada de Escasez',
     'login.ic_title':'Equipo IC','login.ic_sub':'Verificar e Informar',
@@ -4570,7 +4573,7 @@ const LANGS={
     'form.duplicate_order':'Reporte: Orden Doble','dup.modal_title':'⚠ Reporte: Orden Recogida Dos Veces','dup.modal_btn':'⚠ Reportar Recogida Duplicada — Orden Completa Recogida Dos Veces','dup.what_does':'¿Qué hace esto?','dup.what_desc':'Marca una orden completa como recogida dos veces (exceso). No se necesitan líneas de producto — toda la orden debe devolverse e investigarse. Crea un registro de Recogida Duplicada para revisión.','dup.picker_involved':'Recolector Involucrado','dup.notes_label':'Notas / Detalles','dup.notes_ph':'Describa qué pasó — dónde se encontró, quién lo reportó, qué acción se tomó...','dup.submit':'⚠ Enviar Reporte de Recogida Duplicada','dup.cancel':'Cancelar','dup.alert':'Reporte de recogida duplicada para orden {0}.\nEl equipo IC y la gerencia han sido notificados para investigación.',
   },
   fa:{dir:'rtl',
-    'login.title':'پورتل کنترل کمبود','login.subtitle':'برنامه جداگانه گزارش کمبود',
+    'login.title':'پورتل مسئولیت موجودی','login.subtitle':'برنامه جداگانه گزارش کمبود',
     'login.select_role':'نقش را انتخاب کنید',
     'login.clerk_title':'کارمند خروجی','login.clerk_sub':'ورود کمبود',
     'login.ic_title':'تیم IC','login.ic_sub':'تأیید و گزارش',
@@ -4622,12 +4625,12 @@ const LANGS={
     'form.duplicate_order':'گزارش: سفارش دو بار برداشته شد','dup.modal_title':'⚠ گزارش: سفارش دو بار جمع‌آوری شد','dup.modal_btn':'⚠ گزارش برداشت تکراری — کل سفارش دو بار برداشته شد','dup.what_does':'این چه می‌کند:','dup.what_desc':'یک سفارش کامل را به عنوان دو بار جمع‌آوری شده (مازاد) علامت می‌زند. نیازی به خطوط محصول نیست — کل سفارش باید بازگشت داده شود و بررسی شود. این یک رکورد برداشت تکراری برای بررسی IC ایجاد می‌کند.','dup.picker_involved':'جمع‌آورنده مربوطه','dup.notes_label':'یادداشت‌ها / جزئیات','dup.notes_ph':'توضیح دهید چه اتفاقی افتاد — کجا پیدا شد، چه کسی گزارش داد، چه اقدامی انجام شد...','dup.submit':'⚠ ارسال گزارش برداشت تکراری','dup.cancel':'لغو','dup.alert':'گزارش برداشت تکراری برای سفارش {0} ثبت شد.\nتیم IC و مدیریت برای بررسی مطلع شدند.',
   },
   fil:{dir:'ltr',
-    'login.title':'Portal ng Kontrol sa Kakulangan','login.subtitle':'Hiwalay na app para sa pag-uulat ng kakulangan',
+    'login.title':'Portal ng Pananagutan sa Imbentaryo','login.subtitle':'Hiwalay na app para sa pag-uulat ng kakulangan',
     'login.select_role':'Pumili ng papel',
     'login.clerk_title':'Outbound Clerk','login.clerk_sub':'Pagpasok ng Kakulangan',
     'login.ic_title':'Koponan ng IC','login.ic_sub':'I-verify at Mag-ulat',
     'login.manager_title':'IC Manager','login.manager_sub':'Mga Setting at Paglipat',
-    'login.no_login':'Walang Login','login.batch_btn':'Master Report Module','login.batch_sub':'Isang item, maraming orders','login.op_btn':'Over Pull Portal','login.op_sub':'I-log ang mga item na sobra',
+    'login.no_login':'Walang Login','login.batch_btn':'Master Report Module','login.batch_sub':'Isang item, maraming orders','login.op_btn':'Packer Reported Over-Pulls','login.op_sub':'I-log ang mga item na sobra',
     'login.shortage_portal':'Portal ng Kakulangan at Sobra','login.shortage_portal_sub':'Binubuksan ang standalone app (bagong tab)',
     'login.enter_pin':'Ilagay ang PIN','login.back':'Bumalik',
     'form.date_time':'Petsa at Oras','form.division':'Dibisyon','form.picker':'Tagapulot',
@@ -4674,7 +4677,7 @@ const LANGS={
     'form.duplicate_order':'Report: Dalawang Beses na na-pick','dup.modal_title':'⚠ Report: Dalawang Beses na Na-pick ang Order','dup.modal_btn':'⚠ Mag-ulat ng Duplicate Pick — Buong Order na Na-pick ng Dalawang Beses','dup.what_does':'Ano ang gagawin nito:','dup.what_desc':'Magtatanda ng buong order bilang na-pick ng dalawang beses (sobrang kinuha). Hindi na kailangan ng mga linya ng produkto — ang buong order ay dapat ibalik at imbestigahan. Gumagawa ito ng Duplicate Pick record para sa IC at management review.','dup.picker_involved':'Tagapulot na Kasangkot','dup.notes_label':'Mga Tala / Detalye','dup.notes_ph':'Ilarawan kung ano ang nangyari — saan natagpuan ang duplicate pick, sino ang nag-ulat, anong aksyon ang ginawa...','dup.submit':'⚠ Isumite ang Duplicate Pick Report','dup.cancel':'Kanselahin','dup.alert':'Na-file ang duplicate pick report para sa order na {0}.\nNaabisuhan ang IC team at management para sa imbestigasyon.',
   },
   ar:{dir:'rtl',
-    'login.title':'بوابة التحكم في النقص','login.subtitle':'تطبيق منفصل للإبلاغ عن النقص',
+    'login.title':'بوابة مساءلة المخزون','login.subtitle':'تطبيق منفصل للإبلاغ عن النقص',
     'login.select_role':'اختر الدور',
     'login.clerk_title':'موظف الشحن','login.clerk_sub':'إدخال النقص',
     'login.ic_title':'فريق IC','login.ic_sub':'التحقق والتقرير',
@@ -4751,11 +4754,13 @@ function setLang(lang){
   // Update page title
   const ti=$('i18n-title');if(ti)ti.textContent=t('login.title');
   const su=$('i18n-subtitle');if(su)su.textContent=t('login.subtitle');
-  // Highlight active lang button
+  // Highlight active lang button (topbar + login)
   ['en','es','fa','ar','fil'].forEach(l=>{
     const btn=$('lang'+l.charAt(0).toUpperCase()+l.slice(1));
     if(btn)btn.style.borderColor=l===lang?'var(--accent)':'var(--border)';
     if(btn)btn.style.color=l===lang?'var(--accent)':'var(--muted)';
+    const lbtn=$('loginLang'+l.charAt(0).toUpperCase()+l.slice(1));
+    if(lbtn)lbtn.classList.toggle('lang-active',l===lang);
   });
   // Dynamically update key labels and placeholders in the current active screen
   applyLangToForms();
@@ -5352,7 +5357,7 @@ document.addEventListener('input',function(e){
   }
 });
 
-function startup(){applyTheme();initFirebase();$('sDate').value=nowLocalInput();loadAllPersonnel();populatePickerSelects();populateStationSelects();if($('productLines'))addProductLine();const sl=localStorage.getItem('scp_lang')||'en';setLang(sl);startResetListener();}
+function startup(){applyTheme();initFirebase();$('sDate').value=nowLocalInput();loadAllPersonnel();populatePickerSelects();populateStationSelects();if($('productLines'))addProductLine();const sl=localStorage.getItem('scp_lang')||'en';setLang(sl);startResetListener();const dv=$('dcVer');if(dv)dv.textContent=IAP_VERSION;const dp=$('dcPatch');if(dp)dp.textContent=IAP_PATCH;}
 function seedPresetsIfNeeded(){
   var changed=false;
   Object.keys(PICKER_PROFILE_DEFAULTS).forEach(function(name){
