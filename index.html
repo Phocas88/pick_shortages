@@ -191,14 +191,14 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
   <!-- Direct entry (no PIN): Outbound Clerk + Packer Reported Over-Pulls -->
   <div class="login-group-label" style="margin-top:4px">Outbound — No PIN Required</div>
   <div class="ic-btns" style="grid-template-columns:1fr 1fr">
-    <button class="ic-login-btn" onclick="goPin('clerk')">
+    <button class="ic-login-btn" data-loginkey="clerk" onclick="goPin('clerk')">
       <span class="ib-icon">&#128203;</span>
       <span class="ib-label">
         <span class="ib-title">Outbound Clerk</span>
         <span class="ib-sub">Shortage Entry</span>
       </span>
     </button>
-    <button class="ic-login-btn" onclick="enterOverPull()"
+    <button class="ic-login-btn" data-loginkey="overpull" onclick="enterOverPull()"
       style="border-color:rgba(251,146,60,.4);background:var(--orange-l)">
       <span class="ib-icon">&#128230;</span>
       <span class="ib-label">
@@ -211,14 +211,14 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
   <!-- Inventory Control (PIN required) -->
   <div class="login-group-label" style="margin-top:20px">Inventory Control — PIN Required</div>
   <div class="ic-btns" style="grid-template-columns:1fr 1fr">
-    <button class="ic-login-btn" onclick="goPin('icteam')">
+    <button class="ic-login-btn" data-loginkey="icteam" onclick="goPin('icteam')">
       <span class="ib-icon">&#128269;</span>
       <span class="ib-label">
         <span class="ib-title">IC Team</span>
         <span class="ib-sub">Verify and Report</span>
       </span>
     </button>
-    <button class="ic-login-btn" onclick="goPin('manager')">
+    <button class="ic-login-btn" data-loginkey="manager" onclick="goPin('manager')">
       <span class="ib-icon">&#128188;</span>
       <span class="ib-label">
         <span class="ib-title">IC Manager</span>
@@ -230,7 +230,7 @@ body.light-mode{--bg:#f0f2f7;--surface:#ffffff;--panel:#f8f9fc;--panel2:#eef0f6;
   <!-- Master Report Module (PIN required) -->
   <div class="login-group-label" style="margin-top:20px">Reporting — PIN Required</div>
   <div class="ic-btns" style="grid-template-columns:1fr">
-    <button class="ic-login-btn" onclick="enterReportsMode()"
+    <button class="ic-login-btn" data-loginkey="reports" onclick="enterReportsMode()"
       style="border-color:rgba(99,102,241,.4);background:rgba(99,102,241,.07)">
       <span class="ib-icon">&#128202;</span>
       <span class="ib-label">
@@ -4863,28 +4863,19 @@ function applyLangToForms(){
   if(selectRoleLbl)selectRoleLbl.textContent=t('login.select_role');
   const noLoginLbl=document.querySelectorAll('.login-group-label')[1];
   if(noLoginLbl)noLoginLbl.textContent=t('login.no_login');
-  // Login role buttons
-  const icBtns=document.querySelectorAll('.ic-login-btn');
-  if(icBtns[0]){
-    const t1=icBtns[0].querySelector('.ib-title');const s1=icBtns[0].querySelector('.ib-sub');
-    if(t1)t1.textContent=t('login.clerk_title');if(s1)s1.textContent=t('login.clerk_sub');
+  // Login role buttons — target by stable data-loginkey so order can never mismatch
+  function setLoginBtn(key,titleKey,subKey,subFallback){
+    const btn=document.querySelector('.ic-login-btn[data-loginkey="'+key+'"]');
+    if(!btn)return;
+    const tt=btn.querySelector('.ib-title');const ss=btn.querySelector('.ib-sub');
+    if(tt){const v=t(titleKey);if(v&&v!==titleKey)tt.textContent=v;}
+    if(ss){const v=t(subKey);ss.textContent=(v&&v!==subKey)?v:(subFallback||ss.textContent);}
   }
-  if(icBtns[1]){
-    const t2=icBtns[1].querySelector('.ib-title');const s2=icBtns[1].querySelector('.ib-sub');
-    if(t2)t2.textContent=t('login.ic_title');if(s2)s2.textContent=t('login.ic_sub');
-  }
-  if(icBtns[2]){
-    const t3=icBtns[2].querySelector('.ib-title');const s3=icBtns[2].querySelector('.ib-sub');
-    if(t3)t3.textContent=t('login.manager_title');if(s3)s3.textContent=t('login.manager_sub');
-  }
-  if(icBtns[3]){
-    const t4=icBtns[3].querySelector('.ib-title');const s4=icBtns[3].querySelector('.ib-sub');
-    if(t4)t4.textContent=t('login.op_btn')||t('login.shortage_portal');if(s4)s4.textContent=t('login.op_sub')||t('login.shortage_portal_sub');
-  }
-  if(icBtns[4]){
-    const t5=icBtns[4].querySelector('.ib-title');const s5=icBtns[4].querySelector('.ib-sub');
-    if(t5)t5.textContent=t('login.batch_btn')||'Batch Pick Sheet';if(s5)s5.textContent=t('login.batch_sub')||'One item, multiple orders';
-  }
+  setLoginBtn('clerk','login.clerk_title','login.clerk_sub');
+  setLoginBtn('icteam','login.ic_title','login.ic_sub');
+  setLoginBtn('manager','login.manager_title','login.manager_sub');
+  setLoginBtn('overpull','login.op_btn','login.op_sub');
+  setLoginBtn('reports','login.batch_btn','login.batch_sub');
 
   // PIN screen back button
   const backBtn=$('pinScreen')?.querySelector('.pin-back-btn');
